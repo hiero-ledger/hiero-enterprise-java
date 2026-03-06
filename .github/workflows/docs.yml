@@ -24,7 +24,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   deploy-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -100,7 +99,7 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const url = `https://openelements.github.io/hiero-enterprise-java/pr/${{ github.event.pull_request.number }}/`;
+            const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${{ github.event.pull_request.number }}/`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
