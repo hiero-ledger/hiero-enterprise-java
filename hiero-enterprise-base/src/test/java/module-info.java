@@ -1,3 +1,6 @@
+import org.hiero.base.config.NetworkSettingsProvider;
+import org.hiero.base.test.config.SoloActionNetworkSettingsProvider;
+
 open module com.openelements.hiero.base.test {
   requires com.openelements.hiero.base;
   requires io.github.cdimascio.dotenv.java;
@@ -7,6 +10,6 @@ open module com.openelements.hiero.base.test {
   requires org.mockito;
   requires org.slf4j;
 
-  provides com.openelements.hiero.base.config.NetworkSettingsProvider with
-      com.openelements.hiero.base.test.config.SoloActionNetworkSettingsProvider;
+  provides NetworkSettingsProvider with
+          SoloActionNetworkSettingsProvider;
 }

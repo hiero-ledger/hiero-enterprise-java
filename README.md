@@ -124,22 +124,22 @@ A sample project can be found at https://github.com/hendrikebbers/quarkus-hiero-
 The module provides a set of managed services that can be used to interact with a Hiero network.
 The following services are available in spring and microprofile:
 
-- `com.openelements.hiero.base.HieroContext`: component that provides the information about the Hiero network and the operator account
-- `com.openelements.hiero.base.AccountClient`: to interact with accounts
-- `com.openelements.hiero.base.FileClient`: to interact with files
-- `com.openelements.hiero.base.FungibleTokenClient`: to interact with fungible tokens
-- `com.openelements.hiero.base.NftClient`: to interact with NFTs
-- `com.openelements.hiero.base.SmartContractClient`: to interact with smart contracts
+- `base.org.hiero.HieroContext`: component that provides the information about the Hiero network and the operator account
+- `base.org.hiero.AccountClient`: to interact with accounts
+- `base.org.hiero.FileClient`: to interact with files
+- `base.org.hiero.FungibleTokenClient`: to interact with fungible tokens
+- `base.org.hiero.NftClient`: to interact with NFTs
+- `base.org.hiero.SmartContractClient`: to interact with smart contracts
 - `com.openelements.hiero.base.verifcation.ContractVerificationClient`: to verify smart contracts
-- `com.openelements.hiero.base.mirrornode.AccountRepository`: to query accounts
-- `com.openelements.hiero.base.mirrornode.NetworkRepository`: to query network information
-- `com.openelements.hiero.base.mirrornode.NftRepository`: to query NFTs
-- `com.openelements.hiero.base.mirrornode.TransactionRepository`: to query transaction information
+- `mirrornode.base.org.hiero.AccountRepository`: to query accounts
+- `mirrornode.base.org.hiero.NetworkRepository`: to query network information
+- `mirrornode.base.org.hiero.NftRepository`: to query NFTs
+- `mirrornode.base.org.hiero.TransactionRepository`: to query transaction information
 
 Next to that the following low-level services are available:
 
-- `com.openelements.hiero.base.protocol.ProtocolLayerClient`: to interact with the Hiero protocol layer
-- `com.openelements.hiero.base.mirrornode.MirrorNodeClient`: to query the Hiero mirror node 
+- `protocol.base.org.hiero.ProtocolLayerClient`: to interact with the Hiero protocol layer
+- `mirrornode.base.org.hiero.MirrorNodeClient`: to query the Hiero mirror node 
 
 ## Built the project
 

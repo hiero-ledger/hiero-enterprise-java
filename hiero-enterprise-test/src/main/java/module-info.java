@@ -1,8 +1,11 @@
-open module com.openelements.hiero.test {
-  exports com.openelements.hiero.test;
+import org.hiero.base.config.NetworkSettingsProvider;
+import org.hiero.test.implementation.SoloActionNetworkSettingsProvider;
 
-  provides com.openelements.hiero.base.config.NetworkSettingsProvider with
-      com.openelements.hiero.test.implementation.SoloActionNetworkSettingsProvider;
+open module com.openelements.hiero.test {
+  exports org.hiero.test;
+
+  provides NetworkSettingsProvider with
+          SoloActionNetworkSettingsProvider;
 
   requires transitive com.openelements.hiero.base;
   requires org.jspecify;
