@@ -1,6 +1,6 @@
 # Contributing to the docs
 
-This folder contains the source for the [Hiero Enterprise Java technical documentation](https://openelements.github.io/hiero-enterprise-java/) (GitHub Pages).
+This folder contains the source for the [Hiero Enterprise Java technical documentation](https://hiero-ledger.github.io/hiero-enterprise-java/) (GitHub Pages).
 
 ## Structure
 

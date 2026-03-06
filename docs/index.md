@@ -14,5 +14,5 @@ Hiero Enterprise Java provides Java modules to interact with a [Hiero network](h
 
 ## Links
 
-- [GitHub repository](https://github.com/OpenElements/hiero-enterprise-java)
-- [README / user guide](https://github.com/OpenElements/hiero-enterprise-java#readme)
+- [GitHub repository](https://github.com/hiero-ledger/hiero-enterprise-java)
+- [README / user guide](https://github.com/hiero-ledger/hiero-enterprise-java#readme)
