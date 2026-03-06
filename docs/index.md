@@ -9,7 +9,6 @@ This site contains:
 - **[Spring Boot](spring-boot.md)** — Spring Boot integration and usage.
 - **[MicroProfile](microprofile.md)** — MicroProfile / Quarkus integration and usage.
 - **[Base / Managed services](managed-services.md)** — Core clients and services (AccountClient, FileClient, etc.).
-- **[Architecture Decision Records (ADRs)](adr/index.md)** — Design decisions and their context.
 
 Hiero Enterprise Java provides Java modules to interact with a [Hiero network](https://hiero.org) in Spring Boot or Eclipse MicroProfile (e.g. Quarkus) applications.
 

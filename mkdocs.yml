@@ -47,6 +47,4 @@ nav:
   - Spring Boot: spring-boot.md
   - MicroProfile: microprofile.md
   - Base / Managed services: managed-services.md
-  - ADRs:
-    - adr/index.md
   - Contributing to the docs: contributing.md

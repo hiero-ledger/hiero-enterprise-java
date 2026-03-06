@@ -206,7 +206,7 @@ The execution will release the current code under version 0.1.0 and later switch
 
 ## Documentation
 
-Technical documentation (getting started, architecture, Spring/MicroProfile, managed services, ADRs) is in the **[docs](docs/)** folder and is published as [GitHub Pages](https://openelements.github.io/hiero-enterprise-java/). Pull requests that change the docs get a preview at `…/pr/<number>/`. Set **Settings → Pages → Deploy from a branch** → branch: `gh-pages`, folder: `/ (root)`.
+Technical documentation (getting started, architecture, Spring/MicroProfile, managed services, ADRs) is in the **[docs](docs/)** folder and is published as [GitHub Pages](https://hiero-ledger.github.io/hiero-enterprise-java/). Pull requests that change the docs get a preview at `…/pr/<number>/`. Set **Settings → Pages → Deploy from a branch** → branch: `gh-pages`, folder: `/ (root)`.
 
 ## License
 
