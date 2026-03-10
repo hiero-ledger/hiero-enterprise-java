@@ -4,6 +4,7 @@ module com.openelements.hiero.base {
   exports com.openelements.hiero.base.mirrornode;
   exports com.openelements.hiero.base.verification;
   exports com.openelements.hiero.base.data;
+  exports com.openelements.hiero.base.solidity;
   exports com.openelements.hiero.base.config;
   exports com.openelements.hiero.base.implementation to
       com.openelements.hiero.base.test;
@@ -24,4 +25,7 @@ module com.openelements.hiero.base {
   requires com.google.protobuf; // TODO: We should not have the need to use it
   requires static org.jspecify;
   requires com.google.auto.service;
+  requires com.openelements.hiero.smartcontract.abi;
+  requires abi;
+  requires org.bouncycastle.provider;
 }
