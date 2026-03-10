@@ -16,6 +16,11 @@ To use this module, you need to add the following dependency to your project:
 </dependency>
 ```
 
+> [!NOTE]
+> We are currently working on migrating the project to the Hiero namespace.
+> The `groupId`, package names and Java module names will be changed with that in near future.
+
+
 ### Configuration
 
 To configure the module, you need to add the following properties to your application.properties file:
@@ -124,26 +129,28 @@ A sample project can be found at https://github.com/hendrikebbers/quarkus-hiero-
 The module provides a set of managed services that can be used to interact with a Hiero network.
 The following services are available in spring and microprofile:
 
-- `base.org.hiero.HieroContext`: component that provides the information about the Hiero network and the operator account
-- `base.org.hiero.AccountClient`: to interact with accounts
-- `base.org.hiero.FileClient`: to interact with files
-- `base.org.hiero.FungibleTokenClient`: to interact with fungible tokens
-- `base.org.hiero.NftClient`: to interact with NFTs
-- `base.org.hiero.SmartContractClient`: to interact with smart contracts
+- `org.hiero.base.HieroContext`: component that provides the information about the Hiero network and the operator account
+- `org.hiero.base.AccountClient`: to interact with accounts
+- `org.hiero.base.FileClient`: to interact with files
+- `org.hiero.base.FungibleTokenClient`: to interact with fungible tokens
+- `org.hiero.base.NftClient`: to interact with NFTs
+- `org.hiero.base.SmartContractClient`: to interact with smart contracts
 - `org.hiero.base.verifcation.ContractVerificationClient`: to verify smart contracts
-- `mirrornode.base.org.hiero.AccountRepository`: to query accounts
-- `mirrornode.base.org.hiero.NetworkRepository`: to query network information
-- `mirrornode.base.org.hiero.NftRepository`: to query NFTs
-- `mirrornode.base.org.hiero.TransactionRepository`: to query transaction information
+- `base.org.hiero.mirrornode.AccountRepository`: to query accounts
+- `base.org.hiero.mirrornode.NetworkRepository`: to query network information
+- `base.org.hiero.mirrornode.NftRepository`: to query NFTs
+- `base.org.hiero.mirrornode.TransactionRepository`: to query transaction information
 
 Next to that the following low-level services are available:
 
-- `protocol.base.org.hiero.ProtocolLayerClient`: to interact with the Hiero protocol layer
-- `mirrornode.base.org.hiero.MirrorNodeClient`: to query the Hiero mirror node 
+- `base.org.hiero.protocol.ProtocolLayerClient`: to interact with the Hiero protocol layer
+- `base.org.hiero.mirrornode.MirrorNodeClient`: to query the Hiero mirror node 
 
 ## Built the project
 
 The project is based on [Maven](https://maven.apache.org/).
+The Maven wrapper is used to build the project.
+Therefore you do not need to install Maven on your machine.
 To build the project, you can use the following command:
 
 ```shell
@@ -178,7 +185,8 @@ Currently there is no running release process and we work on setting uop everyth
 
 ## Documentation
 
-Technical documentation (getting started, architecture, Spring/MicroProfile, managed services, ADRs) is in the **[docs](docs/)** folder and is published as [GitHub Pages](https://hiero-ledger.github.io/hiero-enterprise-java/). Pull requests that change the docs get a preview at `…/pr/<number>/`.
+Technical documentation (getting started, architecture, Spring/MicroProfile, managed services, ADRs) is in the **[docs](docs/)** folder and is published as [GitHub Pages](https://hiero-ledger.github.io/hiero-enterprise-java/).
+Pull requests that change the docs get a preview at `…/pr/<number>/`.
 
 ## License
 
