@@ -1,12 +1,13 @@
 /* Navbar/header primary color */
 :root {
-  --md-primary-fg-color: #67c2a7;
-  --md-primary-fg-color--light: #67c2a7;
-  --md-primary-fg-color--dark: #5ab395;
+  --md-primary-fg-color: #b91b56;
+  --md-primary-fg-color--light: #b91b56;
+  --md-primary-fg-color--dark: #8f1543;
 }
 
+
 [data-md-color-scheme="slate"] {
-  --md-primary-fg-color: #67c2a7;
-  --md-primary-fg-color--light: #67c2a794;
-  --md-primary-fg-color--dark: #5ab395;
+  --md-primary-fg-color: #b91b56;
+  --md-primary-fg-color--light: #b91b564;
+  --md-primary-fg-color--dark: #8f1543;
 }
