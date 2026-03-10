@@ -6,7 +6,7 @@ import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
-import com.openelements.hiero.base.protocol.data.*;
+import org.hiero.base.protocol.data.*;
 import java.util.Objects;
 
 import org.hiero.base.protocol.data.*;

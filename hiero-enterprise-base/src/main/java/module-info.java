@@ -1,7 +1,7 @@
 import org.hiero.base.config.NetworkSettingsProvider;
 import org.hiero.base.config.hedera.HederaNetworkSettingsProvider;
 
-module com.openelements.hiero.base {
+module org.hiero.base {
   exports org.hiero.base;
   exports org.hiero.base.protocol;
   exports org.hiero.base.mirrornode;
@@ -9,13 +9,13 @@ module com.openelements.hiero.base {
   exports org.hiero.base.data;
   exports org.hiero.base.config;
   exports org.hiero.base.implementation to
-      com.openelements.hiero.base.test;
+      org.hiero.base.test;
   exports org.hiero.base.implementation.data to
-      com.openelements.hiero.base.test;
+      org.hiero.base.test;
   exports org.hiero.base.config.implementation;
   exports org.hiero.base.protocol.data;
   exports org.hiero.base.interceptors to
-      com.openelements.hiero.base.test;
+      org.hiero.base.test;
 
   uses NetworkSettingsProvider;
 

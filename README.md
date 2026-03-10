@@ -130,7 +130,7 @@ The following services are available in spring and microprofile:
 - `base.org.hiero.FungibleTokenClient`: to interact with fungible tokens
 - `base.org.hiero.NftClient`: to interact with NFTs
 - `base.org.hiero.SmartContractClient`: to interact with smart contracts
-- `com.openelements.hiero.base.verifcation.ContractVerificationClient`: to verify smart contracts
+- `org.hiero.base.verifcation.ContractVerificationClient`: to verify smart contracts
 - `mirrornode.base.org.hiero.AccountRepository`: to query accounts
 - `mirrornode.base.org.hiero.NetworkRepository`: to query network information
 - `mirrornode.base.org.hiero.NftRepository`: to query NFTs
