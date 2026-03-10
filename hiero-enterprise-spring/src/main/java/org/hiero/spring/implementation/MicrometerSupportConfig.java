@@ -2,13 +2,13 @@ package org.hiero.spring.implementation;
 
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.TransactionRecord;
-import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.HashSet;
 import java.util.Set;
+import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

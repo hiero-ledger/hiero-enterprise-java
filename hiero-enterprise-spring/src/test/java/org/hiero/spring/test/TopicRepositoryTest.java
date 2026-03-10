@@ -1,6 +1,7 @@
 package org.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.TopicId;
+import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Page;
@@ -8,7 +9,6 @@ import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.test.HieroTestUtils;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

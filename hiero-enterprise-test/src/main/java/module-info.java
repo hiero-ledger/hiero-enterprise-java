@@ -5,7 +5,7 @@ open module org.hiero.test {
   exports org.hiero.test;
 
   provides NetworkSettingsProvider with
-          SoloActionNetworkSettingsProvider;
+      SoloActionNetworkSettingsProvider;
 
   requires transitive org.hiero.base;
   requires org.jspecify;

@@ -1,14 +1,14 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.TopicId;
+import java.util.Objects;
+import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.TopicRepository;
-import java.util.Objects;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 public class TopicRepositoryImpl implements TopicRepository {

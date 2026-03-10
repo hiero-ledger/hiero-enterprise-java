@@ -1,6 +1,5 @@
 package org.hiero.microprofile.implementation;
 
-import org.hiero.base.data.Page;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -11,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import org.hiero.base.data.Page;
 import org.jspecify.annotations.NonNull;
 
 public class RestBasedPage<T> implements Page<T> {

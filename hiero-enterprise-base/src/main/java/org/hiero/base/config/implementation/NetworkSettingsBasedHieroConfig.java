@@ -1,12 +1,12 @@
 package org.hiero.base.config.implementation;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import org.hiero.base.config.ConsensusNode;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.config.NetworkSettings;
 import org.hiero.base.data.Account;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import org.jspecify.annotations.NonNull;
 
 public class NetworkSettingsBasedHieroConfig implements HieroConfig {

@@ -2,8 +2,8 @@ package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
-import org.hiero.base.data.Account;
 import java.util.Objects;
+import org.hiero.base.data.Account;
 import org.jspecify.annotations.NonNull;
 
 /**

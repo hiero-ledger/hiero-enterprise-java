@@ -1,9 +1,9 @@
 package org.hiero.base.config.hedera;
 
 import com.google.auto.service.AutoService;
+import java.util.Set;
 import org.hiero.base.config.NetworkSettings;
 import org.hiero.base.config.NetworkSettingsProvider;
-import java.util.Set;
 
 /** Provides network settings for the Hedera networks. */
 @AutoService(NetworkSettingsProvider.class)

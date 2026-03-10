@@ -1,12 +1,12 @@
 package org.hiero.microprofile.sample;
 
-import org.hiero.base.AccountClient;
-import org.hiero.base.data.Account;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.hiero.base.AccountClient;
+import org.hiero.base.data.Account;
 
 @Path("/")
 public class HieroEndpoint {

@@ -1,5 +1,7 @@
 package org.hiero.base.implementation;
 
+import java.util.List;
+import java.util.Optional;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.Contract;
@@ -14,8 +16,6 @@ import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
-import java.util.List;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 public interface MirrorNodeJsonConverter<JSON> {

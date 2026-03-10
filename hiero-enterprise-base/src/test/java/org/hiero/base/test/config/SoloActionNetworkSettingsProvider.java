@@ -1,8 +1,8 @@
 package org.hiero.base.test.config;
 
+import java.util.Set;
 import org.hiero.base.config.NetworkSettings;
 import org.hiero.base.config.NetworkSettingsProvider;
-import java.util.Set;
 
 public class SoloActionNetworkSettingsProvider implements NetworkSettingsProvider {
 

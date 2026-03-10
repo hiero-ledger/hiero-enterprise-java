@@ -1,5 +1,9 @@
 package org.hiero.microprofile;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.hiero.base.AccountClient;
 import org.hiero.base.FileClient;
 import org.hiero.base.FungibleTokenClient;
@@ -33,10 +37,6 @@ import org.hiero.microprofile.implementation.HieroConfigImpl;
 import org.hiero.microprofile.implementation.MirrorNodeClientImpl;
 import org.hiero.microprofile.implementation.MirrorNodeJsonConverterImpl;
 import org.hiero.microprofile.implementation.MirrorNodeRestClientImpl;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.jspecify.annotations.NonNull;
 
 public class ClientProvider {

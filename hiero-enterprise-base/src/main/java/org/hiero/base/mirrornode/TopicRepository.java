@@ -1,12 +1,12 @@
 package org.hiero.base.mirrornode;
 
 import com.hedera.hashgraph.sdk.TopicId;
+import java.util.Objects;
+import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
-import java.util.Objects;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 /**

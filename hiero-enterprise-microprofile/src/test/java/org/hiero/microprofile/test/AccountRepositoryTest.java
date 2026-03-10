@@ -1,11 +1,6 @@
 package org.hiero.microprofile.test;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import org.hiero.base.AccountClient;
-import org.hiero.base.data.Account;
-import org.hiero.base.data.AccountInfo;
-import org.hiero.base.mirrornode.AccountRepository;
-import org.hiero.microprofile.ClientProvider;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.Configuration;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
@@ -13,6 +8,11 @@ import jakarta.inject.Inject;
 import java.util.Optional;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
+import org.hiero.base.AccountClient;
+import org.hiero.base.data.Account;
+import org.hiero.base.data.AccountInfo;
+import org.hiero.base.mirrornode.AccountRepository;
+import org.hiero.microprofile.ClientProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

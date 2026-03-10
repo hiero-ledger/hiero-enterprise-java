@@ -2,10 +2,10 @@ package org.hiero.base.protocol.data;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.Hbar;
-import org.hiero.base.data.ContractParam;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import org.hiero.base.data.ContractParam;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

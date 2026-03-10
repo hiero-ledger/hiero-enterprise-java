@@ -4,6 +4,9 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
@@ -23,9 +26,6 @@ import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.protocol.data.TransactionType;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 /** A client for querying the Hiero Mirror Node REST API. */

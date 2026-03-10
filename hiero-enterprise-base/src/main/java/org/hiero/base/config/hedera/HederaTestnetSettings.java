@@ -1,9 +1,9 @@
 package org.hiero.base.config.hedera;
 
-import org.hiero.base.config.ConsensusNode;
-import org.hiero.base.config.NetworkSettings;
 import java.util.Optional;
 import java.util.Set;
+import org.hiero.base.config.ConsensusNode;
+import org.hiero.base.config.NetworkSettings;
 import org.jspecify.annotations.NonNull;
 
 /** Network settings for the Hedera Testnet. */

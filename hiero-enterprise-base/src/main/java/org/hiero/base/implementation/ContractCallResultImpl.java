@@ -2,9 +2,9 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.Hbar;
-import org.hiero.base.data.ContractCallResult;
 import java.math.BigInteger;
 import java.util.Objects;
+import org.hiero.base.data.ContractCallResult;
 import org.jspecify.annotations.NonNull;
 
 public class ContractCallResultImpl implements ContractCallResult {

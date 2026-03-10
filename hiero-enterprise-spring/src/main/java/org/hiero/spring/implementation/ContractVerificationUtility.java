@@ -1,11 +1,11 @@
 package org.hiero.spring.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import java.util.Map;
+import java.util.Objects;
 import org.hiero.base.HieroException;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.base.verification.ContractVerificationState;
-import java.util.Map;
-import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

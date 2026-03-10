@@ -1,6 +1,5 @@
 package org.hiero.microprofile;
 
-import org.hiero.base.config.ConsensusNode;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import java.util.Optional;
@@ -9,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.hiero.base.config.ConsensusNode;
 
 @ConfigProperties(prefix = "hiero.network")
 @Dependent

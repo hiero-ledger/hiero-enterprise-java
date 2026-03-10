@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import java.util.Objects;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
@@ -11,7 +12,6 @@ import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
-import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 public class AccountClientImpl implements AccountClient {

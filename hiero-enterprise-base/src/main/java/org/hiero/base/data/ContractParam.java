@@ -2,6 +2,9 @@ package org.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.implementation.data.BigIntegerBasedNumericDatatypes;
 import org.hiero.base.implementation.data.BooleanDatatype;
@@ -9,15 +12,12 @@ import org.hiero.base.implementation.data.BytesBasedDatatype;
 import org.hiero.base.implementation.data.LongBasedNumericDatatypes;
 import org.hiero.base.implementation.data.ParamSupplier;
 import org.hiero.base.implementation.data.StringBasedDatatype;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Represents a parameter for a smart contract call (see {@link
- * SmartContractClient}). For all supported types, see the static
- * factory methods. Normally a developer should not need to create instances of this class directly.
+ * Represents a parameter for a smart contract call (see {@link SmartContractClient}). For all
+ * supported types, see the static factory methods. Normally a developer should not need to create
+ * instances of this class directly.
  *
  * @param value the value of the parameter
  * @param nativeType the native type of the parameter

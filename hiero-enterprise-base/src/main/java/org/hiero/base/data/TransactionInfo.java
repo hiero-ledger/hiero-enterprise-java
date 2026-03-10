@@ -1,9 +1,9 @@
 package org.hiero.base.data;
 
-import org.hiero.base.protocol.data.TransactionType;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

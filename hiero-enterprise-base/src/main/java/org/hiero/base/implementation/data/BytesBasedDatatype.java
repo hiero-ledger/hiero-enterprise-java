@@ -1,9 +1,9 @@
 package org.hiero.base.implementation.data;
 
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import org.hiero.base.data.Bytes;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import org.hiero.base.data.Bytes;
 
 public enum BytesBasedDatatype implements ParamSupplier<Bytes> {
   BYTES("bytes", (v, params) -> params.addBytes(v.bytes())),

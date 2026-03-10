@@ -1,12 +1,12 @@
 package org.hiero.microprofile.implementation;
 
-import org.hiero.base.HieroException;
-import org.hiero.base.implementation.MirrorNodeRestClient;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.hiero.base.HieroException;
+import org.hiero.base.implementation.MirrorNodeRestClient;
 import org.jspecify.annotations.NonNull;
 
 public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonObject> {

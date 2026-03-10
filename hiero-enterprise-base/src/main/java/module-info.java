@@ -20,7 +20,7 @@ module org.hiero.base {
   uses NetworkSettingsProvider;
 
   provides NetworkSettingsProvider with
-          HederaNetworkSettingsProvider;
+      HederaNetworkSettingsProvider;
 
   requires transitive sdk; // Hedera SDK
   requires org.slf4j;

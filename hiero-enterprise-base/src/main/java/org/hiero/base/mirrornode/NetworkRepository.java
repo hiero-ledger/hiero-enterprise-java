@@ -1,12 +1,12 @@
 package org.hiero.base.mirrornode;
 
+import java.util.List;
+import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
-import java.util.List;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 /**

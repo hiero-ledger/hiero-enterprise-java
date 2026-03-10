@@ -1,5 +1,8 @@
 package org.hiero.base.implementation;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
@@ -7,9 +10,6 @@ import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 public class NetworkRepositoryImpl implements NetworkRepository {

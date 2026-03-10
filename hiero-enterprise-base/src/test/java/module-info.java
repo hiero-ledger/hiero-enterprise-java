@@ -11,5 +11,5 @@ open module org.hiero.base.test {
   requires org.slf4j;
 
   provides NetworkSettingsProvider with
-          SoloActionNetworkSettingsProvider;
+      SoloActionNetworkSettingsProvider;
 }

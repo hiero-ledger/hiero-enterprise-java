@@ -1,10 +1,6 @@
 package org.hiero.microprofile.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import org.hiero.base.HieroException;
-import org.hiero.base.config.HieroConfig;
-import org.hiero.base.verification.ContractVerificationClient;
-import org.hiero.base.verification.ContractVerificationState;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -19,6 +15,10 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.hiero.base.HieroException;
+import org.hiero.base.config.HieroConfig;
+import org.hiero.base.verification.ContractVerificationClient;
+import org.hiero.base.verification.ContractVerificationState;
 import org.jspecify.annotations.NonNull;
 
 public class ContractVerificationClientImpl implements ContractVerificationClient {

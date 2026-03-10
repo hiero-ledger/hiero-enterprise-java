@@ -5,14 +5,14 @@ import static org.hiero.base.data.ContractParam.string;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
-import org.hiero.base.FileClient;
-import org.hiero.base.HieroException;
-import org.hiero.base.SmartContractClient;
-import org.hiero.base.data.ContractCallResult;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.hiero.base.FileClient;
+import org.hiero.base.HieroException;
+import org.hiero.base.SmartContractClient;
+import org.hiero.base.data.ContractCallResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

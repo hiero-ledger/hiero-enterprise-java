@@ -4,6 +4,8 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
+import java.util.List;
+import java.util.Objects;
 import org.hiero.base.FungibleTokenClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
@@ -17,8 +19,6 @@ import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
-import java.util.List;
-import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 public class FungibleTokenClientImpl implements FungibleTokenClient {
