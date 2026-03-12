@@ -55,12 +55,7 @@
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
-      <artifactId>grpc-okhttp</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-inprocess</artifactId>
+      <artifactId>grpc-netty-shaded</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

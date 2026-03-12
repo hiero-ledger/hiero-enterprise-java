@@ -22,7 +22,7 @@ module org.hiero.base {
   provides NetworkSettingsProvider with
       HederaNetworkSettingsProvider;
 
-  requires transitive sdk; // Hedera SDK
+  requires transitive com.hedera.hashgraph.sdk; // Hedera SDK
   requires org.slf4j;
   requires com.google.protobuf; // TODO: We should not have the need to use it
   requires static org.jspecify;
