@@ -4,11 +4,14 @@
 site_name: Hiero Enterprise Java — Technical Documentation
 site_description: Technical documentation for Hiero Enterprise Java (Spring & MicroProfile integrations for Hiero)
 site_url: https://hiero-ledger.github.io/hiero-enterprise-java/
+repo_url: https://github.com/hiero-ledger/hiero-enterprise-java
 
 theme:
   name: material
   favicon: assets/favicon.ico
   logo: assets/logo.svg
+  icon:
+    repo: fontawesome/brands/github
   palette:
     - scheme: default
       primary: hiero
