@@ -18,7 +18,7 @@ The site is built with [MkDocs](https://www.mkdocs.org/) and the [Material for M
 From the repository root:
 
 ```bash
-pip install mkdocs-material "pymdown-extensions"
+pip install -r requirements-docs.txt
 mkdocs serve
 ```
 
