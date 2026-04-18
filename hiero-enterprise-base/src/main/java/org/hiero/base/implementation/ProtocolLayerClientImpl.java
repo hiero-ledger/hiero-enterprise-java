@@ -188,7 +188,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       transaction.setExpirationTime(request.expirationTime());
     }
 
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_CREATE);
     return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
   }
 
@@ -215,7 +216,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     if (request.expirationTime() != null) {
       transaction.setExpirationTime(request.expirationTime());
     }
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_UPDATE);
     return new FileUpdateResult(receipt.transactionId, receipt.status);
   }
 
@@ -238,7 +240,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setContents(request.contents())
             .setTransactionMemo(request.fileMemo());
 
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_APPEND);
     return new FileAppendResult(receipt.transactionId, receipt.status);
   }
 
@@ -250,7 +253,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setMaxTransactionFee(request.maxTransactionFee())
             .setTransactionValidDuration(request.transactionValidDuration())
             .setFileId(request.fileId());
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_DELETE);
     return new FileDeleteResult(receipt.transactionId, receipt.status);
   }
 
@@ -266,7 +270,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setBytecodeFileId(request.fileId())
             .setGas(DEFAULT_GAS)
             .setConstructorParameters(constructorParams);
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_CREATE);
     return new ContractCreateResult(receipt.transactionId, receipt.status, receipt.contractId);
   }
 
@@ -285,7 +290,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     if (request.transferFeeToAccountId() != null) {
       transaction.setTransferAccountId(request.transferFeeToAccountId());
     }
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_DELETE);
     return new ContractDeleteResult(receipt.transactionId, receipt.status);
   }
 
@@ -302,7 +308,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setContractId(request.contractId())
             .setFunction(request.functionName(), functionParams)
             .setGas(DEFAULT_GAS);
-    final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
+    final TransactionRecord record =
+        executeTransactionAndWaitOnRecord(transaction, TransactionType.CONTRACT_CALL);
     return new ContractCallResult(
         record.transactionId,
         record.receipt.status,
@@ -325,7 +332,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setTransactionValidDuration(request.transactionValidDuration())
             .setKey(publicKey)
             .setInitialBalance(request.initialBalance());
-    final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
+    final TransactionRecord record =
+        executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_CREATE);
     final Account newAccount = Account.of(record.receipt.accountId, publicKey, privateKey);
     return new AccountCreateResult(
         record.transactionId,
@@ -359,7 +367,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           request.toDelete().privateKey(),
           hieroContext.getOperatorAccount().privateKey());
     }
-    final TransactionRecord record = executeTransactionAndWaitOnRecord(transaction);
+    final TransactionRecord record =
+        executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_DELETE);
     return new AccountDeleteResult(
         record.transactionId,
         record.receipt.status,
@@ -387,7 +396,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         transaction.setSubmitKey(request.submitKey());
       }
       sign(transaction, request.adminKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_CREATE);
       return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute create topic transaction", e);
@@ -421,7 +431,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       } else {
         sign(transaction, request.adminKey());
       }
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_UPDATE);
       return new TopicUpdateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute update topic transaction", e);
@@ -438,7 +449,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTransactionValidDuration(request.transactionValidDuration())
               .setTopicId(request.topicId());
       sign(transaction, request.adminKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_DELETE);
       return new TopicDeleteResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute delete topic transaction", e);
@@ -458,7 +470,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (request.submitKey() != null) {
         sign(transaction, request.submitKey());
       }
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_MESSAGE_SUBMIT);
       return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute submit message transaction", e);
@@ -502,7 +515,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTokenType(request.tokenType())
               .setSupplyKey(request.supplyKey());
       sign(transaction, request.treasuryKey(), request.supplyKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
       return new TokenCreateResult(receipt.transactionId, receipt.status, receipt.tokenId);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute create token transaction", e);
@@ -520,7 +534,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTokenIds(request.tokenIds())
               .setAccountId(request.accountId());
       sign(transaction, request.accountPrivateKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_ASSOCIATE);
       return new TokenAssociateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute associate token transaction", e);
@@ -539,7 +554,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setAccountId(request.accountId())
               .setTokenIds(request.tokenIds());
       sign(transaction, request.accountKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_DISSOCIATE);
       return new TokenDissociateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute dissociate token transaction", e);
@@ -563,7 +579,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         throw new IllegalArgumentException("either amount or serial must be provided");
       }
 
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_BURN);
       return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute burn token transaction", e);
@@ -587,7 +604,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         throw new IllegalArgumentException("either amount or metadata must be provided");
       }
       sign(transaction, request.supplyKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_MINT);
       return new TokenMintResult(
           receipt.transactionId, receipt.status, receipt.serials, receipt.totalSupply);
     } catch (final Exception e) {
@@ -619,7 +637,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         throw new IllegalArgumentException("either amount or serial must be provided");
       }
       sign(transaction, request.senderKey());
-      final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);
       return new TokenTransferResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute transfer nft transaction", e);
@@ -651,15 +670,16 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @NonNull
   private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(
-      @NonNull final T transaction) throws HieroException {
+      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
     Objects.requireNonNull(transaction, "transaction must not be null");
+    Objects.requireNonNull(type, "type must not be null");
     try {
       log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
       final TransactionResponse response = transaction.execute(hieroContext.getClient());
       listeners.forEach(
           listener -> {
             try {
-              listener.transactionSubmitted(TransactionType.ACCOUNT_CREATE, response.transactionId);
+              listener.transactionSubmitted(type, response.transactionId);
             } catch (Exception e) {
               log.error("Failed to notify listener", e);
             }
@@ -673,8 +693,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         listeners.forEach(
             listener -> {
               try {
-                listener.transactionHandled(
-                    TransactionType.ACCOUNT_CREATE, response.transactionId, receipt.status);
+                listener.transactionHandled(type, response.transactionId, receipt.status);
               } catch (Exception e) {
                 log.error("Failed to notify listener", e);
               }
@@ -696,8 +715,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @NonNull
   private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(
-      @NonNull final T transaction) throws HieroException {
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction);
+      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
+    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction, type);
     try {
       log.debug(
           "Waiting for record of transaction '{}' of type {}",
