@@ -219,7 +219,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final String _node = getNullableString(jsonObject, "node").orElse(null);
       final int nonce = jsonObject.getInt("nonce");
       final Instant parentConsensusTimestamp =
-        jsonObject.isNull("parent_consensus_timestamp")
+          jsonObject.isNull("parent_consensus_timestamp")
               ? null
               : Instant.ofEpochSecond(
                   (long) Double.parseDouble(jsonObject.getString("parent_consensus_timestamp")));
