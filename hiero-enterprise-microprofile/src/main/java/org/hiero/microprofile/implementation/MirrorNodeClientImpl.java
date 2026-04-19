@@ -25,6 +25,10 @@ import org.jspecify.annotations.NonNull;
 
 public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
+  private static final String TRANSACTIONS_PATH = "/api/v1/transactions";
+  private static final String TOKENS_PATH = "/api/v1/tokens";
+  private static final String TOPICS_PATH = "/api/v1/topics";
+
   private final MirrorNodeRestClientImpl restClient;
 
   private final MirrorNodeJsonConverter<JsonObject> jsonConverter;
@@ -65,7 +69,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId;
+    final String path = TRANSACTIONS_PATH + "?account.id=" + accountId;
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -76,7 +80,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
       @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(type, "type must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId + "&transactiontype=" + type;
+    final String path =
+        TRANSACTIONS_PATH + "?account.id=" + accountId + "&transactiontype=" + type.getType();
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -87,7 +92,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
       @NonNull AccountId accountId, @NonNull Result result) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(result, "result must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId + "&result=" + result;
+    final String path = TRANSACTIONS_PATH + "?account.id=" + accountId + "&result=" + result.name();
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -98,7 +103,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
       @NonNull AccountId accountId, @NonNull BalanceModification type) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(type, "type must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId + "&type=" + type;
+    final String path = TRANSACTIONS_PATH + "?account.id=" + accountId + "&type=" + type.name();
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -107,7 +112,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   @Override
   public Page<Token> queryTokensForAccount(@NonNull AccountId accountId) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId;
+    final String path = TOKENS_PATH + "?account.id=" + accountId;
     final Function<JsonObject, List<Token>> dataExtractionFunction =
         node -> jsonConverter.toTokens(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -116,7 +121,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   @Override
   public @NonNull Page<Balance> queryTokenBalances(@NonNull TokenId tokenId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
-    final String path = "/api/v1/tokens/" + tokenId + "/balances";
+    final String path = TOKENS_PATH + "/" + tokenId + "/balances";
     final Function<JsonObject, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -127,7 +132,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
       @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/tokens/" + tokenId + "/balances?account.id=" + accountId;
+    final String path = TOKENS_PATH + "/" + tokenId + "/balances?account.id=" + accountId;
     final Function<JsonObject, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -136,7 +141,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   @Override
   public @NonNull Page<TopicMessage> queryTopicMessages(TopicId topicId) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
-    final String path = "/api/v1/topics/" + topicId + "/messages";
+    final String path = TOPICS_PATH + "/" + topicId + "/messages";
     final Function<JsonObject, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);

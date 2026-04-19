@@ -207,19 +207,19 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final String transactionId = jsonObject.getString("transaction_id");
-      final byte[] bytes = jsonObject.getString("bytes").getBytes();
-      final long chargedTxFee = Long.parseLong(jsonObject.getString("charged_tx_fee"));
+      final byte[] bytes = getNullableString(jsonObject, "bytes").orElse("").getBytes();
+      final long chargedTxFee = jsonObject.getJsonNumber("charged_tx_fee").longValue();
       final Instant consensusTimestamp =
           Instant.ofEpochSecond(
               (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
-      final String entityId = jsonObject.getString("entity_id");
+      final String entityId = getNullableString(jsonObject, "entity_id").orElse(null);
       final String maxFee = jsonObject.getString("max_fee");
       final byte[] memo = jsonObject.getString("memo_base64").getBytes();
       final TransactionType name = TransactionType.from(jsonObject.getString("name"));
-      final String _node = jsonObject.getString("node");
+      final String _node = getNullableString(jsonObject, "node").orElse(null);
       final int nonce = jsonObject.getInt("nonce");
       final Instant parentConsensusTimestamp =
-          jsonObject.get("parent_consensus_timestamp").asJsonObject() == null
+          jsonObject.isNull("parent_consensus_timestamp")
               ? null
               : Instant.ofEpochSecond(
                   (long) Double.parseDouble(jsonObject.getString("parent_consensus_timestamp")));
@@ -297,7 +297,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   private Transfer toTransfer(JsonValue node) {
     final JsonObject jsonObject = node.asJsonObject();
     final AccountId account = AccountId.fromString(jsonObject.getString("account"));
-    final long amount = Long.parseLong(jsonObject.getString("amount"));
+    final long amount = jsonObject.getJsonNumber("amount").longValue();
     final boolean isApproval = jsonObject.getBoolean("is_approval");
 
     return new Transfer(account, amount, isApproval);
@@ -307,7 +307,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     final JsonObject jsonObject = node.asJsonObject();
     final TokenId tokenId = TokenId.fromString(jsonObject.getString("token_id"));
     final AccountId account = AccountId.fromString(jsonObject.getString("account"));
-    final long amount = Long.parseLong(jsonObject.getString("amount"));
+    final long amount = jsonObject.getJsonNumber("amount").longValue();
     final boolean isApproval = jsonObject.getBoolean("is_approval");
 
     return new TokenTransfer(tokenId, account, amount, isApproval);
@@ -316,7 +316,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   private StakingRewardTransfer toStakingRewardTransfer(JsonValue node) {
     final JsonObject jsonObject = node.asJsonObject();
     final AccountId account = AccountId.fromString(jsonObject.getString("account"));
-    long amount = Long.parseLong(jsonObject.getString("amount"));
+    long amount = jsonObject.getJsonNumber("amount").longValue();
 
     return new StakingRewardTransfer(account, amount);
   }
@@ -328,10 +328,17 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         AccountId.fromString(jsonObject.getString("receiver_account_id"));
     final AccountId senderAccountId =
         AccountId.fromString(jsonObject.getString("sender_account_id"));
-    final long serialNumber = Long.parseLong(jsonObject.getString("serial_number"));
+    final long serialNumber = jsonObject.getJsonNumber("serial_number").longValue();
     final TokenId tokenId = TokenId.fromString(jsonObject.getString("token_id"));
 
     return new NftTransfer(isApproval, receiverAccountId, senderAccountId, serialNumber, tokenId);
+  }
+
+  private Optional<String> getNullableString(JsonObject jsonObject, String key) {
+    if (!jsonObject.containsKey(key) || jsonObject.isNull(key)) {
+      return Optional.empty();
+    }
+    return Optional.of(jsonObject.getString(key));
   }
 
   @Override
@@ -355,9 +362,6 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @NonNull
   private Stream<JsonValue> jsonArrayToStream(@NonNull final JsonArray jsonObject) {
-    if (jsonObject.isEmpty()) {
-      throw new IllegalStateException("not an array");
-    }
     return StreamSupport.stream(
         Spliterators.spliteratorUnknownSize(jsonObject.iterator(), Spliterator.ORDERED), false);
   }
