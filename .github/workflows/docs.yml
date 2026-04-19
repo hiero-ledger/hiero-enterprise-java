@@ -61,8 +61,12 @@ jobs:
         run: mkdocs gh-deploy --force --strict
 
   # PR preview: build and deploy to .../pr/<number>/
+  # Skipped for fork PRs because GITHUB_TOKEN is read-only and cannot push to gh-pages.
   deploy-preview:
-    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.action != 'closed'
+      && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
