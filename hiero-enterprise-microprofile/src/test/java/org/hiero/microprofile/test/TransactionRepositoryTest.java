@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 
 @HelidonTest
 @AddBean(ClientProvider.class)
-@AddBean(HieroTestProducer.class)
 @Configuration(useExisting = true)
 public class TransactionRepositoryTest {
 
