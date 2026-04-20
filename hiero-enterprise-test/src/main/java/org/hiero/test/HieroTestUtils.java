@@ -1,9 +1,11 @@
 package org.hiero.test;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import org.hiero.base.HieroException;
 import org.hiero.base.mirrornode.MirrorNodeClient;
@@ -80,6 +82,39 @@ public class HieroTestUtils implements Serializable {
       log.debug("Transaction '{}' is available at mirror node", transactionId);
     } else {
       log.debug("No transaction to wait for");
+    }
+  }
+
+  /**
+   * Waits for the last submitted transaction to be available at the mirror node, and additionally
+   * waits for the given account to be queryable via the {@code ?account.id=} index. The mirror node
+   * updates its by-transaction-id and by-account indexes independently, so after a new account is
+   * created the account index can lag a few hundred milliseconds behind the transaction-id index.
+   * Tests that assert on results obtained through the account index should use this overload.
+   */
+  public void waitForMirrorNodeRecords(final AccountId accountId) {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    waitForMirrorNodeRecords();
+    log.debug("Waiting for account '{}' available at mirror node", accountId);
+    final LocalDateTime start = LocalDateTime.now();
+    while (true) {
+      try {
+        if (!mirrorNodeClient.queryTransactionsByAccount(accountId).getData().isEmpty()) {
+          log.debug("Account '{}' is available at mirror node", accountId);
+          return;
+        }
+      } catch (HieroException e) {
+        throw new RuntimeException("Error in mirror node query!", e);
+      }
+      if (LocalDateTime.now().isAfter(start.plusSeconds(30))) {
+        throw new RuntimeException("Timeout waiting for account '" + accountId + "'");
+      }
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Interrupted while waiting for account", e);
+      }
     }
   }
 }

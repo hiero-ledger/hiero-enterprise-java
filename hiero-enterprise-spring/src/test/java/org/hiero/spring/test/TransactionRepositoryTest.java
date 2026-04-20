@@ -28,7 +28,7 @@ public class TransactionRepositoryTest {
   @Test
   void testFindTransactionByAccountId() throws HieroException {
     final Account account = accountClient.createAccount(1);
-    hieroTestUtils.waitForMirrorNodeRecords();
+    hieroTestUtils.waitForMirrorNodeRecords(account.accountId());
     final Page<TransactionInfo> page = transactionRepository.findByAccount(account.accountId());
     Assertions.assertNotNull(page);
 
