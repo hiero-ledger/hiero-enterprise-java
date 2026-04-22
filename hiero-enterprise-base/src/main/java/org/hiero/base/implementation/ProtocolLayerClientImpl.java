@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
@@ -56,6 +57,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountUpdateRequest;
+import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCallResult;
 import org.hiero.base.protocol.data.ContractCreateRequest;
@@ -375,6 +378,30 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         record.transactionHash.toByteArray(),
         record.consensusTimestamp,
         record.transactionFee);
+  }
+
+  @Override
+  @NonNull
+  public AccountUpdateResult executeAccountUpdateTransaction(
+      @NonNull final AccountUpdateRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    final AccountUpdateTransaction transaction =
+        new AccountUpdateTransaction()
+            .setMaxTransactionFee(request.maxTransactionFee())
+            .setTransactionValidDuration(request.transactionValidDuration())
+            .setAccountId(request.toUpdate().accountId());
+    if (request.memo() != null) {
+      transaction.setAccountMemo(request.memo());
+    }
+    if (request.updatedPrivateKey() != null) {
+      transaction.setKey(request.updatedPrivateKey().getPublicKey());
+      sign(transaction, request.toUpdate().privateKey(), request.updatedPrivateKey());
+    } else {
+      sign(transaction, request.toUpdate().privateKey());
+    }
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
+    return new AccountUpdateResult(receipt.transactionId, receipt.status);
   }
 
   public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)

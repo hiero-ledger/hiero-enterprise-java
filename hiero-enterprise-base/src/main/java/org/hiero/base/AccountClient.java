@@ -2,6 +2,7 @@ package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.Objects;
 import org.hiero.base.data.Account;
 import org.jspecify.annotations.NonNull;
@@ -70,6 +71,41 @@ public interface AccountClient {
    * @throws HieroException if the account could not be deleted
    */
   void deleteAccount(@NonNull Account account, @NonNull Account toAccount) throws HieroException;
+
+  /**
+   * Updates the account key of the given account.
+   *
+   * @param account the account to update
+   * @param updatedPrivateKey the new private key to set for the account
+   * @return the updated account with the same account ID and new key pair
+   * @throws HieroException if the account could not be updated
+   */
+  @NonNull
+  Account updateAccountKey(@NonNull Account account, @NonNull PrivateKey updatedPrivateKey)
+      throws HieroException;
+
+  /**
+   * Updates the memo of the given account.
+   *
+   * @param account the account to update
+   * @param memo the new memo
+   * @throws HieroException if the account could not be updated
+   */
+  void updateAccountMemo(@NonNull Account account, @NonNull String memo) throws HieroException;
+
+  /**
+   * Updates both key and memo of the given account.
+   *
+   * @param account the account to update
+   * @param updatedPrivateKey the new private key to set for the account
+   * @param memo the new memo
+   * @return the updated account with the same account ID and new key pair
+   * @throws HieroException if the account could not be updated
+   */
+  @NonNull
+  Account updateAccount(
+      @NonNull Account account, @NonNull PrivateKey updatedPrivateKey, @NonNull String memo)
+      throws HieroException;
 
   /**
    * Returns the balance of the given account.

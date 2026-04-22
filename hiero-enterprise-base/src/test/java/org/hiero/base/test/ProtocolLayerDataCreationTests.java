@@ -27,6 +27,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountUpdateRequest;
+import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCallResult;
 import org.hiero.base.protocol.data.ContractCreateRequest;
@@ -299,6 +301,80 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new AccountDeleteResult(
                 transactionId, status, null, consensusTimestamp, transactionFee));
+  }
+
+  @Test
+  void testAccountUpdateRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(10);
+    final Account toUpdate = Account.of(new AccountId(0, 0, 12345), PrivateKey.generateECDSA());
+    final PrivateKey updatedPrivateKey = PrivateKey.generateECDSA();
+    final String memo = "updated-memo";
+
+    Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.updateKey(toUpdate, updatedPrivateKey));
+    Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.updateMemo(toUpdate, memo));
+    Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.of(toUpdate, updatedPrivateKey, memo));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new AccountUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, updatedPrivateKey, null));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new AccountUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, null, memo));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.updateKey(null, updatedPrivateKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.updateKey(toUpdate, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.updateMemo(toUpdate, null));
+    Assertions.assertThrows(NullPointerException.class, () -> AccountUpdateRequest.updateMemo(null, memo));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.of(null, updatedPrivateKey, memo));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.of(toUpdate, null, memo));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.of(toUpdate, updatedPrivateKey, null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, null, null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountUpdateRequest(maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountUpdateRequest(
+                Hbar.fromTinybars(-1000),
+                transactionValidDuration,
+                toUpdate,
+                updatedPrivateKey,
+                memo));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountUpdateRequest(
+                maxTransactionFee, Duration.ZERO, toUpdate, updatedPrivateKey, memo));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountUpdateRequest(
+                maxTransactionFee, Duration.ofSeconds(-1), toUpdate, updatedPrivateKey, memo));
+  }
+
+  @Test
+  void testAccountUpdateResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new AccountUpdateResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new AccountUpdateResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new AccountUpdateResult(transactionId, null));
   }
 
   @Test

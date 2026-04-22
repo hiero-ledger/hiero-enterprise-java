@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.Objects;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
@@ -12,6 +13,7 @@ import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
+import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.jspecify.annotations.NonNull;
 
 public class AccountClientImpl implements AccountClient {
@@ -53,6 +55,30 @@ public class AccountClientImpl implements AccountClient {
       throws HieroException {
     final AccountDeleteRequest request = AccountDeleteRequest.of(account, toAccount);
     client.executeAccountDeleteTransaction(request);
+  }
+
+  @Override
+  public @NonNull Account updateAccountKey(
+      @NonNull Account account, @NonNull PrivateKey updatedPrivateKey) throws HieroException {
+    final AccountUpdateRequest request = AccountUpdateRequest.updateKey(account, updatedPrivateKey);
+    client.executeAccountUpdateTransaction(request);
+    return Account.of(account.accountId(), updatedPrivateKey);
+  }
+
+  @Override
+  public void updateAccountMemo(@NonNull Account account, @NonNull String memo)
+      throws HieroException {
+    final AccountUpdateRequest request = AccountUpdateRequest.updateMemo(account, memo);
+    client.executeAccountUpdateTransaction(request);
+  }
+
+  @Override
+  public @NonNull Account updateAccount(
+      @NonNull Account account, @NonNull PrivateKey updatedPrivateKey, @NonNull String memo)
+      throws HieroException {
+    final AccountUpdateRequest request = AccountUpdateRequest.of(account, updatedPrivateKey, memo);
+    client.executeAccountUpdateTransaction(request);
+    return Account.of(account.accountId(), updatedPrivateKey);
   }
 
   @NonNull

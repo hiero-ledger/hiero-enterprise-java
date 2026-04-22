@@ -74,6 +74,27 @@ public class HieroAccountService {
 }
 ```
 
+You can also use `AccountClient` to update account metadata or rotate keys using high-level APIs:
+
+```java
+@Service
+public class AccountMaintenanceService {
+
+    @Autowired
+    private AccountClient accountClient;
+
+    public void updateMemo(Account account, String memo) throws HieroException {
+        accountClient.updateAccountMemo(account, memo);
+    }
+
+    public Account rotateKey(Account account, PrivateKey newPrivateKey) throws HieroException {
+        return accountClient.updateAccountKey(account, newPrivateKey);
+    }
+}
+```
+
+For MicroProfile, inject the same managed client with `@Inject AccountClient accountClient`.
+
 All APIs of the client are synchronous and return the result of the operation.
 For asynchronous operations, you can easily wrap calls by use the [`@Async` annotation of spring](https://spring.io/guides/gs/async-method).
 

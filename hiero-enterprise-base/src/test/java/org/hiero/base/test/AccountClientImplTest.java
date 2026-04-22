@@ -6,6 +6,9 @@ import static org.mockito.Mockito.*;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TransactionId;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.AccountClientImpl;
@@ -14,9 +17,12 @@ import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
+import org.hiero.base.protocol.data.AccountUpdateRequest;
+import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.ArgumentCaptor;
 
 public class AccountClientImplTest {
 
@@ -150,5 +156,74 @@ public class AccountClientImplTest {
     Exception exception =
         assertThrows(HieroException.class, () -> accountClientImpl.createAccount(initialBalance));
     assertEquals("Transaction failed", exception.getMessage());
+  }
+
+  @Test
+  void testUpdateAccountKeySuccessful() throws HieroException {
+    Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
+    PrivateKey updatedPrivateKey = PrivateKey.generateECDSA();
+    when(mockProtocolLayerClient.executeAccountUpdateTransaction(any(AccountUpdateRequest.class)))
+        .thenReturn(
+            new AccountUpdateResult(TransactionId.generate(account.accountId()), Status.SUCCESS));
+
+    Account updatedAccount = accountClientImpl.updateAccountKey(account, updatedPrivateKey);
+
+    assertEquals(account.accountId(), updatedAccount.accountId());
+    assertEquals(updatedPrivateKey.getPublicKey(), updatedAccount.publicKey());
+    assertEquals(updatedPrivateKey, updatedAccount.privateKey());
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountUpdateTransaction(any(AccountUpdateRequest.class));
+  }
+
+  @Test
+  void testUpdateAccountMemoSuccessful() throws HieroException {
+    Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
+    String memo = "updated-memo";
+    ArgumentCaptor<AccountUpdateRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountUpdateRequest.class);
+    when(mockProtocolLayerClient.executeAccountUpdateTransaction(any(AccountUpdateRequest.class)))
+        .thenReturn(
+            new AccountUpdateResult(TransactionId.generate(account.accountId()), Status.SUCCESS));
+
+    accountClientImpl.updateAccountMemo(account, memo);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountUpdateTransaction(requestCaptor.capture());
+    AccountUpdateRequest request = requestCaptor.getValue();
+    assertEquals(account, request.toUpdate());
+    assertEquals(memo, request.memo());
+    assertNull(request.updatedPrivateKey());
+  }
+
+  @Test
+  void testUpdateAccountMemoBlankMemoThrowsException() throws HieroException {
+    Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
+
+    assertThrows(
+        IllegalArgumentException.class, () -> accountClientImpl.updateAccountMemo(account, " "));
+    verify(mockProtocolLayerClient, never()).executeAccountUpdateTransaction(any());
+  }
+
+  @Test
+  void testUpdateAccountSuccessful() throws HieroException {
+    Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
+    PrivateKey updatedPrivateKey = PrivateKey.generateECDSA();
+    String memo = "updated-memo";
+    ArgumentCaptor<AccountUpdateRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountUpdateRequest.class);
+    when(mockProtocolLayerClient.executeAccountUpdateTransaction(any(AccountUpdateRequest.class)))
+        .thenReturn(
+            new AccountUpdateResult(TransactionId.generate(account.accountId()), Status.SUCCESS));
+
+    Account updatedAccount = accountClientImpl.updateAccount(account, updatedPrivateKey, memo);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountUpdateTransaction(requestCaptor.capture());
+    AccountUpdateRequest request = requestCaptor.getValue();
+    assertEquals(account, request.toUpdate());
+    assertEquals(updatedPrivateKey, request.updatedPrivateKey());
+    assertEquals(memo, request.memo());
+    assertEquals(account.accountId(), updatedAccount.accountId());
+    assertEquals(updatedPrivateKey, updatedAccount.privateKey());
   }
 }
