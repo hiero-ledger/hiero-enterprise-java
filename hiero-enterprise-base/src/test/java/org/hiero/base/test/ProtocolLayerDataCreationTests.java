@@ -1711,6 +1711,7 @@ public class ProtocolLayerDataCreationTests {
     final TopicId validTopicId = TopicId.fromString("0.0.12345");
     final String validMessage = "This is a valid message";
     final byte[] validMessageBytes = validMessage.getBytes(StandardCharsets.UTF_8);
+    final byte[] emptyMessage = new byte[0];
     final byte[] largeMessage = new byte[1025];
     final Hbar validMaxTransactionFee = Hbar.fromTinybars(100_000);
     final Duration validTransactionValidDuration = Duration.ofMinutes(2);
@@ -1735,6 +1736,9 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> TopicSubmitMessageRequest.of(validTopicId, (byte[]) null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TopicSubmitMessageRequest.of(validTopicId, emptyMessage));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> TopicSubmitMessageRequest.of(validTopicId, largeMessage));

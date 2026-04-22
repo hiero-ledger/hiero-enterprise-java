@@ -22,6 +22,9 @@ public record TopicSubmitMessageRequest(
   public TopicSubmitMessageRequest {
     Objects.requireNonNull(topicId, "TopicId cannot be null");
     Objects.requireNonNull(message, "Message cannot be null");
+    if (message.length == 0) {
+      throw new IllegalArgumentException("Message cannot be empty");
+    }
     if (message.length > MAX_MESSAGE_LENGTH) {
       throw new IllegalArgumentException(
           "Message cannot be longer than " + MAX_MESSAGE_LENGTH + " bytes");
