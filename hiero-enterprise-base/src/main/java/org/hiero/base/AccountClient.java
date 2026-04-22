@@ -3,8 +3,10 @@ package org.hiero.base;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import java.util.List;
 import java.util.Objects;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.HookDetails;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -134,4 +136,30 @@ public interface AccountClient {
    * @throws HieroException if the balance could not be retrieved
    */
   @NonNull Hbar getOperatorAccountBalance() throws HieroException;
+
+  /** Adds a hook to an account. */
+  default void addHook(@NonNull Account account, @NonNull HookDetails hookDetails)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    Objects.requireNonNull(hookDetails, "hookDetails must not be null");
+    updateHooks(account, List.of(hookDetails), List.of());
+  }
+
+  /** Deletes a hook from an account. */
+  default void deleteHook(@NonNull Account account, long hookId) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    if (hookId < 0) {
+      throw new IllegalArgumentException("hookId must be non-negative");
+    }
+    updateHooks(account, List.of(), List.of(hookId));
+  }
+
+  /** Updates account hooks by creating and/or deleting hooks. */
+  default void updateHooks(
+      @NonNull Account account,
+      @NonNull List<HookDetails> hooksToCreate,
+      @NonNull List<Long> hookIdsToDelete)
+      throws HieroException {
+    throw new UnsupportedOperationException("Account hook management is not implemented yet.");
+  }
 }
