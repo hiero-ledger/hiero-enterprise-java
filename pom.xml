@@ -49,7 +49,7 @@
     <helidon.test.version>3.2.11</helidon.test.version>
     <jakarta.enterprise.version>3.0.1</jakarta.enterprise.version>
     <microprofile.version>7.1</microprofile.version>
-    <quarkus.version>3.17.2</quarkus.version>
+    <quarkus.version>3.34.5</quarkus.version>
     <google.auto.version>1.1.1</google.auto.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
