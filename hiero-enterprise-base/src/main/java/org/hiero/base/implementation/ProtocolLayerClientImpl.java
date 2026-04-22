@@ -425,8 +425,6 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       }
       if (request.updatedAdminKey() != null) {
         transaction.setAdminKey(request.updatedAdminKey());
-      }
-      if (request.updatedAdminKey() != null) {
         sign(transaction, request.adminKey(), request.updatedAdminKey());
       } else {
         sign(transaction, request.adminKey());
