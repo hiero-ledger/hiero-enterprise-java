@@ -49,11 +49,7 @@ public record AccountUpdateRequest(
     Objects.requireNonNull(toUpdate, "toUpdate is required");
     Objects.requireNonNull(memo, "memo is required");
     return new AccountUpdateRequest(
-        DEFAULT_MAX_TRANSACTION_FEE,
-        DEFAULT_TRANSACTION_VALID_DURATION,
-        toUpdate,
-        null,
-        memo);
+        DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, toUpdate, null, memo);
   }
 
   @NonNull

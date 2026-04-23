@@ -21,8 +21,8 @@ import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 
 public class AccountClientImplTest {
 

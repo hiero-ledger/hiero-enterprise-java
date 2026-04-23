@@ -311,7 +311,8 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey updatedPrivateKey = PrivateKey.generateECDSA();
     final String memo = "updated-memo";
 
-    Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.updateKey(toUpdate, updatedPrivateKey));
+    Assertions.assertDoesNotThrow(
+        () -> AccountUpdateRequest.updateKey(toUpdate, updatedPrivateKey));
     Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.updateMemo(toUpdate, memo));
     Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.of(toUpdate, updatedPrivateKey, memo));
     Assertions.assertDoesNotThrow(
@@ -328,13 +329,15 @@ public class ProtocolLayerDataCreationTests {
         NullPointerException.class, () -> AccountUpdateRequest.updateKey(toUpdate, null));
     Assertions.assertThrows(
         NullPointerException.class, () -> AccountUpdateRequest.updateMemo(toUpdate, null));
-    Assertions.assertThrows(NullPointerException.class, () -> AccountUpdateRequest.updateMemo(null, memo));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountUpdateRequest.updateMemo(null, memo));
     Assertions.assertThrows(
         NullPointerException.class, () -> AccountUpdateRequest.of(null, updatedPrivateKey, memo));
     Assertions.assertThrows(
         NullPointerException.class, () -> AccountUpdateRequest.of(toUpdate, null, memo));
     Assertions.assertThrows(
-        NullPointerException.class, () -> AccountUpdateRequest.of(toUpdate, updatedPrivateKey, null));
+        NullPointerException.class,
+        () -> AccountUpdateRequest.of(toUpdate, updatedPrivateKey, null));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -343,7 +346,8 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
-            new AccountUpdateRequest(maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
+            new AccountUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->

@@ -80,8 +80,7 @@ public interface AccountClient {
    * @return the updated account with the same account ID and new key pair
    * @throws HieroException if the account could not be updated
    */
-  @NonNull
-  Account updateAccountKey(@NonNull Account account, @NonNull PrivateKey updatedPrivateKey)
+  @NonNull Account updateAccountKey(@NonNull Account account, @NonNull PrivateKey updatedPrivateKey)
       throws HieroException;
 
   /**
@@ -102,8 +101,7 @@ public interface AccountClient {
    * @return the updated account with the same account ID and new key pair
    * @throws HieroException if the account could not be updated
    */
-  @NonNull
-  Account updateAccount(
+  @NonNull Account updateAccount(
       @NonNull Account account, @NonNull PrivateKey updatedPrivateKey, @NonNull String memo)
       throws HieroException;
 
