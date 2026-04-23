@@ -188,6 +188,13 @@ Currently there is no running release process and we work on setting uop everyth
 Technical documentation (getting started, architecture, Spring/MicroProfile, managed services, ADRs) is in the **[docs](docs/)** folder and is published as [GitHub Pages](https://hiero-ledger.github.io/hiero-enterprise-java/).
 Pull requests that change the docs get a preview at `…/pr/<number>/`.
 
+## Version Management
+
+This project uses [SDKMAN!](https://sdkman.io/) for version consistency. To set up your environment, simply run:
+```bash
+sdk env install
+```
+**Note:** If you don't use SDKMAN!, this file is safely ignored
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

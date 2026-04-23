@@ -91,8 +91,7 @@ public class HieroConfigImpl implements HieroConfig {
     try {
       return PrivateKey.fromString(privateKey);
     } catch (Exception e) {
-      throw new IllegalArgumentException(
-          "Can not parse 'privateKey' property: '" + privateKey + "'", e);
+      throw new IllegalArgumentException("Can not parse 'privateKey' property", e);
     }
   }
 
