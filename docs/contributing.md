@@ -18,7 +18,7 @@ The site is built with [Zensical](https://zensical.org/docs/get-started/) using 
 From the repository root:
 
 ```bash
-pip install -r requirements-docs.txt
+pip install zensical==0.0.36
 zensical serve
 ```
 
@@ -28,7 +28,7 @@ Then open http://127.0.0.1:8000 .
 
 The `.github/workflows/docs.yml` workflow:
 
-- **Push to `main`:** Installs `requirements-docs.txt`, builds the site with `zensical build --clean`, and deploys the production site to the GitHub Pages root.
-- **Pull request:** Installs `requirements-docs.txt`, builds the site with `zensical build --clean`, deploys a preview to `/pr/<number>/`, and comments the preview URL on the PR.
+- **Push to `main`:** Installs `zensical==0.0.36`, builds the site with `zensical build --clean`, and deploys the production site to the GitHub Pages root.
+- **Pull request:** Installs `zensical==0.0.36`, builds the site with `zensical build --clean`, deploys a preview to `/pr/<number>/`, and comments the preview URL on the PR.
 
 Ensure **GitHub Pages** is enabled and set the source to **Deploy from a branch** → branch: `gh-pages`, folder: `/ (root)`.
