@@ -30,7 +30,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   private static final String TOPICS_PATH = "/api/v1/topics";
 
   private static final String MSG_REST_CLIENT_MUST_NOT_BE_NULL = "restClient must not be null";
-  private static final String MSG_JSON_CONVERTER_MUST_NOT_BE_NULL = "jsonConverter must not be null";
+  private static final String MSG_JSON_CONVERTER_MUST_NOT_BE_NULL =
+      "jsonConverter must not be null";
   private static final String MSG_ACCOUNT_ID_MUST_NOT_BE_NULL = "accountId must not be null";
   private static final String MSG_TYPE_MUST_NOT_BE_NULL = "type must not be null";
   private static final String MSG_RESULT_MUST_NOT_BE_NULL = "result must not be null";
@@ -44,8 +45,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public MirrorNodeClientImpl(
       MirrorNodeRestClientImpl restClient, MirrorNodeJsonConverter<JsonObject> jsonConverter) {
     this.restClient = Objects.requireNonNull(restClient, MSG_REST_CLIENT_MUST_NOT_BE_NULL);
-    this.jsonConverter =
-        Objects.requireNonNull(jsonConverter, MSG_JSON_CONVERTER_MUST_NOT_BE_NULL);
+    this.jsonConverter = Objects.requireNonNull(jsonConverter, MSG_JSON_CONVERTER_MUST_NOT_BE_NULL);
   }
 
   @Override
