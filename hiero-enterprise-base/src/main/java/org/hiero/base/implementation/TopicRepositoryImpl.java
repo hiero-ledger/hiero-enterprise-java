@@ -32,6 +32,14 @@ public class TopicRepositoryImpl implements TopicRepository {
   }
 
   @Override
+  public @NonNull Page<TopicMessage> getMessages(@NonNull TopicId topicId, @NonNull java.time.Instant after)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    return mirrorNodeClient.queryTopicMessages(topicId, after);
+  }
+
+  @Override
   public @NonNull Optional<TopicMessage> getMessageBySequenceNumber(
       TopicId topicId, long sequenceNumber) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");

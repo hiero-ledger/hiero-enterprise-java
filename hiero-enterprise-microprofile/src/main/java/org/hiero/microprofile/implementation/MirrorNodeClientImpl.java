@@ -65,7 +65,18 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId;
+    final String path = "/api/v1/transactions?account.id=" + accountId;
+    final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
+        node -> jsonConverter.toTransactionInfos(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<TransactionInfo> queryTransactionsByAccount(
+      @NonNull AccountId accountId, @NonNull java.time.Instant after) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    final String path = "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -140,6 +151,21 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final Function<JsonObject, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<TopicMessage> queryTopicMessages(
+      @NonNull TopicId topicId, @NonNull java.time.Instant after) throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    final String path = "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
+    final Function<JsonObject, List<TopicMessage>> dataExtractionFunction =
+        node -> jsonConverter.toTopicMessages(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  private String formatInstant(java.time.Instant instant) {
+    return instant.getEpochSecond() + "." + String.format("%09d", instant.getNano());
   }
 
   @Override

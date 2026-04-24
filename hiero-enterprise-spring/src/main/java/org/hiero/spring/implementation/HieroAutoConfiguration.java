@@ -226,4 +226,15 @@ public class HieroAutoConfiguration {
   ContractVerificationClient contractVerificationClient(final HieroConfig hieroConfig) {
     return new ContractVerificationClientImplementation(hieroConfig);
   }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "mirrorNodeSupported",
+      havingValue = "true",
+      matchIfMissing = true)
+  HieroListenerProcessor hieroListenerProcessor(
+      final TransactionRepository transactionRepository, final TopicRepository topicRepository) {
+    return new HieroListenerProcessor(transactionRepository, topicRepository);
+  }
 }

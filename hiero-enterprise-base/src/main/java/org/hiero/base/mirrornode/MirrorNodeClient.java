@@ -176,6 +176,18 @@ public interface MirrorNodeClient {
       throws HieroException;
 
   /**
+   * Queries transactions for a specific account after a certain timestamp.
+   *
+   * @param accountId the account ID to query transactions for
+   * @param after the timestamp to start querying from (exclusive)
+   * @return a page of transaction information
+   * @throws HieroException if an error occurs during the query
+   */
+  @NonNull
+  Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId, @NonNull java.time.Instant after)
+      throws HieroException;
+
+  /**
    * Queries all transactions for a specific account and transaction type.
    *
    * @param accountId the account ID to query transactions for
@@ -395,6 +407,18 @@ public interface MirrorNodeClient {
    * @throws HieroException if the search fails
    */
   @NonNull Page<TopicMessage> queryTopicMessages(TopicId topicId) throws HieroException;
+
+  /**
+   * Return TopicMessages for given topicId after a certain timestamp.
+   *
+   * @param topicId id of the topic
+   * @param after the timestamp to start querying from (exclusive)
+   * @return Page of TopicMessage
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  Page<TopicMessage> queryTopicMessages(@NonNull TopicId topicId, @NonNull java.time.Instant after)
+      throws HieroException;
 
   /**
    * Return TopicMessages for given topicId.

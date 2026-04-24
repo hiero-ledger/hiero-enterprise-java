@@ -1,6 +1,7 @@
 package org.hiero.base.mirrornode;
 
 import com.hedera.hashgraph.sdk.TopicId;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
@@ -57,7 +58,34 @@ public interface TopicRepository {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return getMessages(TopicId.fromString(topicId));
   }
-  ;
+
+  /**
+   * Return TopicMessages for given topicId after a certain timestamp.
+   *
+   * @param topicId id of the topic
+   * @param after the timestamp to start querying from (exclusive)
+   * @return Page of TopicMessage
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  Page<TopicMessage> getMessages(@NonNull TopicId topicId, @NonNull Instant after)
+      throws HieroException;
+
+  /**
+   * Return TopicMessages for given topicId after a certain timestamp.
+   *
+   * @param topicId id of the topic
+   * @param after the timestamp to start querying from (exclusive)
+   * @return Page of TopicMessage
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  default Page<TopicMessage> getMessages(@NonNull String topicId, @NonNull Instant after)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    return getMessages(TopicId.fromString(topicId), after);
+  }
 
   /**
    * Return TopicMessage for given topicId.

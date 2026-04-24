@@ -98,6 +98,18 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   }
 
   @Override
+  public Page<TransactionInfo> queryTransactionsByAccount(
+      @NonNull AccountId accountId, @NonNull java.time.Instant after) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    final String path = "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
+    final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction =
+        n -> jsonConverter.toTransactionInfos(n);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
   public @NonNull Page<TransactionInfo> queryTransactionsByAccountAndType(
       @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
@@ -171,6 +183,22 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
         node -> jsonConverter.toTopicMessages(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<TopicMessage> queryTopicMessages(@NonNull TopicId topicId, @NonNull java.time.Instant after)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    final String path = "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
+    final Function<JsonNode, List<TopicMessage>> dataExtractionFunction =
+        node -> jsonConverter.toTopicMessages(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  private String formatInstant(java.time.Instant instant) {
+    return instant.getEpochSecond() + "." + String.format("%09d", instant.getNano());
   }
 
   @Override

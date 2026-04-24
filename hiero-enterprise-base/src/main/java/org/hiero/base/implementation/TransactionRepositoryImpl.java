@@ -30,6 +30,14 @@ public class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @Override
+  public @NonNull Page<TransactionInfo> findByAccount(
+      @NonNull AccountId accountId, @NonNull java.time.Instant after) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    return this.mirrorNodeClient.queryTransactionsByAccount(accountId, after);
+  }
+
+  @Override
   public @NonNull Page<TransactionInfo> findByAccountAndType(
       @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
