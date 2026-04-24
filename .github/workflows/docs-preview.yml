@@ -1,0 +1,58 @@
+name: Docs Preview Deploy
+
+# Runs after the "Docs" workflow completes. Because workflow_run runs in
+# the base-repo context, it has a writable GITHUB_TOKEN even when the
+# originating run was a fork PR. This lets us deploy a /pr/<number>/
+# preview for any PR without giving PR-controlled code access to secrets.
+on:
+  workflow_run:
+    workflows: ["Docs"]
+    types: [completed]
+
+permissions:
+  actions: read        # download the artifact from the triggering Docs run
+  contents: write      # push the preview to gh-pages
+  pull-requests: write # comment the preview URL on the PR
+
+concurrency:
+  group: "docs-preview-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-preview
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read PR number
+        id: pr
+        run: echo "number=$(cat pr/NR | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy PR preview to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: "pr/${{ steps.pr.outputs.number }}"
+          keep_files: true
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const prNumber = parseInt('${{ steps.pr.outputs.number }}', 10);
+            const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${prNumber}/`;
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `📖 **Docs preview** for this PR: ${url}`
+            });
