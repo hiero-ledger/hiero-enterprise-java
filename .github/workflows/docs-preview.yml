@@ -32,9 +32,18 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # The artifact comes from a run on PR-controlled code (possibly a fork),
+      # so pr/NR must be treated as untrusted input. We only accept a plain
+      # positive integer to prevent script/path injection.
       - name: Read PR number
         id: pr
-        run: echo "number=$(cat pr/NR | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+        run: |
+          raw=$(tr -d '[:space:]' < pr/NR)
+          if [[ ! "$raw" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Invalid PR number in artifact: '$raw'"
+            exit 1
+          fi
+          echo "number=$raw" >> "$GITHUB_OUTPUT"
 
       - name: Deploy PR preview to gh-pages
         uses: peaceiris/actions-gh-pages@v4
@@ -44,11 +53,15 @@ jobs:
           destination_dir: "pr/${{ steps.pr.outputs.number }}"
           keep_files: true
 
+      # Pass the PR number through env rather than ${{ }} interpolation so no
+      # attacker-controlled text can be expanded into the inline script body.
       - name: Comment PR with preview URL
         uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         with:
           script: |
-            const prNumber = parseInt('${{ steps.pr.outputs.number }}', 10);
+            const prNumber = Number(process.env.PR_NUMBER);
             const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${prNumber}/`;
             await github.rest.issues.createComment({
               issue_number: prNumber,
