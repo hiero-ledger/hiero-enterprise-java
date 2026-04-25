@@ -216,53 +216,53 @@ public class ProtocolLayerDataCreationTests {
     final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
     final Duration transactionValidDuration = Duration.ofSeconds(10);
     final Account toDelete = Account.of(new AccountId(0, 0, 12345), PrivateKey.generateECDSA());
-    final Account transferFoundsToAccount =
+    final Account transferFundsToAccount =
         Account.of(new AccountId(0, 0, 54321), PrivateKey.generateECDSA());
 
     // then
     Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete));
-    Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete, transferFoundsToAccount));
+    Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete, transferFundsToAccount));
     Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete, null));
     Assertions.assertDoesNotThrow(
         () ->
             new AccountDeleteRequest(
-                maxTransactionFee, transactionValidDuration, toDelete, transferFoundsToAccount));
+                maxTransactionFee, transactionValidDuration, toDelete, transferFundsToAccount));
     Assertions.assertDoesNotThrow(
         () ->
             new AccountDeleteRequest(maxTransactionFee, transactionValidDuration, toDelete, null));
     Assertions.assertThrows(NullPointerException.class, () -> AccountDeleteRequest.of(null));
     Assertions.assertThrows(
-        NullPointerException.class, () -> AccountDeleteRequest.of(null, transferFoundsToAccount));
+        NullPointerException.class, () -> AccountDeleteRequest.of(null, transferFundsToAccount));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new AccountDeleteRequest(
-                null, transactionValidDuration, toDelete, transferFoundsToAccount));
+                null, transactionValidDuration, toDelete, transferFundsToAccount));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new AccountDeleteRequest(maxTransactionFee, null, toDelete, transferFoundsToAccount));
+        () -> new AccountDeleteRequest(maxTransactionFee, null, toDelete, transferFundsToAccount));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new AccountDeleteRequest(
-                maxTransactionFee, transactionValidDuration, null, transferFoundsToAccount));
+                maxTransactionFee, transactionValidDuration, null, transferFundsToAccount));
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> AccountDeleteRequest.of(toDelete, toDelete));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new AccountDeleteRequest(
-                Hbar.from(-1000), transactionValidDuration, toDelete, transferFoundsToAccount));
+                Hbar.from(-1000), transactionValidDuration, toDelete, transferFundsToAccount));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new AccountDeleteRequest(
-                maxTransactionFee, Duration.ZERO, toDelete, transferFoundsToAccount));
+                maxTransactionFee, Duration.ZERO, toDelete, transferFundsToAccount));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new AccountDeleteRequest(
-                maxTransactionFee, Duration.ofSeconds(-10), toDelete, transferFoundsToAccount));
+                maxTransactionFee, Duration.ofSeconds(-10), toDelete, transferFundsToAccount));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->

@@ -11,7 +11,7 @@ public record AccountDeleteRequest(
     @NonNull Hbar maxTransactionFee,
     @NonNull Duration transactionValidDuration,
     @NonNull Account toDelete,
-    @Nullable Account transferFoundsToAccount)
+    @Nullable Account transferFundsToAccount)
     implements TransactionRequest {
 
   public AccountDeleteRequest {
@@ -24,9 +24,9 @@ public record AccountDeleteRequest(
     if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
       throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
-    if (transferFoundsToAccount != null
-        && Objects.equals(toDelete.accountId(), transferFoundsToAccount.accountId())) {
-      throw new IllegalArgumentException("transferFoundsToAccount must be different from toDelete");
+    if (transferFundsToAccount != null
+        && Objects.equals(toDelete.accountId(), transferFundsToAccount.accountId())) {
+      throw new IllegalArgumentException("transferFundsToAccount must be different from toDelete");
     }
   }
 
@@ -37,11 +37,11 @@ public record AccountDeleteRequest(
 
   @NonNull
   public static AccountDeleteRequest of(
-      @NonNull Account toDelete, @Nullable Account transferFoundsToAccount) {
+      @NonNull Account toDelete, @Nullable Account transferFundsToAccount) {
     return new AccountDeleteRequest(
         DEFAULT_MAX_TRANSACTION_FEE,
         DEFAULT_TRANSACTION_VALID_DURATION,
         toDelete,
-        transferFoundsToAccount);
+        transferFundsToAccount);
   }
 }

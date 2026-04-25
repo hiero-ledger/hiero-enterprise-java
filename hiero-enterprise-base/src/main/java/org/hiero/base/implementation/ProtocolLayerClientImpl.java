@@ -354,12 +354,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setMaxTransactionFee(request.maxTransactionFee())
             .setTransactionValidDuration(request.transactionValidDuration())
             .setAccountId(request.toDelete().accountId());
-    if (request.transferFoundsToAccount() != null) {
-      transaction.setTransferAccountId(request.transferFoundsToAccount().accountId());
+    if (request.transferFundsToAccount() != null) {
+      transaction.setTransferAccountId(request.transferFundsToAccount().accountId());
       sign(
           transaction,
           request.toDelete().privateKey(),
-          request.transferFoundsToAccount().privateKey());
+          request.transferFundsToAccount().privateKey());
     } else {
       transaction.setTransferAccountId(hieroContext.getOperatorAccount().accountId());
       sign(
