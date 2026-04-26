@@ -43,11 +43,11 @@ public class TopicObserver extends AbstractPollingObserver<TopicMessage> {
     }
 
     @Override
-    protected void poll() throws Exception {
+    public void poll() throws Exception {
         log.trace("Polling messages for topic {} after {}", topicId, lastSeenTimestamp);
 
         Page<TopicMessage> page = repository.getMessages(topicId, lastSeenTimestamp);
-        List<TopicMessage> messages = page.getData();
+        List<TopicMessage> messages = new java.util.ArrayList<>(page.getData());
 
         if (messages.isEmpty()) {
             return;
@@ -57,8 +57,8 @@ public class TopicObserver extends AbstractPollingObserver<TopicMessage> {
         messages.sort(Comparator.comparing(TopicMessage::consensusTimestamp));
 
         for (TopicMessage msg : messages) {
-            notifyListener(msg);
             if (msg.consensusTimestamp().isAfter(lastSeenTimestamp)) {
+                notifyListener(msg);
                 lastSeenTimestamp = msg.consensusTimestamp();
             }
         }

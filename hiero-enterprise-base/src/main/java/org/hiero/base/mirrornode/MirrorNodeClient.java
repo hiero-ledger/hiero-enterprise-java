@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -183,8 +184,7 @@ public interface MirrorNodeClient {
    * @return a page of transaction information
    * @throws HieroException if an error occurs during the query
    */
-  @NonNull
-  Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId, @NonNull java.time.Instant after)
+  @NonNull Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId, @NonNull Instant after)
       throws HieroException;
 
   /**
@@ -416,8 +416,7 @@ public interface MirrorNodeClient {
    * @return Page of TopicMessage
    * @throws HieroException if the search fails
    */
-  @NonNull
-  Page<TopicMessage> queryTopicMessages(@NonNull TopicId topicId, @NonNull java.time.Instant after)
+  @NonNull Page<TopicMessage> queryTopicMessages(@NonNull TopicId topicId, @NonNull Instant after)
       throws HieroException;
 
   /**

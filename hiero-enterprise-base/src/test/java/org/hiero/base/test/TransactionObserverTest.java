@@ -1,4 +1,4 @@
-package org.hiero.base.observer;
+package org.hiero.base.test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,6 +12,8 @@ import java.util.List;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.mirrornode.TransactionRepository;
+import org.hiero.base.observer.EventObserver;
+import org.hiero.base.observer.TransactionObserver;
 import org.hiero.base.protocol.data.TransactionType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,7 @@ class TransactionObserverTest {
         TransactionInfo tx = new TransactionInfo(
                 "0.0.1234@1234567890.000000001",
                 null, 0, txTime, null, "100", null,
-                TransactionType.CRYPTOTRANSFER, Collections.emptyList(), null, 0, null,
+                TransactionType.CRYPTO_TRANSFER, Collections.emptyList(), null, 0, null,
                 "SUCCESS", false, Collections.emptyList(), Collections.emptyList(), null,
                 Collections.emptyList(), "120", Instant.now()
         );

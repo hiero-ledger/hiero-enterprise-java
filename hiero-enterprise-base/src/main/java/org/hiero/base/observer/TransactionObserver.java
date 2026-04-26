@@ -47,11 +47,11 @@ public class TransactionObserver extends AbstractPollingObserver<TransactionInfo
     }
 
     @Override
-    protected void poll() throws Exception {
+    public void poll() throws Exception {
         log.trace("Polling transactions for account {} after {}", accountId, lastSeenTimestamp);
 
         Page<TransactionInfo> page = repository.findByAccount(accountId, lastSeenTimestamp);
-        List<TransactionInfo> transactions = page.getData();
+        List<TransactionInfo> transactions = new java.util.ArrayList<>(page.getData());
 
         if (transactions.isEmpty()) {
             return;
@@ -61,8 +61,8 @@ public class TransactionObserver extends AbstractPollingObserver<TransactionInfo
         transactions.sort(Comparator.comparing(TransactionInfo::consensusTimestamp));
 
         for (TransactionInfo tx : transactions) {
-            notifyListener(tx);
             if (tx.consensusTimestamp().isAfter(lastSeenTimestamp)) {
+                notifyListener(tx);
                 lastSeenTimestamp = tx.consensusTimestamp();
             }
         }

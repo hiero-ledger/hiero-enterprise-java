@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import jakarta.json.JsonObject;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -73,7 +74,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
   @Override
   public @NonNull Page<TransactionInfo> queryTransactionsByAccount(
-      @NonNull AccountId accountId, @NonNull java.time.Instant after) throws HieroException {
+      @NonNull AccountId accountId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(after, "after must not be null");
     final String path = "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
@@ -155,7 +156,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
   @Override
   public @NonNull Page<TopicMessage> queryTopicMessages(
-      @NonNull TopicId topicId, @NonNull java.time.Instant after) throws HieroException {
+      @NonNull TopicId topicId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(after, "after must not be null");
     final String path = "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
@@ -164,7 +165,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
-  private String formatInstant(java.time.Instant instant) {
+  private String formatInstant(Instant instant) {
     return instant.getEpochSecond() + "." + String.format("%09d", instant.getNano());
   }
 

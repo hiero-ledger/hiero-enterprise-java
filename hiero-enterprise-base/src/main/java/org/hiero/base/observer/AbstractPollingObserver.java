@@ -75,7 +75,7 @@ public abstract class AbstractPollingObserver<T> {
      *
      * @throws Exception if polling fails.
      */
-    protected abstract void poll() throws Exception;
+    public abstract void poll() throws Exception;
 
     /**
      * Notifies the listener of a new event.

@@ -1,6 +1,7 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
@@ -31,7 +32,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
   @Override
   public @NonNull Page<TransactionInfo> findByAccount(
-      @NonNull AccountId accountId, @NonNull java.time.Instant after) throws HieroException {
+      @NonNull AccountId accountId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(after, "after must not be null");
     return this.mirrorNodeClient.queryTransactionsByAccount(accountId, after);
