@@ -29,17 +29,17 @@ public abstract class AbstractPollingObserver<T> {
     /**
      * Creates a new polling observer.
      *
+     * @param executorService The shared executor service to use for polling.
      * @param pollingInterval How often to check for new events.
      * @param listener The callback to trigger when an event is found.
      */
-    protected AbstractPollingObserver(@NonNull Duration pollingInterval, @NonNull EventObserver<T> listener) {
+    protected AbstractPollingObserver(
+            @NonNull ScheduledExecutorService executorService,
+            @NonNull Duration pollingInterval,
+            @NonNull EventObserver<T> listener) {
+        this.executorService = executorService;
         this.pollingInterval = pollingInterval;
         this.listener = listener;
-        this.executorService = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread thread = new Thread(r, "hiero-observer-" + getClass().getSimpleName());
-            thread.setDaemon(true);
-            return thread;
-        });
     }
 
     /**
@@ -48,7 +48,13 @@ public abstract class AbstractPollingObserver<T> {
     public void start() {
         if (running.compareAndSet(false, true)) {
             log.info("Starting Hiero observer: {}", getClass().getSimpleName());
-            executorService.scheduleAtFixedRate(this::pollSafe, 0, pollingInterval.toMillis(), TimeUnit.MILLISECONDS);
+            scheduleNext(0);
+        }
+    }
+
+    private void scheduleNext(long delayMs) {
+        if (running.get()) {
+            executorService.schedule(this::pollSafe, delayMs, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -56,26 +62,29 @@ public abstract class AbstractPollingObserver<T> {
      * Stops the background polling task.
      */
     public void stop() {
-        if (running.compareAndSet(true, false)) {
-            log.info("Stopping Hiero observer: {}", getClass().getSimpleName());
-            executorService.shutdown();
-        }
+        running.set(false);
+        log.info("Stopping Hiero observer: {}", getClass().getSimpleName());
     }
 
     private void pollSafe() {
         try {
-            poll();
+            boolean hasMore = poll();
+            // If there's more data (pagination), poll again immediately.
+            // Otherwise, wait for the polling interval.
+            scheduleNext(hasMore ? 0 : pollingInterval.toMillis());
         } catch (Exception e) {
             log.error("Unexpected error during Hiero polling in {}", getClass().getSimpleName(), e);
+            scheduleNext(pollingInterval.toMillis());
         }
     }
 
     /**
      * The actual polling logic to be implemented by subclasses.
      *
+     * @return true if there is more data to poll immediately (pagination), false otherwise.
      * @throws Exception if polling fails.
      */
-    public abstract void poll() throws Exception;
+    public abstract boolean poll() throws Exception;
 
     /**
      * Notifies the listener of a new event.

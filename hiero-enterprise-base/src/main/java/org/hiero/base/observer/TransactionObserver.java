@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.mirrornode.TransactionRepository;
@@ -29,17 +30,19 @@ public class TransactionObserver extends AbstractPollingObserver<TransactionInfo
     /**
      * Creates a new transaction observer.
      *
+     * @param executorService The shared executor service to use for polling.
      * @param repository The repository to use for polling.
      * @param accountId The account to monitor.
      * @param pollingInterval How often to poll the mirror node.
      * @param listener The callback for new transactions.
      */
     public TransactionObserver(
+            @NonNull ScheduledExecutorService executorService,
             @NonNull TransactionRepository repository,
             @NonNull AccountId accountId,
             @NonNull Duration pollingInterval,
             @NonNull EventObserver<TransactionInfo> listener) {
-        super(pollingInterval, listener);
+        super(executorService, pollingInterval, listener);
         this.repository = repository;
         this.accountId = accountId;
         // Start from current time to avoid processing historical transactions by default
@@ -47,12 +50,17 @@ public class TransactionObserver extends AbstractPollingObserver<TransactionInfo
     }
 
     @Override
-    public void poll() throws Exception {
+    public boolean poll() throws Exception {
         log.trace("Polling transactions for account {} after {}", accountId, lastSeenTimestamp);
 
         Page<TransactionInfo> page = repository.findByAccount(accountId, lastSeenTimestamp);
-        List<TransactionInfo> transactions = new java.util.ArrayList<>(page.getData());
+        processPage(page);
 
+        return page.hasNext();
+    }
+
+    private void processPage(Page<TransactionInfo> page) {
+        List<TransactionInfo> transactions = new java.util.ArrayList<>(page.getData());
         if (transactions.isEmpty()) {
             return;
         }

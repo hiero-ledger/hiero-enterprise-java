@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.TopicRepository;
@@ -26,29 +27,36 @@ public class TopicObserver extends AbstractPollingObserver<TopicMessage> {
     /**
      * Creates a new topic observer.
      *
+     * @param executorService The shared executor service to use for polling.
      * @param repository The repository to use for polling.
      * @param topicId The topic to monitor.
      * @param pollingInterval How often to poll the mirror node.
      * @param listener The callback for new messages.
      */
     public TopicObserver(
+            @NonNull ScheduledExecutorService executorService,
             @NonNull TopicRepository repository,
             @NonNull TopicId topicId,
             @NonNull Duration pollingInterval,
             @NonNull EventObserver<TopicMessage> listener) {
-        super(pollingInterval, listener);
+        super(executorService, pollingInterval, listener);
         this.repository = repository;
         this.topicId = topicId;
         this.lastSeenTimestamp = Instant.now();
     }
 
     @Override
-    public void poll() throws Exception {
+    public boolean poll() throws Exception {
         log.trace("Polling messages for topic {} after {}", topicId, lastSeenTimestamp);
 
         Page<TopicMessage> page = repository.getMessages(topicId, lastSeenTimestamp);
-        List<TopicMessage> messages = new java.util.ArrayList<>(page.getData());
+        processPage(page);
 
+        return page.hasNext();
+    }
+
+    private void processPage(Page<TopicMessage> page) {
+        List<TopicMessage> messages = new java.util.ArrayList<>(page.getData());
         if (messages.isEmpty()) {
             return;
         }

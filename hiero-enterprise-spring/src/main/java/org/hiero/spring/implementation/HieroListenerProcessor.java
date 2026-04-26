@@ -15,9 +15,12 @@ import org.hiero.spring.annotation.HieroTopicListener;
 import org.hiero.spring.annotation.HieroTransactionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -30,17 +33,29 @@ public class HieroListenerProcessor implements BeanPostProcessor, SmartLifecycle
 
     private final TransactionRepository transactionRepository;
     private final TopicRepository topicRepository;
+    private final TaskScheduler taskScheduler;
     private final List<AbstractPollingObserver<?>> observers = new ArrayList<>();
     private boolean running = false;
 
     public HieroListenerProcessor(TransactionRepository transactionRepository, TopicRepository topicRepository) {
         this.transactionRepository = transactionRepository;
         this.topicRepository = topicRepository;
+        this.taskScheduler = createDefaultTaskScheduler();
+    }
+
+    private TaskScheduler createDefaultTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(Runtime.getRuntime().availableProcessors());
+        scheduler.setThreadNamePrefix("hiero-observer-");
+        scheduler.setDaemon(true);
+        scheduler.initialize();
+        return scheduler;
     }
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        ReflectionUtils.doWithMethods(bean.getClass(), method -> {
+        Class<?> targetClass = AopProxyUtils.ultimateTargetClass(bean);
+        ReflectionUtils.doWithMethods(targetClass, method -> {
             if (method.isAnnotationPresent(HieroTransactionListener.class)) {
                 processTransactionListener(bean, method);
             }
@@ -56,6 +71,7 @@ public class HieroListenerProcessor implements BeanPostProcessor, SmartLifecycle
         log.info("Registering transaction listener for account {} on method {}", annotation.account(), method.getName());
 
         TransactionObserver observer = new TransactionObserver(
+                ((ThreadPoolTaskScheduler) taskScheduler).getScheduledExecutor(),
                 transactionRepository,
                 AccountId.fromString(annotation.account()),
                 Duration.ofMillis(annotation.interval()),
@@ -72,6 +88,7 @@ public class HieroListenerProcessor implements BeanPostProcessor, SmartLifecycle
         log.info("Registering topic listener for topic {} on method {}", annotation.topicId(), method.getName());
 
         TopicObserver observer = new TopicObserver(
+                ((ThreadPoolTaskScheduler) taskScheduler).getScheduledExecutor(),
                 topicRepository,
                 TopicId.fromString(annotation.topicId()),
                 Duration.ofMillis(annotation.interval()),

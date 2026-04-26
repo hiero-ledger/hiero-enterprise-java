@@ -19,8 +19,8 @@ public class HieroEventListener {
      */
     @HieroTransactionListener(account = "0.0.1234", interval = 10000)
     public void onTransaction(TransactionInfo tx) {
-        log.info(">>> [Hiero Event] New transaction detected: {} (Status: {})", 
-                 tx.transactionId(), tx.status());
+        log.info(">>> [Hiero Event] New transaction detected: {} (Result: {})", 
+                 tx.transactionId(), tx.result());
     }
 
     /**

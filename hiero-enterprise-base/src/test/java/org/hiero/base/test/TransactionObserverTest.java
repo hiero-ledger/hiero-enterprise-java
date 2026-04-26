@@ -9,6 +9,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.mirrornode.TransactionRepository;
@@ -30,11 +32,12 @@ class TransactionObserverTest {
 
     private TransactionObserver observer;
     private final AccountId accountId = AccountId.fromString("0.0.1234");
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        observer = new TransactionObserver(repository, accountId, Duration.ofMillis(100), listener);
+        observer = new TransactionObserver(executorService, repository, accountId, Duration.ofMillis(100), listener);
     }
 
     @Test
