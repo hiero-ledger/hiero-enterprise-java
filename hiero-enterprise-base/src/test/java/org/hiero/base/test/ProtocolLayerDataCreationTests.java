@@ -323,6 +323,10 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new AccountUpdateRequest(
                 maxTransactionFee, transactionValidDuration, toUpdate, null, memo));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new AccountUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
     Assertions.assertThrows(
         NullPointerException.class, () -> AccountUpdateRequest.updateKey(null, updatedPrivateKey));
     Assertions.assertThrows(
@@ -343,11 +347,6 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new AccountUpdateRequest(
                 maxTransactionFee, transactionValidDuration, toUpdate, null, null));
-    Assertions.assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            new AccountUpdateRequest(
-                maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->

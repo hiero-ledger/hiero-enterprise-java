@@ -196,12 +196,23 @@ public class AccountClientImplTest {
   }
 
   @Test
-  void testUpdateAccountMemoBlankMemoThrowsException() throws HieroException {
+  void testUpdateAccountMemoBlankMemoSuccessful() throws HieroException {
     Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
+    String memo = " ";
+    ArgumentCaptor<AccountUpdateRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountUpdateRequest.class);
+    when(mockProtocolLayerClient.executeAccountUpdateTransaction(any(AccountUpdateRequest.class)))
+        .thenReturn(
+            new AccountUpdateResult(TransactionId.generate(account.accountId()), Status.SUCCESS));
 
-    assertThrows(
-        IllegalArgumentException.class, () -> accountClientImpl.updateAccountMemo(account, " "));
-    verify(mockProtocolLayerClient, never()).executeAccountUpdateTransaction(any());
+    accountClientImpl.updateAccountMemo(account, memo);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountUpdateTransaction(requestCaptor.capture());
+    AccountUpdateRequest request = requestCaptor.getValue();
+    assertEquals(account, request.toUpdate());
+    assertEquals(memo, request.memo());
+    assertNull(request.updatedPrivateKey());
   }
 
   @Test

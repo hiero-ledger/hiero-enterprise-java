@@ -26,7 +26,7 @@ public record AccountUpdateRequest(
     if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
       throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
-    if (updatedPrivateKey == null && (memo == null || memo.isBlank())) {
+    if (updatedPrivateKey == null && memo == null) {
       throw new IllegalArgumentException("at least one update field (key or memo) must be set");
     }
   }
