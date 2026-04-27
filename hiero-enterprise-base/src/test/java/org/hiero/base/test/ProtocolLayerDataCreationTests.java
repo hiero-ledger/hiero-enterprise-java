@@ -3,8 +3,11 @@ package org.hiero.base.test;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.EvmHookStorageUpdate;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HookEntityId;
+import com.hedera.hashgraph.sdk.HookId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -45,6 +48,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HookStoreRequest;
+import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -1816,5 +1821,80 @@ public class ProtocolLayerDataCreationTests {
         NullPointerException.class, () -> new TopicUpdateResult(null, validStatus));
     Assertions.assertThrows(
         NullPointerException.class, () -> new TopicUpdateResult(validTransactionId, null));
+  }
+
+  @Test
+  void testHookStoreRequestCreation() {
+    // given
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final HookId hookId = new HookId(new HookEntityId(new ContractId(0, 0, 1234)), 1L);
+    final List<EvmHookStorageUpdate> storageUpdates =
+        List.of(new EvmHookStorageUpdate.EvmHookStorageSlot(new byte[] {1}, new byte[] {2}));
+    final PrivateKey signerKey = PrivateKey.generateED25519();
+    final List<PrivateKey> signerKeys = List.of(signerKey);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new HookStoreRequest(
+                maxTransactionFee, transactionValidDuration, hookId, storageUpdates, signerKeys));
+    Assertions.assertDoesNotThrow(() -> HookStoreRequest.of(hookId, storageUpdates, signerKey));
+    Assertions.assertDoesNotThrow(() -> HookStoreRequest.of(hookId, storageUpdates, signerKeys));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HookStoreRequest(
+                null, transactionValidDuration, hookId, storageUpdates, signerKeys));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new HookStoreRequest(maxTransactionFee, null, hookId, storageUpdates, signerKeys));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HookStoreRequest(
+                maxTransactionFee, transactionValidDuration, null, storageUpdates, signerKeys));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HookStoreRequest(
+                maxTransactionFee, transactionValidDuration, hookId, null, signerKeys));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HookStoreRequest(
+                maxTransactionFee, transactionValidDuration, hookId, storageUpdates, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HookStoreRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                hookId,
+                storageUpdates,
+                List.of(signerKey, null)));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> HookStoreRequest.of(null, storageUpdates, signerKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> HookStoreRequest.of(hookId, null, signerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> HookStoreRequest.of(hookId, storageUpdates, (PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> HookStoreRequest.of(hookId, storageUpdates, (List<PrivateKey>) null));
+  }
+
+  @Test
+  void testHookStoreResultCreation() {
+    // given
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    // then
+    Assertions.assertDoesNotThrow(() -> new HookStoreResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new HookStoreResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new HookStoreResult(transactionId, null));
   }
 }

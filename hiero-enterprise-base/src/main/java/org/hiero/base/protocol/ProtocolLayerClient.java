@@ -26,6 +26,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HookStoreRequest;
+import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -232,6 +234,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenTransferResult executeTransferTransaction(
       @NonNull final TokenTransferRequest request) throws HieroException;
+
+  /**
+   * Executes a hook store transaction.
+   *
+   * @param request the request containing the details of the hook store transaction
+   * @return the result of the hook store transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull HookStoreResult executeHookStoreTransaction(@NonNull final HookStoreRequest request)
+      throws HieroException;
 
   /**
    * Executes a topic create transaction.
