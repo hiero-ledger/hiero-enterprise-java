@@ -60,6 +60,8 @@ public class AccountClientImpl implements AccountClient {
   @Override
   public @NonNull Account updateAccountKey(
       @NonNull Account account, @NonNull PrivateKey updatedPrivateKey) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    Objects.requireNonNull(updatedPrivateKey, "updatedPrivateKey must not be null");
     final AccountUpdateRequest request = AccountUpdateRequest.updateKey(account, updatedPrivateKey);
     client.executeAccountUpdateTransaction(request);
     return Account.of(account.accountId(), updatedPrivateKey);
@@ -68,6 +70,8 @@ public class AccountClientImpl implements AccountClient {
   @Override
   public void updateAccountMemo(@NonNull Account account, @NonNull String memo)
       throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    Objects.requireNonNull(memo, "memo must not be null");
     final AccountUpdateRequest request = AccountUpdateRequest.updateMemo(account, memo);
     client.executeAccountUpdateTransaction(request);
   }
@@ -76,6 +80,9 @@ public class AccountClientImpl implements AccountClient {
   public @NonNull Account updateAccount(
       @NonNull Account account, @NonNull PrivateKey updatedPrivateKey, @NonNull String memo)
       throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    Objects.requireNonNull(updatedPrivateKey, "updatedPrivateKey must not be null");
+    Objects.requireNonNull(memo, "memo must not be null");
     final AccountUpdateRequest request = AccountUpdateRequest.of(account, updatedPrivateKey, memo);
     client.executeAccountUpdateTransaction(request);
     return Account.of(account.accountId(), updatedPrivateKey);
