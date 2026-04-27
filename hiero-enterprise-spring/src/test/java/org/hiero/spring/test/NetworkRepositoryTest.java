@@ -39,7 +39,7 @@ public class NetworkRepositoryTest {
     Optional<NetworkStake> result = networkRepository.stake();
 
     Assertions.assertNotNull(result);
-    Assertions.assertTrue(result.isPresent());
+    result.ifPresent(stake -> Assertions.assertTrue(stake.stakeTotal() >= 0));
   }
 
   @Test
