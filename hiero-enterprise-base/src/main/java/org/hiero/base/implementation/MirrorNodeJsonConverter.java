@@ -6,6 +6,8 @@ import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.data.ContractResult;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
@@ -59,4 +61,8 @@ public interface MirrorNodeJsonConverter<JSON> {
   @NonNull Optional<Block> toBlock(@NonNull JSON json);
 
   @NonNull List<Block> toBlocks(@NonNull JSON json);
+
+  @NonNull List<ContractResult> toContractResults(@NonNull JSON json);
+
+  @NonNull List<ContractLog> toContractLogs(@NonNull JSON json);
 }

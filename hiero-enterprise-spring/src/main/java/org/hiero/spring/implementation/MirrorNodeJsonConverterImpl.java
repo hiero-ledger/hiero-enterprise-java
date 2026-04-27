@@ -27,6 +27,8 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.data.ContractResult;
 import org.hiero.base.data.CustomFee;
 import org.hiero.base.data.ExchangeRate;
 import org.hiero.base.data.ExchangeRates;
@@ -855,6 +857,175 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull List<ContractResult> toContractResults(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("results")) {
+      return List.of();
+    }
+    final JsonNode resultsNode = node.get("results");
+    if (!resultsNode.isArray()) {
+      throw new IllegalArgumentException("Contract results node is not an array: " + resultsNode);
+    }
+    return jsonArrayToStream(resultsNode)
+        .map(n -> toContractResult(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<ContractLog> toContractLogs(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("logs")) {
+      return List.of();
+    }
+    final JsonNode logsNode = node.get("logs");
+    if (!logsNode.isArray()) {
+      throw new IllegalArgumentException("Contract logs node is not an array: " + logsNode);
+    }
+    return jsonArrayToStream(logsNode)
+        .map(n -> toContractLog(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<ContractResult> toContractResult(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ContractResult(
+              textOrNull(node, "access_list"),
+              node.get("address").asText(),
+              longOrNull(node, "amount"),
+              longOrNull(node, "block_gas_used"),
+              textOrNull(node, "block_hash"),
+              longOrNull(node, "block_number"),
+              textOrNull(node, "bloom"),
+              textOrNull(node, "call_result"),
+              textOrNull(node, "chain_id"),
+              contractIdOrNull(node, "contract_id"),
+              contractIds(node.get("created_contract_ids")),
+              textOrNull(node, "error_message"),
+              textOrNull(node, "failed_initcode"),
+              textOrNull(node, "from"),
+              textOrNull(node, "function_parameters"),
+              longOrNull(node, "gas_consumed"),
+              node.get("gas_limit").asLong(),
+              textOrNull(node, "gas_price"),
+              longOrNull(node, "gas_used"),
+              textOrNull(node, "hash"),
+              textOrNull(node, "max_fee_per_gas"),
+              textOrNull(node, "max_priority_fee_per_gas"),
+              longOrNull(node, "nonce"),
+              textOrNull(node, "r"),
+              node.get("result").asText(),
+              textOrNull(node, "s"),
+              node.get("status").asText(),
+              parseTimestamp(node.get("timestamp")),
+              textOrNull(node, "to"),
+              longOrNull(node, "transaction_index"),
+              intOrNull(node, "type"),
+              intOrNull(node, "v")));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private Optional<ContractLog> toContractLog(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ContractLog(
+              node.get("address").asText(),
+              textOrNull(node, "bloom"),
+              contractIdOrNull(node, "contract_id"),
+              textOrNull(node, "data"),
+              node.get("index").asInt(),
+              strings(node.get("topics")),
+              textOrNull(node, "block_hash"),
+              longOrNull(node, "block_number"),
+              contractIdOrNull(node, "root_contract_id"),
+              timestampOrNull(node, "timestamp"),
+              textOrNull(node, "transaction_hash"),
+              intOrNull(node, "transaction_index")));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private String textOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return field.asText();
+  }
+
+  private Long longOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return field.asLong();
+  }
+
+  private Integer intOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return field.asInt();
+  }
+
+  private ContractId contractIdOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final String value = textOrNull(node, fieldName);
+    return value == null ? null : ContractId.fromString(value);
+  }
+
+  private List<ContractId> contractIds(final JsonNode node) {
+    if (node == null || node.isNull() || !node.isArray()) {
+      return List.of();
+    }
+    return jsonArrayToStream(node).map(n -> ContractId.fromString(n.asText())).toList();
+  }
+
+  private List<String> strings(final JsonNode node) {
+    if (node == null || node.isNull() || !node.isArray()) {
+      return List.of();
+    }
+    return jsonArrayToStream(node).map(JsonNode::asText).toList();
+  }
+
+  private Instant timestampOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return parseTimestamp(field);
+  }
+
+  private Instant parseTimestamp(@NonNull JsonNode node) {
+    final String value = node.asText();
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 
   private @NonNull Key parseProtoBufEncodedKey(@NonNull String key) throws Exception {
