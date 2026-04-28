@@ -1,8 +1,11 @@
 package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.Client;
+import org.hiero.base.config.NetworkSettings;
 import org.hiero.base.data.Account;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Optional;
 
 /** Context for a specific Hiero connection to a network. */
 public interface HieroContext {
@@ -21,4 +24,6 @@ public interface HieroContext {
    * @return the client
    */
   @NonNull Client getClient();
+
+  @NonNull Optional<String> getMirrorNodeRestUrl();
 }

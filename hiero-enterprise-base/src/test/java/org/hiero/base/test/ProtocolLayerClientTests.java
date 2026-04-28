@@ -9,6 +9,8 @@ import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 public class ProtocolLayerClientTests {
 
   @Test
@@ -29,6 +31,11 @@ public class ProtocolLayerClientTests {
           @Override
           public @NonNull Client getClient() {
             return null;
+          }
+
+          @Override
+          public @NonNull Optional<String> getMirrorNodeRestUrl() {
+            return Optional.empty();
           }
         };
     final ProtocolLayerClient client = new ProtocolLayerClientImpl(context);
