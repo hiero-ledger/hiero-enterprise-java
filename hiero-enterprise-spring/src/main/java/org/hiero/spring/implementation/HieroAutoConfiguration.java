@@ -13,6 +13,7 @@ import org.hiero.base.TopicClient;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.implementation.AccountRepositoryImpl;
+import org.hiero.base.implementation.BlockRepositoryImpl;
 import org.hiero.base.implementation.ContractRepositoryImpl;
 import org.hiero.base.implementation.FileClientImpl;
 import org.hiero.base.implementation.FungibleTokenClientImpl;
