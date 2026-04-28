@@ -3,6 +3,9 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
+import java.util.function.Consumer;
+
+import com.hedera.hashgraph.sdk.TopicMessage;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
@@ -226,5 +229,13 @@ public class TopicClientImpl implements TopicClient {
     Objects.requireNonNull(message, "message must not be null");
     TopicSubmitMessageRequest request = TopicSubmitMessageRequest.of(topicId, submitKey, message);
     client.executeTopicMessageSubmitTransaction(request);
+  }
+
+  @Override
+  public TopicMessageResult subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+    TopicMessageRequest request = TopicMessageRequest.of(topicId, handler);
+    return client.executeTopicMessageQuery(request);
   }
 }

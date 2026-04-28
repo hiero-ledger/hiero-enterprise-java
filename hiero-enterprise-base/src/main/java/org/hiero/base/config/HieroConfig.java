@@ -30,11 +30,18 @@ public interface HieroConfig {
   @NonNull Optional<String> getNetworkName();
 
   /**
+   * Returns the mirror node gRPC addresses.
+   *
+   * @return the mirror node gRPC addresses
+   */
+  @NonNull Set<String> getMirrorNodeGrpcAddresses();
+
+  /**
    * Returns the mirror node addresses.
    *
    * @return the mirror node addresses
    */
-  @NonNull Set<String> getMirrorNodeAddresses();
+  @NonNull Optional<String> getMirrorNodeRestUrl();
 
   /**
    * Returns the consensus nodes.
@@ -81,6 +88,11 @@ public interface HieroConfig {
       public @NonNull Client getClient() {
         return client;
       }
+
+      @Override
+      public @NonNull Optional<String> getMirrorNodeRestUrl() {
+        return getMirrorNodeRestUrl();
+      }
     };
   }
 
@@ -97,9 +109,9 @@ public interface HieroConfig {
           getConsensusNodes().stream()
               .collect(Collectors.toMap(n -> n.getAddress(), n -> n.getAccountId()));
       final Client client = Client.forNetwork(nodes);
-      final List<String> mirrorNodeAddresses =
-          getMirrorNodeAddresses().stream().collect(Collectors.toList());
-      client.setMirrorNetwork(mirrorNodeAddresses);
+      final List<String> mirrorNodeGrpcAddresses =
+          getMirrorNodeGrpcAddresses().stream().collect(Collectors.toList());
+      client.setMirrorNetwork(mirrorNodeGrpcAddresses);
       client.setOperator(getOperatorAccount().accountId(), getOperatorAccount().privateKey());
       getRequestTimeout().ifPresent(client::setRequestTimeout);
       return client;

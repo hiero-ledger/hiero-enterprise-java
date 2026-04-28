@@ -21,7 +21,8 @@ public class HieroConfigImpl implements HieroConfig {
 
   private final String networkName;
 
-  private final Set<String> mirrorNodeAddresses;
+  private final Set<String> mirrorNodeGrpcAddresses;
+  private final String mirrorNodeRestUrl;
 
   private final Set<ConsensusNode> consensusNodes;
 
@@ -48,21 +49,27 @@ public class HieroConfigImpl implements HieroConfig {
 
     final Optional<NetworkSettings> networkSettings =
         NetworkSettings.forIdentifier(properties.getNetwork().getName());
+
     if (networkSettings.isPresent()) {
       final NetworkSettings settings = networkSettings.get();
       networkName = settings.getNetworkName().orElse(properties.getNetwork().getName());
-      mirrorNodeAddresses = Collections.unmodifiableSet(settings.getMirrorNodeAddresses());
+      mirrorNodeGrpcAddresses = Collections.unmodifiableSet(settings.getMirrorNodeGrpcAddresses());
+      mirrorNodeRestUrl = settings.getMirrorNodeRestUrl().get();
       consensusNodes = Collections.unmodifiableSet(settings.getConsensusNodes());
       chainId = settings.chainId().orElse(null);
       relayUrl = settings.relayUrl().orElse(null);
     } else {
       networkName = properties.getNetwork().getName();
       final String mirrorNodeAddress = properties.getNetwork().getMirrorNode();
+
       if (mirrorNodeAddress != null && !mirrorNodeAddress.isBlank()) {
-        mirrorNodeAddresses = Set.of(mirrorNodeAddress);
+        mirrorNodeGrpcAddresses = Set.of();
+        mirrorNodeRestUrl = mirrorNodeAddress;
       } else {
-        mirrorNodeAddresses = Set.of();
+        mirrorNodeGrpcAddresses = Set.of();
+        mirrorNodeRestUrl = null;
       }
+
       final List<HieroNode> nodes = properties.getNetwork().getNodes();
       if (nodes == null || nodes.isEmpty()) {
         consensusNodes = Set.of();
@@ -106,8 +113,13 @@ public class HieroConfigImpl implements HieroConfig {
   }
 
   @Override
-  public Set<String> getMirrorNodeAddresses() {
-    return mirrorNodeAddresses;
+  public Set<String> getMirrorNodeGrpcAddresses() {
+    return mirrorNodeGrpcAddresses;
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.ofNullable(mirrorNodeRestUrl);
   }
 
   @Override
