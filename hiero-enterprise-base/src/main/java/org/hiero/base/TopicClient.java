@@ -2,11 +2,9 @@ package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessage;
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import com.hedera.hashgraph.sdk.TopicMessage;
-import org.hiero.base.protocol.data.TopicMessageRequest;
 import org.hiero.base.protocol.data.TopicMessageResult;
 import org.jspecify.annotations.NonNull;
 
@@ -353,7 +351,8 @@ public interface TopicClient {
    * @param handler the handler to call when a message is receive
    * @return if the Topic could not be subscribed
    */
-  default TopicMessageResult subscribeTopic(@NonNull String topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
+  default TopicMessageResult subscribeTopic(
+      @NonNull String topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(handler, "handler must not be null");
     return subscribeTopic(TopicId.fromString(topicId), handler);
@@ -366,5 +365,6 @@ public interface TopicClient {
    * @param handler the handler to call when a message is receive
    * @return if the Topic could not be subscribed
    */
-  TopicMessageResult subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException;
+  TopicMessageResult subscribeTopic(
+      @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException;
 }

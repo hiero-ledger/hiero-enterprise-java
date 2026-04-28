@@ -54,21 +54,22 @@ public class HieroConfigImpl implements HieroConfig {
       final NetworkSettings settings = networkSettings.get();
       networkName = settings.getNetworkName().orElse(properties.getNetwork().getName());
       mirrorNodeGrpcAddresses = Collections.unmodifiableSet(settings.getMirrorNodeGrpcAddresses());
-      mirrorNodeRestUrl = settings.getMirrorNodeRestUrl().get();
+      mirrorNodeRestUrl = settings.getMirrorNodeRestUrl().orElse(null);
       consensusNodes = Collections.unmodifiableSet(settings.getConsensusNodes());
       chainId = settings.chainId().orElse(null);
       relayUrl = settings.relayUrl().orElse(null);
     } else {
       networkName = properties.getNetwork().getName();
-      final String mirrorNodeAddress = properties.getNetwork().getMirrorNode();
 
-      if (mirrorNodeAddress != null && !mirrorNodeAddress.isBlank()) {
-        mirrorNodeGrpcAddresses = Set.of();
-        mirrorNodeRestUrl = mirrorNodeAddress;
+      final String mirrorNodeRestEndpoint = properties.getNetwork().getMirrorNode().getRestUrl();
+      if (mirrorNodeRestEndpoint != null && !mirrorNodeRestEndpoint.isBlank()) {
+        mirrorNodeRestUrl = mirrorNodeRestEndpoint;
       } else {
-        mirrorNodeGrpcAddresses = Set.of();
         mirrorNodeRestUrl = null;
       }
+
+      mirrorNodeGrpcAddresses =
+          Set.copyOf(properties.getNetwork().getMirrorNode().getGrpcAddresses());
 
       final List<HieroNode> nodes = properties.getNetwork().getNodes();
       if (nodes == null || nodes.isEmpty()) {
