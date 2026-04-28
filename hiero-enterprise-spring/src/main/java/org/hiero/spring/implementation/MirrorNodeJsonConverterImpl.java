@@ -35,6 +35,7 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
@@ -344,6 +345,44 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull List<NftTransactionTransfer> toNftTransactionTransfers(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("transactions")) {
+      return List.of();
+    }
+    final JsonNode transactionsNode = node.get("transactions");
+    if (!transactionsNode.isArray()) {
+      throw new IllegalArgumentException(
+          "NFT transaction history node is not an array: " + transactionsNode);
+    }
+    return jsonArrayToStream(transactionsNode)
+        .map(n -> toNftTransactionTransfer(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<NftTransactionTransfer> toNftTransactionTransfer(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new NftTransactionTransfer(
+              parseTimestamp(node.get("consensus_timestamp")),
+              node.get("is_approval").asBoolean(),
+              node.get("nonce").asInt(),
+              accountIdOrNull(node, "receiver_account_id"),
+              accountIdOrNull(node, "sender_account_id"),
+              node.get("transaction_id").asText(),
+              TransactionType.from(node.get("type").asText())));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
   }
 
   @Override
@@ -850,6 +889,54 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  private String textOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return field.asText();
+  }
+
+  private Long longOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return field.asLong();
+  }
+
+  private Integer intOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return field.asInt();
+  }
+
+  private ContractId contractIdOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final String value = textOrNull(node, fieldName);
+    return value == null ? null : ContractId.fromString(value);
+  }
+
+  private AccountId accountIdOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final String value = textOrNull(node, fieldName);
+    return value == null ? null : AccountId.fromString(value);
+  }
+
+  private Instant parseTimestamp(@NonNull JsonNode node) {
+    final String value = node.asText();
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 
   private @NonNull Key parseProtoBufEncodedKey(@NonNull String key) throws Exception {

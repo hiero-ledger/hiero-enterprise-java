@@ -10,6 +10,7 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
@@ -36,6 +37,8 @@ public interface MirrorNodeJsonConverter<JSON> {
   @NonNull List<TransactionInfo> toTransactionInfos(@NonNull JSON json);
 
   List<Nft> toNfts(@NonNull JSON json);
+
+  @NonNull List<NftTransactionTransfer> toNftTransactionTransfers(@NonNull JSON json);
 
   Optional<TokenInfo> toTokenInfo(JSON json);
 

@@ -12,6 +12,7 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
 import org.hiero.base.data.Token;
@@ -59,6 +60,19 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   @Override
   public @NonNull Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HieroException {
     throw new RuntimeException("Not implemented");
+  }
+
+  @Override
+  public @NonNull Page<NftTransactionTransfer> queryNftTransactionHistory(
+      @NonNull TokenId tokenId, long serialNumber) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    if (serialNumber <= 0) {
+      throw new IllegalArgumentException("serialNumber must be positive");
+    }
+    final String path = "/api/v1/tokens/" + tokenId + "/nfts/" + serialNumber + "/transactions";
+    final Function<JsonObject, List<NftTransactionTransfer>> dataExtractionFunction =
+        node -> jsonConverter.toNftTransactionTransfers(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
