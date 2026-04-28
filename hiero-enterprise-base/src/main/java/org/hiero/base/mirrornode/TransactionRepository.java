@@ -1,6 +1,7 @@
 package org.hiero.base.mirrornode;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
@@ -36,6 +37,33 @@ public interface TransactionRepository {
   default Page<TransactionInfo> findByAccount(@NonNull String accountId) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return findByAccount(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Find all transactions associated with a specific account after a certain timestamp.
+   *
+   * @param accountId id of the account
+   * @param after the timestamp to start querying from (exclusive)
+   * @return page of transactions
+   * @throws HieroException if the search fails
+   */
+  @NonNull Page<TransactionInfo> findByAccount(@NonNull AccountId accountId, @NonNull Instant after)
+      throws HieroException;
+
+  /**
+   * Find all transactions associated with a specific account after a certain timestamp.
+   *
+   * @param accountId id of the account as a string
+   * @param after the timestamp to start querying from (exclusive)
+   * @return page of transactions
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  default Page<TransactionInfo> findByAccount(@NonNull String accountId, @NonNull Instant after)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    return findByAccount(AccountId.fromString(accountId), after);
   }
 
   /**

@@ -1,6 +1,7 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.TopicId;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
@@ -29,6 +30,14 @@ public class TopicRepositoryImpl implements TopicRepository {
   public @NonNull Page<TopicMessage> getMessages(TopicId topicId) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return mirrorNodeClient.queryTopicMessages(topicId);
+  }
+
+  @Override
+  public @NonNull Page<TopicMessage> getMessages(@NonNull TopicId topicId, @NonNull Instant after)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(after, "after must not be null");
+    return mirrorNodeClient.queryTopicMessages(topicId, after);
   }
 
   @Override

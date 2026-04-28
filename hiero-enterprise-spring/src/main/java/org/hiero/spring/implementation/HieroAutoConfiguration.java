@@ -129,9 +129,9 @@ public class HieroAutoConfiguration {
       final String mirrorNodeEndpointProtocol = url.getProtocol();
       final String mirrorNodeEndpointHost = url.getHost();
       final int mirrorNodeEndpointPort;
-      if (mirrorNodeEndpointProtocol == "https" && url.getPort() == -1) {
+      if (mirrorNodeEndpointProtocol.equals("https") && url.getPort() == -1) {
         mirrorNodeEndpointPort = 443;
-      } else if (mirrorNodeEndpointProtocol == "http" && url.getPort() == -1) {
+      } else if (mirrorNodeEndpointProtocol.equals("http") && url.getPort() == -1) {
         mirrorNodeEndpointPort = 80;
       } else if (url.getPort() == -1) {
         mirrorNodeEndpointPort = 443;
@@ -225,5 +225,16 @@ public class HieroAutoConfiguration {
   @Bean
   ContractVerificationClient contractVerificationClient(final HieroConfig hieroConfig) {
     return new ContractVerificationClientImplementation(hieroConfig);
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "mirrorNodeSupported",
+      havingValue = "true",
+      matchIfMissing = true)
+  HieroListenerProcessor hieroListenerProcessor(
+      final TransactionRepository transactionRepository, final TopicRepository topicRepository) {
+    return new HieroListenerProcessor(transactionRepository, topicRepository);
   }
 }

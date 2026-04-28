@@ -31,6 +31,11 @@ jobs:
       # actions: read
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.10.1
+        with:
+          egress-policy: audit
+
       - name: "Checkout code"
         uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # v5.0.1
         with:

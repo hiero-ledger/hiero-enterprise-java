@@ -33,3 +33,4 @@ replay_pid*
 **/pom.xml.versionsBackup
 
 site/
+*.code-workspace
