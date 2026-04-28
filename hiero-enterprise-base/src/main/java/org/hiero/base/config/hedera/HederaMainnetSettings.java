@@ -32,7 +32,6 @@ public final class HederaMainnetSettings implements NetworkSettings {
     return Optional.of("https://mainnet.mirrornode.hedera.com");
   }
 
-
   @Override
   public @NonNull Set<ConsensusNode> getConsensusNodes() {
     return Set.of(new ConsensusNode("35.186.191.247", "50211", "0.0.4"));

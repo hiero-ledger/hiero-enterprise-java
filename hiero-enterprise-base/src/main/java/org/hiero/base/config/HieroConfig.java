@@ -78,6 +78,7 @@ public interface HieroConfig {
   default HieroContext createHieroContext() {
     final Account operatorAccount = getOperatorAccount();
     final Client client = createClient();
+
     return new HieroContext() {
       @Override
       public @NonNull Account getOperatorAccount() {
@@ -87,11 +88,6 @@ public interface HieroConfig {
       @Override
       public @NonNull Client getClient() {
         return client;
-      }
-
-      @Override
-      public @NonNull Optional<String> getMirrorNodeRestUrl() {
-        return getMirrorNodeRestUrl();
       }
     };
   }
