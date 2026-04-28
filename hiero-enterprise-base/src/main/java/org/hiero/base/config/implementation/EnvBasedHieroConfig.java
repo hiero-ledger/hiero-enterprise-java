@@ -79,7 +79,7 @@ public class EnvBasedHieroConfig implements HieroConfig {
   }
 
   @Override
-  public @NonNull Optional<String> getMirrorNodeRestUrl () {
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
     return Optional.ofNullable(mirrorNodeRestUrl);
   }
 
