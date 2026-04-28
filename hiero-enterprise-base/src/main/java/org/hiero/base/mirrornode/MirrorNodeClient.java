@@ -11,6 +11,7 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
+import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
@@ -471,4 +472,30 @@ public interface MirrorNodeClient {
     Objects.requireNonNull(contractId, "contractId must not be null");
     return queryContractById(ContractId.fromString(contractId));
   }
+
+  /**
+   * Queries all blocks.
+   *
+   * @return the blocks
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<Block> queryBlocks() throws HieroException;
+
+  /**
+   * Queries a block by its number.
+   *
+   * @param number the block number
+   * @return the block information
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Optional<Block> queryBlockByNumber(long number) throws HieroException;
+
+  /**
+   * Queries a block by its hash.
+   *
+   * @param hash the block hash
+   * @return the block information
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Optional<Block> queryBlockByHash(@NonNull String hash) throws HieroException;
 }

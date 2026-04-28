@@ -7,10 +7,12 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
+import org.hiero.base.data.Block;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
@@ -181,5 +183,12 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public @NonNull Page<NftMetadata> findAllNftTypes() {
     throw new UnsupportedOperationException("Not yet implemented");
+  }
+
+  @Override
+  public @NonNull Page<Block> queryBlocks() throws HieroException {
+    final String path = "/api/v1/blocks";
+    final Function<JsonNode, List<Block>> dataExtractionFunction = node -> jsonConverter.toBlocks(node);
+    return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
   }
 }

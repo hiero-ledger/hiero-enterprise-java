@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
+import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.CustomFee;
@@ -39,6 +40,7 @@ import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
+import org.hiero.base.data.TimestampRange;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.TokenTransfer;
@@ -875,6 +877,59 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .map(n -> toContract(n.asJsonObject()))
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
+        .toList();
+  }
+
+  @Override
+  public @NonNull Optional<Block> toBlock(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final long count = jsonObject.getJsonNumber("count").longValue();
+      final String hapiVersion = jsonObject.getString("hapi_version");
+      final String hash = jsonObject.getString("hash");
+      final String name = jsonObject.getString("name");
+      final long number = jsonObject.getJsonNumber("number").longValue();
+      final String previousHash = jsonObject.getString("previous_hash");
+      final long size = jsonObject.getJsonNumber("size").longValue();
+      final long gasUsed = jsonObject.getJsonNumber("gas_used").longValue();
+      final String logsBloom = jsonObject.get("logs_bloom") != null ? jsonObject.getString("logs_bloom") : null;
+
+      final Instant fromTimestamp =
+          Instant.ofEpochSecond(
+              (long) Double.parseDouble(jsonObject.getJsonObject("timestamp").getString("from")));
+      final Instant toTimestamp =
+          Instant.ofEpochSecond(
+              (long) Double.parseDouble(jsonObject.getJsonObject("timestamp").getString("to")));
+
+      return Optional.of(
+          new Block(
+              count, hapiVersion, hash, name, number, previousHash, size,
+              new TimestampRange(fromTimestamp, toTimestamp), gasUsed, logsBloom));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<Block> toBlocks(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("blocks")) {
+      return List.of();
+    }
+
+    final JsonArray blocks = jsonObject.getJsonArray("blocks");
+    if (blocks == null) {
+      throw new IllegalArgumentException("Blocks array is not an array: " + blocks);
+    }
+
+    return jsonArrayToStream(blocks)
+        .map(n -> toBlock(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .toList();
   }
 }
