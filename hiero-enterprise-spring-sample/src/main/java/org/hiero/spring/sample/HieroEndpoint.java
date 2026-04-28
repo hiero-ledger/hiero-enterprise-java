@@ -17,7 +17,8 @@ public class HieroEndpoint {
 
   public HieroEndpoint(final AccountClient client, final BlockRepository blockRepository) {
     this.client = Objects.requireNonNull(client, "client must not be null");
-    this.blockRepository = Objects.requireNonNull(blockRepository, "blockRepository must not be null");
+    this.blockRepository =
+        Objects.requireNonNull(blockRepository, "blockRepository must not be null");
   }
 
   @GetMapping("/")

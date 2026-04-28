@@ -33,8 +33,7 @@ public class BlockRepositoryTest {
 
   @Test
   void testNullParam() {
-    Assertions.assertThrows(
-        NullPointerException.class, () -> blockRepository.findByHash(null));
+    Assertions.assertThrows(NullPointerException.class, () -> blockRepository.findByHash(null));
   }
 
   @Test
@@ -63,7 +62,8 @@ public class BlockRepositoryTest {
   @Test
   void testFindByHashWithNonExistentBlock() throws HieroException {
     // given
-    final String nonExistentBlockHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
+    final String nonExistentBlockHash =
+        "0x0000000000000000000000000000000000000000000000000000000000000000";
 
     // when
     final Optional<Block> result = blockRepository.findByHash(nonExistentBlockHash);

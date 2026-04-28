@@ -156,7 +156,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   @Override
   public @NonNull Page<Block> queryBlocks() throws HieroException {
     final String path = "/api/v1/blocks";
-    final Function<JsonObject, List<Block>> dataExtractionFunction = node -> jsonConverter.toBlocks(node);
+    final Function<JsonObject, List<Block>> dataExtractionFunction =
+        node -> jsonConverter.toBlocks(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 }

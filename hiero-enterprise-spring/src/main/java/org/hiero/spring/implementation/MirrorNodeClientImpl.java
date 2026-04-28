@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
@@ -188,7 +187,9 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public @NonNull Page<Block> queryBlocks() throws HieroException {
     final String path = "/api/v1/blocks";
-    final Function<JsonNode, List<Block>> dataExtractionFunction = node -> jsonConverter.toBlocks(node);
-    return new RestBasedPage<>(objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+    final Function<JsonNode, List<Block>> dataExtractionFunction =
+        node -> jsonConverter.toBlocks(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
   }
 }

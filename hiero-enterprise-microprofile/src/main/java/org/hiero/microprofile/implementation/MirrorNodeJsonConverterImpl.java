@@ -896,7 +896,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final String previousHash = jsonObject.getString("previous_hash");
       final long size = jsonObject.getJsonNumber("size").longValue();
       final long gasUsed = jsonObject.getJsonNumber("gas_used").longValue();
-      final String logsBloom = jsonObject.get("logs_bloom") != null ? jsonObject.getString("logs_bloom") : null;
+      final String logsBloom =
+          jsonObject.get("logs_bloom") != null ? jsonObject.getString("logs_bloom") : null;
 
       final Instant fromTimestamp =
           Instant.ofEpochSecond(
@@ -907,8 +908,16 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
       return Optional.of(
           new Block(
-              count, hapiVersion, hash, name, number, previousHash, size,
-              new TimestampRange(fromTimestamp, toTimestamp), gasUsed, logsBloom));
+              count,
+              hapiVersion,
+              hash,
+              name,
+              number,
+              previousHash,
+              size,
+              new TimestampRange(fromTimestamp, toTimestamp),
+              gasUsed,
+              logsBloom));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }

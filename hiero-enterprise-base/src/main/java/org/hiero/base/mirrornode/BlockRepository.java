@@ -1,6 +1,5 @@
 package org.hiero.base.mirrornode;
 
-import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Block;
@@ -16,8 +15,7 @@ public interface BlockRepository {
    * @return a page of blocks
    * @throws HieroException if an error occurs
    */
-  @NonNull
-  Page<Block> findAll() throws HieroException;
+  @NonNull Page<Block> findAll() throws HieroException;
 
   /**
    * Queries a block by its number.
@@ -26,8 +24,7 @@ public interface BlockRepository {
    * @return the block, or empty if not found
    * @throws HieroException if an error occurs
    */
-  @NonNull
-  Optional<Block> findByNumber(long number) throws HieroException;
+  @NonNull Optional<Block> findByNumber(long number) throws HieroException;
 
   /**
    * Queries a block by its hash.
@@ -36,6 +33,5 @@ public interface BlockRepository {
    * @return the block, or empty if not found
    * @throws HieroException if an error occurs
    */
-  @NonNull
-  Optional<Block> findByHash(@NonNull String hash) throws HieroException;
+  @NonNull Optional<Block> findByHash(@NonNull String hash) throws HieroException;
 }
