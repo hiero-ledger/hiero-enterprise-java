@@ -68,7 +68,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens?account.id=" + accountId;
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens?account.id=" + accountId + "&transactiontype=" + type;
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens?account.id=" + accountId + "&result=" + result;
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -101,7 +101,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens?account.id=" + accountId + "&type=" + type;
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -110,7 +110,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens?account.id=" + accountId;
     final Function<JsonObject, List<Token>> dataExtractionFunction =
         node -> jsonConverter.toTokens(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -119,7 +119,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens/" + tokenId + "/balances";
     final Function<JsonObject, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -130,7 +130,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens/" + tokenId + "/balances?account.id=" + accountId;
     final Function<JsonObject, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override
@@ -139,7 +139,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/topics/" + topicId + "/messages";
     final Function<JsonObject, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
-    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+    return new RestBasedPage<>(restClient.getRootTarget(), dataExtractionFunction, path);
   }
 
   @Override

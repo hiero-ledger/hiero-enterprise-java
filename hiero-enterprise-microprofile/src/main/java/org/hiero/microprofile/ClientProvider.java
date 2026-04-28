@@ -1,6 +1,7 @@
 package org.hiero.microprofile;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
@@ -118,14 +119,23 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
-  MirrorNodeClient createMirrorNodeClient(@NonNull final HieroConfig hieroConfig) {
+  MirrorNodeRestClientImpl createMirrorNodeRestClient(@NonNull final HieroConfig hieroConfig) {
     final String target =
         hieroConfig.getMirrorNodeAddresses().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No mirror node addresses configured"));
-    final MirrorNodeRestClientImpl restClient = new MirrorNodeRestClientImpl(target);
-    final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();
-    return new MirrorNodeClientImpl(restClient, jsonConverter);
+    return new MirrorNodeRestClientImpl(target);
+  }
+
+  void disposeMirrorNodeRestClient(@Disposes @NonNull final MirrorNodeRestClientImpl restClient) {
+    restClient.close();
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  MirrorNodeClient createMirrorNodeClient(@NonNull final MirrorNodeRestClientImpl restClient) {
+    return new MirrorNodeClientImpl(restClient, new MirrorNodeJsonConverterImpl());
   }
 
   @NonNull

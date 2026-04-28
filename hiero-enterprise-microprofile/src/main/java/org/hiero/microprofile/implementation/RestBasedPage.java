@@ -1,8 +1,7 @@
 package org.hiero.microprofile.implementation;
 
 import jakarta.json.JsonObject;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -14,7 +13,10 @@ import org.hiero.base.data.Page;
 import org.jspecify.annotations.NonNull;
 
 public class RestBasedPage<T> implements Page<T> {
-  private final String restTarget;
+
+  private static final int HTTP_NOT_FOUND = Response.Status.NOT_FOUND.getStatusCode();
+
+  private final WebTarget rootTarget;
   private final Function<JsonObject, List<T>> dataExtractionFunction;
   private final List<T> data;
   private final String rootPath;
@@ -23,49 +25,46 @@ public class RestBasedPage<T> implements Page<T> {
   private final int number;
 
   public RestBasedPage(
-      @NonNull String restTarget,
+      @NonNull WebTarget rootTarget,
       @NonNull Function<JsonObject, @NonNull List<T>> dataExtractionFunction,
       @NonNull String path) {
-    this(restTarget, dataExtractionFunction, path, path, 0);
+    this(rootTarget, dataExtractionFunction, path, path, 0);
   }
 
   public RestBasedPage(
-      @NonNull String restTarget,
+      @NonNull WebTarget rootTarget,
       @NonNull Function<JsonObject, List<T>> dataExtractionFunction,
       @NonNull String path,
       @NonNull String rootPath,
       int number) {
-    this.restTarget = Objects.requireNonNull(restTarget, "restTarget must not be null");
+    this.rootTarget = Objects.requireNonNull(rootTarget, "rootTarget must not be null");
     this.dataExtractionFunction =
         Objects.requireNonNull(dataExtractionFunction, "dataExtractionFunction must not be null");
     this.rootPath = Objects.requireNonNull(rootPath, "rootPath must not be null");
     this.currentPath = Objects.requireNonNull(path, "path must not be null");
     this.number = number;
 
-    String[] pathParts = currentPath.split("\\?");
-    final String requestPath = pathParts[0];
-
-    try {
-      Client client = ClientBuilder.newClient();
-      WebTarget target = client.target(restTarget).path(requestPath);
-      if (pathParts.length > 1) {
-        String[] params = pathParts[1].split("&");
-        for (String param : params) {
-          String[] p = param.split("=");
-          target = target.queryParam(p[0], p[1]);
-        }
+    final WebTarget requestTarget = MirrorNodeRestClientImpl.buildTarget(rootTarget, path);
+    try (final Response response = requestTarget.request(MediaType.APPLICATION_JSON).get()) {
+      final int status = response.getStatus();
+      if (status >= 400 && status != HTTP_NOT_FOUND) {
+        throw new IllegalStateException(
+            "Mirror node returned error " + status + " for path '" + path + "'");
       }
-      Response response = target.request(MediaType.APPLICATION_JSON).get();
-
-      final JsonObject jsonObject = response.readEntity(JsonObject.class);
+      final JsonObject jsonObject;
+      if (status == HTTP_NOT_FOUND || !response.hasEntity()) {
+        jsonObject = JsonObject.EMPTY_JSON_OBJECT;
+      } else {
+        jsonObject = response.readEntity(JsonObject.class);
+      }
       this.data = Collections.unmodifiableList(dataExtractionFunction.apply(jsonObject));
       this.nextPath = getNextPath(jsonObject);
-    } catch (Exception e) {
-      throw new IllegalStateException("Can not parse JSON: " + e);
+    } catch (final ProcessingException e) {
+      throw new IllegalStateException("Error calling mirror node for path '" + path + "'", e);
     }
   }
 
-  private String getNextPath(final JsonObject jsonObject) {
+  private static String getNextPath(final JsonObject jsonObject) {
     if (!jsonObject.containsKey("links")) {
       return null;
     }
@@ -73,16 +72,12 @@ public class RestBasedPage<T> implements Page<T> {
     if (linksObject == null || !linksObject.containsKey("next")) {
       return null;
     }
-
     try {
-      final String next;
-      if (!linksObject.isNull("next")) {
-        next = linksObject.getString("next");
-      } else {
-        next = null;
+      if (linksObject.isNull("next")) {
+        return null;
       }
-      return next;
-    } catch (Exception e) {
+      return linksObject.getString("next");
+    } catch (final Exception e) {
       throw new IllegalArgumentException("Error parsing next link '" + linksObject + "'", e);
     }
   }
@@ -112,12 +107,12 @@ public class RestBasedPage<T> implements Page<T> {
     if (nextPath == null) {
       throw new IllegalStateException("No next Page");
     }
-    return new RestBasedPage<T>(restTarget, dataExtractionFunction, nextPath, rootPath, number + 1);
+    return new RestBasedPage<T>(rootTarget, dataExtractionFunction, nextPath, rootPath, number + 1);
   }
 
   @Override
   public Page<T> first() {
-    return new RestBasedPage<T>(restTarget, dataExtractionFunction, rootPath);
+    return new RestBasedPage<T>(rootTarget, dataExtractionFunction, rootPath);
   }
 
   @Override
