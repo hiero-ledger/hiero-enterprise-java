@@ -86,9 +86,4 @@ public class HieroTestContext implements HieroContext {
   public Client getClient() {
     return client;
   }
-
-  @Override
-  public @NonNull Optional<String> getMirrorNodeRestUrl() {
-    return Optional.empty();
-  }
 }

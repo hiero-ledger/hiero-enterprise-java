@@ -19,7 +19,7 @@ public class HieroNetworkProperties {
   private List<HieroNode> nodes;
 
   /** Mirror node endpoint to connect to. */
-  private String mirrorNode;
+  private MirrorNode mirrorNode;
 
   private Long requestTimeoutInMs;
 
@@ -31,11 +31,11 @@ public class HieroNetworkProperties {
     this.name = name;
   }
 
-  public String getMirrorNode() {
+  public MirrorNode getMirrorNode() {
     return mirrorNode;
   }
 
-  public void setMirrorNode(String mirrorNode) {
+  public void setMirrorNode(MirrorNode mirrorNode) {
     this.mirrorNode = mirrorNode;
   }
 
@@ -53,5 +53,29 @@ public class HieroNetworkProperties {
 
   public void setRequestTimeoutInMs(Long requestTimeoutInMs) {
     this.requestTimeoutInMs = requestTimeoutInMs;
+  }
+
+  public static class MirrorNode {
+    /** Mirror node RestApi endpoint. */
+    private String restUrl;
+
+    /** List of mirror node gRPC endpoints. */
+    private List<String> grpcAddresses;
+
+    public String getRestUrl() {
+      return restUrl;
+    }
+
+    public void setRestUrl(String restUrl) {
+      this.restUrl = restUrl;
+    }
+
+    public List<String> getGrpcAddresses() {
+      return grpcAddresses;
+    }
+
+    public void setGrpcAddresses(List<String> grpcAddresses) {
+      this.grpcAddresses = grpcAddresses;
+    }
   }
 }
