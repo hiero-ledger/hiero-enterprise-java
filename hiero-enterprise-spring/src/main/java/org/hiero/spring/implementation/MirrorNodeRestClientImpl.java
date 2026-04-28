@@ -41,7 +41,8 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonNode> 
             .onStatus(
                 HttpStatusCode::is4xxClientError,
                 (request, response) -> {
-                  if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())) {
+                  if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())
+                      && !HttpStatus.BAD_REQUEST.equals(response.getStatusCode())) {
                     throw new RuntimeException("Client error: " + response.getStatusText());
                   }
                 })
@@ -53,7 +54,8 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonNode> 
             .toEntity(String.class);
     final String body = responseEntity.getBody();
     try {
-      if (HttpStatus.NOT_FOUND.equals(responseEntity.getStatusCode())) {
+      if (HttpStatus.NOT_FOUND.equals(responseEntity.getStatusCode())
+          || HttpStatus.BAD_REQUEST.equals(responseEntity.getStatusCode())) {
         return objectMapper.readTree("{}");
       }
       if (body == null || body.isBlank()) {

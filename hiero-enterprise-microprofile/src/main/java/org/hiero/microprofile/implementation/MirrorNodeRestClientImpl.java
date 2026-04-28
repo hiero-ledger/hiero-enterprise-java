@@ -22,9 +22,14 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonObject
     Client client = ClientBuilder.newClient();
     Response response = client.target(target).path(path).request(MediaType.APPLICATION_JSON).get();
 
-    if (response.getStatus() == 404 || !response.hasEntity()) {
+    if (response.getStatus() == 404 || response.getStatus() == 400 || !response.hasEntity()) {
       return JsonObject.EMPTY_JSON_OBJECT;
     }
+
+    if (response.getStatus() >= 400) {
+      throw new HieroException("Mirror Node call failed with status " + response.getStatus());
+    }
+
     return response.readEntity(JsonObject.class);
   }
 

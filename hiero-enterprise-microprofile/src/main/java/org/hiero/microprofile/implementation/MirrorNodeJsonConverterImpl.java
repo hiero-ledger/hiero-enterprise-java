@@ -56,6 +56,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public @NonNull Optional<Nft> toNft(@NonNull JsonObject jsonObject) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
     try {
       final TokenId parsedTokenId = TokenId.fromString(jsonObject.getString("token_id"));
       final AccountId account = AccountId.fromString(jsonObject.getString("account_id"));
@@ -69,6 +72,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public @NonNull Optional<NetworkSupplies> toNetworkSupplies(@NonNull JsonObject jsonObject) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
     try {
       final String releasedSupply = jsonObject.getString("released_supply");
       final String totalSupply = jsonObject.getString("total_supply");
@@ -80,6 +86,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public @NonNull Optional<NetworkStake> toNetworkStake(@NonNull JsonObject jsonObject) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
     try {
       final long maxStakeReward = jsonObject.getJsonNumber("max_stake_rewarded").longValue();
       final long maxStakeRewardPerHbar =
@@ -126,6 +135,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public @NonNull Optional<ExchangeRates> toExchangeRates(@NonNull JsonObject jsonObject) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
     try {
       final int currentCentEquivalent =
           jsonObject.getJsonObject("current_rate").getJsonNumber("cent_equivalent").intValue();
@@ -157,6 +169,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public @NonNull Optional<AccountInfo> toAccountInfo(@NonNull JsonObject node) {
+    if (node.isEmpty() || node.containsKey("_status")) {
+      return Optional.empty();
+    }
     try {
       final AccountId accountId = AccountId.fromString(node.getString("account"));
       final String evmAddress = node.getString("evm_address");
@@ -195,7 +210,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<TransactionInfo> toTransactionInfo(@NonNull JsonObject jsonObject) {
     Objects.requireNonNull(jsonObject, "jsonObject must not be null");
-    if (jsonObject.isEmpty()) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
       return Optional.empty();
     }
 
@@ -386,7 +401,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<Topic> toTopic(JsonObject jsonObject) {
     Objects.requireNonNull(jsonObject, "jsonObject must not be null");
-    if (jsonObject.isEmpty()) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
       return Optional.empty();
     }
 
@@ -468,7 +483,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<TopicMessage> toTopicMessage(JsonObject jsonObject) {
     Objects.requireNonNull(jsonObject, "jsonObject must not be null");
-    if (jsonObject.isEmpty()) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
       return Optional.empty();
     }
 
@@ -532,7 +547,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   private Optional<Token> toToken(JsonObject jsonObject) {
     Objects.requireNonNull(jsonObject, "jsonObject must not be null");
-    if (jsonObject.isEmpty()) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
       return Optional.empty();
     }
 
@@ -883,7 +898,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<Block> toBlock(@NonNull JsonObject jsonObject) {
     Objects.requireNonNull(jsonObject, "jsonObject must not be null");
-    if (jsonObject.isEmpty()) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
       return Optional.empty();
     }
 

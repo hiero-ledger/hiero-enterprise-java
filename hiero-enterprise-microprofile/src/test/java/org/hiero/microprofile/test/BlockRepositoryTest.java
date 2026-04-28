@@ -49,7 +49,7 @@ public class BlockRepositoryTest {
   @Test
   void testFindByNumberWithNonExistentBlock() throws HieroException {
     // given
-    final long nonExistentBlockNumber = -1L;
+    final long nonExistentBlockNumber = 999999999L;
 
     // when
     final Optional<Block> result = blockRepository.findByNumber(nonExistentBlockNumber);

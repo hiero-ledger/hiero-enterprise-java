@@ -157,6 +157,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public Optional<AccountInfo> toAccountInfo(final JsonNode node) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
+      return Optional.empty();
+    }
     try {
       final AccountId accountId = AccountId.fromString(node.get("account").asText());
       final String evmAddress = node.get("evm_address").asText();
@@ -199,7 +202,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<TransactionInfo> toTransactionInfo(@NonNull JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
-    if (node.isNull() || node.isEmpty()) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
       return Optional.empty();
     }
 
@@ -543,7 +546,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<Topic> toTopic(JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
-    if (node.isNull() || node.isEmpty()) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
       return Optional.empty();
     }
 
@@ -619,7 +622,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<TopicMessage> toTopicMessage(JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
-    if (node.isNull() || node.isEmpty()) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
       return Optional.empty();
     }
     try {
@@ -680,7 +683,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   private Optional<Token> toToken(JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
-    if (node.isNull() || node.isEmpty()) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
       return Optional.empty();
     }
 
@@ -879,7 +882,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull Optional<Block> toBlock(@NonNull JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
-    if (node.isNull() || node.isEmpty()) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
       return Optional.empty();
     }
 
