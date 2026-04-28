@@ -8,6 +8,8 @@ module org.hiero.base {
   exports org.hiero.base.verification;
   exports org.hiero.base.data;
   exports org.hiero.base.config;
+  exports org.hiero.base.annotations;
+  exports org.hiero.base.proxy;
   exports org.hiero.base.implementation to
       org.hiero.base.test;
   exports org.hiero.base.implementation.data to
