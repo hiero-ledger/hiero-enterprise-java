@@ -184,8 +184,8 @@ public interface MirrorNodeClient {
    * @return a page of transaction information
    * @throws HieroException if an error occurs during the query
    */
-  @NonNull Page<TransactionInfo> queryTransactionsByAccount(@NonNull AccountId accountId, @NonNull Instant after)
-      throws HieroException;
+  @NonNull Page<TransactionInfo> queryTransactionsByAccount(
+      @NonNull AccountId accountId, @NonNull Instant after) throws HieroException;
 
   /**
    * Queries all transactions for a specific account and transaction type.

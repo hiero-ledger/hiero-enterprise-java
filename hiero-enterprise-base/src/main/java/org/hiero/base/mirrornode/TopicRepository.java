@@ -78,7 +78,8 @@ public interface TopicRepository {
    * @return Page of TopicMessage
    * @throws HieroException if the search fails
    */
-  @NonNull default Page<TopicMessage> getMessages(@NonNull String topicId, @NonNull Instant after)
+  @NonNull
+  default Page<TopicMessage> getMessages(@NonNull String topicId, @NonNull Instant after)
       throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(after, "after must not be null");

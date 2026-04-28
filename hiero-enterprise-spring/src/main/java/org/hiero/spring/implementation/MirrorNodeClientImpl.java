@@ -103,7 +103,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
       @NonNull AccountId accountId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(after, "after must not be null");
-    final String path = "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
+    final String path =
+        "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
     final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction =
         n -> jsonConverter.toTransactionInfos(n);
     return new RestBasedPage<>(
@@ -187,11 +188,12 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   }
 
   @Override
-  public @NonNull Page<TopicMessage> queryTopicMessages(@NonNull TopicId topicId, @NonNull Instant after)
-      throws HieroException {
+  public @NonNull Page<TopicMessage> queryTopicMessages(
+      @NonNull TopicId topicId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(after, "after must not be null");
-    final String path = "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
+    final String path =
+        "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
     final Function<JsonNode, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
     return new RestBasedPage<>(

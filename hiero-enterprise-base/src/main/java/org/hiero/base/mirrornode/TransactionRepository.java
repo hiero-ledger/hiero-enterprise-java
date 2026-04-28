@@ -58,7 +58,8 @@ public interface TransactionRepository {
    * @return page of transactions
    * @throws HieroException if the search fails
    */
-  @NonNull default Page<TransactionInfo> findByAccount(@NonNull String accountId, @NonNull Instant after)
+  @NonNull
+  default Page<TransactionInfo> findByAccount(@NonNull String accountId, @NonNull Instant after)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(after, "after must not be null");

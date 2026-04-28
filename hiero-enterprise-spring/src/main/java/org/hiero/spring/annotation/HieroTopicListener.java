@@ -21,17 +21,17 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HieroTopicListener {
 
-    /**
-     * The topic ID to monitor for messages.
-     *
-     * @return the topic ID (e.g., "0.0.5678").
-     */
-    String topicId();
+  /**
+   * The topic ID to monitor for messages.
+   *
+   * @return the topic ID (e.g., "0.0.5678").
+   */
+  String topicId();
 
-    /**
-     * Polling interval in milliseconds. Defaults to 5000ms (5 seconds).
-     *
-     * @return the polling interval.
-     */
-    long interval() default 5000;
+  /**
+   * Polling interval in milliseconds. Defaults to 5000ms (5 seconds).
+   *
+   * @return the polling interval.
+   */
+  long interval() default 5000;
 }

@@ -77,7 +77,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
       @NonNull AccountId accountId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(after, "after must not be null");
-    final String path = "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
+    final String path =
+        "/api/v1/transactions?account.id=" + accountId + "&timestamp=gt:" + formatInstant(after);
     final Function<JsonObject, List<TransactionInfo>> dataExtractionFunction =
         node -> jsonConverter.toTransactionInfos(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -159,7 +160,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
       @NonNull TopicId topicId, @NonNull Instant after) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(after, "after must not be null");
-    final String path = "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
+    final String path =
+        "/api/v1/topics/" + topicId + "/messages?timestamp=gt:" + formatInstant(after);
     final Function<JsonObject, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);

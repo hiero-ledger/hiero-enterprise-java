@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.core.annotation.AliasFor;
 
 /**
  * Annotation that marks a method as a listener for Hiero network transactions.
@@ -22,17 +21,17 @@ import org.springframework.core.annotation.AliasFor;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HieroTransactionListener {
 
-    /**
-     * The account ID to monitor for transactions.
-     *
-     * @return the account ID (e.g., "0.0.1234").
-     */
-    String account();
+  /**
+   * The account ID to monitor for transactions.
+   *
+   * @return the account ID (e.g., "0.0.1234").
+   */
+  String account();
 
-    /**
-     * Polling interval in milliseconds. Defaults to 5000ms (5 seconds).
-     *
-     * @return the polling interval.
-     */
-    long interval() default 5000;
+  /**
+   * Polling interval in milliseconds. Defaults to 5000ms (5 seconds).
+   *
+   * @return the polling interval.
+   */
+  long interval() default 5000;
 }
