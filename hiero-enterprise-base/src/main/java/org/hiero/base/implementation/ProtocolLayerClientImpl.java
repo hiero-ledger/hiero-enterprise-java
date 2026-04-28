@@ -671,7 +671,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   }
 
   @NonNull
-  protected <T extends Transaction<T>> Transaction<T> sign(
+  private <T extends Transaction<T>> Transaction<T> sign(
       Transaction<T> transaction, final PrivateKey... keys) {
     if (keys != null) {
       transaction.freezeWith(hieroContext.getClient());
@@ -694,7 +694,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   }
 
   @NonNull
-  protected <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(
+  private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(
       @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
     Objects.requireNonNull(transaction, "transaction must not be null");
     Objects.requireNonNull(type, "type must not be null");

@@ -7,6 +7,7 @@ import org.hiero.base.AccountClient;
 import org.hiero.base.FileClient;
 import org.hiero.base.FungibleTokenClient;
 import org.hiero.base.HieroContext;
+import org.hiero.base.HookClient;
 import org.hiero.base.NftClient;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.TopicClient;
@@ -16,6 +17,7 @@ import org.hiero.base.implementation.AccountRepositoryImpl;
 import org.hiero.base.implementation.ContractRepositoryImpl;
 import org.hiero.base.implementation.FileClientImpl;
 import org.hiero.base.implementation.FungibleTokenClientImpl;
+import org.hiero.base.implementation.HookClientImpl;
 import org.hiero.base.implementation.NetworkRepositoryImpl;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.implementation.NftRepositoryImpl;
@@ -108,6 +110,11 @@ public class HieroAutoConfiguration {
   TopicClient topicClient(
       final ProtocolLayerClient protocolLayerClient, HieroContext hieroContext) {
     return new TopicClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
+  }
+
+  @Bean
+  HookClient hookClient(final ProtocolLayerClient protocolLayerClient) {
+    return new HookClientImpl(protocolLayerClient);
   }
 
   @Bean
