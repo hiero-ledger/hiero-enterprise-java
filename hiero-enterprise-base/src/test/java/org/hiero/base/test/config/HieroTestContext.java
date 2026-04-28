@@ -68,9 +68,9 @@ public class HieroTestContext implements HieroContext {
         .forEach(
             consensusNode -> nodes.put(consensusNode.getAddress(), consensusNode.getAccountId()));
     client = Client.forNetwork(nodes);
-    if (!networkSettings.getMirrorNodeAddresses().isEmpty()) {
+    if (!networkSettings.getMirrorNodeGrpcAddresses().isEmpty()) {
       try {
-        client.setMirrorNetwork(networkSettings.getMirrorNodeAddresses().stream().toList());
+        client.setMirrorNetwork(networkSettings.getMirrorNodeGrpcAddresses().stream().toList());
       } catch (InterruptedException e) {
         throw new RuntimeException("Error in configuring Mirror Node", e);
       }
@@ -85,5 +85,10 @@ public class HieroTestContext implements HieroContext {
 
   public Client getClient() {
     return client;
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.empty();
   }
 }
