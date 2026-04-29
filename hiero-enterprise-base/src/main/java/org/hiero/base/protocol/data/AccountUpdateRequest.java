@@ -24,6 +24,26 @@ public record AccountUpdateRequest(
     @Nullable Account toUpdate // Compatibility with main branch
 ) implements TransactionRequest {
 
+  // Compatibility constructor for tests
+  public AccountUpdateRequest(
+      @NonNull Hbar maxTransactionFee,
+      @NonNull Duration transactionValidDuration,
+      @NonNull Account toUpdate,
+      @Nullable PrivateKey updatedPrivateKey,
+      @Nullable String memo) {
+    this(
+        toUpdate.accountId(),
+        updatedPrivateKey != null ? updatedPrivateKey.getPublicKey() : null,
+        memo,
+        null,
+        null,
+        null,
+        maxTransactionFee,
+        transactionValidDuration,
+        updatedPrivateKey,
+        toUpdate);
+  }
+
   public static AccountUpdateRequest of(@NonNull AccountId accountId) {
     return new AccountUpdateRequest(
         accountId, null, null, null, null, null, null, null, null, null);
