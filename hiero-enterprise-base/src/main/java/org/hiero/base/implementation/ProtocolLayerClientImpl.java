@@ -1,11 +1,15 @@
 package org.hiero.base.implementation;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.AccountInfo;
+import com.hedera.hashgraph.sdk.AccountInfoQuery;
+import com.hedera.hashgraph.sdk.AccountRecordsQuery;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
@@ -57,8 +61,14 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
+import org.hiero.base.protocol.data.AccountRecordsRequest;
+import org.hiero.base.protocol.data.AccountRecordsResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
+import org.hiero.base.protocol.data.AllowanceApproveRequest;
+import org.hiero.base.protocol.data.AllowanceApproveResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCallResult;
 import org.hiero.base.protocol.data.ContractCreateRequest;
@@ -177,8 +187,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     if (request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
       throw new HieroException(
           "File contents of 1 transaction must be less than "
-              + FileCreateRequest.FILE_CREATE_MAX_SIZE
-              + " bytes. Use FileAppend for larger files.");
+               + FileCreateRequest.FILE_CREATE_MAX_SIZE
+               + " bytes. Use FileAppend for larger files.");
     }
     final FileCreateTransaction transaction =
         new FileCreateTransaction()
@@ -204,8 +214,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         && request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
       throw new HieroException(
           "File contents of 1 transaction must be less than "
-              + FileCreateRequest.FILE_CREATE_MAX_SIZE
-              + " bytes. Use FileAppend for larger files.");
+               + FileCreateRequest.FILE_CREATE_MAX_SIZE
+               + " bytes. Use FileAppend for larger files.");
     }
     final FileUpdateTransaction transaction =
         new FileUpdateTransaction()
@@ -232,8 +242,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     if (request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
       throw new HieroException(
           "File contents of 1 transaction must be less than "
-              + FileCreateRequest.FILE_CREATE_MAX_SIZE
-              + " bytes. Use multiple FileAppend for larger files.");
+               + FileCreateRequest.FILE_CREATE_MAX_SIZE
+               + " bytes. Use multiple FileAppend for larger files.");
     }
     final FileAppendTransaction transaction =
         new FileAppendTransaction()
@@ -348,6 +358,142 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   }
 
   @Override
+  public @NonNull AccountInfoResponse executeAccountInfoQuery(
+      @NonNull final AccountInfoRequest request) throws HieroException {
+    final AccountInfoQuery query =
+        new AccountInfoQuery()
+            .setAccountId(request.accountId())
+            .setQueryPayment(request.queryPayment())
+            .setMaxQueryPayment(request.maxQueryPayment());
+    final AccountInfo info = executeQueryAndWait(query);
+    return new AccountInfoResponse(
+        new org.hiero.base.data.AccountInfo(
+            info.accountId,
+            info.contractAccountId,
+            info.isDeleted,
+            info.balance,
+            info.key,
+            info.isReceiverSignatureRequired,
+            info.expirationTime,
+            info.autoRenewPeriod,
+            info.accountMemo,
+            info.ownedNfts,
+            info.maxAutomaticTokenAssociations,
+            info.aliasKey != null ? info.aliasKey.toString() : null,
+            info.ledgerId.toString()));
+  }
+
+  @Override
+  public @NonNull AccountRecordsResponse executeAccountRecordsQuery(
+      @NonNull final AccountRecordsRequest request) throws HieroException {
+    final AccountRecordsQuery query =
+        new AccountRecordsQuery()
+            .setAccountId(request.accountId())
+            .setQueryPayment(request.queryPayment())
+            .setMaxQueryPayment(request.maxQueryPayment());
+    final List<TransactionRecord> records = executeQueryAndWait(query);
+    return new AccountRecordsResponse(
+        records.stream()
+            .map(
+                r ->
+                    new org.hiero.base.data.HieroTransactionRecord(
+                        r.transactionId,
+                        r.consensusTimestamp,
+                        r.transactionHash.toString(),
+                        r.transactionMemo,
+                        r.transactionFee.toTinybars(),
+                        r.receipt.status.toString()))
+            .toList());
+  }
+
+  @Override
+  @NonNull
+  public AccountUpdateResult executeAccountUpdateTransaction(
+      @NonNull final AccountUpdateRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    final AccountUpdateTransaction transaction =
+        new AccountUpdateTransaction()
+            .setAccountId(request.accountId());
+
+    if (request.maxTransactionFee() != null) {
+        transaction.setMaxTransactionFee(request.maxTransactionFee());
+    }
+    if (request.transactionValidDuration() != null) {
+        transaction.setTransactionValidDuration(request.transactionValidDuration());
+    }
+
+    if (request.key() != null) {
+      transaction.setKey(request.key());
+    }
+    if (request.memo() != null) {
+      transaction.setAccountMemo(request.memo());
+    }
+    if (request.autoRenewPeriod() != null) {
+      transaction.setAutoRenewPeriod(request.autoRenewPeriod());
+    }
+    if (request.receiverSignatureRequired() != null) {
+      transaction.setReceiverSignatureRequired(request.receiverSignatureRequired());
+    }
+    if (request.maxAutomaticTokenAssociations() != null) {
+      transaction.setMaxAutomaticTokenAssociations(request.maxAutomaticTokenAssociations());
+    }
+
+    // Handle special signing requirements for key rotation if provided via main branch pattern
+    if (request.toUpdate() != null && request.updatedPrivateKey() != null) {
+        transaction.setKey(request.updatedPrivateKey().getPublicKey());
+        sign(transaction, request.toUpdate().privateKey(), request.updatedPrivateKey());
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
+        return new AccountUpdateResult(receipt.transactionId, receipt.status);
+    } else if (request.toUpdate() != null) {
+        sign(transaction, request.toUpdate().privateKey());
+        final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
+        return new AccountUpdateResult(receipt.transactionId, receipt.status);
+    }
+
+    final TransactionRecord record =
+        executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_UPDATE);
+    return new AccountUpdateResult(
+        record.transactionId,
+        record.receipt.status,
+        record.transactionHash.toByteArray(),
+        record.consensusTimestamp,
+        record.transactionFee.toTinybars());
+  }
+
+  @Override
+  @NonNull
+  public AllowanceApproveResult executeAccountAllowanceApproveTransaction(
+      @NonNull final AllowanceApproveRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    final AccountAllowanceApproveTransaction transaction =
+        new AccountAllowanceApproveTransaction()
+            .setMaxTransactionFee(request.maxTransactionFee())
+            .setTransactionValidDuration(request.transactionValidDuration());
+
+    if (request.hbarSpenderId() != null && request.hbarAmount() != null) {
+      transaction.approveHbarAllowance(
+          hieroContext.getOperatorAccount().accountId(), request.hbarSpenderId(), request.hbarAmount());
+    }
+
+    if (request.tokenId() != null && request.tokenSpenderId() != null && request.tokenAmount() != null) {
+      transaction.approveTokenAllowance(
+          request.tokenId(),
+          hieroContext.getOperatorAccount().accountId(),
+          request.tokenSpenderId(),
+          request.tokenAmount());
+    }
+
+    final TransactionRecord record =
+        executeTransactionAndWaitOnRecord(transaction, TransactionType.ALLOWANCE_APPROVAL);
+    return new AllowanceApproveResult(
+        record.transactionId,
+        record.receipt.status,
+        record.transactionHash.toByteArray(),
+        record.consensusTimestamp,
+        record.transactionFee.toTinybars());
+  }
+
+  @Override
   @NonNull
   public AccountDeleteResult executeAccountDeleteTransaction(
       @NonNull final AccountDeleteRequest request) throws HieroException {
@@ -378,30 +524,6 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         record.transactionHash.toByteArray(),
         record.consensusTimestamp,
         record.transactionFee);
-  }
-
-  @Override
-  @NonNull
-  public AccountUpdateResult executeAccountUpdateTransaction(
-      @NonNull final AccountUpdateRequest request) throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    final AccountUpdateTransaction transaction =
-        new AccountUpdateTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setAccountId(request.toUpdate().accountId());
-    if (request.memo() != null) {
-      transaction.setAccountMemo(request.memo());
-    }
-    if (request.updatedPrivateKey() != null) {
-      transaction.setKey(request.updatedPrivateKey().getPublicKey());
-      sign(transaction, request.toUpdate().privateKey(), request.updatedPrivateKey());
-    } else {
-      sign(transaction, request.toUpdate().privateKey());
-    }
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
-    return new AccountUpdateResult(receipt.transactionId, receipt.status);
   }
 
   public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)
@@ -757,9 +879,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     } catch (final Exception e) {
       throw new HieroException(
           "Failed to receive record of transaction '"
-              + receipt.transactionId
-              + "' of type "
-              + transaction.getClass(),
+               + receipt.transactionId
+               + "' of type "
+               + transaction.getClass(),
           e);
     }
   }

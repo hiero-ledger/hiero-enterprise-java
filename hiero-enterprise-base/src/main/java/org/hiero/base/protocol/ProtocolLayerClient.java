@@ -8,8 +8,14 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
+import org.hiero.base.protocol.data.AccountRecordsRequest;
+import org.hiero.base.protocol.data.AccountRecordsResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
+import org.hiero.base.protocol.data.AllowanceApproveRequest;
+import org.hiero.base.protocol.data.AllowanceApproveResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCallResult;
 import org.hiero.base.protocol.data.ContractCreateRequest;
@@ -183,7 +189,37 @@ public interface ProtocolLayerClient {
    * @throws HieroException if the transaction could not be executed
    */
   @NonNull AccountUpdateResult executeAccountUpdateTransaction(
-      @NonNull AccountUpdateRequest request) throws HieroException;
+      @NonNull final AccountUpdateRequest request) throws HieroException;
+
+  /**
+   * Executes an account allowance approve transaction.
+   *
+   * @param request the request containing the details of the allowance approve transaction
+   * @return the result of the allowance approve transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull AllowanceApproveResult executeAccountAllowanceApproveTransaction(
+      @NonNull final AllowanceApproveRequest request) throws HieroException;
+
+  /**
+   * Execute an account info query.
+   *
+   * @param request the request
+   * @return the response
+   * @throws HieroException if the query could not be executed
+   */
+  @NonNull AccountInfoResponse executeAccountInfoQuery(@NonNull AccountInfoRequest request)
+      throws HieroException;
+
+  /**
+   * Execute an account records query.
+   *
+   * @param request the request
+   * @return the response
+   * @throws HieroException if the query could not be executed
+   */
+  @NonNull AccountRecordsResponse executeAccountRecordsQuery(@NonNull AccountRecordsRequest request)
+      throws HieroException;
 
   /**
    * Executes a token create transaction.
