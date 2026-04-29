@@ -3,8 +3,12 @@ package org.hiero.base;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TokenId;
+import java.util.List;
 import java.util.Objects;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.HieroTransactionRecord;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -134,4 +138,70 @@ public interface AccountClient {
    * @throws HieroException if the balance could not be retrieved
    */
   @NonNull Hbar getOperatorAccountBalance() throws HieroException;
+
+  /**
+   * Returns detailed information about the given account.
+   *
+   * @param accountId the ID of the account
+   * @return the account information
+   * @throws HieroException if the information could not be retrieved
+   */
+  @NonNull AccountInfo getAccountInfo(@NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Returns the transaction records for the given account.
+   *
+   * @param accountId the ID of the account
+   * @return the list of transaction records
+   * @throws HieroException if the records could not be retrieved
+   */
+  @NonNull List<HieroTransactionRecord> getAccountRecords(@NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Approves an HBAR allowance for the given spender.
+   *
+   * @param spenderId the ID of the spender account
+   * @param amount the amount of HBAR to allow
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveHbarAllowance(@NonNull AccountId spenderId, @NonNull Hbar amount) throws HieroException;
+
+  /**
+   * Approves a token allowance for the given spender.
+   *
+   * @param tokenId the ID of the token
+   * @param spenderId the ID of the spender account
+   * @param amount the amount of tokens to allow
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveTokenAllowance(@NonNull TokenId tokenId, @NonNull AccountId spenderId, long amount) throws HieroException;
+
+  /**
+   * Revokes an HBAR allowance for the given spender.
+   *
+   * @param spenderId the ID of the spender account
+   * @throws HieroException if the allowance could not be revoked
+   */
+  default void revokeHbarAllowance(@NonNull AccountId spenderId) throws HieroException {
+    approveHbarAllowance(spenderId, Hbar.ZERO);
+  }
+
+  /**
+   * Revokes a token allowance for the given spender.
+   *
+   * @param tokenId the ID of the token
+   * @param spenderId the ID of the spender account
+   * @throws HieroException if the allowance could not be revoked
+   */
+  default void revokeTokenAllowance(@NonNull TokenId tokenId, @NonNull AccountId spenderId) throws HieroException {
+    approveTokenAllowance(tokenId, spenderId, 0L);
+  }
+
+  /**
+   * Returns a builder to update the given account.
+   *
+   * @param accountId the ID of the account to update
+   * @return the update builder
+   */
+  @NonNull AccountUpdateBuilder updateAccount(@NonNull AccountId accountId);
 }

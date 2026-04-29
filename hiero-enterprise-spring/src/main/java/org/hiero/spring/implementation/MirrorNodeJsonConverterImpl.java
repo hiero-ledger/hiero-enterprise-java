@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.DelegateContractId;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -158,11 +159,41 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       final AccountId accountId = AccountId.fromString(node.get("account").asText());
       final String evmAddress = node.get("evm_address").asText();
-      final long ethereumNonce = node.get("ethereum_nonce").asLong();
-      final long pendingReward = node.get("pending_reward").asLong();
-      final long balance = node.get("balance").get("balance").asLong();
+      final boolean deleted = node.get("deleted").asBoolean();
+      final Hbar balance = Hbar.fromTinybars(node.get("balance").get("balance").asLong());
+      
+      // Mirror node key might be complex, for now we try to parse it if present
+      Key key = null;
+      if (node.has("key") && !node.get("key").isNull()) {
+        final String keyStr = node.get("key").get("key").asText();
+        key = PublicKey.fromString(keyStr);
+      }
+
+      final boolean receiverSigRequired = node.get("receiver_sig_required").asBoolean();
+      final Instant expirationTime = Instant.ofEpochSecond(
+          Long.parseLong(node.get("expiry_timestamp").asText().split("\\.")[0]));
+      final java.time.Duration autoRenewPeriod = java.time.Duration.ofSeconds(node.get("auto_renew_period").asLong());
+      final String memo = node.get("memo").asText();
+      final long ownedNfts = node.get("owned_nfts").asLong();
+      final int maxAutoAssociations = node.get("max_automatic_token_associations").asInt();
+      final String alias = node.get("alias").asText();
+      final String ledgerId = node.has("ledger_id") ? node.get("ledger_id").asText() : "unknown";
+
       return Optional.of(
-          new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward));
+          new AccountInfo(
+              accountId,
+              evmAddress,
+              deleted,
+              balance,
+              key,
+              receiverSigRequired,
+              expirationTime,
+              autoRenewPeriod,
+              memo,
+              ownedNfts,
+              maxAutoAssociations,
+              alias,
+              ledgerId));
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
