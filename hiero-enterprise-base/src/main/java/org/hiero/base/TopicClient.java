@@ -1,6 +1,7 @@
 package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessage;
 import java.util.Objects;
@@ -351,7 +352,7 @@ public interface TopicClient {
    * @param handler the handler to call when a message is receive
    * @return if the Topic could not be subscribed
    */
-  default TopicMessageResult subscribeTopic(
+  default SubscriptionHandle subscribeTopic(
       @NonNull String topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(handler, "handler must not be null");
@@ -365,6 +366,30 @@ public interface TopicClient {
    * @param handler the handler to call when a message is receive
    * @return if the Topic could not be subscribed
    */
-  TopicMessageResult subscribeTopic(
+  SubscriptionHandle subscribeTopic(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException;
+
+  /**
+   * Subscribe to a Topic
+   *
+   * @param topicId the topicId of topic
+   * @param limit the number of message to return
+   * @return SubscriptionHandle for the Topic
+   * @throws HieroException if Topic could not be subscribed
+   */
+  SubscriptionHandle subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> subscription,
+                                    long limit) throws HieroException;
+
+  /**
+   * Subscribe to a Topic
+   *
+   * @param topicId the topicId of topic
+   * @param limit the number of message to return
+   * @return SubscriptionHandle for the Topic
+   * @throws HieroException if Topic could not be subscribed
+   */
+  default SubscriptionHandle subscribeTopic(@NonNull String topicId, @NonNull Consumer<TopicMessage> subscription,
+                                            long limit) throws HieroException {
+    return subscribeTopic(TopicId.fromString(topicId), subscription, limit);
+  }
 }

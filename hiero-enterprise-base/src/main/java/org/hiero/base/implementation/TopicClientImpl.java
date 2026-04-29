@@ -1,6 +1,7 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessage;
 import java.util.Objects;
@@ -231,11 +232,25 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public TopicMessageResult subscribeTopic(
+  public SubscriptionHandle subscribeTopic(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(handler, "handler must not be null");
     TopicMessageRequest request = TopicMessageRequest.of(topicId, handler);
-    return client.executeTopicMessageQuery(request);
+    return client.executeTopicMessageQuery(request).subscriptionHandle();
+  }
+
+  @Override
+  public SubscriptionHandle subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, long limit) throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
+    if (limit <= 0) {
+      throw new IllegalArgumentException("limit must be greater than 0");
+    }
+
+    TopicMessageRequest request = TopicMessageRequest.of(topicId, handler, limit);
+    TopicMessageResult result = client.executeTopicMessageQuery(request);
+    return result.subscriptionHandle();
   }
 }
