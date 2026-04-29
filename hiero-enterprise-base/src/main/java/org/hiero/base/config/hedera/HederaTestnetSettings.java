@@ -29,7 +29,11 @@ public final class HederaTestnetSettings implements NetworkSettings {
 
   @Override
   public @NonNull Set<ConsensusNode> getConsensusNodes() {
-    return Set.of(new ConsensusNode("0.testnet.hedera.com", "50211", "0.0.3"));
+    return Set.of(
+        new ConsensusNode("34.94.106.61", "50211", "0.0.3"),
+        new ConsensusNode("35.237.200.180", "50211", "0.0.4"),
+        new ConsensusNode("35.245.27.193", "50211", "0.0.5"),
+        new ConsensusNode("34.83.131.197", "50211", "0.0.6"));
   }
 
   @Override

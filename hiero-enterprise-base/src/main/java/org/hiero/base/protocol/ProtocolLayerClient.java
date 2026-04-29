@@ -34,12 +34,32 @@ import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -194,6 +214,106 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenCreateResult executeTokenCreateTransaction(
       @NonNull final TokenCreateRequest request) throws HieroException;
+
+  /**
+   * Executes a token update transaction.
+   *
+   * @param request the request containing the details of the token update transaction
+   * @return the result of the token update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenUpdateResult executeTokenUpdateTransaction(
+      @NonNull final TokenUpdateRequest request) throws HieroException;
+
+  /**
+   * Executes a token delete transaction.
+   *
+   * @param request the request containing the details of the token delete transaction
+   * @return the result of the token delete transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenDeleteResult executeTokenDeleteTransaction(
+      @NonNull final TokenDeleteRequest request) throws HieroException;
+
+  /**
+   * Executes a token pause transaction.
+   *
+   * @param request the request containing the details of the token pause transaction
+   * @return the result of the token some transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenPauseResult executeTokenPauseTransaction(@NonNull final TokenPauseRequest request)
+      throws HieroException;
+
+  /**
+   * Executes a token unpause transaction.
+   *
+   * @param request the request containing the details of the token unpause transaction
+   * @return the result of the token unpause transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenUnpauseResult executeTokenUnpauseTransaction(@NonNull TokenUnpauseRequest request)
+      throws HieroException;
+
+  /**
+   * Freezes a token for an account.
+   *
+   * @param request the request
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenFreezeResult executeTokenFreezeTransaction(@NonNull TokenFreezeRequest request)
+      throws HieroException;
+
+  /**
+   * Unfreezes a token for an account.
+   *
+   * @param request the request
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenUnfreezeResult executeTokenUnfreezeTransaction(
+      @NonNull TokenUnfreezeRequest request) throws HieroException;
+
+  /**
+   * Grants KYC for a token for an account.
+   *
+   * @param request the request
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenGrantKycResult executeTokenGrantKycTransaction(
+      @NonNull TokenGrantKycRequest request) throws HieroException;
+
+  /**
+   * Revokes KYC for a token for an account.
+   *
+   * @param request the request
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenRevokeKycResult executeTokenRevokeKycTransaction(
+      @NonNull TokenRevokeKycRequest request) throws HieroException;
+
+  /**
+   * Wipes tokens from an account.
+   *
+   * @param request the request
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenWipeResult executeTokenWipeTransaction(@NonNull TokenWipeRequest request)
+      throws HieroException;
+
+  /**
+   * Updates the fee schedule of a token.
+   *
+   * @param request the request
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenFeeScheduleUpdateResult executeTokenFeeScheduleUpdateTransaction(
+      @NonNull TokenFeeScheduleUpdateRequest request) throws HieroException;
 
   /**
    * Executes a token associate transaction.

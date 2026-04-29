@@ -2,6 +2,7 @@ package org.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -31,7 +32,7 @@ public class SmartContractDatatypesTests {
     if (contractId == null) {
       try {
         final Path path =
-            Path.of(ContractServiceTest.class.getResource("/datatypes.bin").getPath());
+            Path.of(ContractServiceTest.class.getResource("/datatypes.bin").toURI());
         contractId = smartContractClient.createContract(path);
       } catch (Exception e) {
         throw new RuntimeException("Can not create contract", e);

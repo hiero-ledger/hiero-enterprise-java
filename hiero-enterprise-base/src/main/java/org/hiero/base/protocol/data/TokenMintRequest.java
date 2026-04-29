@@ -44,14 +44,20 @@ public record TokenMintRequest(
       @NonNull final TokenId tokenId,
       @NonNull final PrivateKey supplyKey,
       @NonNull byte[]... metadata) {
-    Objects.requireNonNull(metadata, "metadata must not be null");
+    return of(tokenId, supplyKey, List.of(metadata));
+  }
+
+  public static TokenMintRequest of(
+      @NonNull final TokenId tokenId,
+      @NonNull final PrivateKey supplyKey,
+      @NonNull final List<byte[]> metadata) {
     return new TokenMintRequest(
         TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
         TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
         tokenId,
         supplyKey,
         null,
-        List.of(metadata));
+        metadata);
   }
 
   public static TokenMintRequest of(
@@ -90,7 +96,7 @@ public record TokenMintRequest(
         List.of(metadata.getBytes(StandardCharsets.UTF_8)));
   }
 
-  public static TokenMintRequest of(
+  public static TokenMintRequest ofMetadataStrings(
       @NonNull final TokenId tokenId,
       @NonNull final PrivateKey supplyKey,
       @NonNull final List<String> metadata) {

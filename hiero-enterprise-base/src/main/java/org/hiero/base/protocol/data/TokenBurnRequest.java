@@ -25,11 +25,17 @@ public record TokenBurnRequest(
     Objects.requireNonNull(supplyKey, "Supply key cannot be null");
   }
 
-  public static TokenBurnRequest of(TokenId tokenId, long serial, PrivateKey supplyKey) {
-    return of(tokenId, Set.of(serial), supplyKey);
+  public static TokenBurnRequest of(TokenId tokenId, PrivateKey supplyKey, long amount) {
+    return new TokenBurnRequest(
+        TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        tokenId,
+        supplyKey,
+        amount,
+        null);
   }
 
-  public static TokenBurnRequest of(TokenId tokenId, Set<Long> serials, PrivateKey supplyKey) {
+  public static TokenBurnRequest of(TokenId tokenId, PrivateKey supplyKey, Set<Long> serials) {
     return new TokenBurnRequest(
         TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
         TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
@@ -39,13 +45,11 @@ public record TokenBurnRequest(
         serials);
   }
 
-  public static TokenBurnRequest of(TokenId tokenId, PrivateKey supplyKey, long amount) {
-    return new TokenBurnRequest(
-        TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
-        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
-        tokenId,
-        supplyKey,
-        amount,
-        null);
+  public static TokenBurnRequest of(TokenId tokenId, long serial, PrivateKey supplyKey) {
+    return of(tokenId, supplyKey, Set.of(serial));
+  }
+
+  public static TokenBurnRequest of(TokenId tokenId, Set<Long> serials, PrivateKey supplyKey) {
+    return of(tokenId, supplyKey, serials);
   }
 }

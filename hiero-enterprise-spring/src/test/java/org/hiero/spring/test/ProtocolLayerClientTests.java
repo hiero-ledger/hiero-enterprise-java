@@ -3,6 +3,7 @@ package org.hiero.spring.test;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,7 +44,6 @@ public class ProtocolLayerClientTests {
   @Autowired private HieroTestUtils hieroTestUtils;
 
   @Test
-  @Disabled
   void testGetBalance() throws Exception {
     // given
     final AccountBalanceRequest accountBalanceRequest =
@@ -134,7 +134,7 @@ public class ProtocolLayerClientTests {
   void testContractCreate() throws Exception {
     // given
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").toURI());
     final String content = Files.readString(path, StandardCharsets.UTF_8);
     final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
     final FileCreateRequest fileCreateRequest = FileCreateRequest.of(bytes);

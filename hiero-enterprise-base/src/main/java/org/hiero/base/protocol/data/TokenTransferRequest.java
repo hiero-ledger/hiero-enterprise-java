@@ -47,15 +47,24 @@ public record TokenTransferRequest(
       @NonNull final AccountId sender,
       @NonNull final AccountId receiver,
       @NonNull final PrivateKey senderKey) {
-    return of(tokenId, List.of(serial), sender, receiver, senderKey);
+    return of(tokenId, sender, receiver, senderKey, List.of(serial));
   }
 
   public static TokenTransferRequest of(
       @NonNull final TokenId tokenId,
-      @NonNull final List<Long> serials,
       @NonNull final AccountId sender,
       @NonNull final AccountId receiver,
-      @NonNull final PrivateKey senderKey) {
+      @NonNull final PrivateKey senderKey,
+      final long serial) {
+    return of(tokenId, sender, receiver, senderKey, List.of(serial));
+  }
+
+  public static TokenTransferRequest of(
+      @NonNull final TokenId tokenId,
+      @NonNull final AccountId sender,
+      @NonNull final AccountId receiver,
+      @NonNull final PrivateKey senderKey,
+      @NonNull final List<Long> serials) {
     return new TokenTransferRequest(
         TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
         TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,

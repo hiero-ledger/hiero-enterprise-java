@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import org.hiero.base.FungibleTokenClient;
 import org.hiero.base.HieroException;
+import org.hiero.base.TokenUpdateBuilder;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -15,10 +16,28 @@ import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.jspecify.annotations.NonNull;
 
 public class FungibleTokenClientImpl implements FungibleTokenClient {
@@ -163,5 +182,63 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, fromAccountId, toAccountId, fromAccountKey, amount);
     client.executeTransferTransaction(request);
+  }
+
+  @Override
+  public @NonNull TokenUpdateBuilder updateToken(@NonNull TokenId tokenId) {
+    return new TokenUpdateBuilderImpl(client, tokenId);
+  }
+
+  @Override
+  public @NonNull TokenDeleteResult deleteToken(@NonNull TokenId tokenId) throws HieroException {
+    return client.executeTokenDeleteTransaction(TokenDeleteRequest.of(tokenId));
+  }
+
+  @Override
+  public @NonNull TokenPauseResult pauseToken(@NonNull TokenId tokenId) throws HieroException {
+    return client.executeTokenPauseTransaction(TokenPauseRequest.of(tokenId));
+  }
+
+  @Override
+  public @NonNull TokenUnpauseResult unpauseToken(@NonNull TokenId tokenId) throws HieroException {
+    return client.executeTokenUnpauseTransaction(TokenUnpauseRequest.of(tokenId));
+  }
+
+  @Override
+  public @NonNull TokenFreezeResult freezeAccount(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException {
+    return client.executeTokenFreezeTransaction(TokenFreezeRequest.of(tokenId, accountId));
+  }
+
+  @Override
+  public @NonNull TokenUnfreezeResult unfreezeAccount(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException {
+    return client.executeTokenUnfreezeTransaction(TokenUnfreezeRequest.of(tokenId, accountId));
+  }
+
+  @Override
+  public @NonNull TokenGrantKycResult grantKyc(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException {
+    return client.executeTokenGrantKycTransaction(TokenGrantKycRequest.of(tokenId, accountId));
+  }
+
+  @Override
+  public @NonNull TokenRevokeKycResult revokeKyc(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException {
+    return client.executeTokenRevokeKycTransaction(TokenRevokeKycRequest.of(tokenId, accountId));
+  }
+
+  @Override
+  public @NonNull TokenWipeResult wipeToken(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, long amount) throws HieroException {
+    return client.executeTokenWipeTransaction(TokenWipeRequest.of(tokenId, accountId, amount));
+  }
+
+  @Override
+  public @NonNull TokenFeeScheduleUpdateResult updateFeeSchedule(
+      @NonNull TokenId tokenId, @NonNull List<com.hedera.hashgraph.sdk.CustomFee> customFees)
+      throws HieroException {
+    return client.executeTokenFeeScheduleUpdateTransaction(
+        TokenFeeScheduleUpdateRequest.of(tokenId, customFees));
   }
 }
