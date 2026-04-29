@@ -4,7 +4,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessage;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.TopicClientImpl;
@@ -13,6 +15,8 @@ import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
 import org.hiero.base.protocol.data.TopicDeleteResult;
+import org.hiero.base.protocol.data.TopicMessageRequest;
+import org.hiero.base.protocol.data.TopicMessageResult;
 import org.hiero.base.protocol.data.TopicSubmitMessageRequest;
 import org.hiero.base.protocol.data.TopicSubmitMessageResult;
 import org.hiero.base.protocol.data.TopicUpdateRequest;
@@ -22,6 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+
+import java.util.function.Consumer;
 
 public class TopicClientImplTest {
   ProtocolLayerClient protocolLayerClient;
@@ -37,6 +43,8 @@ public class TopicClientImplTest {
       ArgumentCaptor.forClass(TopicDeleteRequest.class);
   ArgumentCaptor<TopicSubmitMessageRequest> topicSubmitCaptor =
       ArgumentCaptor.forClass(TopicSubmitMessageRequest.class);
+  ArgumentCaptor<TopicMessageRequest> topicSubscribeCaptor =
+      ArgumentCaptor.forClass(TopicMessageRequest.class);
 
   @BeforeEach
   void setup() {
@@ -606,5 +614,81 @@ public class TopicClientImplTest {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> topicClient.submitMessage((TopicId) null, null, (String) null));
+  }
+
+  @Test
+  void shouldSubscribeTopic() throws HieroException {
+    final TopicMessageResult topicMessageResult = Mockito.mock(TopicMessageResult.class);
+    final SubscriptionHandle subscriptionHandle = Mockito.mock(SubscriptionHandle.class);
+
+    // given
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Consumer<TopicMessage> subscription = (message) -> {};
+
+    when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
+      .thenReturn(topicMessageResult);
+    when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
+
+    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription);
+
+    verify(protocolLayerClient, times(1))
+      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
+    Assertions.assertEquals(topicId, capture.topicId());
+    Assertions.assertEquals(subscription, capture.subscription());
+    Assertions.assertEquals(-1, capture.limit()); // default limit infinite(-1)
+    Assertions.assertNull(capture.startTime());
+    Assertions.assertNull(capture.endTime());
+
+    verify(topicMessageResult, times(1)).subscriptionHandle();
+
+    Assertions.assertNotNull(handler);
+    Assertions.assertEquals(subscriptionHandle, handler);
+  }
+
+  @Test
+  void shouldSubscribeTopicWithLimit() throws HieroException {
+    final TopicMessageResult topicMessageResult = Mockito.mock(TopicMessageResult.class);
+    final SubscriptionHandle subscriptionHandle = Mockito.mock(SubscriptionHandle.class);
+
+    // given
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final int limit = 2;
+    final Consumer<TopicMessage> subscription = (message) -> {};
+
+    when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
+      .thenReturn(topicMessageResult);
+    when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
+
+    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, limit);
+
+    verify(protocolLayerClient, times(1))
+      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
+    Assertions.assertEquals(topicId, capture.topicId());
+    Assertions.assertEquals(subscription, capture.subscription());
+    Assertions.assertEquals(limit, capture.limit());
+    Assertions.assertNull(capture.startTime());
+    Assertions.assertNull(capture.endTime());
+
+    verify(topicMessageResult, times(1)).subscriptionHandle();
+
+    Assertions.assertNotNull(handler);
+    Assertions.assertEquals(subscriptionHandle, handler);
+  }
+
+
+  @Test
+  void shouldThrowExceptionOnSubscribeTopicWithLimitEqualsZero() {
+    final String msg = "limit must be greater than 0";
+    // given
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Consumer<TopicMessage> subscription = (message) -> {};
+    final int limit = 0;
+
+    final IllegalArgumentException e1 = Assertions.assertThrows(IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, subscription, limit));
+
+    Assertions.assertEquals(msg, e1.getMessage());
   }
 }

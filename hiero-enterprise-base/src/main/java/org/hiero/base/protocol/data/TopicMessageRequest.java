@@ -31,4 +31,9 @@ public record TopicMessageRequest(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> subscription) {
     return new TopicMessageRequest(topicId, subscription, null, null, NO_LIMIT, null, null);
   }
+
+  @NonNull
+  public static TopicMessageRequest of(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> subscription, long limit) {
+    return new TopicMessageRequest(topicId, subscription, null, null, limit, null, null);
+  }
 }
