@@ -46,7 +46,7 @@
     <junit.version>6.0.3</junit.version>
     <slf4j.version>2.0.17</slf4j.version>
     <helidon.version>4.3.4</helidon.version>
-    <helidon.test.version>3.2.11</helidon.test.version>
+    <helidon.test.version>3.2.17</helidon.test.version>
     <jakarta.enterprise.version>3.0.1</jakarta.enterprise.version>
     <microprofile.version>7.1</microprofile.version>
     <quarkus.version>3.17.2</quarkus.version>
