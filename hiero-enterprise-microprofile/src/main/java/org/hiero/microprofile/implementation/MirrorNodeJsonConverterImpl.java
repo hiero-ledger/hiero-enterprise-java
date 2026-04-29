@@ -2,6 +2,8 @@ package org.hiero.microprofile.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
@@ -158,11 +160,41 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       final AccountId accountId = AccountId.fromString(node.getString("account"));
       final String evmAddress = node.getString("evm_address");
-      final long ethereumNonce = node.getJsonNumber("ethereum_nonce").longValue();
-      final long pendingReward = node.getJsonNumber("pending_reward").longValue();
-      final long balance = node.getJsonObject("balance").getJsonNumber("balance").longValue();
+      final boolean deleted = node.getBoolean("deleted");
+      final Hbar balance = Hbar.fromTinybars(node.getJsonObject("balance").getJsonNumber("balance").longValue());
+
+      // Mirror node key might be complex, for now we try to parse it if present
+      Key key = null;
+      if (node.containsKey("key") && !node.isNull("key")) {
+        final String keyStr = node.getJsonObject("key").getString("key");
+        key = PublicKey.fromString(keyStr);
+      }
+
+      final boolean receiverSigRequired = node.getBoolean("receiver_sig_required");
+      final Instant expirationTime = Instant.ofEpochSecond(
+          Long.parseLong(node.getString("expiry_timestamp").split("\\.")[0]));
+      final java.time.Duration autoRenewPeriod = java.time.Duration.ofSeconds(node.getJsonNumber("auto_renew_period").longValue());
+      final String memo = node.getString("memo");
+      final long ownedNfts = node.getJsonNumber("owned_nfts").longValue();
+      final int maxAutoAssociations = node.getJsonNumber("max_automatic_token_associations").intValue();
+      final String alias = node.getString("alias");
+      final String ledgerId = node.containsKey("ledger_id") ? node.getString("ledger_id") : "unknown";
+
       return Optional.of(
-          new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward));
+          new AccountInfo(
+              accountId,
+              evmAddress,
+              deleted,
+              balance,
+              key,
+              receiverSigRequired,
+              expirationTime,
+              autoRenewPeriod,
+              memo,
+              ownedNfts,
+              maxAutoAssociations,
+              alias,
+              ledgerId));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + node, e);
     }
