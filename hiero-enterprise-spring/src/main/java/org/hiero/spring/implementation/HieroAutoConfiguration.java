@@ -129,12 +129,14 @@ public class HieroAutoConfiguration {
       final String mirrorNodeEndpointProtocol = url.getProtocol();
       final String mirrorNodeEndpointHost = url.getHost();
       final int mirrorNodeEndpointPort;
-      if (mirrorNodeEndpointProtocol == "https" && url.getPort() == -1) {
-        mirrorNodeEndpointPort = 443;
-      } else if (mirrorNodeEndpointProtocol == "http" && url.getPort() == -1) {
-        mirrorNodeEndpointPort = 80;
-      } else if (url.getPort() == -1) {
-        mirrorNodeEndpointPort = 443;
+      if (url.getPort() == -1) {
+        if ("http".equalsIgnoreCase(mirrorNodeEndpointProtocol)) {
+          mirrorNodeEndpointPort = 80;
+        } else if ("https".equalsIgnoreCase(mirrorNodeEndpointProtocol)) {
+          mirrorNodeEndpointPort = 443;
+        } else {
+          throw new IllegalArgumentException("Unsupported protocol: " + mirrorNodeEndpointProtocol);
+        }
       } else {
         mirrorNodeEndpointPort = url.getPort();
       }
