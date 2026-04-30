@@ -40,7 +40,7 @@
     <hedera.sdk-version>2.32.0</hedera.sdk-version>
     <grpc.version>1.58.0</grpc.version>
     <spring.version>6.1.8</spring.version>
-    <spring.boot.version>3.5.11</spring.boot.version>
+    <spring.boot.version>4.0.6</spring.boot.version>
     <jspecify.version>1.0.0</jspecify.version>
     <dotenv.version>3.2.0</dotenv.version>
     <junit.version>6.0.3</junit.version>
