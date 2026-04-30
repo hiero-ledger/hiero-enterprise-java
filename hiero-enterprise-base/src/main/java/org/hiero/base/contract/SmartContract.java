@@ -1,4 +1,4 @@
-package org.hiero.base.annotations;
+package org.hiero.base.contract;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface HieroContract {
+public @interface SmartContract {
     /**
      * @return the ID of the contract (e.g. "0.0.12345")
      */
-    String address() default "";
+    String value() default "";
 }

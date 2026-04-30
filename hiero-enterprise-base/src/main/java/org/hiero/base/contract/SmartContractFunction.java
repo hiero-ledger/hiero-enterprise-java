@@ -1,4 +1,4 @@
-package org.hiero.base.annotations;
+package org.hiero.base.contract;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface ContractFunction {
+public @interface SmartContractFunction {
     /**
      * @return the name of the function in Solidity. Defaults to the Java method name.
      */

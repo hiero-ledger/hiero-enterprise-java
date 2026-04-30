@@ -1,14 +1,14 @@
-package org.hiero.base.test.proxy;
+package org.hiero.base.test.contract;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import java.math.BigInteger;
 import org.hiero.base.SmartContractClient;
-import org.hiero.base.annotations.ContractFunction;
-import org.hiero.base.annotations.HieroContract;
+import org.hiero.base.contract.SmartContract;
+import org.hiero.base.contract.SmartContractFunction;
 import org.hiero.base.data.ContractCallResult;
 import org.hiero.base.data.ContractParam;
-import org.hiero.base.proxy.ContractProxyFactory;
+import org.hiero.base.contract.proxy.SmartContractProxyFactory;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -16,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class ContractProxyFactoryTest {
+class SmartContractProxyFactoryTest {
 
-    @HieroContract(address = "0.0.12345")
+    @SmartContract("0.0.12345")
     interface TestContract {
-        @ContractFunction
+        @SmartContractFunction
         ContractCallResult transfer(AccountId recipient, BigInteger amount);
 
-        @ContractFunction("balanceOf")
+        @SmartContractFunction("balanceOf")
         ContractCallResult getBalance(AccountId account);
 
         void noAnnotationMethod(String arg);
@@ -36,7 +36,7 @@ class ContractProxyFactoryTest {
         AccountId recipient = AccountId.fromString("0.0.999");
         BigInteger amount = BigInteger.valueOf(1000);
         
-        ContractProxyFactory factory = new ContractProxyFactory(mockClient);
+        SmartContractProxyFactory factory = new SmartContractProxyFactory(mockClient);
         TestContract proxy = factory.createProxy(TestContract.class);
 
         proxy.transfer(recipient, amount);
@@ -58,7 +58,7 @@ class ContractProxyFactoryTest {
         ContractId contractId = ContractId.fromString("0.0.12345");
         AccountId account = AccountId.fromString("0.0.888");
         
-        ContractProxyFactory factory = new ContractProxyFactory(mockClient);
+        SmartContractProxyFactory factory = new SmartContractProxyFactory(mockClient);
         TestContract proxy = factory.createProxy(TestContract.class);
 
         proxy.getBalance(account);
@@ -71,7 +71,7 @@ class ContractProxyFactoryTest {
         SmartContractClient mockClient = mock(SmartContractClient.class);
         ContractId contractId = ContractId.fromString("0.0.12345");
         
-        ContractProxyFactory factory = new ContractProxyFactory(mockClient);
+        SmartContractProxyFactory factory = new SmartContractProxyFactory(mockClient);
         TestContract proxy = factory.createProxy(TestContract.class);
 
         proxy.noAnnotationMethod("test");
@@ -83,7 +83,7 @@ class ContractProxyFactoryTest {
     void testCreateProxyWithoutAnnotationThrowsException() {
         interface NoAnnotation {}
         SmartContractClient mockClient = mock(SmartContractClient.class);
-        ContractProxyFactory factory = new ContractProxyFactory(mockClient);
+        SmartContractProxyFactory factory = new SmartContractProxyFactory(mockClient);
 
         assertThrows(IllegalArgumentException.class, () -> factory.createProxy(NoAnnotation.class));
     }

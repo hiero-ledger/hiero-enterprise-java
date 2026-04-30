@@ -106,4 +106,39 @@ public interface SmartContractClient {
       @NonNull String functionName,
       @Nullable ContractParam<?>... params)
       throws HieroException;
+
+  /**
+   * Creates a type-safe proxy for the given interface.
+   *
+   * @param interfaceClass the interface class annotated with {@link org.hiero.base.contract.SmartContract}
+   * @param <T> the type of the interface
+   * @return a proxy instance
+   * @throws IllegalArgumentException if the interface is missing the annotation or is not an interface
+   */
+  @NonNull <T> T createProxy(@NonNull Class<T> interfaceClass);
+
+  /**
+   * Creates a type-safe proxy for the given interface with a specific contract ID.
+   *
+   * @param interfaceClass the interface class
+   * @param contractId the contract ID
+   * @param <T> the type of the interface
+   * @return a proxy instance
+   * @throws IllegalArgumentException if the interfaceClass is not an interface
+   */
+  @NonNull <T> T createProxy(@NonNull Class<T> interfaceClass, @NonNull ContractId contractId);
+
+  /**
+   * Creates a type-safe proxy for the given interface with a specific contract ID.
+   *
+   * @param interfaceClass the interface class
+   * @param contractId the contract ID
+   * @param <T> the type of the interface
+   * @return a proxy instance
+   * @throws IllegalArgumentException if the interfaceClass is not an interface
+   */
+  @NonNull
+  default <T> T createProxy(@NonNull Class<T> interfaceClass, @NonNull String contractId) {
+    return createProxy(interfaceClass, ContractId.fromString(contractId));
+  }
 }

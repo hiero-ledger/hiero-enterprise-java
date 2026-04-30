@@ -1,19 +1,19 @@
-package org.hiero.base.proxy;
+package org.hiero.base.contract.proxy;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 import org.hiero.base.SmartContractClient;
-import org.hiero.base.annotations.HieroContract;
+import org.hiero.base.contract.SmartContract;
 
 /**
  * Factory for creating Hiero Smart Contract proxies.
  */
-public class ContractProxyFactory {
+public class SmartContractProxyFactory {
 
     private final SmartContractClient client;
 
-    public ContractProxyFactory(SmartContractClient client) {
+    public SmartContractProxyFactory(SmartContractClient client) {
         this.client = Objects.requireNonNull(client, "client must not be null");
     }
 
@@ -23,14 +23,14 @@ public class ContractProxyFactory {
      * @param interfaceClass the interface class
      * @param <T> the type of the interface
      * @return a proxy instance
-     * @throws IllegalArgumentException if the interface is missing @HieroContract annotation and no address is provided
+     * @throws IllegalArgumentException if the interface is missing @SmartContract annotation and no address is provided
      */
     public <T> T createProxy(Class<T> interfaceClass) {
-        HieroContract annotation = interfaceClass.getAnnotation(HieroContract.class);
-        if (annotation == null || annotation.address().isEmpty()) {
-            throw new IllegalArgumentException("Interface must be annotated with @HieroContract and have a valid address");
+        SmartContract annotation = interfaceClass.getAnnotation(SmartContract.class);
+        if (annotation == null || annotation.value().isEmpty()) {
+            throw new IllegalArgumentException("Interface must be annotated with @SmartContract and have a valid address");
         }
-        return createProxy(interfaceClass, ContractId.fromString(annotation.address()));
+        return createProxy(interfaceClass, ContractId.fromString(annotation.value()));
     }
 
     /**
@@ -53,7 +53,7 @@ public class ContractProxyFactory {
         return (T) Proxy.newProxyInstance(
             interfaceClass.getClassLoader(),
             new Class<?>[]{interfaceClass},
-            new ContractInvocationHandler(client, contractId)
+            new SmartContractInvocationHandler(client, contractId)
         );
     }
 }

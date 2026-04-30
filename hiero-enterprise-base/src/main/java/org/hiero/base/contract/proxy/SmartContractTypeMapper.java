@@ -1,4 +1,4 @@
-package org.hiero.base.proxy;
+package org.hiero.base.contract.proxy;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
@@ -11,7 +11,7 @@ import org.hiero.base.data.ContractParam;
 /**
  * Utility to map Java types to Solidity ContractParams.
  */
-public class TypeMapper {
+public class SmartContractTypeMapper {
 
     private static final Map<Class<?>, Function<Object, ContractParam<?>>> MAPPERS = new HashMap<>();
 
