@@ -46,6 +46,14 @@
       <groupId>io.grpc</groupId>
       <artifactId>grpc-inprocess</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-jackson</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

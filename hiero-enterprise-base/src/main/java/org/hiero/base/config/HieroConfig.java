@@ -90,6 +90,12 @@ public interface HieroConfig {
    *
    * @return the client
    */
+  /**
+   * Creates a new client for the network. Calling this method multiple times will return a new
+   * instance each time.
+   *
+   * @return the client
+   */
   @NonNull
   default Client createClient() {
     try {
@@ -97,9 +103,11 @@ public interface HieroConfig {
           getConsensusNodes().stream()
               .collect(Collectors.toMap(n -> n.getAddress(), n -> n.getAccountId()));
       final Client client = Client.forNetwork(nodes);
+
       final List<String> mirrorNodeAddresses =
           getMirrorNodeAddresses().stream().collect(Collectors.toList());
       client.setMirrorNetwork(mirrorNodeAddresses);
+
       client.setOperator(getOperatorAccount().accountId(), getOperatorAccount().privateKey());
       getRequestTimeout().ifPresent(client::setRequestTimeout);
       return client;

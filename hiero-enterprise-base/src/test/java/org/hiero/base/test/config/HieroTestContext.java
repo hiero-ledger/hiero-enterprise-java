@@ -27,13 +27,16 @@ public class HieroTestContext implements HieroContext {
 
     final String hieroAccountIdByEnv =
         Optional.ofNullable(System.getenv("HEDERA_ACCOUNT_ID"))
-            .orElse(dotenv.get("hiero.accountId"));
+            .or(() -> Optional.ofNullable(dotenv.get("hiero.accountId")))
+            .orElseGet(() -> dotenv.get("HEDERA_ACCOUNT_ID"));
     final String hieroPrivateKeyByEnv =
         Optional.ofNullable(System.getenv("HEDERA_PRIVATE_KEY"))
-            .orElse(dotenv.get("hiero.privateKey"));
+            .or(() -> Optional.ofNullable(dotenv.get("hiero.privateKey")))
+            .orElseGet(() -> dotenv.get("HEDERA_PRIVATE_KEY"));
     final String hieroNetwork =
         Optional.ofNullable(System.getenv("HEDERA_NETWORK"))
             .or(() -> Optional.ofNullable(dotenv.get("hiero.network")))
+            .or(() -> Optional.ofNullable(dotenv.get("HEDERA_NETWORK")))
             .orElse("hedera-testnet");
 
     if (hieroAccountIdByEnv == null) {

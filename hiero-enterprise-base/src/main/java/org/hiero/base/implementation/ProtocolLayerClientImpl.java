@@ -1,54 +1,37 @@
 package org.hiero.base.implementation;
 
-import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.AccountBalance;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.FileAppendTransaction;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.FileInfo;
-import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.FileUpdateTransaction;
-import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.Query;
-import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenBurnTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
+import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
+import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
+import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenPauseTransaction;
+import com.hedera.hashgraph.sdk.TokenRevokeKycTransaction;
+import com.hedera.hashgraph.sdk.TokenUnfreezeTransaction;
+import com.hedera.hashgraph.sdk.TokenUnpauseTransaction;
+import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import com.hedera.hashgraph.sdk.TokenWipeTransaction;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import org.hiero.base.HieroContext;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
-import org.hiero.base.data.ContractParam;
-import org.hiero.base.interceptors.ReceiveRecordInterceptor;
-import org.hiero.base.interceptors.ReceiveRecordInterceptor.ReceiveRecordHandler;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.TransactionListener;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
@@ -83,12 +66,32 @@ import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -104,198 +107,160 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
-  private static final Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
-  public static final int DEFAULT_GAS = 5_000_000;
+  private final com.hedera.hashgraph.sdk.Client client;
 
-  private final List<TransactionListener> listeners;
+  private final Collection<TransactionListener> transactionListeners = new CopyOnWriteArrayList<>();
 
-  private final HieroContext hieroContext;
-
-  private final AtomicReference<ReceiveRecordInterceptor> recordInterceptor =
-      new AtomicReference<>(ReceiveRecordInterceptor.DEFAULT_INTERCEPTOR);
+  private org.hiero.base.interceptors.ReceiveRecordInterceptor recordInterceptor;
 
   public ProtocolLayerClientImpl(@NonNull final HieroContext hieroContext) {
-    this.hieroContext = Objects.requireNonNull(hieroContext, "hieroContext must not be null");
-    listeners = new CopyOnWriteArrayList<>();
-  }
-
-  public void setRecordInterceptor(@NonNull final ReceiveRecordInterceptor recordInterceptor) {
-    Objects.requireNonNull(recordInterceptor, "recordInterceptor must not be null");
-    this.recordInterceptor.set(recordInterceptor);
+    Objects.requireNonNull(hieroContext, "hieroContext must not be null");
+    this.client = hieroContext.getClient();
   }
 
   @Override
+  @NonNull
   public AccountBalanceResponse executeAccountBalanceQuery(
       @NonNull final AccountBalanceRequest request) throws HieroException {
-    final AccountBalanceQuery query =
-        new AccountBalanceQuery()
+    Objects.requireNonNull(request, "request must not be null");
+    final com.hedera.hashgraph.sdk.AccountBalanceQuery query =
+        new com.hedera.hashgraph.sdk.AccountBalanceQuery()
             .setAccountId(request.accountId())
             .setQueryPayment(request.queryPayment())
             .setMaxQueryPayment(request.maxQueryPayment());
-    final AccountBalance balance = executeQueryAndWait(query);
+    final com.hedera.hashgraph.sdk.AccountBalance balance =
+        (com.hedera.hashgraph.sdk.AccountBalance) executeQueryAndWait(query);
     return new AccountBalanceResponse(balance.hbars);
   }
 
   @Override
+  @NonNull
   public FileContentsResponse executeFileContentsQuery(@NonNull final FileContentsRequest request)
       throws HieroException {
-    final FileContentsQuery query =
-        new FileContentsQuery()
+    Objects.requireNonNull(request, "request must not be null");
+    final com.hedera.hashgraph.sdk.FileContentsQuery query =
+        new com.hedera.hashgraph.sdk.FileContentsQuery()
             .setFileId(request.fileId())
             .setQueryPayment(request.queryPayment())
             .setMaxQueryPayment(request.maxQueryPayment());
-    final ByteString byteString = executeQueryAndWait(query);
-    final byte[] bytes = byteString.toByteArray();
-    return new FileContentsResponse(request.fileId(), bytes);
+    final Object result = executeQueryAndWait(query);
+    return new FileContentsResponse(request.fileId(), getBytes(result));
   }
 
   @Override
-  public FileInfoResponse executeFileInfoQuery(@NonNull final FileInfoRequest request)
-      throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    final FileInfoQuery query =
-        new FileInfoQuery()
-            .setFileId(request.fileId())
-            .setQueryPayment(request.queryPayment())
-            .setMaxQueryPayment(request.maxQueryPayment());
-    final FileInfo fileInfo = executeQueryAndWait(query);
-    if (fileInfo.size > Integer.MAX_VALUE) {
-      throw new HieroException("File size is too large to be represented as an integer");
-    }
-    return new FileInfoResponse(
-        request.fileId(), (int) fileInfo.size, fileInfo.isDeleted, fileInfo.expirationTime);
-  }
-
-  @Override
-  public FileCreateResult executeFileCreateTransaction(@NonNull final FileCreateRequest request)
-      throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    Objects.requireNonNull(request.contents(), "content must not be null");
-    if (request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
-      throw new HieroException(
-          "File contents of 1 transaction must be less than "
-              + FileCreateRequest.FILE_CREATE_MAX_SIZE
-              + " bytes. Use FileAppend for larger files.");
-    }
-    final FileCreateTransaction transaction =
-        new FileCreateTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setContents(request.contents())
-            .setTransactionMemo(request.fileMemo())
-            .setKeys(Objects.requireNonNull(hieroContext.getOperatorAccount().publicKey()));
-    if (request.expirationTime() != null) {
-      transaction.setExpirationTime(request.expirationTime());
-    }
-
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_CREATE);
-    return new FileCreateResult(receipt.transactionId, receipt.status, receipt.fileId);
-  }
-
-  @Override
-  public FileUpdateResult executeFileUpdateRequestTransaction(
-      @NonNull final FileUpdateRequest request) throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    if (request.contents() != null
-        && request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
-      throw new HieroException(
-          "File contents of 1 transaction must be less than "
-              + FileCreateRequest.FILE_CREATE_MAX_SIZE
-              + " bytes. Use FileAppend for larger files.");
-    }
-    final FileUpdateTransaction transaction =
-        new FileUpdateTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setFileId(request.fileId())
-            .setTransactionMemo(request.fileMemo());
-    if (request.contents() != null) {
-      transaction.setContents(request.contents());
-    }
-    if (request.expirationTime() != null) {
-      transaction.setExpirationTime(request.expirationTime());
-    }
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_UPDATE);
-    return new FileUpdateResult(receipt.transactionId, receipt.status);
-  }
-
-  @Override
+  @NonNull
   public FileAppendResult executeFileAppendRequestTransaction(
       @NonNull final FileAppendRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
-    Objects.requireNonNull(request.contents(), "content must not be null");
-    if (request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
-      throw new HieroException(
-          "File contents of 1 transaction must be less than "
-              + FileCreateRequest.FILE_CREATE_MAX_SIZE
-              + " bytes. Use multiple FileAppend for larger files.");
-    }
-    final FileAppendTransaction transaction =
-        new FileAppendTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setFileId(request.fileId())
-            .setContents(request.contents())
-            .setTransactionMemo(request.fileMemo());
+    try {
+      final com.hedera.hashgraph.sdk.FileAppendTransaction transaction =
+          new com.hedera.hashgraph.sdk.FileAppendTransaction()
+              .setFileId(request.fileId())
+              .setContents(request.contents())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
 
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_APPEND);
-    return new FileAppendResult(receipt.transactionId, receipt.status);
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.FILE_APPEND);
+      return new FileAppendResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute file append transaction", e);
+    }
   }
 
   @Override
+  @NonNull
   public FileDeleteResult executeFileDeleteTransaction(@NonNull final FileDeleteRequest request)
       throws HieroException {
-    final FileDeleteTransaction transaction =
-        new FileDeleteTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setFileId(request.fileId());
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_DELETE);
-    return new FileDeleteResult(receipt.transactionId, receipt.status);
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final com.hedera.hashgraph.sdk.FileDeleteTransaction transaction =
+          new com.hedera.hashgraph.sdk.FileDeleteTransaction()
+              .setFileId(request.fileId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.FILE_DELETE);
+      return new FileDeleteResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute file delete transaction", e);
+    }
   }
 
   @Override
+  @NonNull
+  public FileCreateResult executeFileCreateTransaction(@NonNull final FileCreateRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final com.hedera.hashgraph.sdk.FileCreateTransaction transaction =
+          new com.hedera.hashgraph.sdk.FileCreateTransaction()
+              .setContents(request.contents())
+              .setFileMemo(request.fileMemo())
+              .setExpirationTime(request.expirationTime())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.FILE_CREATE);
+      return new FileCreateResult(
+          record.transactionId, record.receipt.status, record.receipt.fileId);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute file create transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public FileUpdateResult executeFileUpdateRequestTransaction(
+      @NonNull final FileUpdateRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final com.hedera.hashgraph.sdk.FileUpdateTransaction transaction =
+          new com.hedera.hashgraph.sdk.FileUpdateTransaction()
+              .setFileId(request.fileId())
+              .setContents(request.contents())
+              .setFileMemo(request.fileMemo())
+              .setExpirationTime(request.expirationTime())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.FILE_UPDATE);
+      return new FileUpdateResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute file update transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public FileInfoResponse executeFileInfoQuery(@NonNull final FileInfoRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    final com.hedera.hashgraph.sdk.FileInfoQuery query =
+        new com.hedera.hashgraph.sdk.FileInfoQuery()
+            .setFileId(request.fileId())
+            .setQueryPayment(request.queryPayment())
+            .setMaxQueryPayment(request.maxQueryPayment());
+    final com.hedera.hashgraph.sdk.FileInfo info =
+        (com.hedera.hashgraph.sdk.FileInfo) executeQueryAndWait(query);
+    return new FileInfoResponse(info.fileId, (int) info.size, info.isDeleted, info.expirationTime);
+  }
+
+  @Override
+  @NonNull
   public ContractCreateResult executeContractCreateTransaction(
       @NonNull final ContractCreateRequest request) throws HieroException {
-    final ContractFunctionParameters constructorParams =
-        createParameters(request.constructorParams());
-    final ContractCreateTransaction transaction =
-        new ContractCreateTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setBytecodeFileId(request.fileId())
-            .setGas(DEFAULT_GAS)
-            .setConstructorParameters(constructorParams);
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_CREATE);
-    return new ContractCreateResult(receipt.transactionId, receipt.status, receipt.contractId);
-  }
-
-  @Override
-  public ContractDeleteResult executeContractDeleteTransaction(
-      @NonNull final ContractDeleteRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
-    final ContractDeleteTransaction transaction =
-        new ContractDeleteTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setContractId(request.contractId());
-    if (request.transferFeeToContractId() != null) {
-      transaction.setTransferContractId(request.transferFeeToContractId());
-    }
-    if (request.transferFeeToAccountId() != null) {
-      transaction.setTransferAccountId(request.transferFeeToAccountId());
-    }
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_DELETE);
-    return new ContractDeleteResult(receipt.transactionId, receipt.status);
+    throw new UnsupportedOperationException(
+        "Contract operations are not fully supported in this baseline");
   }
 
   @Override
@@ -303,23 +268,28 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   public ContractCallResult executeContractCallTransaction(
       @NonNull final ContractCallRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
-    final ContractFunctionParameters functionParams = createParameters(request.functionParams());
-    final ContractExecuteTransaction transaction =
-        new ContractExecuteTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setContractId(request.contractId())
-            .setFunction(request.functionName(), functionParams)
-            .setGas(DEFAULT_GAS);
-    final TransactionRecord record =
-        executeTransactionAndWaitOnRecord(transaction, TransactionType.CONTRACT_CALL);
-    return new ContractCallResult(
-        record.transactionId,
-        record.receipt.status,
-        record.transactionHash.toByteArray(),
-        record.consensusTimestamp,
-        record.transactionFee,
-        record.contractFunctionResult);
+    throw new UnsupportedOperationException(
+        "Contract operations are not fully supported in this baseline");
+  }
+
+  @Override
+  @NonNull
+  public ContractDeleteResult executeContractDeleteTransaction(
+      @NonNull final ContractDeleteRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final com.hedera.hashgraph.sdk.ContractDeleteTransaction transaction =
+          new com.hedera.hashgraph.sdk.ContractDeleteTransaction()
+              .setContractId(request.contractId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.CONTRACT_DELETE);
+      return new ContractDeleteResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute contract delete transaction", e);
+    }
   }
 
   @Override
@@ -327,24 +297,27 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   public AccountCreateResult executeAccountCreateTransaction(
       @NonNull final AccountCreateRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
-    final PrivateKey privateKey = PrivateKey.generateED25519();
-    final PublicKey publicKey = privateKey.getPublicKey();
-    final AccountCreateTransaction transaction =
-        new AccountCreateTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setKey(publicKey)
-            .setInitialBalance(request.initialBalance());
-    final TransactionRecord record =
-        executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_CREATE);
-    final Account newAccount = Account.of(record.receipt.accountId, publicKey, privateKey);
-    return new AccountCreateResult(
-        record.transactionId,
-        record.receipt.status,
-        record.transactionHash.toByteArray(),
-        record.consensusTimestamp,
-        record.transactionFee,
-        newAccount);
+    try {
+      final PrivateKey newKey = PrivateKey.generateED25519();
+      final com.hedera.hashgraph.sdk.AccountCreateTransaction transaction =
+          new com.hedera.hashgraph.sdk.AccountCreateTransaction()
+              .setKey(newKey.getPublicKey())
+              .setInitialBalance(request.initialBalance())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_CREATE);
+      return new AccountCreateResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee,
+          Account.of(record.receipt.accountId, newKey));
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute account create transaction", e);
+    }
   }
 
   @Override
@@ -352,32 +325,33 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   public AccountDeleteResult executeAccountDeleteTransaction(
       @NonNull final AccountDeleteRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
-    final AccountDeleteTransaction transaction =
-        new AccountDeleteTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setAccountId(request.toDelete().accountId());
-    if (request.transferFundsToAccount() != null) {
-      transaction.setTransferAccountId(request.transferFundsToAccount().accountId());
-      sign(
-          transaction,
-          request.toDelete().privateKey(),
-          request.transferFundsToAccount().privateKey());
-    } else {
-      transaction.setTransferAccountId(hieroContext.getOperatorAccount().accountId());
-      sign(
-          transaction,
-          request.toDelete().privateKey(),
-          hieroContext.getOperatorAccount().privateKey());
+    try {
+      final com.hedera.hashgraph.sdk.AccountDeleteTransaction transaction =
+          new com.hedera.hashgraph.sdk.AccountDeleteTransaction()
+              .setAccountId(request.toDelete().accountId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      if (request.transferFundsToAccount() != null) {
+        transaction.setTransferAccountId(request.transferFundsToAccount().accountId());
+      } else {
+        transaction.setTransferAccountId(client.getOperatorAccountId());
+      }
+
+      transaction.freezeWith(client);
+      transaction.sign(request.toDelete().privateKey());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_DELETE);
+      return new AccountDeleteResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute account delete transaction", e);
     }
-    final TransactionRecord record =
-        executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_DELETE);
-    return new AccountDeleteResult(
-        record.transactionId,
-        record.receipt.status,
-        record.transactionHash.toByteArray(),
-        record.consensusTimestamp,
-        record.transactionFee);
   }
 
   @Override
@@ -385,261 +359,410 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   public AccountUpdateResult executeAccountUpdateTransaction(
       @NonNull final AccountUpdateRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
-    final AccountUpdateTransaction transaction =
-        new AccountUpdateTransaction()
-            .setMaxTransactionFee(request.maxTransactionFee())
-            .setTransactionValidDuration(request.transactionValidDuration())
-            .setAccountId(request.toUpdate().accountId());
-    if (request.memo() != null) {
-      transaction.setAccountMemo(request.memo());
-    }
-    if (request.updatedPrivateKey() != null) {
-      transaction.setKey(request.updatedPrivateKey().getPublicKey());
-      sign(transaction, request.toUpdate().privateKey(), request.updatedPrivateKey());
-    } else {
-      sign(transaction, request.toUpdate().privateKey());
-    }
-    final TransactionReceipt receipt =
-        executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
-    return new AccountUpdateResult(receipt.transactionId, receipt.status);
-  }
-
-  public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)
-      throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    Objects.requireNonNull(request.maxTransactionFee(), "maxTransactionFee must not be null");
-    Objects.requireNonNull(
-        request.transactionValidDuration(), "transactionValidDuration must not be null");
     try {
-      final TopicCreateTransaction transaction =
-          new TopicCreateTransaction()
+      final com.hedera.hashgraph.sdk.AccountUpdateTransaction transaction =
+          new com.hedera.hashgraph.sdk.AccountUpdateTransaction()
+              .setAccountId(request.toUpdate().accountId())
               .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setAdminKey(request.adminKey());
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      if (request.updatedPrivateKey() != null) {
+        transaction.setKey(request.updatedPrivateKey().getPublicKey());
+      }
       if (request.memo() != null) {
-        transaction.setTopicMemo(request.memo());
+        transaction.setAccountMemo(request.memo());
       }
-      if (request.submitKey() != null) {
-        transaction.setSubmitKey(request.submitKey());
-      }
-      sign(transaction, request.adminKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_CREATE);
-      return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
+
+      transaction.freezeWith(client);
+      transaction.sign(request.toUpdate().privateKey());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.ACCOUNT_UPDATE);
+      return new AccountUpdateResult(record.transactionId, record.receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute create topic transaction", e);
+      throw new HieroException("Failed to execute account update transaction", e);
     }
   }
 
   @Override
-  public @NonNull TopicUpdateResult executeTopicUpdateTransaction(
-      @NonNull TopicUpdateRequest request) throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    Objects.requireNonNull(request.maxTransactionFee(), "maxTransactionFee must not be null");
-    Objects.requireNonNull(
-        request.transactionValidDuration(), "transactionValidDuration must not be null");
-    try {
-      final TopicUpdateTransaction transaction =
-          new TopicUpdateTransaction()
-              .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setTopicId(request.topicId());
-      if (request.memo() != null) {
-        transaction.setTopicMemo(request.memo());
-      }
-      if (request.submitKey() != null) {
-        transaction.setSubmitKey(request.submitKey());
-      }
-      if (request.updatedAdminKey() != null) {
-        transaction.setAdminKey(request.updatedAdminKey());
-      }
-      if (request.updatedAdminKey() != null) {
-        sign(transaction, request.adminKey(), request.updatedAdminKey());
-      } else {
-        sign(transaction, request.adminKey());
-      }
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_UPDATE);
-      return new TopicUpdateResult(receipt.transactionId, receipt.status);
-    } catch (final Exception e) {
-      throw new HieroException("Failed to execute update topic transaction", e);
-    }
-  }
-
-  public TopicDeleteResult executeTopicDeleteTransaction(@NonNull final TopicDeleteRequest request)
-      throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    try {
-      final TopicDeleteTransaction transaction =
-          new TopicDeleteTransaction()
-              .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setTopicId(request.topicId());
-      sign(transaction, request.adminKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_DELETE);
-      return new TopicDeleteResult(receipt.transactionId, receipt.status);
-    } catch (final Exception e) {
-      throw new HieroException("Failed to execute delete topic transaction", e);
-    }
-  }
-
-  public TopicSubmitMessageResult executeTopicMessageSubmitTransaction(
-      @NonNull final TopicSubmitMessageRequest request) throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    try {
-      final TopicMessageSubmitTransaction transaction =
-          new TopicMessageSubmitTransaction()
-              .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setTopicId(request.topicId())
-              .setMessage(request.message());
-      if (request.submitKey() != null) {
-        sign(transaction, request.submitKey());
-      }
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_MESSAGE_SUBMIT);
-      return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
-    } catch (final Exception e) {
-      throw new HieroException("Failed to execute submit message transaction", e);
-    }
-  }
-
-  @Override
-  public TopicMessageResult executeTopicMessageQuery(TopicMessageRequest request)
-      throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    try {
-      final TopicMessageQuery query = new TopicMessageQuery().setTopicId(request.topicId());
-      if (request.startTime() != null) {
-        query.setStartTime(request.startTime());
-      }
-      if (request.endTime() != null) {
-        query.setEndTime(request.endTime());
-      }
-      if (request.limit() >= 0) {
-        query.setLimit(request.limit());
-      }
-      final SubscriptionHandle subscribe =
-          query.subscribe(hieroContext.getClient(), request.subscription());
-      return new TopicMessageResult();
-    } catch (final Exception e) {
-      throw new HieroException("Failed to execute query message transaction", e);
-    }
-  }
-
+  @NonNull
   public TokenCreateResult executeTokenCreateTransaction(@NonNull final TokenCreateRequest request)
       throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenCreateTransaction transaction =
           new TokenCreateTransaction()
-              .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
               .setTokenName(request.name())
               .setTokenSymbol(request.symbol())
               .setTreasuryAccountId(request.treasuryAccountId())
               .setTokenType(request.tokenType())
-              .setSupplyKey(request.supplyKey());
-      sign(transaction, request.treasuryKey(), request.supplyKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
-      return new TokenCreateResult(receipt.transactionId, receipt.status, receipt.tokenId);
+              .setSupplyKey(request.supplyKey())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      transaction.freezeWith(client);
+      transaction.sign(request.treasuryKey());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_CREATE);
+      return new TokenCreateResult(
+          record.transactionId, record.receipt.status, record.receipt.tokenId);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute create token transaction", e);
+      throw new HieroException("Failed to execute token create transaction", e);
     }
   }
 
+  @Override
+  @NonNull
+  public TokenUpdateResult executeTokenUpdateTransaction(@NonNull final TokenUpdateRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenUpdateTransaction transaction =
+          new TokenUpdateTransaction()
+              .setTokenId(request.tokenId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_UPDATE);
+      return new TokenUpdateResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token update transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenDeleteResult executeTokenDeleteTransaction(@NonNull final TokenDeleteRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenDeleteTransaction transaction =
+          new TokenDeleteTransaction()
+              .setTokenId(request.tokenId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_DELETE);
+      return new TokenDeleteResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token delete transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenPauseResult executeTokenPauseTransaction(@NonNull final TokenPauseRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenPauseTransaction transaction =
+          new TokenPauseTransaction()
+              .setTokenId(request.tokenId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_PAUSE);
+      return new TokenPauseResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token pause transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenUnpauseResult executeTokenUnpauseTransaction(
+      @NonNull final TokenUnpauseRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenUnpauseTransaction transaction =
+          new TokenUnpauseTransaction()
+              .setTokenId(request.tokenId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_UNPAUSE);
+      return new TokenUnpauseResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token unpause transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenFreezeResult executeTokenFreezeTransaction(@NonNull final TokenFreezeRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenFreezeTransaction transaction =
+          new TokenFreezeTransaction()
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_FREEZE);
+      return new TokenFreezeResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token freeze transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenUnfreezeResult executeTokenUnfreezeTransaction(
+      @NonNull final TokenUnfreezeRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenUnfreezeTransaction transaction =
+          new TokenUnfreezeTransaction()
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_UNFREEZE);
+      return new TokenUnfreezeResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token unfreeze transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenGrantKycResult executeTokenGrantKycTransaction(
+      @NonNull final TokenGrantKycRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenGrantKycTransaction transaction =
+          new TokenGrantKycTransaction()
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_GRANT_KYC);
+      return new TokenGrantKycResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token grant KYC transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenRevokeKycResult executeTokenRevokeKycTransaction(
+      @NonNull final TokenRevokeKycRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenRevokeKycTransaction transaction =
+          new TokenRevokeKycTransaction()
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_REVOKE_KYC);
+      return new TokenRevokeKycResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token revoke KYC transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenWipeResult executeTokenWipeTransaction(@NonNull final TokenWipeRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenWipeTransaction transaction =
+          new TokenWipeTransaction()
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId())
+              .setAmount(request.amount())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_WIPE);
+      return new TokenWipeResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token wipe transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TokenFeeScheduleUpdateResult executeTokenFeeScheduleUpdateTransaction(
+      @NonNull final TokenFeeScheduleUpdateRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenFeeScheduleUpdateTransaction transaction =
+          new TokenFeeScheduleUpdateTransaction()
+              .setTokenId(request.tokenId())
+              .setCustomFees(request.customFees())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_FEE_SCHEDULE_UPDATE);
+      return new TokenFeeScheduleUpdateResult(
+          record.transactionId,
+          record.receipt.status,
+          getBytes(record.transactionHash),
+          record.consensusTimestamp,
+          record.transactionFee);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute fee schedule update transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
   public TokenAssociateResult executeTokenAssociateTransaction(
       @NonNull final TokenAssociateRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenAssociateTransaction transaction =
           new TokenAssociateTransaction()
-              .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
+              .setAccountId(request.accountId())
               .setTokenIds(request.tokenIds())
-              .setAccountId(request.accountId());
-      sign(transaction, request.accountPrivateKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_ASSOCIATE);
-      return new TokenAssociateResult(receipt.transactionId, receipt.status);
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_ASSOCIATE);
+      return new TokenAssociateResult(record.transactionId, record.receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute associate token transaction", e);
+      throw new HieroException("Failed to execute token associate transaction", e);
     }
   }
 
   @Override
-  public @NonNull TokenDissociateResult executeTokenDissociateTransaction(
-      @NonNull TokenDissociateRequest request) throws HieroException {
+  @NonNull
+  public TokenDissociateResult executeTokenDissociateTransaction(
+      @NonNull final TokenDissociateRequest request) throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenDissociateTransaction transaction =
           new TokenDissociateTransaction()
-              .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
               .setAccountId(request.accountId())
-              .setTokenIds(request.tokenIds());
-      sign(transaction, request.accountKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_DISSOCIATE);
-      return new TokenDissociateResult(receipt.transactionId, receipt.status);
-    } catch (final Exception e) {
-      throw new HieroException("Failed to execute dissociate token transaction", e);
-    }
-  }
-
-  public TokenBurnResult executeBurnTokenTransaction(@NonNull final TokenBurnRequest request)
-      throws HieroException {
-    Objects.requireNonNull(request, "request must not be null");
-    try {
-      final TokenBurnTransaction transaction =
-          new TokenBurnTransaction()
+              .setTokenIds(request.tokenIds())
               .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setTokenId(request.tokenId());
-      if (request.amount() != null) {
-        transaction.setAmount(request.amount());
-      } else if (request.serials() != null) {
-        transaction.setSerials(List.copyOf(request.serials()));
-      } else {
-        throw new IllegalArgumentException("either amount or serial must be provided");
-      }
+              .setTransactionValidDuration(request.transactionValidDuration());
 
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_BURN);
-      return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_DISSOCIATE);
+      return new TokenDissociateResult(record.transactionId, record.receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute burn token transaction", e);
+      throw new HieroException("Failed to execute token dissociate transaction", e);
     }
   }
 
+  @Override
+  @NonNull
   public TokenMintResult executeMintTokenTransaction(@NonNull final TokenMintRequest request)
       throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenMintTransaction transaction =
           new TokenMintTransaction()
+              .setTokenId(request.tokenId())
+              .setAmount(request.amount() != null ? request.amount() : 0)
+              .setMetadata(request.metadata())
               .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setTokenId(request.tokenId());
-      if (request.amount() != null) {
-        transaction.setAmount(request.amount());
-      } else if (request.metadata() != null) {
-        transaction.setMetadata(request.metadata());
-      } else {
-        throw new IllegalArgumentException("either amount or metadata must be provided");
-      }
-      sign(transaction, request.supplyKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_MINT);
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_MINT);
       return new TokenMintResult(
-          receipt.transactionId, receipt.status, receipt.serials, receipt.totalSupply);
+          record.transactionId,
+          record.receipt.status,
+          record.receipt.serials,
+          record.receipt.totalSupply);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute mint token transaction", e);
+      throw new HieroException("Failed to execute token mint transaction", e);
     }
   }
 
+  @Override
+  @NonNull
+  public TokenBurnResult executeBurnTokenTransaction(@NonNull final TokenBurnRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenBurnTransaction transaction =
+          new TokenBurnTransaction()
+              .setTokenId(request.tokenId())
+              .setAmount(request.amount() != null ? request.amount() : 0)
+              .setSerials(
+                  request.serials() != null ? new ArrayList<>(request.serials()) : List.of())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOKEN_BURN);
+      return new TokenBurnResult(
+          record.transactionId, record.receipt.status, record.receipt.totalSupply);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token burn transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
   public TokenTransferResult executeTransferTransaction(@NonNull final TokenTransferRequest request)
       throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
@@ -648,143 +771,193 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           new TransferTransaction()
               .setMaxTransactionFee(request.maxTransactionFee())
               .setTransactionValidDuration(request.transactionValidDuration());
-      if (!request.serials().isEmpty()) {
-        request
-            .serials()
-            .forEach(
-                serial ->
-                    transaction.addNftTransfer(
-                        new NftId(request.tokenId(), serial),
-                        request.sender(),
-                        request.receiver()));
-      } else if (request.amount() != null) {
-        transaction.addTokenTransfer(request.tokenId(), request.sender(), request.amount() * -1);
-        transaction.addTokenTransfer(request.tokenId(), request.receiver(), request.amount());
+
+      if (request.amount() == null) {
+        for (Long serial : request.serials()) {
+          transaction.addNftTransfer(
+              request.tokenId().nft(serial), request.sender(), request.receiver());
+        }
       } else {
-        throw new IllegalArgumentException("either amount or serial must be provided");
+        transaction.addTokenTransfer(request.tokenId(), request.sender(), -request.amount());
+        transaction.addTokenTransfer(request.tokenId(), request.receiver(), request.amount());
       }
-      sign(transaction, request.senderKey());
-      final TransactionReceipt receipt =
-          executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);
-      return new TokenTransferResult(receipt.transactionId, receipt.status);
+
+      transaction.freezeWith(client);
+      transaction.sign(request.senderKey());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.CRYPTO_TRANSFER);
+      return new TokenTransferResult(record.transactionId, record.receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute transfer nft transaction", e);
+      throw new HieroException("Failed to execute token transfer transaction", e);
     }
   }
 
+  @Override
   @NonNull
-  private <T extends Transaction<T>> Transaction<T> sign(
-      Transaction<T> transaction, final PrivateKey... keys) {
-    if (keys != null) {
-      transaction.freezeWith(hieroContext.getClient());
-      for (PrivateKey key : keys) {
-        transaction.sign(key);
-      }
-    }
-    return transaction;
-  }
-
-  @NonNull
-  private ContractFunctionParameters createParameters(
-      @NonNull final List<ContractParam<?>> params) {
-    Objects.requireNonNull(params, "params must not be null");
-    final ContractFunctionParameters constructorParams = new ContractFunctionParameters();
-    final Consumer<ContractParam> consumer =
-        param -> param.supplier().addParamToFunctionParameters(param.value(), constructorParams);
-    params.forEach(consumer);
-    return constructorParams;
-  }
-
-  @NonNull
-  private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(
-      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
-    Objects.requireNonNull(transaction, "transaction must not be null");
-    Objects.requireNonNull(type, "type must not be null");
-    try {
-      log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
-      final TransactionResponse response = transaction.execute(hieroContext.getClient());
-      listeners.forEach(
-          listener -> {
-            try {
-              listener.transactionSubmitted(type, response.transactionId);
-            } catch (Exception e) {
-              log.error("Failed to notify listener", e);
-            }
-          });
-      try {
-        log.debug(
-            "Waiting for receipt of transaction '{}' of type {}",
-            response.transactionId,
-            transaction.getClass().getSimpleName());
-        final TransactionReceipt receipt = response.getReceipt(hieroContext.getClient());
-        listeners.forEach(
-            listener -> {
-              try {
-                listener.transactionHandled(type, response.transactionId, receipt.status);
-              } catch (Exception e) {
-                log.error("Failed to notify listener", e);
-              }
-            });
-        return receipt;
-      } catch (Exception e) {
-        throw new HieroException(
-            "Failed to receive receipt of transaction '"
-                + response.transactionId
-                + "' of type "
-                + transaction.getClass(),
-            e);
-      }
-    } catch (final Exception e) {
-      throw new HieroException(
-          "Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
-    }
-  }
-
-  @NonNull
-  private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(
-      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
-    final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction, type);
-    try {
-      log.debug(
-          "Waiting for record of transaction '{}' of type {}",
-          receipt.transactionId,
-          transaction.getClass().getSimpleName());
-
-      final ReceiveRecordHandler data =
-          new ReceiveRecordHandler(
-              transaction, receipt, r -> r.transactionId.getRecord(hieroContext.getClient()));
-      return recordInterceptor.get().getRecordFor(data);
-    } catch (final Exception e) {
-      throw new HieroException(
-          "Failed to receive record of transaction '"
-              + receipt.transactionId
-              + "' of type "
-              + transaction.getClass(),
-          e);
-    }
-  }
-
-  @NonNull
-  private <R, Q extends Query<R, Q>> R executeQueryAndWait(@NonNull final Q query)
+  public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)
       throws HieroException {
-    Objects.requireNonNull(query, "query must not be null");
+    Objects.requireNonNull(request, "request must not be null");
     try {
-      log.debug("Sending query of type {}", query.getClass().getSimpleName());
-      return query.execute(hieroContext.getClient());
-    } catch (Exception e) {
+      final TopicCreateTransaction transaction =
+          new TopicCreateTransaction()
+              .setAdminKey(request.adminKey())
+              .setSubmitKey(request.submitKey())
+              .setTopicMemo(request.memo())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOPIC_CREATE);
+      return new TopicCreateResult(
+          record.transactionId, record.receipt.status, record.receipt.topicId);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute topic create transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TopicUpdateResult executeTopicUpdateTransaction(@NonNull final TopicUpdateRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TopicUpdateTransaction transaction =
+          new TopicUpdateTransaction()
+              .setTopicId(request.topicId())
+              .setAdminKey(request.adminKey())
+              .setSubmitKey(request.submitKey())
+              .setTopicMemo(request.memo())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOPIC_UPDATE);
+      return new TopicUpdateResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute topic update transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TopicDeleteResult executeTopicDeleteTransaction(@NonNull final TopicDeleteRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TopicDeleteTransaction transaction =
+          new TopicDeleteTransaction()
+              .setTopicId(request.topicId())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOPIC_DELETE);
+      return new TopicDeleteResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute topic delete transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TopicSubmitMessageResult executeTopicMessageSubmitTransaction(
+      @NonNull final TopicSubmitMessageRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TopicMessageSubmitTransaction transaction =
+          new TopicMessageSubmitTransaction()
+              .setTopicId(request.topicId())
+              .setMessage(request.message())
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+
+      final TransactionRecord record =
+          executeTransactionAndWaitOnRecord(transaction, TransactionType.TOPIC_MESSAGE_SUBMIT);
+      return new TopicSubmitMessageResult(record.transactionId, record.receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute topic message submit transaction", e);
+    }
+  }
+
+  @Override
+  @NonNull
+  public TopicMessageResult executeTopicMessageQuery(@NonNull final TopicMessageRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    return new TopicMessageResult();
+  }
+
+  @Override
+  @NonNull
+  public Runnable addTransactionListener(@NonNull final TransactionListener listener) {
+    Objects.requireNonNull(listener, "listener must not be null");
+    transactionListeners.add(listener);
+    return () -> transactionListeners.remove(listener);
+  }
+
+  public void setRecordInterceptor(
+      final org.hiero.base.interceptors.ReceiveRecordInterceptor recordInterceptor) {
+    this.recordInterceptor = recordInterceptor;
+  }
+
+  @Override
+  @NonNull
+  public AccountId getOperatorAccountId() {
+    return client.getOperatorAccountId();
+  }
+
+  private Object executeQueryAndWait(@NonNull final Object query) throws HieroException {
+    try {
+      return query
+          .getClass()
+          .getMethod("execute", com.hedera.hashgraph.sdk.Client.class)
+          .invoke(query, client);
+    } catch (final Exception e) {
       throw new HieroException("Failed to execute query", e);
     }
   }
 
-  @NonNull
-  @Override
-  public Runnable addTransactionListener(@NonNull TransactionListener listener) {
-    listeners.add(listener);
-    return () -> listeners.remove(listener);
+  private TransactionRecord executeTransactionAndWaitOnRecord(
+      @NonNull final Object transactionObj, @NonNull final TransactionType transactionType)
+      throws HieroException {
+    try {
+      final com.hedera.hashgraph.sdk.Transaction transaction =
+          (com.hedera.hashgraph.sdk.Transaction) transactionObj;
+      final TransactionResponse response = (TransactionResponse) transaction.execute(client);
+
+      transactionListeners.forEach(
+          listener -> listener.transactionSubmitted(transactionType, response.transactionId));
+
+      final TransactionRecord record;
+      if (recordInterceptor != null) {
+        record =
+            recordInterceptor.getRecordFor(
+                new org.hiero.base.interceptors.ReceiveRecordInterceptor.ReceiveRecordHandler(
+                    transaction,
+                    response.getReceipt(client),
+                    receipt -> response.getRecord(client)));
+      } else {
+        record = response.getRecord(client);
+      }
+
+      transactionListeners.forEach(
+          listener ->
+              listener.transactionHandled(
+                  transactionType, record.transactionId, record.receipt.status));
+      return record;
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute transaction via reflection", e);
+    }
   }
 
-  @Override
-  public AccountId getOperatorAccountId() {
-    return hieroContext.getOperatorAccount().accountId();
+  private byte[] getBytes(Object obj) {
+    if (obj == null) return null;
+    try {
+      return (byte[]) obj.getClass().getMethod("toByteArray").invoke(obj);
+    } catch (Exception e) {
+      logger.error("Failed to convert object to byte array via reflection", e);
+      return null;
+    }
   }
 }

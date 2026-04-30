@@ -1,6 +1,7 @@
 package org.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,8 +26,12 @@ class ContractVerificationClientImplementationTest {
   @Autowired private ContractVerificationClient verificationClient;
 
   private Path getResource(String resource) {
-    return Path.of(
-        ContractVerificationClientImplementationTest.class.getResource(resource).getPath());
+    try {
+      return Path.of(
+          ContractVerificationClientImplementationTest.class.getResource(resource).toURI());
+    } catch (Exception e) {
+      throw new RuntimeException("Can not get resource", e);
+    }
   }
 
   private boolean isNotSupportedChain() {

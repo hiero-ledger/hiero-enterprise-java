@@ -1,11 +1,21 @@
 package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
 import java.util.Objects;
 import org.hiero.base.data.Account;
+import org.hiero.base.protocol.data.TokenDeleteResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
+import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
+import org.hiero.base.protocol.data.TokenPauseResult;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -546,4 +556,187 @@ public interface FungibleTokenClient {
         AccountId.fromString(toAccountId),
         amount);
   }
+
+  /**
+   * Returns a builder for updating a token.
+   *
+   * @param tokenId the ID of the token to update
+   * @return the builder
+   */
+  @NonNull TokenUpdateBuilder updateToken(@NonNull TokenId tokenId);
+
+  /**
+   * Returns a builder for updating a token.
+   *
+   * @param tokenId the ID of the token to update
+   * @return the builder
+   */
+  @NonNull
+  default TokenUpdateBuilder updateToken(@NonNull String tokenId) {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return updateToken(TokenId.fromString(tokenId));
+  }
+
+  /**
+   * Deletes a token.
+   *
+   * @param tokenId the ID of the token to delete
+   * @return the result of the deletion
+   * @throws HieroException if the token could not be deleted
+   */
+  @NonNull TokenDeleteResult deleteToken(@NonNull TokenId tokenId) throws HieroException;
+
+  /**
+   * Deletes a token.
+   *
+   * @param tokenId the ID of the token to delete
+   * @return the result of the deletion
+   * @throws HieroException if the token could not be deleted
+   */
+  @NonNull
+  default TokenDeleteResult deleteToken(@NonNull String tokenId) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return deleteToken(TokenId.fromString(tokenId));
+  }
+
+  /**
+   * Pauses a token.
+   *
+   * @param tokenId the ID of the token to pause
+   * @return the result of the pause
+   * @throws HieroException if the token could not be paused
+   */
+  @NonNull TokenPauseResult pauseToken(@NonNull TokenId tokenId) throws HieroException;
+
+  /**
+   * Pauses a token.
+   *
+   * @param tokenId the ID of the token to pause
+   * @return the result of the pause
+   * @throws HieroException if the token could not be paused
+   */
+  @NonNull
+  default TokenPauseResult pauseToken(@NonNull String tokenId) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return pauseToken(TokenId.fromString(tokenId));
+  }
+
+  /**
+   * Unpauses a token.
+   *
+   * @param tokenId the ID of the token to unpause
+   * @return the result of the unpause
+   * @throws HieroException if the token could not be unpaused
+   */
+  @NonNull TokenUnpauseResult unpauseToken(@NonNull TokenId tokenId) throws HieroException;
+
+  /**
+   * Unpauses a token.
+   *
+   * @param tokenId the ID of the token to unpause
+   * @return the result of the unpause
+   * @throws HieroException if the token could not be unpaused
+   */
+  @NonNull
+  default TokenUnpauseResult unpauseToken(@NonNull String tokenId) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return unpauseToken(TokenId.fromString(tokenId));
+  }
+
+  /**
+   * Freezes a token for an account.
+   *
+   * @param tokenId the ID of the token
+   * @param accountId the ID of the account
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenFreezeResult freezeAccount(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException;
+
+  default @NonNull TokenFreezeResult freezeAccount(
+      @NonNull TokenId tokenId, @NonNull Account account) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    return freezeAccount(tokenId, account.accountId());
+  }
+
+  /**
+   * Unfreezes a token for an account.
+   *
+   * @param tokenId the ID of the token
+   * @param accountId the ID of the account
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenUnfreezeResult unfreezeAccount(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException;
+
+  default @NonNull TokenUnfreezeResult unfreezeAccount(
+      @NonNull TokenId tokenId, @NonNull Account account) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    return unfreezeAccount(tokenId, account.accountId());
+  }
+
+  /**
+   * Grants KYC for a token for an account.
+   *
+   * @param tokenId the ID of the token
+   * @param accountId the ID of the account
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenGrantKycResult grantKyc(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException;
+
+  default @NonNull TokenGrantKycResult grantKyc(@NonNull TokenId tokenId, @NonNull Account account)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    return grantKyc(tokenId, account.accountId());
+  }
+
+  /**
+   * Revokes KYC for a token for an account.
+   *
+   * @param tokenId the ID of the token
+   * @param accountId the ID of the account
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenRevokeKycResult revokeKyc(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException;
+
+  default @NonNull TokenRevokeKycResult revokeKyc(
+      @NonNull TokenId tokenId, @NonNull Account account) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    return revokeKyc(tokenId, account.accountId());
+  }
+
+  /**
+   * Wipes tokens from an account.
+   *
+   * @param tokenId the ID of the token
+   * @param accountId the ID of the account
+   * @param amount the amount to wipe
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenWipeResult wipeToken(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, long amount) throws HieroException;
+
+  default @NonNull TokenWipeResult wipeToken(
+      @NonNull TokenId tokenId, @NonNull Account account, long amount) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    return wipeToken(tokenId, account.accountId(), amount);
+  }
+
+  /**
+   * Updates the custom fee schedule of a token.
+   *
+   * @param tokenId the ID of the token
+   * @param customFees the new list of custom fees
+   * @return the result
+   * @throws HieroException if the transaction fails
+   */
+  @NonNull TokenFeeScheduleUpdateResult updateFeeSchedule(
+      @NonNull TokenId tokenId, @NonNull List<CustomFee> customFees) throws HieroException;
 }

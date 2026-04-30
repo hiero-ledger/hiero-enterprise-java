@@ -6,6 +6,7 @@ import static org.hiero.base.data.ContractParam.string;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,7 @@ public class ContractServiceTest {
   void testContractCreateByFileId() throws Exception {
     // given
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").toURI());
     final String content = Files.readString(path, StandardCharsets.UTF_8);
     final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
     final FileId fileId = fileClient.createFile(bytes);
@@ -46,7 +47,7 @@ public class ContractServiceTest {
   void testContractCreateByBytes() throws Exception {
     // given
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").toURI());
     final String content = Files.readString(path, StandardCharsets.UTF_8);
     final byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
 
@@ -61,7 +62,7 @@ public class ContractServiceTest {
   void testContractCreateSimple() throws Exception {
     // given
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").toURI());
 
     // when
     final ContractId contract = smartContractClient.createContract(path);
@@ -74,7 +75,7 @@ public class ContractServiceTest {
   void testContractCreateSimpleWithLargeContract() throws Exception {
     // given
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/large_contract.bin").getPath());
+        Path.of(ContractServiceTest.class.getResource("/large_contract.bin").toURI());
 
     // when
     final ContractId contract = smartContractClient.createContract(path);
@@ -100,7 +101,7 @@ public class ContractServiceTest {
         Path.of(
             ContractServiceTest.class
                 .getResource("/string_param_constructor_contract.bin")
-                .getPath());
+                .toURI());
 
     // when
     final ContractId contract = smartContractClient.createContract(path, string("Hello"));
@@ -114,7 +115,7 @@ public class ContractServiceTest {
   void testContractWithInvalidConstructorParam() throws Exception {
     // given
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").getPath());
+        Path.of(ContractServiceTest.class.getResource("/small_contract.bin").toURI());
 
     // when
     Assertions.assertThrows(
@@ -126,7 +127,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
 
     // when
@@ -141,7 +142,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
 
     // when
@@ -154,7 +155,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
 
     // when
@@ -170,7 +171,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
 
     // then
@@ -184,7 +185,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
     smartContractClient.callContractFunction(contract, "set", int256(123));
 
@@ -201,7 +202,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
     smartContractClient.callContractFunction(contract, "set", int256(123));
 
@@ -217,7 +218,7 @@ public class ContractServiceTest {
     // given
     final Path path =
         Path.of(
-            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").toURI());
     final ContractId contract = smartContractClient.createContract(path);
     smartContractClient.callContractFunction(contract, "set", int256(123));
 
