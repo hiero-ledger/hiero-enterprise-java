@@ -908,18 +908,27 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final String hash = jsonObject.getString("hash");
       final String name = jsonObject.getString("name");
       final long number = jsonObject.getJsonNumber("number").longValue();
-      final String previousHash = jsonObject.getString("previous_hash");
+      final String previousHash =
+          jsonObject.isNull("previous_hash") ? null : jsonObject.getString("previous_hash");
       final long size = jsonObject.getJsonNumber("size").longValue();
       final long gasUsed = jsonObject.getJsonNumber("gas_used").longValue();
       final String logsBloom =
-          jsonObject.get("logs_bloom") != null ? jsonObject.getString("logs_bloom") : null;
+          jsonObject.isNull("logs_bloom") ? null : jsonObject.getString("logs_bloom");
 
       final Instant fromTimestamp =
           Instant.ofEpochSecond(
-              (long) Double.parseDouble(jsonObject.getJsonObject("timestamp").getString("from")));
+              jsonObject.getJsonObject("timestamp").get("from").getValueType()
+                      == JsonValue.ValueType.NUMBER
+                  ? jsonObject.getJsonObject("timestamp").getJsonNumber("from").longValue()
+                  : Long.parseLong(
+                      jsonObject.getJsonObject("timestamp").getString("from").split("\\.")[0]));
       final Instant toTimestamp =
           Instant.ofEpochSecond(
-              (long) Double.parseDouble(jsonObject.getJsonObject("timestamp").getString("to")));
+              jsonObject.getJsonObject("timestamp").get("to").getValueType()
+                      == JsonValue.ValueType.NUMBER
+                  ? jsonObject.getJsonObject("timestamp").getJsonNumber("to").longValue()
+                  : Long.parseLong(
+                      jsonObject.getJsonObject("timestamp").getString("to").split("\\.")[0]));
 
       return Optional.of(
           new Block(

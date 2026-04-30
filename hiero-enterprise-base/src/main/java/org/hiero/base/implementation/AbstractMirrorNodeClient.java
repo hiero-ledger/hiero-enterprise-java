@@ -122,6 +122,9 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
 
   @Override
   public @NonNull Optional<Block> queryBlockByNumber(long number) throws HieroException {
+    if (number < 0) {
+      throw new IllegalArgumentException("Block number must not be negative");
+    }
     final JSON json = getRestClient().queryBlock(String.valueOf(number));
     return getJsonConverter().toBlock(json);
   }
