@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -256,8 +258,8 @@ public class TopicClientTest {
 
   @Test
   void testSubscribeTopicWithInvalidLimit() throws HieroException {
-    final String msg = "limit must be greater than 0";
-    final long limit = 0;
+    final String msg = "limit must be greater than equal to -1";
+    final long limit = -2;
 
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -268,5 +270,47 @@ public class TopicClientTest {
     );
 
     Assertions.assertEquals(msg, e.getMessage());
+  }
+
+
+  @Test
+  void testSubscribeTopicWithStartAndEndTime() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    hieroTestUtils.waitForMirrorNodeRecords();
+
+    final Instant start = Instant.now().plus(Duration.ofMinutes(10));
+    final Instant end = Instant.now().plus(Duration.ofDays(2));
+    final SubscriptionHandle handler = Assertions.assertDoesNotThrow(
+      () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end)
+    );
+
+    Assertions.assertNotNull(handler);
+    handler.unsubscribe();
+  }
+
+  @Test
+  void testSubscribeTopicWithStartAndEndTimeWithInvalidParams() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    // Start time before Current time
+    final Instant invalidStart = Instant.now().minus(Duration.ofMinutes(10));
+    final Instant end = Instant.now().plus(Duration.ofDays(2));
+
+    final IllegalArgumentException e1 = Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, (message) -> {}, invalidStart, end)
+    );
+
+    Assertions.assertEquals("startTime must be greater than currentTime", e1.getMessage());
+
+    // End time before than Start time
+    final Instant start = Instant.now().plus(Duration.ofMinutes(10));
+    final Instant invalidEnd = start.minus(Duration.ofMinutes(1));
+
+    final IllegalArgumentException e2 = Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, invalidEnd)
+    );
+
+    Assertions.assertEquals("endTime must be greater than startTime", e2.getMessage());
   }
 }
