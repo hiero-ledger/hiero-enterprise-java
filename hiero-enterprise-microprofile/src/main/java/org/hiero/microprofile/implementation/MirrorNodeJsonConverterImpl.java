@@ -1017,7 +1017,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       return Optional.of(
           new ContractResult(
               stringOrNull(jsonObject, "access_list"),
-              jsonObject.getString("address"),
+              stringOrDefault(jsonObject, "address", ""),
               longOrNull(jsonObject, "amount"),
               longOrNull(jsonObject, "block_gas_used"),
               stringOrNull(jsonObject, "block_hash"),
@@ -1032,7 +1032,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               stringOrNull(jsonObject, "from"),
               stringOrNull(jsonObject, "function_parameters"),
               longOrNull(jsonObject, "gas_consumed"),
-              jsonObject.getJsonNumber("gas_limit").longValue(),
+              longOrDefault(jsonObject, "gas_limit", 0),
               stringOrNull(jsonObject, "gas_price"),
               longOrNull(jsonObject, "gas_used"),
               stringOrNull(jsonObject, "hash"),
@@ -1085,11 +1085,23 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     return jsonObject.getString(fieldName);
   }
 
+  private String stringOrDefault(
+      @NonNull JsonObject jsonObject, @NonNull String fieldName, @NonNull String defaultValue) {
+    final String value = stringOrNull(jsonObject, fieldName);
+    return value == null ? defaultValue : value;
+  }
+
   private Long longOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
     if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
       return null;
     }
     return jsonObject.getJsonNumber(fieldName).longValue();
+  }
+
+  private long longOrDefault(
+      @NonNull JsonObject jsonObject, @NonNull String fieldName, long defaultValue) {
+    final Long value = longOrNull(jsonObject, fieldName);
+    return value == null ? defaultValue : value;
   }
 
   private Integer intOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {

@@ -902,7 +902,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       return Optional.of(
           new ContractResult(
               textOrNull(node, "access_list"),
-              node.get("address").asText(),
+              textOrDefault(node, "address", ""),
               longOrNull(node, "amount"),
               longOrNull(node, "block_gas_used"),
               textOrNull(node, "block_hash"),
@@ -917,7 +917,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               textOrNull(node, "from"),
               textOrNull(node, "function_parameters"),
               longOrNull(node, "gas_consumed"),
-              node.get("gas_limit").asLong(),
+              longOrDefault(node, "gas_limit", 0),
               textOrNull(node, "gas_price"),
               longOrNull(node, "gas_used"),
               textOrNull(node, "hash"),
@@ -925,9 +925,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               textOrNull(node, "max_priority_fee_per_gas"),
               longOrNull(node, "nonce"),
               textOrNull(node, "r"),
-              node.get("result").asText(),
+              textOrDefault(node, "result", ""),
               textOrNull(node, "s"),
-              node.get("status").asText(),
+              textOrDefault(node, "status", ""),
               parseTimestamp(node.get("timestamp")),
               textOrNull(node, "to"),
               longOrNull(node, "transaction_index"),
@@ -971,12 +971,23 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     return field.asText();
   }
 
+  private String textOrDefault(
+      @NonNull JsonNode node, @NonNull String fieldName, @NonNull String defaultValue) {
+    final String value = textOrNull(node, fieldName);
+    return value == null ? defaultValue : value;
+  }
+
   private Long longOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
     final JsonNode field = node.get(fieldName);
     if (field == null || field.isNull()) {
       return null;
     }
     return field.asLong();
+  }
+
+  private long longOrDefault(@NonNull JsonNode node, @NonNull String fieldName, long defaultValue) {
+    final Long value = longOrNull(node, fieldName);
+    return value == null ? defaultValue : value;
   }
 
   private Integer intOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
