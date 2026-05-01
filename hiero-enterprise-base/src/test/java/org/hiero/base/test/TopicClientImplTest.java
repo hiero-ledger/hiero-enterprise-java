@@ -7,6 +7,8 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessage;
+import java.time.Instant;
+import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.TopicClientImpl;
@@ -26,9 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-
-import java.time.Instant;
-import java.util.function.Consumer;
 
 public class TopicClientImplTest {
   ProtocolLayerClient protocolLayerClient;
@@ -627,13 +626,12 @@ public class TopicClientImplTest {
     final Consumer<TopicMessage> subscription = (message) -> {};
 
     when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
-      .thenReturn(topicMessageResult);
+        .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
     final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription);
 
-    verify(protocolLayerClient, times(1))
-      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());
     final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
     Assertions.assertEquals(topicId, capture.topicId());
     Assertions.assertEquals(subscription, capture.subscription());
@@ -658,13 +656,12 @@ public class TopicClientImplTest {
     final Consumer<TopicMessage> subscription = (message) -> {};
 
     when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
-      .thenReturn(topicMessageResult);
+        .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
     final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, limit);
 
-    verify(protocolLayerClient, times(1))
-      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());
     final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
     Assertions.assertEquals(topicId, capture.topicId());
     Assertions.assertEquals(subscription, capture.subscription());
@@ -690,13 +687,13 @@ public class TopicClientImplTest {
     final Instant endTime = Instant.now().plusSeconds(1800);
 
     when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
-      .thenReturn(topicMessageResult);
+        .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
-    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, startTime, endTime);
+    final SubscriptionHandle handler =
+        topicClient.subscribeTopic(topicId, subscription, startTime, endTime);
 
-    verify(protocolLayerClient, times(1))
-      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());
     final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
     Assertions.assertEquals(topicId, capture.topicId());
     Assertions.assertEquals(subscription, capture.subscription());
@@ -723,13 +720,13 @@ public class TopicClientImplTest {
     final int limit = 1;
 
     when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
-      .thenReturn(topicMessageResult);
+        .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
-    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit);
+    final SubscriptionHandle handler =
+        topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit);
 
-    verify(protocolLayerClient, times(1))
-      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());
     final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
     Assertions.assertEquals(topicId, capture.topicId());
     Assertions.assertEquals(subscription, capture.subscription());
@@ -743,7 +740,6 @@ public class TopicClientImplTest {
     Assertions.assertEquals(subscriptionHandle, handler);
   }
 
-
   @Test
   void shouldThrowExceptionOnSubscribeTopicWithInvalidStartAndEndTime() {
     // given
@@ -756,20 +752,28 @@ public class TopicClientImplTest {
     final Instant endTime2 = Instant.now().plusSeconds(120);
     final int limit = 1;
 
-    //End time before start time
-    final IllegalArgumentException e1 = Assertions.assertThrows(IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1));
-    final IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1, limit));
+    // End time before start time
+    final IllegalArgumentException e1 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1));
+    final IllegalArgumentException e2 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1, limit));
 
     Assertions.assertEquals("endTime must be greater than startTime", e1.getMessage());
     Assertions.assertEquals("endTime must be greater than startTime", e2.getMessage());
 
-    //Start time before current time
-    final IllegalArgumentException e3 = Assertions.assertThrows(IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2));
-    final IllegalArgumentException e4 = Assertions.assertThrows(IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2, limit));
+    // Start time before current time
+    final IllegalArgumentException e3 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2));
+    final IllegalArgumentException e4 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2, limit));
 
     Assertions.assertEquals("startTime must be greater than currentTime", e3.getMessage());
     Assertions.assertEquals("startTime must be greater than currentTime", e4.getMessage());
@@ -785,10 +789,14 @@ public class TopicClientImplTest {
     final Instant endTime = startTime.plusSeconds(120);
     final int limit = -2;
 
-    final IllegalArgumentException e1 = Assertions.assertThrows(IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, subscription, limit));
-    final IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit));
+    final IllegalArgumentException e1 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, subscription, limit));
+    final IllegalArgumentException e2 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit));
 
     Assertions.assertEquals(msg, e1.getMessage());
     Assertions.assertEquals(msg, e2.getMessage());

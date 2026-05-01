@@ -4,7 +4,6 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessage;
-
 import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -241,24 +240,36 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public SubscriptionHandle subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, long limit) throws HieroException {
+  public SubscriptionHandle subscribeTopic(
+      @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, long limit)
+      throws HieroException {
     return subscribeTopic(topicId, handler, null, null, limit);
   }
 
   @Override
-  public SubscriptionHandle subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, @NonNull Instant startTime, @NonNull Instant endTime) throws HieroException {
+  public SubscriptionHandle subscribeTopic(
+      @NonNull TopicId topicId,
+      @NonNull Consumer<TopicMessage> handler,
+      @NonNull Instant startTime,
+      @NonNull Instant endTime)
+      throws HieroException {
     return subscribeTopic(topicId, handler, startTime, endTime, -1);
   }
 
   @Override
-  public SubscriptionHandle subscribeTopic(@NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, @Nullable Instant startTime, @Nullable Instant endTime, long limit) throws HieroException {
+  public SubscriptionHandle subscribeTopic(
+      @NonNull TopicId topicId,
+      @NonNull Consumer<TopicMessage> handler,
+      @Nullable Instant startTime,
+      @Nullable Instant endTime,
+      long limit)
+      throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(handler, "handler must not be null");
 
     if (limit < -1) {
       throw new IllegalArgumentException("limit must be greater than equal to -1");
     }
-
 
     if (startTime != null) {
       if (startTime.isBefore(Instant.now())) {
@@ -267,11 +278,12 @@ public class TopicClientImpl implements TopicClient {
     }
     if (startTime != null && endTime != null) {
       if (endTime.isBefore(startTime)) {
-        throw  new IllegalArgumentException("endTime must be greater than startTime");
+        throw new IllegalArgumentException("endTime must be greater than startTime");
       }
     }
 
-    TopicMessageRequest request = TopicMessageRequest.of(topicId, handler, startTime, endTime, limit);
+    TopicMessageRequest request =
+        TopicMessageRequest.of(topicId, handler, startTime, endTime, limit);
     TopicMessageResult result = client.executeTopicMessageQuery(request);
     return result.subscriptionHandle();
   }
