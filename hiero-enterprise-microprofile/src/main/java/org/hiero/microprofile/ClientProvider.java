@@ -11,6 +11,7 @@ import org.hiero.base.HieroContext;
 import org.hiero.base.HookClient;
 import org.hiero.base.NftClient;
 import org.hiero.base.SmartContractClient;
+import org.hiero.base.TopicClient;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.implementation.AccountRepositoryImpl;
@@ -25,6 +26,8 @@ import org.hiero.base.implementation.NftRepositoryImpl;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.implementation.SmartContractClientImpl;
 import org.hiero.base.implementation.TokenRepositoryImpl;
+import org.hiero.base.implementation.TopicClientImpl;
+import org.hiero.base.implementation.TopicRepositoryImpl;
 import org.hiero.base.implementation.TransactionRepositoryImpl;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.BlockRepository;
@@ -33,6 +36,7 @@ import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.hiero.base.mirrornode.NftRepository;
 import org.hiero.base.mirrornode.TokenRepository;
+import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.base.mirrornode.TransactionRepository;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
@@ -114,6 +118,15 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
+  TopicClient createTopicClient(
+      @NonNull final ProtocolLayerClient protocolLayerClient,
+      @NonNull final HieroContext hieroContext) {
+    return new TopicClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
   HookClient createHookClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
     return new HookClientImpl(protocolLayerClient);
   }
@@ -187,5 +200,12 @@ public class ClientProvider {
   @ApplicationScoped
   ContractRepository createContractRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
     return new ContractRepositoryImpl(mirrorNodeClient);
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  TopicRepository createTopicRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
+    return new TopicRepositoryImpl(mirrorNodeClient);
   }
 }
