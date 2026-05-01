@@ -6,7 +6,7 @@ import org.jspecify.annotations.NonNull;
 
 public interface TransactionRequest {
 
-  Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(10);
+  Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(20);
 
   Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
