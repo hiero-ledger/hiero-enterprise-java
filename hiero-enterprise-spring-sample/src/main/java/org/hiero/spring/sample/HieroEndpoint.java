@@ -22,7 +22,9 @@ public class HieroEndpoint {
   private final BlockRepository blockRepository;
   private final ContractRepository contractRepository;
 
-  public HieroEndpoint(final AccountClient client, final BlockRepository blockRepository,
+  public HieroEndpoint(
+      final AccountClient client,
+      final BlockRepository blockRepository,
       final ContractRepository contractRepository) {
     this.client = Objects.requireNonNull(client, "client must not be null");
     this.blockRepository =
@@ -67,7 +69,8 @@ public class HieroEndpoint {
   }
 
   @GetMapping("/contracts/{contractId}/results")
-  public Map<String, Object> getContractResults(@PathVariable("contractId") final String contractId) {
+  public Map<String, Object> getContractResults(
+      @PathVariable("contractId") final String contractId) {
     try {
       final Page<ContractResult> page =
           contractRepository.findResultsById(ContractId.fromString(contractId));

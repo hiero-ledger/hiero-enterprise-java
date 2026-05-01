@@ -102,7 +102,8 @@ public class ContractRepositoryTest {
 
   private ContractId createUintGetterSetterContract() throws Exception {
     final Path path =
-        Path.of(ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
+        Path.of(
+            ContractServiceTest.class.getResource("/uint_getter_setter_contract.bin").getPath());
     return smartContractClient.createContract(path);
   }
 }

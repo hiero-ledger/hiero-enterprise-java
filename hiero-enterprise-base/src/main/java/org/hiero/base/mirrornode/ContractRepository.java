@@ -64,8 +64,7 @@ public interface ContractRepository {
    * @throws HieroException if the search fails
    */
   @NonNull
-  default Page<ContractResult> findResultsById(@NonNull String contractId)
-      throws HieroException {
+  default Page<ContractResult> findResultsById(@NonNull String contractId) throws HieroException {
     Objects.requireNonNull(contractId, "contractId must not be null");
     return findResultsById(ContractId.fromString(contractId));
   }
