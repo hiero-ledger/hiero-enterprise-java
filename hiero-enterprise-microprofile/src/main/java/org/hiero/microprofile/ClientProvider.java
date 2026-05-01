@@ -25,6 +25,7 @@ import org.hiero.base.implementation.NftRepositoryImpl;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.implementation.SmartContractClientImpl;
 import org.hiero.base.implementation.TokenRepositoryImpl;
+import org.hiero.base.implementation.TopicRepositoryImpl;
 import org.hiero.base.implementation.TransactionRepositoryImpl;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.BlockRepository;
@@ -33,6 +34,7 @@ import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.hiero.base.mirrornode.NftRepository;
 import org.hiero.base.mirrornode.TokenRepository;
+import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.base.mirrornode.TransactionRepository;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
@@ -180,6 +182,13 @@ public class ClientProvider {
   @ApplicationScoped
   TokenRepository createTokenRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
     return new TokenRepositoryImpl(mirrorNodeClient);
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  TopicRepository createTopicRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
+    return new TopicRepositoryImpl(mirrorNodeClient);
   }
 
   @NonNull
