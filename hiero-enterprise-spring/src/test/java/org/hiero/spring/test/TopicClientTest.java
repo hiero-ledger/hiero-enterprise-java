@@ -3,6 +3,10 @@ package org.hiero.spring.test;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.test.HieroTestUtils;
@@ -11,17 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 @SpringBootTest(classes = HieroTestConfig.class)
 public class TopicClientTest {
   @Autowired private TopicClient topicClient;
 
-  @Autowired
-  private HieroTestUtils hieroTestUtils;
+  @Autowired private HieroTestUtils hieroTestUtils;
 
   @Test
   void testCreateTopic() throws HieroException {
@@ -216,9 +214,12 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, (message) -> {
-      messages.add(new String(message.contents));
-    });
+    final SubscriptionHandle handler =
+        topicClient.subscribeTopic(
+            topicId,
+            (message) -> {
+              messages.add(new String(message.contents));
+            });
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -226,7 +227,7 @@ public class TopicClientTest {
 
     Assertions.assertNotNull(handler);
     Assertions.assertEquals(1, messages.size());
-    Assertions.assertEquals(msg,messages.getFirst());
+    Assertions.assertEquals(msg, messages.getFirst());
     handler.unsubscribe();
   }
 
@@ -239,9 +240,13 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, (message) -> {
-      messages.add(new String(message.contents));
-    }, limit);
+    final SubscriptionHandle handler =
+        topicClient.subscribeTopic(
+            topicId,
+            (message) -> {
+              messages.add(new String(message.contents));
+            },
+            limit);
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -264,14 +269,13 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final IllegalArgumentException e = Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, (message) -> {}, limit)
-    );
+    final IllegalArgumentException e =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, limit));
 
     Assertions.assertEquals(msg, e.getMessage());
   }
-
 
   @Test
   void testSubscribeTopicWithStartAndEndTime() throws HieroException {
@@ -280,9 +284,9 @@ public class TopicClientTest {
 
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
-    final SubscriptionHandle handler = Assertions.assertDoesNotThrow(
-      () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end)
-    );
+    final SubscriptionHandle handler =
+        Assertions.assertDoesNotThrow(
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end));
 
     Assertions.assertNotNull(handler);
     handler.unsubscribe();
@@ -295,10 +299,10 @@ public class TopicClientTest {
     final Instant invalidStart = Instant.now().minus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
 
-    final IllegalArgumentException e1 = Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, (message) -> {}, invalidStart, end)
-    );
+    final IllegalArgumentException e1 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, invalidStart, end));
 
     Assertions.assertEquals("startTime must be greater than currentTime", e1.getMessage());
 
@@ -306,10 +310,10 @@ public class TopicClientTest {
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant invalidEnd = start.minus(Duration.ofMinutes(1));
 
-    final IllegalArgumentException e2 = Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, invalidEnd)
-    );
+    final IllegalArgumentException e2 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, invalidEnd));
 
     Assertions.assertEquals("endTime must be greater than startTime", e2.getMessage());
   }
