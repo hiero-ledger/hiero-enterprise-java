@@ -3,9 +3,8 @@ package org.hiero.spring.sample.web;
 import com.hedera.hashgraph.sdk.ContractId;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.data.ContractCallResult;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -24,25 +23,31 @@ public class ContractController {
 
     /**
      * Demonstrates deploying a smart contract.
+     * Uses the known-good small_contract.bin bytecode from the test suite.
      */
     @PostMapping("/demo/deploy")
     public ResponseEntity<?> deployDemo() {
         try {
-            // Load bytecode from resources
-            ClassPathResource resource = new ClassPathResource("HelloWorld.bin");
-            String bytecodeHex = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-            byte[] bytecode = hexToBytes(bytecodeHex.trim());
+            // This is the small_contract.bin from hiero-enterprise-spring test resources.
+            // It contains a greet() function that returns "Hello, World!"
+            // and a greetHiero() function that returns "Hello, OHG!"
+            String bytecodeHex = "608060405234801561001057600080fd5b50610118806100206000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c8063b4598503146037578063fe17e8b7146070575b600080fd5b60408051808201909152600d81526c48656c6c6f2c20576f726c642160981b60208201525b604051606791906096565b60405180910390f35b60408051808201909152600b81526a48656c6c6f2c204f48472160a81b6020820152605c565b600060208083528351808285015260005b8181101560c15785810183015185820160400152820160a7565b506000604082860101526040601f19601f830116850101925050509291505056fea264697066735822122092e0b690eaa3de2581f4b757d0675c3bebfaba72b6d17ddb72855d915865693864736f6c63430008110033";
 
-            // Deploy contract
-            ContractId contractId = smartContractClient.createContract(bytecode);
-            
+            // CRITICAL: The Hedera SDK's ContractCreateTransaction with setBytecodeFileId
+            // expects the file to contain the hex-encoded bytecode STRING, NOT raw binary.
+            // So we pass the hex string as UTF-8 bytes to createFile.
+            byte[] hexStringAsBytes = bytecodeHex.getBytes(StandardCharsets.UTF_8);
+
+            ContractId contractId = smartContractClient.createContract(hexStringAsBytes);
+
             return ResponseEntity.ok(Map.of(
                 "status", "SUCCESS",
                 "contractId", contractId.toString(),
                 "message", "Demo contract (HelloWorld) deployed successfully!"
             ));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to deploy contract: " + e.getMessage());
         }
     }
 
@@ -56,7 +61,6 @@ public class ContractController {
             Greeter greeter = smartContractClient.createProxy(Greeter.class, contractId);
 
             // 2. Call the contract function just like a regular Java method!
-            // The framework handles the translation to Solidity 'greet()' and maps the result.
             String message = greeter.greet();
 
             return ResponseEntity.ok(Map.of(
@@ -65,7 +69,8 @@ public class ContractController {
                 "explanation", "This call was made using a Type-Safe Proxy interface."
             ));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Proxy call failed: " + e.getMessage());
         }
     }
 
@@ -76,15 +81,5 @@ public class ContractController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
-    }
-
-    private byte[] hexToBytes(String hex) {
-        int len = hex.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                                 + Character.digit(hex.charAt(i+1), 16));
-        }
-        return data;
     }
 }

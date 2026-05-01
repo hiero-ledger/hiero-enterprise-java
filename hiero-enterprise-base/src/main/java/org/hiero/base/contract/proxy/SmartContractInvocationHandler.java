@@ -41,10 +41,30 @@ public class SmartContractInvocationHandler implements InvocationHandler {
             }
         }
 
-        return client.callContractFunction(
+        var result = client.callContractFunction(
             contractId, 
             functionName, 
             params.toArray(new ContractParam[0])
         );
+
+        // Extract the correct return type based on the method's declared return type
+        Class<?> returnType = method.getReturnType();
+        if (returnType == String.class) {
+            return result.getString(0);
+        } else if (returnType == boolean.class || returnType == Boolean.class) {
+            return result.getBool(0);
+        } else if (returnType == int.class || returnType == Integer.class) {
+            return result.getInt32(0);
+        } else if (returnType == long.class || returnType == Long.class) {
+            return result.getInt64(0);
+        } else if (returnType == byte.class || returnType == Byte.class) {
+            return result.getInt8(0);
+        } else if (returnType == java.math.BigInteger.class) {
+            return result.getInt256(0);
+        } else if (returnType == void.class || returnType == Void.class) {
+            return null;
+        }
+        // For any other type, return the raw result
+        return result;
     }
 }

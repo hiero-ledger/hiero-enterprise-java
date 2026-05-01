@@ -13,6 +13,6 @@ public interface Greeter {
      * Calls the greet() function of the smart contract.
      * @return the greeting message
      */
-    @SmartContractFunction("greet")
+    @SmartContractFunction("say_hello")
     String greet();
 }
