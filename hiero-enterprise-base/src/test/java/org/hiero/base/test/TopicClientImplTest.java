@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.time.Instant;
 import java.util.function.Consumer;
 
 public class TopicClientImplTest {
@@ -677,18 +678,119 @@ public class TopicClientImplTest {
     Assertions.assertEquals(subscriptionHandle, handler);
   }
 
-
   @Test
-  void shouldThrowExceptionOnSubscribeTopicWithLimitEqualsZero() {
-    final String msg = "limit must be greater than 0";
+  void shouldSubscribeTopicWithStartAndEndTime() throws HieroException {
+    final TopicMessageResult topicMessageResult = Mockito.mock(TopicMessageResult.class);
+    final SubscriptionHandle subscriptionHandle = Mockito.mock(SubscriptionHandle.class);
+
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
     final Consumer<TopicMessage> subscription = (message) -> {};
-    final int limit = 0;
+    final Instant startTime = Instant.now().plusSeconds(120);
+    final Instant endTime = Instant.now().plusSeconds(1800);
+
+    when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
+      .thenReturn(topicMessageResult);
+    when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
+
+    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, startTime, endTime);
+
+    verify(protocolLayerClient, times(1))
+      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
+    Assertions.assertEquals(topicId, capture.topicId());
+    Assertions.assertEquals(subscription, capture.subscription());
+    Assertions.assertEquals(-1, capture.limit()); // default limit
+    Assertions.assertEquals(startTime, capture.startTime());
+    Assertions.assertEquals(endTime, capture.endTime());
+
+    verify(topicMessageResult, times(1)).subscriptionHandle();
+
+    Assertions.assertNotNull(handler);
+    Assertions.assertEquals(subscriptionHandle, handler);
+  }
+
+  @Test
+  void shouldSubscribeTopicWithAllParams() throws HieroException {
+    final TopicMessageResult topicMessageResult = Mockito.mock(TopicMessageResult.class);
+    final SubscriptionHandle subscriptionHandle = Mockito.mock(SubscriptionHandle.class);
+
+    // given
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Instant startTime = Instant.now().plusSeconds(120);
+    final Instant endTime = Instant.now().plusSeconds(1800);
+    final int limit = 1;
+
+    when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
+      .thenReturn(topicMessageResult);
+    when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
+
+    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit);
+
+    verify(protocolLayerClient, times(1))
+      .executeTopicMessageQuery(topicSubscribeCaptor.capture());
+    final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
+    Assertions.assertEquals(topicId, capture.topicId());
+    Assertions.assertEquals(subscription, capture.subscription());
+    Assertions.assertEquals(limit, capture.limit());
+    Assertions.assertEquals(startTime, capture.startTime());
+    Assertions.assertEquals(endTime, capture.endTime());
+
+    verify(topicMessageResult, times(1)).subscriptionHandle();
+
+    Assertions.assertNotNull(handler);
+    Assertions.assertEquals(subscriptionHandle, handler);
+  }
+
+
+  @Test
+  void shouldThrowExceptionOnSubscribeTopicWithInvalidStartAndEndTime() {
+    // given
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Consumer<TopicMessage> subscription = (message) -> {};
+
+    final Instant startTime1 = Instant.now().plusSeconds(120);
+    final Instant endTime1 = startTime1.minusSeconds(60);
+    final Instant startTime2 = Instant.now().minusSeconds(60);
+    final Instant endTime2 = Instant.now().plusSeconds(120);
+    final int limit = 1;
+
+    //End time before start time
+    final IllegalArgumentException e1 = Assertions.assertThrows(IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1));
+    final IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1, limit));
+
+    Assertions.assertEquals("endTime must be greater than startTime", e1.getMessage());
+    Assertions.assertEquals("endTime must be greater than startTime", e2.getMessage());
+
+    //Start time before current time
+    final IllegalArgumentException e3 = Assertions.assertThrows(IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2));
+    final IllegalArgumentException e4 = Assertions.assertThrows(IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2, limit));
+
+    Assertions.assertEquals("startTime must be greater than currentTime", e3.getMessage());
+    Assertions.assertEquals("startTime must be greater than currentTime", e4.getMessage());
+  }
+
+  @Test
+  void shouldThrowExceptionOnSubscribeTopicWithLimitLessThanNegOne() {
+    final String msg = "limit must be greater than equal to -1";
+    // given
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Instant startTime = Instant.now().plusSeconds(120);
+    final Instant endTime = startTime.plusSeconds(120);
+    final int limit = -2;
 
     final IllegalArgumentException e1 = Assertions.assertThrows(IllegalArgumentException.class,
       () -> topicClient.subscribeTopic(topicId, subscription, limit));
+    final IllegalArgumentException e2 = Assertions.assertThrows(IllegalArgumentException.class,
+      () -> topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit));
 
     Assertions.assertEquals(msg, e1.getMessage());
+    Assertions.assertEquals(msg, e2.getMessage());
   }
 }
