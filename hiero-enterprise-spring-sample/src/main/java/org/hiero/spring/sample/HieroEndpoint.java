@@ -21,7 +21,9 @@ public class HieroEndpoint {
   private final BlockRepository blockRepository;
   private final TopicRepository topicRepository;
 
-  public HieroEndpoint(final AccountClient client, final BlockRepository blockRepository,
+  public HieroEndpoint(
+      final AccountClient client,
+      final BlockRepository blockRepository,
       final TopicRepository topicRepository) {
     this.client = Objects.requireNonNull(client, "client must not be null");
     this.blockRepository =
@@ -66,15 +68,25 @@ public class HieroEndpoint {
           topicRepository.getMessageByConsensusTimestamp(consensusTimestamp);
       if (message.isPresent()) {
         TopicMessage tm = message.get();
-        return new TopicMessageResponse(true, tm.topicId().toString(),
-            tm.consensusTimestamp().toString(), tm.sequenceNumber(), tm.message(), null);
+        return new TopicMessageResponse(
+            true,
+            tm.topicId().toString(),
+            tm.consensusTimestamp().toString(),
+            tm.sequenceNumber(),
+            tm.message(),
+            null);
       } else {
-        return new TopicMessageResponse(false, null, null, 0, null,
+        return new TopicMessageResponse(
+            false,
+            null,
+            null,
+            0,
+            null,
             "No message found for consensus timestamp: " + consensusTimestamp);
       }
     } catch (final Exception e) {
-      return new TopicMessageResponse(false, null, null, 0, null,
-          "Error: " + e.getClass().getName() + " - " + e.getMessage());
+      return new TopicMessageResponse(
+          false, null, null, 0, null, "Error: " + e.getClass().getName() + " - " + e.getMessage());
     }
   }
 

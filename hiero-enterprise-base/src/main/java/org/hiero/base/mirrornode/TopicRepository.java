@@ -89,7 +89,7 @@ public interface TopicRepository {
   /**
    * Return TopicMessage for the given consensus timestamp.
    *
-   * The timestamp string must be in seconds.nanoseconds format (e.g. "1234567890.000000001").
+   * <p>The timestamp string must be in seconds.nanoseconds format (e.g. "1234567890.000000001").
    *
    * @param consensusTimestamp the consensus timestamp in seconds.nanoseconds format
    * @return Optional of TopicMessage

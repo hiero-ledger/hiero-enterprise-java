@@ -71,8 +71,8 @@ public interface MirrorNodeRestClient<JSON> {
   /**
    * Queries a topic message by consensus timestamp.
    *
-   * Uses the Mirror Node endpoint GET /api/v1/topics/messages/{timestamp}. The timestamp
-   * must be in seconds.nanoseconds format (e.g. "1234567890.000000001").
+   * <p>Uses the Mirror Node endpoint GET /api/v1/topics/messages/{timestamp}. The timestamp must be
+   * in seconds.nanoseconds format (e.g. "1234567890.000000001").
    *
    * @param consensusTimestamp the consensus timestamp string in seconds.nanoseconds format
    * @return the raw JSON response

@@ -32,8 +32,7 @@ public class TopicRepositoryTest {
         NullPointerException.class,
         () -> topicRepository.getMessageBySequenceNumber((TopicId) null, 1));
     Assertions.assertThrows(
-        NullPointerException.class,
-        () -> topicRepository.getMessageByConsensusTimestamp(null));
+        NullPointerException.class, () -> topicRepository.getMessageByConsensusTimestamp(null));
   }
 
   // @Test
