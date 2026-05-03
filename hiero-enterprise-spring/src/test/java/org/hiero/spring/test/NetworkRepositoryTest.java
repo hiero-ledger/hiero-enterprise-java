@@ -35,15 +35,8 @@ public class NetworkRepositoryTest {
   }
 
   @Test
-  void findNetworkStake() throws HieroException, InterruptedException {
-    Optional<NetworkStake> result = Optional.empty();
-
-    for (int attempt = 0; attempt < 10 && result.isEmpty(); attempt++) {
-      result = networkRepository.stake();
-      if (result.isEmpty()) {
-        Thread.sleep(500);
-      }
-    }
+  void findNetworkStake() throws HieroException {
+    Optional<NetworkStake> result = networkRepository.stake();
 
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
