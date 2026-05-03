@@ -63,7 +63,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final TokenId parsedTokenId = TokenId.fromString(jsonObject.getString("token_id"));
       final AccountId account = AccountId.fromString(jsonObject.getString("account_id"));
       final long serial = jsonObject.getJsonNumber("serial_number").longValue();
-      final byte[] metadata = jsonObject.getString("metadata").getBytes();
+      final byte[] metadata = Base64.getDecoder().decode(jsonObject.getString("metadata"));
       return Optional.of(new Nft(parsedTokenId, serial, account, metadata));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
@@ -353,12 +353,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public List<Nft> toNfts(@NonNull JsonObject jsonObject) {
-    if (!jsonObject.containsKey("transactions")) {
+    if (!jsonObject.containsKey("nfts")) {
       return List.of();
     }
 
     final JsonArray nftsArray = jsonObject.getJsonArray("nfts");
-    if (nftsArray.isEmpty()) {
+    if (nftsArray == null) {
       throw new IllegalArgumentException("NFTs jsonObject is not an array: " + nftsArray);
     }
     Spliterator<JsonValue> spliterator =

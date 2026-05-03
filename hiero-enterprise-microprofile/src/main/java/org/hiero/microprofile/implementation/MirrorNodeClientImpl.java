@@ -26,6 +26,11 @@ import org.jspecify.annotations.NonNull;
 
 public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
+  private static final String ACCOUNTS_PATH = "/api/v1/accounts";
+  private static final String TOKENS_PATH = "/api/v1/tokens";
+  private static final String NFTS_PATH = "/nfts";
+  private static final String ACCOUNT_ID_QUERY = "?account.id=";
+
   private final MirrorNodeRestClientImpl restClient;
 
   private final MirrorNodeJsonConverter<JsonObject> jsonConverter;
@@ -48,18 +53,31 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
   @Override
   public @NonNull Page<Nft> queryNftsByAccount(@NonNull AccountId accountId) throws HieroException {
-    throw new RuntimeException("Not implemented");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = ACCOUNTS_PATH + "/" + accountId + NFTS_PATH;
+    final Function<JsonObject, List<Nft>> dataExtractionFunction =
+        node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
   public @NonNull Page<Nft> queryNftsByAccountAndTokenId(
       @NonNull AccountId accountId, @NonNull TokenId tokenId) throws HieroException {
-    throw new RuntimeException("Not implemented");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    final String path = TOKENS_PATH + "/" + tokenId + NFTS_PATH + ACCOUNT_ID_QUERY + accountId;
+    final Function<JsonObject, List<Nft>> dataExtractionFunction =
+        node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
   public @NonNull Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HieroException {
-    throw new RuntimeException("Not implemented");
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    final String path = TOKENS_PATH + "/" + tokenId + NFTS_PATH;
+    final Function<JsonObject, List<Nft>> dataExtractionFunction =
+        node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
