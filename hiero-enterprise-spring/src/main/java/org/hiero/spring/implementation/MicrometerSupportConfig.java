@@ -66,4 +66,11 @@ public class MicrometerSupportConfig {
           });
     };
   }
+
+  @Bean
+  @NonNull
+  public HieroMetricsBeanPostProcessor hieroMetricsBeanPostProcessor(
+      @NonNull final MeterRegistry meterRegistry) {
+    return new HieroMetricsBeanPostProcessor(meterRegistry);
+  }
 }
