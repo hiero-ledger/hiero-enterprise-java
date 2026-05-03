@@ -124,6 +124,13 @@ For most of the part, the sample application is the same as the Spring Boot samp
 
 A sample project can be found at https://github.com/hendrikebbers/quarkus-hiero-sample
 
+## Helidon samples
+
+This repository includes Helidon-based samples:
+
+- `hiero-enterprise-helidon-me-sample` (MicroProfile-based)
+- `hiero-enterprise-helidon-se-sample` (base module + Helidon SE routing)
+
 ## Managed services
 
 The module provides a set of managed services that can be used to interact with a Hiero network.
