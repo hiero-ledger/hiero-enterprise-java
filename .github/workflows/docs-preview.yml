@@ -1,0 +1,71 @@
+name: Docs Preview Deploy
+
+# Runs after the "Docs" workflow completes. Because workflow_run runs in
+# the base-repo context, it has a writable GITHUB_TOKEN even when the
+# originating run was a fork PR. This lets us deploy a /pr/<number>/
+# preview for any PR without giving PR-controlled code access to secrets.
+on:
+  workflow_run:
+    workflows: ["Docs"]
+    types: [completed]
+
+permissions:
+  actions: read        # download the artifact from the triggering Docs run
+  contents: write      # push the preview to gh-pages
+  pull-requests: write # comment the preview URL on the PR
+
+concurrency:
+  group: "docs-preview-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-preview
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The artifact comes from a run on PR-controlled code (possibly a fork),
+      # so pr/NR must be treated as untrusted input. We only accept a plain
+      # positive integer to prevent script/path injection.
+      - name: Read PR number
+        id: pr
+        run: |
+          raw=$(tr -d '[:space:]' < pr/NR)
+          if [[ ! "$raw" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Invalid PR number in artifact: '$raw'"
+            exit 1
+          fi
+          echo "number=$raw" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy PR preview to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: "pr/${{ steps.pr.outputs.number }}"
+          keep_files: true
+
+      # Pass the PR number through env rather than ${{ }} interpolation so no
+      # attacker-controlled text can be expanded into the inline script body.
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${prNumber}/`;
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `📖 **Docs preview** for this PR: ${url}`
+            });
