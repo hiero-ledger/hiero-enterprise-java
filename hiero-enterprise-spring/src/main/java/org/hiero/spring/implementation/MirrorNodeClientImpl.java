@@ -28,6 +28,11 @@ import org.springframework.web.client.RestClient;
 
 public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
 
+  private static final String ACCOUNTS_PATH = "/api/v1/accounts";
+  private static final String TRANSACTIONS_PATH = "/api/v1/transactions";
+  private static final String TOKENS_PATH = "/api/v1/tokens";
+  private static final String TOPICS_PATH = "/api/v1/topics";
+
   private final ObjectMapper objectMapper;
 
   private final RestClient restClient;
@@ -62,7 +67,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public Page<Nft> queryNftsByAccount(@NonNull final AccountId accountId) throws HieroException {
     Objects.requireNonNull(accountId, "newAccountId must not be null");
-    final String path = "/api/v1/accounts/" + accountId + "/nfts";
+    final String path = ACCOUNTS_PATH + "/" + accountId + "/nfts";
     final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
@@ -73,7 +78,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
       @NonNull final AccountId accountId, @NonNull final TokenId tokenId) {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(tokenId, "tokenId must not be null");
-    final String path = "/api/v1/tokens/" + tokenId + "/nfts/?account.id=" + accountId;
+    final String path = TOKENS_PATH + "/" + tokenId + "/nfts/?account.id=" + accountId;
     final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
@@ -81,7 +86,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
 
   @Override
   public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) {
-    final String path = "/api/v1/tokens/" + tokenId + "/nfts";
+    final String path = TOKENS_PATH + "/" + tokenId + "/nfts";
     final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
@@ -91,7 +96,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   public Page<TransactionInfo> queryTransactionsByAccount(@NonNull final AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/transactions?account.id=" + accountId;
+    final String path = TRANSACTIONS_PATH + "?account.id=" + accountId;
     final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction =
         n -> jsonConverter.toTransactionInfos(n);
     return new RestBasedPage<>(
@@ -103,7 +108,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
       @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     final String path =
-        "/api/v1/transactions?account.id=" + accountId + "&transactiontype=" + type.getType();
+        TRANSACTIONS_PATH + "?account.id=" + accountId + "&transactiontype=" + type.getType();
     final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction =
         n -> jsonConverter.toTransactionInfos(n);
     return new RestBasedPage<>(
@@ -114,7 +119,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   public @NonNull Page<TransactionInfo> queryTransactionsByAccountAndResult(
       @NonNull AccountId accountId, @NonNull Result result) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/transactions?account.id=" + accountId + "&result=" + result.name();
+    final String path = TRANSACTIONS_PATH + "?account.id=" + accountId + "&result=" + result.name();
     final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction =
         n -> jsonConverter.toTransactionInfos(n);
     return new RestBasedPage<>(
@@ -125,7 +130,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   public @NonNull Page<TransactionInfo> queryTransactionsByAccountAndModification(
       @NonNull AccountId accountId, @NonNull BalanceModification type) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/transactions?account.id=" + accountId + "&type=" + type.name();
+    final String path = TRANSACTIONS_PATH + "?account.id=" + accountId + "&type=" + type.name();
     final Function<JsonNode, List<TransactionInfo>> dataExtractionFunction =
         n -> jsonConverter.toTransactionInfos(n);
     return new RestBasedPage<>(
@@ -135,7 +140,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public Page<Token> queryTokensForAccount(@NonNull AccountId accountId) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/tokens?account.id=" + accountId;
+    final String path = TOKENS_PATH + "?account.id=" + accountId;
     final Function<JsonNode, List<Token>> dataExtractionFunction =
         node -> jsonConverter.toTokens(node);
     return new RestBasedPage<>(
@@ -145,7 +150,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public @NonNull Page<Balance> queryTokenBalances(TokenId tokenId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
-    final String path = "/api/v1/tokens/" + tokenId + "/balances";
+    final String path = TOKENS_PATH + "/" + tokenId + "/balances";
     final Function<JsonNode, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
     return new RestBasedPage<>(
@@ -157,7 +162,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
       @NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/tokens/" + tokenId + "/balances?account.id=" + accountId;
+    final String path = TOKENS_PATH + "/" + tokenId + "/balances?account.id=" + accountId;
     final Function<JsonNode, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
     return new RestBasedPage<>(
@@ -167,7 +172,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public @NonNull Page<TopicMessage> queryTopicMessages(TopicId topicId) {
     Objects.requireNonNull(topicId, "topicId must not be null");
-    final String path = "/api/v1/topics/" + topicId + "/messages";
+    final String path = TOPICS_PATH + "/" + topicId + "/messages";
     final Function<JsonNode, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
     return new RestBasedPage<>(
