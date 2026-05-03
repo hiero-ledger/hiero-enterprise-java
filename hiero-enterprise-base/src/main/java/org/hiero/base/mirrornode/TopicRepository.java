@@ -85,4 +85,16 @@ public interface TopicRepository {
     return getMessageBySequenceNumber(TopicId.fromString(topicId), sequenceNumber);
   }
   ;
+
+  /**
+   * Return TopicMessage for the given consensus timestamp.
+   *
+   * <p>The timestamp string must be in seconds.nanoseconds format (e.g. "1234567890.000000001").
+   *
+   * @param consensusTimestamp the consensus timestamp in seconds.nanoseconds format
+   * @return Optional of TopicMessage
+   * @throws HieroException if the search fails
+   */
+  @NonNull Optional<TopicMessage> getMessageByConsensusTimestamp(@NonNull String consensusTimestamp)
+      throws HieroException;
 }

@@ -40,4 +40,11 @@ public class TopicRepositoryImpl implements TopicRepository {
     }
     return mirrorNodeClient.queryTopicMessageBySequenceNumber(topicId, sequenceNumber);
   }
+
+  @Override
+  public @NonNull Optional<TopicMessage> getMessageByConsensusTimestamp(
+      @NonNull String consensusTimestamp) throws HieroException {
+    Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
+    return mirrorNodeClient.queryTopicMessageByConsensusTimestamp(consensusTimestamp);
+  }
 }

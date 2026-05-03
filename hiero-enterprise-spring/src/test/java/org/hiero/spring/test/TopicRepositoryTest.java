@@ -31,6 +31,8 @@ public class TopicRepositoryTest {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> topicRepository.getMessageBySequenceNumber((TopicId) null, 1));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> topicRepository.getMessageByConsensusTimestamp(null));
   }
 
   // @Test
@@ -105,5 +107,38 @@ public class TopicRepositoryTest {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> topicRepository.getMessageBySequenceNumber(topicId, 0));
+  }
+
+  @Test
+  void testGetMessageByConsensusTimestamp() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    topicClient.submitMessage(topicId, "Hello Timestamp");
+    hieroTestUtils.waitForMirrorNodeRecords();
+
+    final Optional<TopicMessage> bySeq = topicRepository.getMessageBySequenceNumber(topicId, 1);
+    Assertions.assertTrue(bySeq.isPresent());
+
+    final TopicMessage original = bySeq.get();
+    final String timestamp =
+        original.consensusTimestamp().getEpochSecond()
+            + "."
+            + String.format("%09d", original.consensusTimestamp().getNano());
+
+    final Optional<TopicMessage> result = topicRepository.getMessageByConsensusTimestamp(timestamp);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertEquals(original.message(), result.get().message());
+    Assertions.assertEquals(original.sequenceNumber(), result.get().sequenceNumber());
+    Assertions.assertEquals(original.topicId(), result.get().topicId());
+  }
+
+  @Test
+  void testGetMessageByConsensusTimestampReturnsEmptyForUnknownTimestamp() throws HieroException {
+    final Optional<TopicMessage> result =
+        topicRepository.getMessageByConsensusTimestamp("1.000000000");
+
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isEmpty());
   }
 }

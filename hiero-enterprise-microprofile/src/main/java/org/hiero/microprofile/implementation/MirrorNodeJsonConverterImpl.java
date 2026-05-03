@@ -500,9 +500,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         chunkInfo = new ChunkInfo(transactionId, nonce, number, total, scheduled);
       }
 
-      final Instant consensusTimestamp =
-          Instant.ofEpochSecond(
-              (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
+      final String tsStr = jsonObject.getString("consensus_timestamp");
+      final String[] tsParts = tsStr.split("\\.", 2);
+      final long tsSeconds = Long.parseLong(tsParts[0]);
+      final int tsNanos =
+          tsParts.length == 1 ? 0 : Integer.parseInt((tsParts[1] + "000000000").substring(0, 9));
+      final Instant consensusTimestamp = Instant.ofEpochSecond(tsSeconds, tsNanos);
       final String message =
           new String(Base64.getDecoder().decode(jsonObject.getString("message")));
       final AccountId payerAccountId =
