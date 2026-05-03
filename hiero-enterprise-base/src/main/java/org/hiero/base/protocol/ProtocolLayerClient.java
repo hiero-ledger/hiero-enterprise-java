@@ -8,6 +8,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -186,6 +188,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull AccountUpdateResult executeAccountUpdateTransaction(
       @NonNull AccountUpdateRequest request) throws HieroException;
+
+  /**
+   * Executes an account hook update transaction.
+   *
+   * @param request the request containing the details of the account hook update transaction
+   * @return the result of the account hook update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull AccountHookUpdateResult executeAccountHookUpdateTransaction(
+      @NonNull AccountHookUpdateRequest request) throws HieroException;
 
   /**
    * Executes a token create transaction.

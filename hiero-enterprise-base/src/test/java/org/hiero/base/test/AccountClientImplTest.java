@@ -5,18 +5,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.EvmHook;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
+import java.util.List;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.HookDetails;
+import org.hiero.base.data.HookExtensionPoint;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -236,5 +243,36 @@ public class AccountClientImplTest {
     assertEquals(memo, request.memo());
     assertEquals(account.accountId(), updatedAccount.accountId());
     assertEquals(updatedPrivateKey, updatedAccount.privateKey());
+  }
+
+  @Test
+  void testUpdateAccountHooksSuccessful() throws HieroException {
+    final Account account =
+        Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
+    final HookDetails hookToCreate =
+        new HookDetails(
+            HookExtensionPoint.ACCOUNT_ALLOWANCE_HOOK,
+            101L,
+            new EvmHook(ContractId.fromString("0.0.23456")),
+            null);
+    final List<Long> hooksToDelete = List.of(88L);
+
+    final ArgumentCaptor<AccountHookUpdateRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountHookUpdateRequest.class);
+    when(mockProtocolLayerClient.executeAccountHookUpdateTransaction(
+            any(AccountHookUpdateRequest.class)))
+        .thenReturn(
+            new AccountHookUpdateResult(
+                TransactionId.generate(account.accountId()), Status.SUCCESS));
+
+    accountClientImpl.updateAccountHooks(account, List.of(hookToCreate), hooksToDelete);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountHookUpdateTransaction(requestCaptor.capture());
+    final AccountHookUpdateRequest request = requestCaptor.getValue();
+    assertEquals(account, request.toUpdate());
+    assertEquals(1, request.hooksToCreate().size());
+    assertEquals(hookToCreate, request.hooksToCreate().get(0));
+    assertEquals(hooksToDelete, request.hooksToDelete());
   }
 }

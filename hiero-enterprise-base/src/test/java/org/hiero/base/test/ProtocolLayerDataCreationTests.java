@@ -3,6 +3,7 @@ package org.hiero.base.test;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.EvmHook;
 import com.hedera.hashgraph.sdk.EvmHookStorageUpdate;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -24,12 +25,16 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.ContractParam;
+import org.hiero.base.data.HookDetails;
+import org.hiero.base.data.HookExtensionPoint;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -383,6 +388,70 @@ public class ProtocolLayerDataCreationTests {
         NullPointerException.class, () -> new AccountUpdateResult(null, status));
     Assertions.assertThrows(
         NullPointerException.class, () -> new AccountUpdateResult(transactionId, null));
+  }
+
+  @Test
+  void testAccountHookUpdateRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(10);
+    final Account toUpdate = Account.of(new AccountId(0, 0, 12345), PrivateKey.generateECDSA());
+    final HookDetails hookDetails =
+        new HookDetails(
+            HookExtensionPoint.ACCOUNT_ALLOWANCE_HOOK,
+            1L,
+            new EvmHook(ContractId.fromString("0.0.1234")),
+            null);
+
+    Assertions.assertDoesNotThrow(
+        () -> AccountHookUpdateRequest.of(toUpdate, List.of(hookDetails), List.of()));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new AccountHookUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, List.of(), List.of(7L)));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountHookUpdateRequest(
+                maxTransactionFee, transactionValidDuration, toUpdate, List.of(), List.of()));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new AccountHookUpdateRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                toUpdate,
+                List.of((HookDetails) null),
+                List.of(7L)));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new AccountHookUpdateRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                toUpdate,
+                List.of(hookDetails),
+                List.of((Long) null)));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountHookUpdateRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                toUpdate,
+                List.of(hookDetails),
+                List.of(-1L)));
+  }
+
+  @Test
+  void testAccountHookUpdateResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new AccountHookUpdateResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new AccountHookUpdateResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new AccountHookUpdateResult(transactionId, null));
   }
 
   @Test
