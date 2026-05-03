@@ -1,5 +1,20 @@
 # Spring Boot Integration
 
-<!-- TODO: Add Spring Boot setup, @EnableHiero, configuration properties, available clients and usage. -->
+Spring integration exposes `AccountClient` as a managed bean.
 
-Placeholder: technical documentation for the Spring Boot integration (hiero-enterprise-spring) will be added here.
+## Hook lifecycle usage
+
+Use `AccountClient.updateAccountHooks(...)` to create and/or delete hooks in one account update transaction.
+
+```java
+@Autowired AccountClient accountClient;
+
+HookDetails hookToCreate =
+    new HookDetails(
+        HookExtensionPoint.ACCOUNT_ALLOWANCE_HOOK,
+        1001L,
+        new EvmHook(ContractId.fromString("0.0.5001")),
+        null);
+
+accountClient.updateAccountHooks(account, List.of(hookToCreate), List.of(77L));
+```

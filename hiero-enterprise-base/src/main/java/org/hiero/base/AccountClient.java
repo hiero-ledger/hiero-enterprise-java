@@ -3,8 +3,10 @@ package org.hiero.base;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import java.util.List;
 import java.util.Objects;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.HookDetails;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -91,6 +93,20 @@ public interface AccountClient {
    * @throws HieroException if the account could not be updated
    */
   void updateAccountMemo(@NonNull Account account, @NonNull String memo) throws HieroException;
+
+  /**
+   * Updates account hooks by creating and/or deleting hooks in one update transaction.
+   *
+   * @param account the account to update
+   * @param hooksToCreate hook definitions to create
+   * @param hooksToDelete hook ids to delete
+   * @throws HieroException if the account could not be updated
+   */
+  void updateAccountHooks(
+      @NonNull Account account,
+      @NonNull List<HookDetails> hooksToCreate,
+      @NonNull List<Long> hooksToDelete)
+      throws HieroException;
 
   /**
    * Updates both key and memo of the given account.
