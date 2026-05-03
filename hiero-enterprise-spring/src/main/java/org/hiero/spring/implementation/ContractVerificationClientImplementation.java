@@ -38,10 +38,12 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
   private final RestClient restClient;
 
-  public ContractVerificationClientImplementation(@NonNull final HieroConfig hieroConfig) {
+  public ContractVerificationClientImplementation(
+      @NonNull final HieroConfig hieroConfig, final RestClient.Builder restClientBuilder) {
     this.hieroConfig = Objects.requireNonNull(hieroConfig, "hieroConfig must not be null");
     objectMapper = new ObjectMapper();
-    restClient = RestClient.create();
+    restClient =
+        Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null").build();
   }
 
   @NonNull
