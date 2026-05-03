@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.Schedule;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -104,6 +106,14 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   @Override
   public @NonNull Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
     throw new UnsupportedOperationException("Not yet implemented");
+  }
+
+  @Override
+  public @NonNull Optional<Schedule> queryScheduleById(@NonNull final ScheduleId scheduleId)
+      throws HieroException {
+    Objects.requireNonNull(scheduleId, "scheduleId must not be null");
+    final JSON json = getRestClient().queryScheduleById(scheduleId);
+    return getJsonConverter().toSchedule(json);
   }
 
   @Override

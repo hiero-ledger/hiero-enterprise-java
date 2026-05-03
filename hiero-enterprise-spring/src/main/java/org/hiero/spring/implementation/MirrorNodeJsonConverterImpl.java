@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.DelegateContractId;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -39,6 +40,8 @@ import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
+import org.hiero.base.data.Schedule;
+import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
@@ -54,6 +57,24 @@ import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
 
 public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<JsonNode> {
+
+  private static final String ADMIN_KEY = "admin_key";
+  private static final String CONSENSUS_TIMESTAMP = "consensus_timestamp";
+  private static final String CREATOR_ACCOUNT_ID = "creator_account_id";
+  private static final String DELETED = "deleted";
+  private static final String EXECUTED_TIMESTAMP = "executed_timestamp";
+  private static final String EXPIRATION_TIME = "expiration_time";
+  private static final String KEY = "key";
+  private static final String MEMO = "memo";
+  private static final String PAYER_ACCOUNT_ID = "payer_account_id";
+  private static final String PUBLIC_KEY_PREFIX = "public_key_prefix";
+  private static final String SCHEDULE_ID = "schedule_id";
+  private static final String SCHEDULES = "schedules";
+  private static final String SIGNATURE = "signature";
+  private static final String SIGNATURES = "signatures";
+  private static final String TRANSACTION_BODY = "transaction_body";
+  private static final String TYPE = "type";
+  private static final String WAIT_FOR_EXPIRY = "wait_for_expiry";
 
   @Override
   public Optional<Nft> toNft(final JsonNode node) {
@@ -855,6 +876,133 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull Optional<Schedule> toSchedule(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final byte[] transactionBody =
+          node.get(TRANSACTION_BODY).isNull()
+              ? null
+              : Base64.getDecoder().decode(node.get(TRANSACTION_BODY).asText());
+      return Optional.of(
+          new Schedule(
+              ScheduleId.fromString(node.get(SCHEDULE_ID).asText()),
+              publicKeyOrNull(node, ADMIN_KEY),
+              node.get(DELETED).asBoolean(),
+              parseTimestamp(node.get(CONSENSUS_TIMESTAMP).asText()),
+              AccountId.fromString(node.get(CREATOR_ACCOUNT_ID).asText()),
+              timestampOrNull(node, EXECUTED_TIMESTAMP),
+              timestampOrNull(node, EXPIRATION_TIME),
+              node.get(MEMO).asText(),
+              accountIdOrNull(node, PAYER_ACCOUNT_ID),
+              scheduleSignatures(node.get(SIGNATURES)),
+              transactionBody,
+              node.get(WAIT_FOR_EXPIRY).asBoolean()));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull Page<Schedule> toSchedulePage(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return new SinglePage<>(List.of());
+    }
+
+    try {
+      return new SinglePage<>(toSchedules(node));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<Schedule> toSchedules(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has(SCHEDULES)) {
+      return List.of();
+    }
+    final JsonNode schedulesNode = node.get(SCHEDULES);
+    if (!schedulesNode.isArray()) {
+      throw new IllegalArgumentException("Schedules node is not an array: " + schedulesNode);
+    }
+    return jsonArrayToStream(schedulesNode)
+        .map(n -> toSchedule(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<ScheduleSignature> toScheduleSignature(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ScheduleSignature(
+              parseTimestamp(node.get(CONSENSUS_TIMESTAMP).asText()),
+              node.get(PUBLIC_KEY_PREFIX).asText(),
+              node.get(SIGNATURE).asText(),
+              node.get(TYPE).asText()));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private List<ScheduleSignature> scheduleSignatures(final JsonNode node) {
+    if (node == null || node.isNull() || !node.isArray()) {
+      return List.of();
+    }
+    return jsonArrayToStream(node)
+        .map(n -> toScheduleSignature(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private PublicKey publicKeyOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return PublicKey.fromString(field.get(KEY).asText());
+  }
+
+  private AccountId accountIdOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return AccountId.fromString(field.asText());
+  }
+
+  private Instant timestampOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return parseTimestamp(field.asText());
+  }
+
+  private Instant parseTimestamp(@NonNull String value) {
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 
   private @NonNull Key parseProtoBufEncodedKey(@NonNull String key) throws Exception {

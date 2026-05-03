@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
@@ -9,6 +10,8 @@ import org.hiero.base.HieroException;
 import org.jspecify.annotations.NonNull;
 
 public interface MirrorNodeRestClient<JSON> {
+
+  String SCHEDULES_PATH = "/api/v1/schedules";
 
   @NonNull
   default JSON queryNftsByTokenIdAndSerial(
@@ -69,6 +72,12 @@ public interface MirrorNodeRestClient<JSON> {
   }
 
   @NonNull JSON doGetCall(@NonNull String path) throws HieroException;
+
+  @NonNull
+  default JSON queryScheduleById(@NonNull final ScheduleId scheduleId) throws HieroException {
+    Objects.requireNonNull(scheduleId, "scheduleId must not be null");
+    return doGetCall(SCHEDULES_PATH + "/" + scheduleId);
+  }
 
   @NonNull
   default JSON queryContracts() throws HieroException {
