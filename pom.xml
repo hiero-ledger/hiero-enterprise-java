@@ -216,6 +216,8 @@
     <module>hiero-enterprise-microprofile</module>
     <module>hiero-enterprise-spring-sample</module>
     <module>hiero-enterprise-microprofile-sample</module>
+    <module>hiero-enterprise-helidon-me-sample</module>
+    <module>hiero-enterprise-helidon-se-sample</module>
   </modules>
 
   <build>
