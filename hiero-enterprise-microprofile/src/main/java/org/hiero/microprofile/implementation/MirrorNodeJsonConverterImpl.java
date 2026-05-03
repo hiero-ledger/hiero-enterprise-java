@@ -26,6 +26,7 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.CustomFee;
 import org.hiero.base.data.ExchangeRate;
 import org.hiero.base.data.ExchangeRates;
@@ -35,13 +36,17 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.SinglePage;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenAirdrop;
+import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.TokenTransfer;
 import org.hiero.base.data.Topic;
@@ -182,6 +187,196 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<CryptoAllowance> toCryptoAllowances(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("allowances")) {
+      return List.of();
+    }
+    final JsonArray allowancesArray = jsonObject.getJsonArray("allowances");
+    if (allowancesArray == null) {
+      throw new IllegalArgumentException("No crypto allowances array in JSON");
+    }
+    if (allowancesArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(allowancesArray)
+        .map(n -> toCryptoAllowance(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<TokenAllowance> toTokenAllowances(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("allowances")) {
+      return List.of();
+    }
+    final JsonArray allowancesArray = jsonObject.getJsonArray("allowances");
+    if (allowancesArray == null) {
+      throw new IllegalArgumentException("No token allowances array in JSON");
+    }
+    if (allowancesArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(allowancesArray)
+        .map(n -> toTokenAllowance(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<NftAllowance> toNftAllowances(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("allowances")) {
+      return List.of();
+    }
+    final JsonArray allowancesArray = jsonObject.getJsonArray("allowances");
+    if (allowancesArray == null) {
+      throw new IllegalArgumentException("No NFT allowances array in JSON");
+    }
+    if (allowancesArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(allowancesArray)
+        .map(n -> toNftAllowance(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<StakingReward> toStakingRewards(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("rewards")) {
+      return List.of();
+    }
+    final JsonArray rewardsArray = jsonObject.getJsonArray("rewards");
+    if (rewardsArray == null) {
+      throw new IllegalArgumentException("No staking rewards array in JSON");
+    }
+    if (rewardsArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(rewardsArray)
+        .map(n -> toStakingReward(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<TokenAirdrop> toTokenAirdrops(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("airdrops")) {
+      return List.of();
+    }
+    final JsonArray airdropsArray = jsonObject.getJsonArray("airdrops");
+    if (airdropsArray == null) {
+      throw new IllegalArgumentException("No token airdrops array in JSON");
+    }
+    if (airdropsArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(airdropsArray)
+        .map(n -> toTokenAirdrop(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<CryptoAllowance> toCryptoAllowance(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new CryptoAllowance(
+              jsonObject.getJsonNumber("amount").longValue(),
+              jsonObject.getJsonNumber("amount_granted").longValue(),
+              AccountId.fromString(jsonObject.getString("owner")),
+              AccountId.fromString(jsonObject.getString("spender")),
+              timestampRange(jsonObject.getJsonObject("timestamp"))));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private Optional<TokenAllowance> toTokenAllowance(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new TokenAllowance(
+              jsonObject.getJsonNumber("amount").longValue(),
+              jsonObject.getJsonNumber("amount_granted").longValue(),
+              AccountId.fromString(jsonObject.getString("owner")),
+              AccountId.fromString(jsonObject.getString("spender")),
+              timestampRange(jsonObject.getJsonObject("timestamp")),
+              TokenId.fromString(jsonObject.getString("token_id"))));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private Optional<NftAllowance> toNftAllowance(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new NftAllowance(
+              jsonObject.getBoolean("approved_for_all"),
+              AccountId.fromString(jsonObject.getString("owner")),
+              AccountId.fromString(jsonObject.getString("spender")),
+              timestampRange(jsonObject.getJsonObject("timestamp")),
+              TokenId.fromString(jsonObject.getString("token_id"))));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private Optional<StakingReward> toStakingReward(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new StakingReward(
+              AccountId.fromString(jsonObject.getString("account_id")),
+              jsonObject.getJsonNumber("amount").longValue(),
+              parseTimestamp(jsonObject.getString("timestamp"))));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private Optional<TokenAirdrop> toTokenAirdrop(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new TokenAirdrop(
+              jsonObject.getJsonNumber("amount").longValue(),
+              AccountId.fromString(jsonObject.getString("receiver_id")),
+              AccountId.fromString(jsonObject.getString("sender_id")),
+              longOrNull(jsonObject, "serial_number"),
+              timestampRange(jsonObject.getJsonObject("timestamp")),
+              TokenId.fromString(jsonObject.getString("token_id"))));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
   }
 
@@ -964,5 +1159,37 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  private Long longOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getJsonNumber(fieldName).longValue();
+  }
+
+  private TimestampRange timestampRange(@NonNull JsonObject jsonObject) {
+    return new TimestampRange(
+        timestampOrNull(jsonObject, "from"), timestampOrNull(jsonObject, "to"));
+  }
+
+  private Instant timestampOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return parseTimestamp(jsonObject.getString(fieldName));
+  }
+
+  private Instant parseTimestamp(@NonNull String value) {
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 }

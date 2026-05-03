@@ -6,13 +6,18 @@ import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenAirdrop;
+import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -29,6 +34,16 @@ public interface MirrorNodeJsonConverter<JSON> {
   @NonNull Optional<ExchangeRates> toExchangeRates(@NonNull JSON json);
 
   @NonNull Optional<AccountInfo> toAccountInfo(@NonNull JSON jsonNode);
+
+  @NonNull List<CryptoAllowance> toCryptoAllowances(@NonNull JSON json);
+
+  @NonNull List<TokenAllowance> toTokenAllowances(@NonNull JSON json);
+
+  @NonNull List<NftAllowance> toNftAllowances(@NonNull JSON json);
+
+  @NonNull List<StakingReward> toStakingRewards(@NonNull JSON json);
+
+  @NonNull List<TokenAirdrop> toTokenAirdrops(@NonNull JSON json);
 
   @NonNull List<NetworkFee> toNetworkFees(@NonNull JSON json);
 

@@ -13,15 +13,20 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenAirdrop;
+import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -238,6 +243,147 @@ public interface MirrorNodeClient {
   default Optional<AccountInfo> queryAccount(@NonNull String accountId) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return queryAccount(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries HBAR allowances granted by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of HBAR allowances
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<CryptoAllowance> queryCryptoAllowances(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries HBAR allowances granted by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of HBAR allowances
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<CryptoAllowance> queryCryptoAllowances(@NonNull String accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryCryptoAllowances(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries fungible token allowances granted by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of fungible token allowances
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<TokenAllowance> queryTokenAllowances(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries fungible token allowances granted by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of fungible token allowances
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<TokenAllowance> queryTokenAllowances(@NonNull String accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryTokenAllowances(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries non-fungible token allowances granted by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of non-fungible token allowances
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<NftAllowance> queryNftAllowances(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries non-fungible token allowances granted by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of non-fungible token allowances
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<NftAllowance> queryNftAllowances(@NonNull String accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryNftAllowances(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries past staking reward payouts for an account.
+   *
+   * @param accountId the account ID
+   * @return a page of staking reward payouts
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<StakingReward> queryStakingRewards(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries past staking reward payouts for an account.
+   *
+   * @param accountId the account ID
+   * @return a page of staking reward payouts
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<StakingReward> queryStakingRewards(@NonNull String accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryStakingRewards(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries outstanding token airdrops sent by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of token airdrops
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<TokenAirdrop> queryOutstandingAirdrops(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries outstanding token airdrops sent by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of token airdrops
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<TokenAirdrop> queryOutstandingAirdrops(@NonNull String accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryOutstandingAirdrops(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries pending token airdrops received by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of token airdrops
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<TokenAirdrop> queryPendingAirdrops(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries pending token airdrops received by an account.
+   *
+   * @param accountId the account ID
+   * @return a page of token airdrops
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<TokenAirdrop> queryPendingAirdrops(@NonNull String accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryPendingAirdrops(AccountId.fromString(accountId));
   }
 
   /**
