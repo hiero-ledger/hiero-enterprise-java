@@ -98,7 +98,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     }
 
     final VerifyRequest verifyRequest =
-        new VerifyRequest(contractId.toSolidityAddress(), getChainId(), "", "", files);
+        new VerifyRequest(contractId.toSolidityAddress(), getChainId(), "", contractName, files);
     try {
       final String resultBody =
           restClient
