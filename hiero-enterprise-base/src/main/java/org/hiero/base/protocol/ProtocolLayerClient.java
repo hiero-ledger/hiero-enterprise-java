@@ -8,6 +8,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -176,6 +178,19 @@ public interface ProtocolLayerClient {
    */
   @NonNull AccountDeleteResult executeAccountDeleteTransaction(
       @NonNull AccountDeleteRequest request) throws HieroException;
+
+  /**
+   * Executes an account hook update transaction.
+   *
+   * @param request the request containing hooks to create and hooks to delete on an account
+   * @return the result of the account hook update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull
+  default AccountHookUpdateResult executeAccountHookUpdateTransaction(
+      @NonNull AccountHookUpdateRequest request) throws HieroException {
+    throw new UnsupportedOperationException("Account hook update transaction is not implemented.");
+  }
 
   /**
    * Executes an account update transaction.
