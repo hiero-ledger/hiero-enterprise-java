@@ -33,16 +33,16 @@ public class TopicRepositoryTest {
         () -> topicRepository.getMessageBySequenceNumber((TopicId) null, 1));
   }
 
-//  @Test
-//  void testFindTopicById() throws HieroException {
-//    final TopicId topicId = topicClient.createTopic();
-//    hieroTestUtils.waitForMirrorNodeRecords();
-//
-//    final Optional<Topic> result = topicRepository.findTopicById(topicId);
-//
-//    Assertions.assertNotNull(result);
-//    Assertions.assertTrue(result.isPresent());
-//  }
+  //  @Test
+  //  void testFindTopicById() throws HieroException {
+  //    final TopicId topicId = topicClient.createTopic();
+  //    hieroTestUtils.waitForMirrorNodeRecords();
+  //
+  //    final Optional<Topic> result = topicRepository.findTopicById(topicId);
+  //
+  //    Assertions.assertNotNull(result);
+  //    Assertions.assertTrue(result.isPresent());
+  //  }
 
   @Test
   void testFindTopicByIdReturnsEmptyOptional() throws HieroException {
