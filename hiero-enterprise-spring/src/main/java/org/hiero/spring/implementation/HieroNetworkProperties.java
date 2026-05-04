@@ -2,6 +2,7 @@ package org.hiero.spring.implementation;
 
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @ConfigurationProperties(prefix = "spring.hiero.network")
 public class HieroNetworkProperties {
@@ -19,7 +20,8 @@ public class HieroNetworkProperties {
   private List<HieroNode> nodes;
 
   /** Mirror node endpoint to connect to. */
-  private MirrorNode mirrorNode;
+  @NestedConfigurationProperty
+  private MirrorNode mirrorNode = new MirrorNode();
 
   private Long requestTimeoutInMs;
 

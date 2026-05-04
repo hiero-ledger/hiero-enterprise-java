@@ -268,18 +268,11 @@ public class TopicClientImpl implements TopicClient {
     Objects.requireNonNull(handler, "handler must not be null");
 
     if (limit < -1) {
-      throw new IllegalArgumentException("limit must be greater than equal to -1");
+      throw new IllegalArgumentException("limit must be -1 (infinite) or greater than 0");
     }
 
-    if (startTime != null) {
-      if (startTime.isBefore(Instant.now())) {
-        throw new IllegalArgumentException("startTime must be greater than currentTime");
-      }
-    }
-    if (startTime != null && endTime != null) {
-      if (endTime.isBefore(startTime)) {
-        throw new IllegalArgumentException("endTime must be greater than startTime");
-      }
+    if (startTime != null && endTime != null && endTime.isBefore(startTime)) {
+      throw new IllegalArgumentException("endTime cannot be before startTime");
     }
 
     TopicMessageRequest request =
