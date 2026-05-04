@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.events.EventFilter;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
@@ -498,4 +500,10 @@ public interface MirrorNodeClient {
    * @throws HieroException if an error occurs
    */
   @NonNull Optional<Block> queryBlockByHash(@NonNull String hash) throws HieroException;
+
+  @NonNull
+  Page<ContractLog> queryContractLogs(@NonNull EventFilter filter) throws HieroException;
+
+  @NonNull
+  Page<ContractLog> queryContractLogsByContractId(@NonNull ContractId contractId, @NonNull EventFilter filter) throws HieroException;
 }

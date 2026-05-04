@@ -28,6 +28,11 @@ import org.hiero.base.implementation.TokenRepositoryImpl;
 import org.hiero.base.implementation.TopicClientImpl;
 import org.hiero.base.implementation.TopicRepositoryImpl;
 import org.hiero.base.implementation.TransactionRepositoryImpl;
+import org.hiero.base.implementation.EventRepositoryImpl;
+import org.hiero.base.implementation.DefaultEventObserver;
+import org.hiero.base.events.EventObserver;
+import org.hiero.spring.events.HieroEventSubscriber;
+import org.hiero.base.mirrornode.EventRepository;
 import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.BlockRepository;
@@ -35,9 +40,11 @@ import org.hiero.base.mirrornode.ContractRepository;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.hiero.base.mirrornode.NftRepository;
+import org.hiero.base.mirrornode.ContractLogRepository;
 import org.hiero.base.mirrornode.TokenRepository;
 import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.base.mirrornode.TransactionRepository;
+import org.hiero.base.implementation.ContractLogRepositoryImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.slf4j.Logger;
@@ -246,5 +253,53 @@ public class HieroAutoConfiguration {
       matchIfMissing = true)
   BlockRepository blockRepository(final MirrorNodeClient mirrorNodeClient) {
     return new BlockRepositoryImpl(mirrorNodeClient);
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "mirrorNodeSupported",
+      havingValue = "true",
+      matchIfMissing = true)
+  ContractLogRepository contractLogRepository(final MirrorNodeClient mirrorNodeClient) {
+    return new ContractLogRepositoryImpl(mirrorNodeClient);
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "mirrorNodeSupported",
+      havingValue = "true",
+      matchIfMissing = true)
+  EventRepository eventRepository(final MirrorNodeClient mirrorNodeClient) {
+    return new EventRepositoryImpl(mirrorNodeClient);
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "eventsEnabled",
+      havingValue = "true",
+      matchIfMissing = true)
+  DefaultEventObserver eventObserver(final EventRepository eventRepository) {
+    java.util.concurrent.ScheduledExecutorService executor =
+        java.util.concurrent.Executors.newSingleThreadScheduledExecutor(
+            r -> {
+              Thread t = new Thread(r, "hiero-event-observer");
+              t.setDaemon(true);
+              return t;
+            });
+    return new DefaultEventObserver(eventRepository, executor);
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "eventsEnabled",
+      havingValue = "true",
+      matchIfMissing = true)
+  HieroEventSubscriber hieroEventSubscriber(
+      final org.hiero.base.events.EventObserver eventObserver) {
+    return new HieroEventSubscriber(eventObserver);
   }
 }

@@ -105,6 +105,14 @@ export HEDERA_PRIVATE_KEY=2130020100312346052b8104400304220420c236508c429395a818
 
 An external sample project can be found at https://github.com/hendrikebbers/spring-hiero-sample
 
+### Hiero Spring Events Sample
+
+A sample application demonstrating smart contract event observation can be found in the `hiero-enterprise-events-sample` module.
+It shows how to:
+- Subscribe to contract events using `HieroEventSubscriber`.
+- Log events to the console.
+- Expose a REST endpoint to view recent events.
+
 ## Microservice support
 
 To use this module, you need to add the following dependency to your project:
@@ -139,7 +147,9 @@ The following services are available in spring and microprofile:
 - `base.org.hiero.mirrornode.AccountRepository`: to query accounts
 - `base.org.hiero.mirrornode.NetworkRepository`: to query network information
 - `base.org.hiero.mirrornode.NftRepository`: to query NFTs
-- `base.org.hiero.mirrornode.TransactionRepository`: to query transaction information
+- `org.hiero.base.mirrornode.TransactionRepository`: to query transaction information
+- `org.hiero.spring.events.HieroEventSubscriber`: to subscribe to smart contract events (Spring only)
+- `org.hiero.base.mirrornode.EventRepository`: to query contract logs
 
 Next to that the following low-level services are available:
 

@@ -22,6 +22,7 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.ContractLog;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
@@ -964,5 +965,60 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  @Override
+  public @NonNull List<ContractLog> toContractLogs(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("logs")) {
+      return List.of();
+    }
+    final JsonArray logsArray = jsonObject.getJsonArray("logs");
+    return jsonArrayToStream(logsArray).map(n -> toContractLog(n.asJsonObject())).toList();
+  }
+
+  @Override
+  public @NonNull Page<ContractLog> toContractLogPage(@NonNull JsonObject jsonObject) {
+    return new SinglePage<>(toContractLogs(jsonObject));
+  }
+
+  private ContractLog toContractLog(JsonObject jsonObject) {
+    try {
+      ContractId contractId = ContractId.fromString(jsonObject.getString("contract_id"));
+      String address = jsonObject.getString("address");
+      String data = jsonObject.getString("data");
+      List<String> topics =
+          jsonArrayToStream(jsonObject.getJsonArray("topics"))
+              .map(JsonValue::toString)
+              .map(s -> s.replaceAll("\"", ""))
+              .toList();
+      Instant consensusTimestamp =
+          Instant.ofEpochSecond(
+              Long.parseLong(jsonObject.getString("timestamp").split("\\.")[0]));
+      String bloom = jsonObject.getString("bloom");
+      String blockHash = jsonObject.getString("block_hash", "");
+      long blockNumber = jsonObject.getJsonNumber("block_number").longValue();
+      String transactionHash = jsonObject.getString("transaction_hash", "");
+      int transactionIndex = jsonObject.getJsonNumber("transaction_index").intValue();
+      int index = jsonObject.getJsonNumber("index").intValue();
+      ContractId rootContractId = jsonObject.containsKey("root_contract_id") && !jsonObject.isNull("root_contract_id")
+          ? ContractId.fromString(jsonObject.getString("root_contract_id"))
+          : null;
+      return new ContractLog(
+          contractId,
+          address,
+          data,
+          topics,
+          consensusTimestamp,
+          bloom,
+          blockHash,
+          blockNumber,
+          transactionHash,
+          transactionIndex,
+          index,
+          rootContractId);
+    } catch (Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
   }
 }

@@ -22,6 +22,8 @@ import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.events.EventFilter;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.jspecify.annotations.NonNull;
 
@@ -134,5 +136,48 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
     Objects.requireNonNull(hash, "hash must not be null");
     final JSON json = getRestClient().queryBlock(hash);
     return getJsonConverter().toBlock(json);
+  }
+
+  @Override
+  public @NonNull Page<ContractLog> queryContractLogs(@NonNull EventFilter filter)
+      throws HieroException {
+    Objects.requireNonNull(filter, "filter must not be null");
+    final String query = buildQuery(filter);
+    final JSON json = getRestClient().queryContractLogs(query);
+    return getJsonConverter().toContractLogPage(json);
+  }
+
+  @Override
+  public @NonNull Page<ContractLog> queryContractLogsByContractId(
+      @NonNull ContractId contractId, @NonNull EventFilter filter) throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    Objects.requireNonNull(filter, "filter must not be null");
+    final String query = buildQuery(filter);
+    final JSON json = getRestClient().queryContractLogsByContractId(contractId, query);
+    return getJsonConverter().toContractLogPage(json);
+  }
+
+  private String buildQuery(EventFilter filter) {
+    StringBuilder sb = new StringBuilder();
+    if (filter.contractId() != null) {
+      sb.append("contract.id=").append(filter.contractId());
+    }
+    if (filter.fromTimestamp() != null) {
+      if (!sb.isEmpty()) sb.append("&");
+      sb.append("timestamp=gt:").append(filter.fromTimestamp());
+    }
+    if (filter.toTimestamp() != null) {
+      if (!sb.isEmpty()) sb.append("&");
+      sb.append("timestamp=lt:").append(filter.toTimestamp());
+    }
+    if (filter.fromBlock() != null) {
+      if (!sb.isEmpty()) sb.append("&");
+      sb.append("block.number=gt:").append(filter.fromBlock());
+    }
+    if (filter.toBlock() != null) {
+      if (!sb.isEmpty()) sb.append("&");
+      sb.append("block.number=lt:").append(filter.toBlock());
+    }
+    return sb.toString();
   }
 }

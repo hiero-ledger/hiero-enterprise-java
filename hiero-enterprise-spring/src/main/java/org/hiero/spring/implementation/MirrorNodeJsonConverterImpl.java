@@ -23,6 +23,7 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.ContractLog;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
@@ -945,5 +946,57 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(o -> o.isPresent())
         .map(o -> o.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull List<ContractLog> toContractLogs(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("logs")) {
+      return List.of();
+    }
+    final JsonNode logsNode = node.get("logs");
+    return jsonArrayToStream(logsNode).map(this::toContractLog).toList();
+  }
+
+  @Override
+  public @NonNull Page<ContractLog> toContractLogPage(@NonNull JsonNode node) {
+    return new SinglePage<>(toContractLogs(node));
+  }
+
+  private ContractLog toContractLog(JsonNode node) {
+    try {
+      ContractId contractId = ContractId.fromString(node.get("contract_id").asText());
+      String address = node.path("address").asText("");
+      String data = node.get("data").asText();
+      List<String> topics =
+          jsonArrayToStream(node.get("topics")).map(JsonNode::asText).toList();
+      Instant consensusTimestamp =
+          Instant.ofEpochSecond(
+              Long.parseLong(node.get("timestamp").asText().split("\\.")[0]));
+      String bloom = node.path("bloom").asText("");
+      String blockHash = node.path("block_hash").asText("");
+      long blockNumber = node.path("block_number").asLong(0);
+      String transactionHash = node.path("transaction_hash").asText("");
+      int transactionIndex = node.path("transaction_index").asInt(0);
+      int index = node.get("index").asInt();
+      ContractId rootContractId = node.has("root_contract_id") && !node.get("root_contract_id").isNull()
+          ? ContractId.fromString(node.get("root_contract_id").asText())
+          : null;
+      return new ContractLog(
+          contractId,
+          address,
+          data,
+          topics,
+          consensusTimestamp,
+          bloom,
+          blockHash,
+          blockNumber,
+          transactionHash,
+          transactionIndex,
+          index,
+          rootContractId);
+    } catch (Exception e) {
+      throw new JsonParseException(node, e);
+    }
   }
 }
