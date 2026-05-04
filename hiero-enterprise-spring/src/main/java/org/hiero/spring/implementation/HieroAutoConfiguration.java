@@ -125,13 +125,12 @@ public class HieroAutoConfiguration {
       havingValue = "true",
       matchIfMissing = true)
   MirrorNodeClient mirrorNodeClient(final HieroConfig hieroConfig) {
-    final String mirrorNodeEndpoint;
-    final String mirrorNetwork = hieroConfig.getMirrorNodeRestUrl().orElse(null);
+    final String mirrorNodeEndpoint = hieroConfig.getMirrorNodeRestUrl().orElse(null);
 
-    if (mirrorNetwork == null || mirrorNetwork.isBlank()) {
-      throw new IllegalArgumentException("Mirror node endpoint must be set");
+    if (mirrorNodeEndpoint == null || mirrorNodeEndpoint.isBlank()) {
+      throw new IllegalArgumentException("Mirror node rest endpoint must be set");
     }
-    mirrorNodeEndpoint = mirrorNetwork;
+
     final String baseUri;
     try {
       URL url = new URI(mirrorNodeEndpoint).toURL();

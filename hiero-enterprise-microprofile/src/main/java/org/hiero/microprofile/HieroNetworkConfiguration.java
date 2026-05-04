@@ -70,7 +70,7 @@ public class HieroNetworkConfiguration {
     }
 
     public Set<String> getGrpcAddresses() {
-      // eg: testnet:mirrornode:443,testnet:5600
+      // eg: mirrornode.mirrornode:443,testnet.mirrornode:5600
       return grpcAddresses
           .map(n -> n.split(","))
           .map(n -> Stream.of(n))
