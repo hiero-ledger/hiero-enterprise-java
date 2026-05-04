@@ -20,8 +20,7 @@ public class HieroNetworkProperties {
   private List<HieroNode> nodes;
 
   /** Mirror node endpoint to connect to. */
-  @NestedConfigurationProperty
-  private MirrorNode mirrorNode = new MirrorNode();
+  @NestedConfigurationProperty private MirrorNode mirrorNode = new MirrorNode();
 
   private Long requestTimeoutInMs;
 
