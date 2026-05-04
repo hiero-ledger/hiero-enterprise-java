@@ -746,42 +746,27 @@ public class TopicClientImplTest {
     final TopicId topicId = TopicId.fromString("1.2.3");
     final Consumer<TopicMessage> subscription = (message) -> {};
 
-    final Instant startTime1 = Instant.now().plusSeconds(120);
-    final Instant endTime1 = startTime1.minusSeconds(60);
-    final Instant startTime2 = Instant.now().minusSeconds(60);
-    final Instant endTime2 = Instant.now().plusSeconds(120);
+    final Instant startTime = Instant.now().plusSeconds(120);
+    final Instant endTime = startTime.minusSeconds(60);
     final int limit = 1;
 
     // End time before start time
     final IllegalArgumentException e1 =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1));
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime, endTime));
     final IllegalArgumentException e2 =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, subscription, startTime1, endTime1, limit));
+            () -> topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit));
 
-    Assertions.assertEquals("endTime must be greater than startTime", e1.getMessage());
-    Assertions.assertEquals("endTime must be greater than startTime", e2.getMessage());
-
-    // Start time before current time
-    final IllegalArgumentException e3 =
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2));
-    final IllegalArgumentException e4 =
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, subscription, startTime2, endTime2, limit));
-
-    Assertions.assertEquals("startTime must be greater than currentTime", e3.getMessage());
-    Assertions.assertEquals("startTime must be greater than currentTime", e4.getMessage());
+    Assertions.assertEquals("endTime cannot be before startTime", e1.getMessage());
+    Assertions.assertEquals("endTime cannot be before startTime", e2.getMessage());
   }
 
   @Test
   void shouldThrowExceptionOnSubscribeTopicWithLimitLessThanNegOne() {
-    final String msg = "limit must be greater than equal to -1";
+    final String msg = "limit must be -1 (infinite) or greater than 0";
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
     final Consumer<TopicMessage> subscription = (message) -> {};

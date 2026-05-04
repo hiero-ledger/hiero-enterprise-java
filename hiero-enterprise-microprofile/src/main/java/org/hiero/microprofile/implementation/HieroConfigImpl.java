@@ -62,7 +62,7 @@ public class HieroConfigImpl implements HieroConfig {
       relayUrl = settings.relayUrl().orElse(null);
     } else {
       networkName = networkConfiguration.getName().orElse(null);
-      mirrorNodeGrpcAddresses = networkConfiguration.getMirrornode().getGrpcAddresses();
+      mirrorNodeGrpcAddresses = networkConfiguration.getMirrornode().getGrpcAddresses() == null? Set.of() : Set.copyOf(networkConfiguration.getMirrornode().getGrpcAddresses());
       mirrorNodeRestUrl = networkConfiguration.getMirrornode().getRestUrl();
       consensusNodes = Collections.unmodifiableSet(networkConfiguration.getNodes());
       chainId = null;

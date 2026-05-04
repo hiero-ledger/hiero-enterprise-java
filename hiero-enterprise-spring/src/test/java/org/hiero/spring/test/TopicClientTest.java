@@ -263,7 +263,7 @@ public class TopicClientTest {
 
   @Test
   void testSubscribeTopicWithInvalidLimit() throws HieroException {
-    final String msg = "limit must be greater than equal to -1";
+    final String msg = "limit must be -1 (infinite) or greater than 0";
     final long limit = -2;
 
     final TopicId topicId = topicClient.createTopic();
@@ -295,18 +295,7 @@ public class TopicClientTest {
   @Test
   void testSubscribeTopicWithStartAndEndTimeWithInvalidParams() throws HieroException {
     final TopicId topicId = topicClient.createTopic();
-    // Start time before Current time
-    final Instant invalidStart = Instant.now().minus(Duration.ofMinutes(10));
-    final Instant end = Instant.now().plus(Duration.ofDays(2));
 
-    final IllegalArgumentException e1 =
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, (message) -> {}, invalidStart, end));
-
-    Assertions.assertEquals("startTime must be greater than currentTime", e1.getMessage());
-
-    // End time before than Start time
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant invalidEnd = start.minus(Duration.ofMinutes(1));
 
@@ -315,6 +304,6 @@ public class TopicClientTest {
             IllegalArgumentException.class,
             () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, invalidEnd));
 
-    Assertions.assertEquals("endTime must be greater than startTime", e2.getMessage());
+    Assertions.assertEquals("endTime cannot be before startTime", e2.getMessage());
   }
 }
