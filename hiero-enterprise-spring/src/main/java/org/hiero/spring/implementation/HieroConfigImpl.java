@@ -68,8 +68,12 @@ public class HieroConfigImpl implements HieroConfig {
         mirrorNodeRestUrl = null;
       }
 
-      mirrorNodeGrpcAddresses =
-          Set.copyOf(properties.getNetwork().getMirrorNode().getGrpcAddresses());
+      final List<String> mirrorNodes = properties.getNetwork().getMirrorNode().getGrpcAddresses();
+      if (mirrorNodes != null) {
+        mirrorNodeGrpcAddresses = Set.copyOf(mirrorNodes);
+      } else {
+        mirrorNodeGrpcAddresses = Set.of();
+      }
 
       final List<HieroNode> nodes = properties.getNetwork().getNodes();
       if (nodes == null || nodes.isEmpty()) {

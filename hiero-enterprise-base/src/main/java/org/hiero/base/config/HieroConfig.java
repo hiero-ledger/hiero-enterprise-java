@@ -37,9 +37,9 @@ public interface HieroConfig {
   @NonNull Set<String> getMirrorNodeGrpcAddresses();
 
   /**
-   * Returns the mirror node addresses.
+   * Returns the mirror node rest url.
    *
-   * @return the mirror node addresses
+   * @return the mirror node rest url
    */
   @NonNull Optional<String> getMirrorNodeRestUrl();
 
