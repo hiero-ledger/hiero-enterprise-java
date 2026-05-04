@@ -1,6 +1,7 @@
 package org.hiero.microprofile.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import jakarta.json.JsonObject;
@@ -11,6 +12,8 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.data.ContractResult;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
@@ -140,6 +143,26 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/topics/" + topicId + "/messages";
     final Function<JsonObject, List<TopicMessage>> dataExtractionFunction =
         node -> jsonConverter.toTopicMessages(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<ContractResult> queryContractResults(@NonNull ContractId contractId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    final String path = "/api/v1/contracts/" + contractId + "/results";
+    final Function<JsonObject, List<ContractResult>> dataExtractionFunction =
+        node -> jsonConverter.toContractResults(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<ContractLog> queryContractLogs(@NonNull ContractId contractId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    final String path = "/api/v1/contracts/" + contractId + "/results/logs";
+    final Function<JsonObject, List<ContractLog>> dataExtractionFunction =
+        node -> jsonConverter.toContractLogs(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 

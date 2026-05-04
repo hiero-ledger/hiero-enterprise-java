@@ -26,6 +26,8 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.data.ContractResult;
 import org.hiero.base.data.CustomFee;
 import org.hiero.base.data.ExchangeRate;
 import org.hiero.base.data.ExchangeRates;
@@ -964,5 +966,199 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  @Override
+  public @NonNull List<ContractResult> toContractResults(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("results")) {
+      return List.of();
+    }
+    final JsonArray resultsArray = jsonObject.getJsonArray("results");
+    if (resultsArray == null) {
+      throw new IllegalArgumentException("No contract results array in JSON");
+    }
+    if (resultsArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(resultsArray)
+        .map(n -> toContractResult(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<ContractLog> toContractLogs(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("logs")) {
+      return List.of();
+    }
+    final JsonArray logsArray = jsonObject.getJsonArray("logs");
+    if (logsArray == null) {
+      throw new IllegalArgumentException("No contract logs array in JSON");
+    }
+    if (logsArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(logsArray)
+        .map(n -> toContractLog(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<ContractResult> toContractResult(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ContractResult(
+              stringOrNull(jsonObject, "access_list"),
+              stringOrDefault(jsonObject, "address", ""),
+              longOrNull(jsonObject, "amount"),
+              longOrNull(jsonObject, "block_gas_used"),
+              stringOrNull(jsonObject, "block_hash"),
+              longOrNull(jsonObject, "block_number"),
+              stringOrNull(jsonObject, "bloom"),
+              stringOrNull(jsonObject, "call_result"),
+              stringOrNull(jsonObject, "chain_id"),
+              contractIdOrNull(jsonObject, "contract_id"),
+              contractIds(jsonArrayOrNull(jsonObject, "created_contract_ids")),
+              stringOrNull(jsonObject, "error_message"),
+              stringOrNull(jsonObject, "failed_initcode"),
+              stringOrNull(jsonObject, "from"),
+              stringOrNull(jsonObject, "function_parameters"),
+              longOrNull(jsonObject, "gas_consumed"),
+              longOrDefault(jsonObject, "gas_limit", 0),
+              stringOrNull(jsonObject, "gas_price"),
+              longOrNull(jsonObject, "gas_used"),
+              stringOrNull(jsonObject, "hash"),
+              stringOrNull(jsonObject, "max_fee_per_gas"),
+              stringOrNull(jsonObject, "max_priority_fee_per_gas"),
+              longOrNull(jsonObject, "nonce"),
+              stringOrNull(jsonObject, "r"),
+              stringOrNull(jsonObject, "result"),
+              stringOrNull(jsonObject, "s"),
+              stringOrNull(jsonObject, "status"),
+              parseTimestamp(jsonObject.getString("timestamp")),
+              stringOrNull(jsonObject, "to"),
+              longOrNull(jsonObject, "transaction_index"),
+              intOrNull(jsonObject, "type"),
+              intOrNull(jsonObject, "v")));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private Optional<ContractLog> toContractLog(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ContractLog(
+              jsonObject.getString("address"),
+              stringOrNull(jsonObject, "bloom"),
+              contractIdOrNull(jsonObject, "contract_id"),
+              stringOrNull(jsonObject, "data"),
+              jsonObject.getInt("index"),
+              strings(jsonArrayOrNull(jsonObject, "topics")),
+              stringOrNull(jsonObject, "block_hash"),
+              longOrNull(jsonObject, "block_number"),
+              contractIdOrNull(jsonObject, "root_contract_id"),
+              timestampOrNull(jsonObject, "timestamp"),
+              stringOrNull(jsonObject, "transaction_hash"),
+              intOrNull(jsonObject, "transaction_index")));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private String stringOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getString(fieldName);
+  }
+
+  private String stringOrDefault(
+      @NonNull JsonObject jsonObject, @NonNull String fieldName, @NonNull String defaultValue) {
+    final String value = stringOrNull(jsonObject, fieldName);
+    return value == null ? defaultValue : value;
+  }
+
+  private Long longOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getJsonNumber(fieldName).longValue();
+  }
+
+  private long longOrDefault(
+      @NonNull JsonObject jsonObject, @NonNull String fieldName, long defaultValue) {
+    final Long value = longOrNull(jsonObject, fieldName);
+    return value == null ? defaultValue : value;
+  }
+
+  private Integer intOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getInt(fieldName);
+  }
+
+  private ContractId contractIdOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    final String value = stringOrNull(jsonObject, fieldName);
+    return value == null ? null : ContractId.fromString(value);
+  }
+
+  private JsonArray jsonArrayOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getJsonArray(fieldName);
+  }
+
+  private List<ContractId> contractIds(final JsonArray jsonArray) {
+    if (jsonArray == null || jsonArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(jsonArray)
+        .map(JsonValue::toString)
+        .map(value -> value.replace("\"", ""))
+        .map(ContractId::fromString)
+        .toList();
+  }
+
+  private List<String> strings(final JsonArray jsonArray) {
+    if (jsonArray == null || jsonArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(jsonArray)
+        .map(JsonValue::toString)
+        .map(value -> value.replace("\"", ""))
+        .toList();
+  }
+
+  private Instant timestampOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    final String value = stringOrNull(jsonObject, fieldName);
+    return value == null ? null : parseTimestamp(value);
+  }
+
+  private Instant parseTimestamp(@NonNull String value) {
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 }
