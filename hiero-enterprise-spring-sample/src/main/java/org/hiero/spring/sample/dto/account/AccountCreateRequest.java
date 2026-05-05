@@ -1,4 +1,4 @@
-package org.hiero.spring.sample.dto;
+package org.hiero.spring.sample.dto.account;
 
 /**
  * Request to create a new Hiero account.

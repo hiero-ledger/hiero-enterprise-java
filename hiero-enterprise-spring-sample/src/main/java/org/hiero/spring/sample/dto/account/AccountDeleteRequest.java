@@ -1,4 +1,4 @@
-package org.hiero.spring.sample.dto;
+package org.hiero.spring.sample.dto.account;
 
 /**
  * Request to delete a Hiero account.
