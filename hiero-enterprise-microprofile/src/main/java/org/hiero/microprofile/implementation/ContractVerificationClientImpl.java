@@ -9,6 +9,8 @@ import jakarta.json.stream.JsonParser;
 import jakarta.json.stream.JsonParserFactory;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.StringReader;
@@ -44,21 +46,64 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
         .orElseThrow(() -> new HieroException("Chain ID is not set"));
   }
 
-  @NonNull
-  @Override
-  public ContractVerificationState checkVerification(@NonNull ContractId contractId)
-      throws HieroException {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
   private void handleError(@NonNull final Response response) throws IOException {
     final String body = response.readEntity(String.class);
     throw new IOException("Error response: " + body);
   }
 
+  private ContractVerificationState parseStatus(@NonNull final String status) {
+    if (status.equals("perfect")) {
+      return ContractVerificationState.FULL;
+    } else if (status.equals("false")) {
+      return ContractVerificationState.NONE;
+    } else {
+      throw new RuntimeException("Unknown status: " + status);
+    }
+  }
+
+  @NonNull
+  @Override
+  public ContractVerificationState checkVerification(@NonNull final ContractId contractId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+
+    final String uri =
+        CONTRACT_VERIFICATION_URL
+            + "/check-by-addresses"
+            + "?addresses="
+            + contractId.toSolidityAddress()
+            + "&chainIds="
+            + getChainId();
+
+    try {
+      final Response response =
+          webClient.target(uri).request(MediaType.APPLICATION_JSON).get();
+      if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+        handleError(response);
+      }
+      final String resultBody = response.readEntity(String.class);
+      final JsonParser parser = jsonParserFactory.createParser(new StringReader(resultBody));
+      final JsonArray root = parser.getArray();
+      final List<JsonObject> results =
+          root.stream()
+              .filter(v -> v.getValueType() == JsonValue.ValueType.OBJECT)
+              .map(JsonValue::asJsonObject)
+              .toList();
+      if (results.size() != 1) {
+        throw new RuntimeException("Expected exactly one result, got " + results.size());
+      }
+      final String status = results.get(0).getString("status");
+      return parseStatus(status);
+    } catch (final Exception e) {
+      throw new HieroException("Error verification step", e);
+    }
+  }
+
   @Override
   public boolean checkVerification(
-      @NonNull ContractId contractId, @NonNull String fileName, @NonNull String fileContent)
+      @NonNull final ContractId contractId,
+      @NonNull final String fileName,
+      @NonNull final String fileContent)
       throws HieroException {
     final ContractVerificationState state = checkVerification(contractId);
     if (state != ContractVerificationState.FULL) {
@@ -79,17 +124,16 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       final JsonArray root = parser.getArray();
       final List<JsonObject> results =
           root.stream()
-              .filter(JsonValue.ValueType.OBJECT::equals)
+              .filter(v -> v.getValueType() == JsonValue.ValueType.OBJECT)
               .map(JsonValue::asJsonObject)
               .filter(obj -> obj.getString("name").equals(fileName))
               .toList();
       if (results.size() != 1) {
         throw new RuntimeException("Expected exactly one result, got " + results.size());
       }
-      final JsonObject result = results.get(0);
-      final String content = result.getString("content");
+      final String content = results.get(0).getString("content");
       return Objects.equals(content, fileContent);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new HieroException("Error verification step", e);
     }
   }
@@ -97,10 +141,47 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
   @NonNull
   @Override
   public ContractVerificationState verify(
-      @NonNull ContractId contractId,
-      @NonNull String contractName,
-      @NonNull Map<String, String> files)
+      @NonNull final ContractId contractId,
+      @NonNull final String contractName,
+      @NonNull final Map<String, String> files)
       throws HieroException {
-    throw new UnsupportedOperationException("Not implemented");
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    Objects.requireNonNull(contractName, "contractName must not be null");
+    Objects.requireNonNull(files, "files must not be null");
+
+    final ContractVerificationState state = checkVerification(contractId);
+    if (state != ContractVerificationState.NONE) {
+      throw new IllegalStateException("Contract is already verified");
+    }
+
+    final JsonObject requestBody = Json.createObjectBuilder()
+        .add("address", contractId.toSolidityAddress())
+        .add("chain", getChainId())
+        .add("creatorTxHash", "")
+        .add("chosenContract", "")
+        .add("files", Json.createObjectBuilder(files).build())
+        .build();
+
+    try {
+      final Response response =
+          webClient
+              .target(CONTRACT_VERIFICATION_URL + "/verify")
+              .request(MediaType.APPLICATION_JSON)
+              .post(Entity.json(requestBody.toString()));
+      if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+        handleError(response);
+      }
+      final String resultBody = response.readEntity(String.class);
+      final JsonParser parser = jsonParserFactory.createParser(new StringReader(resultBody));
+      final JsonObject root = parser.getObject();
+      final JsonArray resultArray = root.getJsonArray("result");
+      if (resultArray == null || resultArray.size() != 1) {
+        throw new RuntimeException("Expected exactly one result");
+      }
+      final String status = resultArray.getJsonObject(0).getString("status");
+      return parseStatus(status);
+    } catch (final Exception e) {
+      throw new HieroException("Error verification step", e);
+    }
   }
 }
