@@ -1,6 +1,8 @@
 package org.hiero.base.protocol.data;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.time.Duration;
 import java.util.Objects;
@@ -8,27 +10,43 @@ import org.hiero.base.data.Account;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/** Request for an account update transaction. */
 public record AccountUpdateRequest(
-    @NonNull Hbar maxTransactionFee,
-    @NonNull Duration transactionValidDuration,
-    @NonNull Account toUpdate,
+    @NonNull AccountId accountId,
+    @Nullable Key key,
+    @Nullable String memo,
+    @Nullable Duration autoRenewPeriod,
+    @Nullable Boolean receiverSignatureRequired,
+    @Nullable Integer maxAutomaticTokenAssociations,
+    @Nullable Hbar maxTransactionFee,
+    @Nullable Duration transactionValidDuration,
     @Nullable PrivateKey updatedPrivateKey,
-    @Nullable String memo)
-    implements TransactionRequest {
+    @Nullable Account toUpdate // Compatibility with main branch
+) implements TransactionRequest {
 
-  public AccountUpdateRequest {
-    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
-    Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
-    Objects.requireNonNull(toUpdate, "toUpdate is required");
-    if (maxTransactionFee.toTinybars() < 0) {
-      throw new IllegalArgumentException("maxTransactionFee must be non-negative");
-    }
-    if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
-      throw new IllegalArgumentException("transactionValidDuration must be positive");
-    }
-    if (updatedPrivateKey == null && memo == null) {
-      throw new IllegalArgumentException("at least one update field (key or memo) must be set");
-    }
+  // Compatibility constructor for tests
+  public AccountUpdateRequest(
+      @NonNull Hbar maxTransactionFee,
+      @NonNull Duration transactionValidDuration,
+      @NonNull Account toUpdate,
+      @Nullable PrivateKey updatedPrivateKey,
+      @Nullable String memo) {
+    this(
+        toUpdate.accountId(),
+        updatedPrivateKey != null ? updatedPrivateKey.getPublicKey() : null,
+        memo,
+        null,
+        null,
+        null,
+        maxTransactionFee,
+        transactionValidDuration,
+        updatedPrivateKey,
+        toUpdate);
+  }
+
+  public static AccountUpdateRequest of(@NonNull AccountId accountId) {
+    return new AccountUpdateRequest(
+        accountId, null, null, null, null, null, null, null, null, null);
   }
 
   @NonNull
@@ -37,11 +55,16 @@ public record AccountUpdateRequest(
     Objects.requireNonNull(toUpdate, "toUpdate is required");
     Objects.requireNonNull(updatedPrivateKey, "updatedPrivateKey is required");
     return new AccountUpdateRequest(
-        DEFAULT_MAX_TRANSACTION_FEE,
-        DEFAULT_TRANSACTION_VALID_DURATION,
-        toUpdate,
+        toUpdate.accountId(),
+        updatedPrivateKey.getPublicKey(),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
         updatedPrivateKey,
-        null);
+        toUpdate);
   }
 
   @NonNull
@@ -49,7 +72,7 @@ public record AccountUpdateRequest(
     Objects.requireNonNull(toUpdate, "toUpdate is required");
     Objects.requireNonNull(memo, "memo is required");
     return new AccountUpdateRequest(
-        DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, toUpdate, null, memo);
+        toUpdate.accountId(), null, memo, null, null, null, null, null, null, toUpdate);
   }
 
   @NonNull
@@ -59,10 +82,15 @@ public record AccountUpdateRequest(
     Objects.requireNonNull(updatedPrivateKey, "updatedPrivateKey is required");
     Objects.requireNonNull(memo, "memo is required");
     return new AccountUpdateRequest(
-        DEFAULT_MAX_TRANSACTION_FEE,
-        DEFAULT_TRANSACTION_VALID_DURATION,
-        toUpdate,
+        toUpdate.accountId(),
+        updatedPrivateKey.getPublicKey(),
+        memo,
+        null,
+        null,
+        null,
+        null,
+        null,
         updatedPrivateKey,
-        memo);
+        toUpdate);
   }
 }
