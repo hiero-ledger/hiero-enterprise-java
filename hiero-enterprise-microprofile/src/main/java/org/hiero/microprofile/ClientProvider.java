@@ -134,6 +134,15 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
+  TopicClient createTopicClient(
+      @NonNull final ProtocolLayerClient protocolLayerClient,
+      @NonNull final HieroContext hieroContext) {
+    return new TopicClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
   ContractVerificationClient createContractVerificationClient(
       @NonNull final HieroConfig hieroConfig) {
     return new ContractVerificationClientImpl(hieroConfig);
