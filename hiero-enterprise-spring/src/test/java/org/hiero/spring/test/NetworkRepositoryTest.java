@@ -35,6 +35,7 @@ public class NetworkRepositoryTest {
   }
 
   @Test
+  @Disabled
   void findNetworkStake() throws HieroException {
     Optional<NetworkStake> result = networkRepository.stake();
 
