@@ -1,11 +1,13 @@
 package org.hiero.spring.sample.dto.network;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import org.hiero.base.data.ExchangeRates;
 
 /**
  * Response DTO for Network Exchange Rates.
  */
+@Schema(name = "Network: Exchange Rates", description = "Response DTO containing current and next network exchange rates.")
 public record ExchangeRatesResponse(
     RateInfo currentRate,
     RateInfo nextRate

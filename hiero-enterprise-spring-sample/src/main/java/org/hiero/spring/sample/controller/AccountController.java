@@ -4,6 +4,8 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.hiero.base.AccountClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.AccountInfo;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for Hiero account operations.
  * This controller provides endpoints for account lifecycle management and queries.
  */
+@Tag(name = "Accounts", description = "Operations related to Hiero account lifecycle and balance queries")
 @RestController
 @RequestMapping("/api/v1/hiero/accounts")
 public class AccountController {
@@ -46,6 +49,7 @@ public class AccountController {
    * @param request The account creation request containing optional initial balance.
    * @return Success message with the new account ID.
    */
+  @Operation(summary = "Create a new Hiero account", description = "Creates a new Hiero account with an optional initial balance.")
   @PostMapping
   public AccountResponse createAccount(@RequestBody(required = false) final AccountCreateRequest request) {
     try {
@@ -70,17 +74,21 @@ public class AccountController {
    * @param request The account update request containing new key or memo.
    * @return Success message.
    */
+  @Operation(summary = "Update an existing Hiero account", description = "Updates an account's metadata such as keys or memo.")
   @PutMapping
   public String updateAccount(@RequestBody final AccountUpdateRequest request) {
     try {
-      final AccountId accountId = AccountId.fromString(request.accountId());
-      final PrivateKey currentKey = PrivateKey.fromString(request.privateKey());
+      if (request.accountId() == null || request.privateKey() == null) {
+        throw new IllegalArgumentException("Missing required fields: accountId and privateKey are mandatory.");
+      }
+      final AccountId accountId = AccountId.fromString(request.accountId().trim());
+      final PrivateKey currentKey = PrivateKey.fromString(request.privateKey().trim());
       final Account account = Account.of(accountId, currentKey);
 
       if (request.newPrivateKey() != null && request.memo() != null) {
-        accountClient.updateAccount(account, PrivateKey.fromString(request.newPrivateKey()), request.memo());
+        accountClient.updateAccount(account, PrivateKey.fromString(request.newPrivateKey().trim()), request.memo());
       } else if (request.newPrivateKey() != null) {
-        accountClient.updateAccountKey(account, PrivateKey.fromString(request.newPrivateKey()));
+        accountClient.updateAccountKey(account, PrivateKey.fromString(request.newPrivateKey().trim()));
       } else if (request.memo() != null) {
         accountClient.updateAccountMemo(account, request.memo());
       }
@@ -96,22 +104,20 @@ public class AccountController {
    *
    * @param request The account deletion request.
    */
+  @Operation(summary = "Delete a Hiero account", description = "Deletes an account and optionally transfers remaining balance to another account.")
   @DeleteMapping
   public String deleteAccount(@RequestBody final AccountDeleteRequest request) {
     try {
-      final AccountId accountId = AccountId.fromString(request.accountId());
-      final PrivateKey privateKey = PrivateKey.fromString(request.privateKey());
+      if (request.accountId() == null || request.privateKey() == null) {
+        throw new IllegalArgumentException("Missing required fields: accountId and privateKey are mandatory.");
+      }
+      final AccountId accountId = AccountId.fromString(request.accountId().trim());
+      final PrivateKey privateKey = PrivateKey.fromString(request.privateKey().trim());
       final Account account = Account.of(accountId, privateKey);
 
       if (request.transferToAccountId() != null) {
-        final AccountId transferTo = AccountId.fromString(request.transferToAccountId());
-        // Since we don't have a full Account object for the transferTo target, 
-        // we use a minimal one if the client allows it, or we might need more logic.
-        // For now, let's assume we can pass a dummy account if we only need the ID.
-        // Wait, AccountClient.deleteAccount(Account account, Account toAccount) 
-        // actually takes Account objects.
-        // Let's check if we can create a shell Account for the transfer target.
-        final Account transferTarget = Account.of(transferTo, PrivateKey.generateED25519()); // Key won't be used for receiving
+        final AccountId transferTo = AccountId.fromString(request.transferToAccountId().trim());
+        final Account transferTarget = Account.of(transferTo, PrivateKey.generateED25519());
         accountClient.deleteAccount(account, transferTarget);
       } else {
         accountClient.deleteAccount(account);
@@ -129,10 +135,11 @@ public class AccountController {
    * @param accountId The ID of the account to query.
    * @return The balance in Hbar.
    */
+  @Operation(summary = "Get account balance", description = "Retrieves the current balance of a Hiero account in Hbar.")
   @GetMapping("/balance/{accountId}")
   public String getBalance(@PathVariable("accountId") final String accountId) {
     try {
-      final Hbar balance = accountClient.getAccountBalance(accountId);
+      final Hbar balance = accountClient.getAccountBalance(accountId.trim());
       return balance.toString();
     } catch (final Exception e) {
       throw new RuntimeException("Failed to retrieve balance for account " + accountId, e);
@@ -145,11 +152,13 @@ public class AccountController {
    * @param accountId The ID of the account to query.
    * @return The AccountInfo object.
    */
+  @Operation(summary = "Get account information", description = "Retrieves detailed account information from the Hiero mirror node.")
   @GetMapping("/info/{accountId}")
   public AccountInfo getInfo(@PathVariable("accountId") final String accountId) {
     try {
-      return accountRepository.findById(accountId)
-          .orElseThrow(() -> new RuntimeException("Account not found: " + accountId));
+      final String trimmedAccountId = accountId.trim();
+      return accountRepository.findById(trimmedAccountId)
+          .orElseThrow(() -> new RuntimeException("Account not found: " + trimmedAccountId));
     } catch (final Exception e) {
       throw new RuntimeException("Failed to retrieve info for account " + accountId, e);
     }

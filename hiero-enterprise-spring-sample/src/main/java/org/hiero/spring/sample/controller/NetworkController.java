@@ -1,5 +1,7 @@
 package org.hiero.spring.sample.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Objects;
 import org.hiero.base.mirrornode.NetworkRepository;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for Hiero network operations.
  * Provides endpoints for querying network-wide information like exchange rates, fees, and staking.
  */
+@Tag(name = "Network", description = "Operations related to Hiero network status (rates, fees, staking)")
 @RestController
 @RequestMapping("/api/v1/hiero/network")
 public class NetworkController {
@@ -29,6 +32,7 @@ public class NetworkController {
   /**
    * Retrieves the current and next exchange rates.
    */
+  @Operation(summary = "Get exchange rates", description = "Retrieves the current and next Hbar-to-USD exchange rates.")
   @GetMapping("/exchange-rate")
   public ExchangeRatesResponse getExchangeRates() {
     try {
@@ -43,6 +47,7 @@ public class NetworkController {
   /**
    * Retrieves the network fees.
    */
+  @Operation(summary = "Get network fees", description = "Retrieves a list of Hiero network transaction fees.")
   @GetMapping("/fee")
   public List<NetworkFeeResponse> getFees() {
     try {
@@ -57,6 +62,7 @@ public class NetworkController {
   /**
    * Retrieves network staking information.
    */
+  @Operation(summary = "Get network staking info", description = "Retrieves current staking parameters and status for the Hiero network.")
   @GetMapping("/stake")
   public NetworkStakeResponse getStake() {
     try {
@@ -71,6 +77,7 @@ public class NetworkController {
   /**
    * Retrieves network supply information.
    */
+  @Operation(summary = "Get network supplies", description = "Retrieves the total and circulating supply of Hbar.")
   @GetMapping("/supplies")
   public NetworkSuppliesResponse getSupplies() {
     try {

@@ -1,6 +1,8 @@
 package org.hiero.spring.sample.controller;
 
 import com.hedera.hashgraph.sdk.FileId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Base64;
 import java.util.Objects;
 import org.hiero.base.FileClient;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for Hiero file operations.
  * Provides endpoints for creating, deleting, updating and querying files on the network.
  */
+@Tag(name = "Files", description = "Operations related to Hiero File Service (HFS)")
 @RestController
 @RequestMapping("/api/v1/hiero/files")
 public class FileController {
@@ -31,6 +34,7 @@ public class FileController {
   /**
    * Creates a new file.
    */
+  @Operation(summary = "Create a new file", description = "Creates a new file on the Hiero network with the provided content.")
   @PostMapping
   public String createFile(@RequestBody final FileCreateRequest request) {
     try {
@@ -49,10 +53,11 @@ public class FileController {
   /**
    * Deletes a file.
    */
+  @Operation(summary = "Delete a file", description = "Deletes an existing file from the Hiero network.")
   @DeleteMapping("/{fileId}")
   public String deleteFile(@PathVariable("fileId") final String fileId) {
     try {
-      fileClient.deleteFile(fileId);
+      fileClient.deleteFile(fileId.trim());
       return "File " + fileId + " deleted successfully!";
     } catch (final Exception e) {
       throw new RuntimeException("Failed to delete file: " + fileId, e);
@@ -62,12 +67,13 @@ public class FileController {
   /**
    * Updates an existing file (Content and/or Expiration Time).
    */
+  @Operation(summary = "Update a file", description = "Updates the content or expiration time of an existing file.")
   @PostMapping("/{fileId}")
   public String updateFile(
       @PathVariable("fileId") final String fileId,
       @RequestBody final FileUpdateRequest request) {
     try {
-      final FileId fid = FileId.fromString(fileId);
+      final FileId fid = FileId.fromString(fileId.trim());
       if (request.content() != null) {
         fileClient.updateFile(fid, request.getDecodedContent());
       }
@@ -83,10 +89,11 @@ public class FileController {
   /**
    * Retrieves the content of a file (returned as Base64 string).
    */
+  @Operation(summary = "Get file content", description = "Retrieves the byte content of a file, encoded as a Base64 string.")
   @GetMapping("/{fileId}/content")
   public String getFileContent(@PathVariable("fileId") final String fileId) {
     try {
-      final byte[] content = fileClient.readFile(fileId);
+      final byte[] content = fileClient.readFile(fileId.trim());
       return Base64.getEncoder().encodeToString(content);
     } catch (final Exception e) {
       throw new RuntimeException("Failed to read file content: " + fileId, e);
@@ -96,10 +103,11 @@ public class FileController {
   /**
    * Retrieves the size of a file in bytes.
    */
+  @Operation(summary = "Get file size", description = "Retrieves the size of a file in bytes.")
   @GetMapping("/{fileId}/size")
   public Integer getFileSize(@PathVariable("fileId") final String fileId) {
     try {
-      return fileClient.getSize(FileId.fromString(fileId));
+      return fileClient.getSize(FileId.fromString(fileId.trim()));
     } catch (final Exception e) {
       throw new RuntimeException("Failed to get file size: " + fileId, e);
     }
