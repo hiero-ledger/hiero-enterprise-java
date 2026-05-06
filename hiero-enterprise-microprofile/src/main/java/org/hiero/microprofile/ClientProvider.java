@@ -1,6 +1,7 @@
 package org.hiero.microprofile;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
@@ -9,6 +10,7 @@ import org.hiero.base.FileClient;
 import org.hiero.base.FungibleTokenClient;
 import org.hiero.base.HieroContext;
 import org.hiero.base.HookClient;
+import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import org.hiero.base.NftClient;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.TopicClient;
@@ -70,8 +72,14 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
-  ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroContext hieroContext) {
-    return new ProtocolLayerClientImpl(hieroContext);
+  ProtocolLayerClient createProtocolLayerClient(
+      @NonNull final HieroContext hieroContext,
+      @NonNull final Instance<ReceiveRecordInterceptor> interceptor) {
+    final ProtocolLayerClientImpl client = new ProtocolLayerClientImpl(hieroContext);
+    if (!interceptor.isUnsatisfied()) {
+      client.setRecordInterceptor(interceptor.get());
+    }
+    return client;
   }
 
   @NonNull
