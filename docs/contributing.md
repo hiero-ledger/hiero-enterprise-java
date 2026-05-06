@@ -11,24 +11,27 @@ This folder contains the source for the [Hiero Enterprise Java technical documen
 - **`microprofile.md`** — MicroProfile integration.
 - **`managed-services.md`** — Base module and managed services.
 
-The site is built with [MkDocs](https://www.mkdocs.org/) and the [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) theme. Configuration is in the repository root: `mkdocs.yml`.
+The site is built with [Zensical](https://zensical.org/docs/get-started/) using the repository root `mkdocs.yml` for configuration.
 
 ## Building locally
 
 From the repository root:
 
 ```bash
-pip install mkdocs-material "pymdown-extensions"
-mkdocs serve
+pip install zensical==0.0.36
+zensical serve
 ```
 
 Then open http://127.0.0.1:8000 .
 
 ## Publishing
 
-The `.github/workflows/docs.yml` workflow:
+Two workflows drive publication:
 
-- **Push to `main`:** Builds and deploys the site to the production URL (root).
-- **Pull request:** Builds and deploys a preview to `/pr/<number>/` and comments the preview URL on the PR.
+- **`.github/workflows/docs.yml`**
+    - **Push to `main`:** builds the site with `zensical build --clean` and publishes it to the GitHub Pages root.
+    - **Pull request:** builds the site and uploads it (together with the PR number) as a `docs-preview` artifact. No deploy happens here, so this step is safe for PRs coming from forks.
+- **`.github/workflows/docs-preview.yml`**
+    - Triggered by the `Docs` workflow completing. It downloads the `docs-preview` artifact, deploys it to `gh-pages/pr/<number>/`, and comments the preview URL on the PR. Because it runs in the base-repo context, fork PRs also get a preview.
 
 Ensure **GitHub Pages** is enabled and set the source to **Deploy from a branch** → branch: `gh-pages`, folder: `/ (root)`.

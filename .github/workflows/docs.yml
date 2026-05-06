@@ -7,102 +7,79 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - ".github/workflows/docs.yml"
+      - ".github/workflows/docs-preview.yml"
   pull_request:
     branches: [main]
     paths:
       - "docs/**"
       - "mkdocs.yml"
       - ".github/workflows/docs.yml"
+      - ".github/workflows/docs-preview.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
-  group: "pages-${{ github.ref }}"
+  group: "docs-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
   deploy-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
-
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
       - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
-      - name: Set cache date
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Install docs dependencies
+        run: pip install zensical==0.0.36
 
-      - uses: actions/cache@v5
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-
-      - name: Install MkDocs and Material
-        run: pip install mkdocs-material "pymdown-extensions"
+      - name: Build site
+        run: zensical build --clean
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
 
-  # PR preview: build and deploy to .../pr/<number>/
-  deploy-preview:
+  # PR preview: build only, upload the site as an artifact.
+  # The deploy to gh-pages/pr/<number>/ runs in docs-preview.yml via
+  # workflow_run, so fork PRs can also get a preview without granting
+  # write access to PR-controlled code.
+  build-preview:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
       - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
-      - name: Set cache date
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-
-      - uses: actions/cache@v5
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-
-      - name: Install MkDocs and Material
-        run: pip install mkdocs-material "pymdown-extensions"
+      - name: Install docs dependencies
+        run: pip install zensical==0.0.36
 
       - name: Build site
-        run: mkdocs build --strict
+        run: zensical build --clean
 
-      - name: Deploy PR preview to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-          destination_dir: "pr/${{ github.event.pull_request.number }}"
-          keep_files: true
+      - name: Save PR metadata
+        run: |
+          mkdir -p pr
+          echo "${{ github.event.pull_request.number }}" > pr/NR
 
-      - name: Comment PR with preview URL
-        uses: actions/github-script@v9
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${{ github.event.pull_request.number }}/`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `📖 **Docs preview** for this PR: ${url}`
-            });
+          name: docs-preview
+          path: |
+            site
+            pr
+          if-no-files-found: error
+          retention-days: 7
