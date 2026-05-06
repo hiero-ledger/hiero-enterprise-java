@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
@@ -50,6 +51,7 @@ import org.hiero.base.data.Account;
 import org.hiero.base.data.ContractParam;
 import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import org.hiero.base.interceptors.ReceiveRecordInterceptor.ReceiveRecordHandler;
+import org.hiero.base.interceptors.TransactionInterceptor;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.TransactionListener;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
@@ -114,6 +116,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   public static final int DEFAULT_GAS = 5_000_000;
 
   private final List<TransactionListener> listeners;
+  private final List<TransactionInterceptor> interceptors;
 
   private final HieroContext hieroContext;
 
@@ -123,11 +126,18 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   public ProtocolLayerClientImpl(@NonNull final HieroContext hieroContext) {
     this.hieroContext = Objects.requireNonNull(hieroContext, "hieroContext must not be null");
     listeners = new CopyOnWriteArrayList<>();
+    interceptors = new CopyOnWriteArrayList<>();
   }
 
   public void setRecordInterceptor(@NonNull final ReceiveRecordInterceptor recordInterceptor) {
     Objects.requireNonNull(recordInterceptor, "recordInterceptor must not be null");
     this.recordInterceptor.set(recordInterceptor);
+  }
+
+  @Override
+  public void addTransactionInterceptor(@NonNull TransactionInterceptor interceptor) {
+    Objects.requireNonNull(interceptor, "interceptor must not be null");
+    this.interceptors.add(interceptor);
   }
 
   @Override
@@ -727,7 +737,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     Objects.requireNonNull(type, "type must not be null");
     try {
       log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
-      final TransactionResponse response = transaction.execute(hieroContext.getClient());
+      final TransactionResponse response =
+          new RealInterceptorChain(0, transaction).proceed(transaction);
       listeners.forEach(
           listener -> {
             try {
@@ -798,6 +809,38 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return query.execute(hieroContext.getClient());
     } catch (Exception e) {
       throw new HieroException("Failed to execute query", e);
+    }
+  }
+
+  private class RealInterceptorChain implements TransactionInterceptor.Chain {
+    private final int index;
+    private final Transaction<?> transaction;
+
+    RealInterceptorChain(int index, Transaction<?> transaction) {
+      this.index = index;
+      this.transaction = transaction;
+    }
+
+    @Override
+    @NonNull
+    public Transaction<?> transaction() {
+      return transaction;
+    }
+
+    @Override
+    @NonNull
+    public Client client() {
+      return hieroContext.getClient();
+    }
+
+    @Override
+    @NonNull
+    public TransactionResponse proceed(@NonNull Transaction<?> transaction) throws Exception {
+      if (index < interceptors.size()) {
+        RealInterceptorChain next = new RealInterceptorChain(index + 1, transaction);
+        return interceptors.get(index).intercept(next);
+      }
+      return transaction.execute(hieroContext.getClient());
     }
   }
 

@@ -128,6 +128,11 @@ public enum BigIntegerBasedNumericDatatypes implements ParamSupplier<BigInteger>
       BigInteger.valueOf(2).pow(255).negate(),
       BigInteger.valueOf(2).pow(255).subtract(BigInteger.ONE)),
 
+  UINT64(
+      "uint64",
+      (v, params) -> params.addUint64(v.longValue()),
+      BigInteger.ZERO,
+      BigInteger.valueOf(2).pow(64).subtract(BigInteger.ONE)),
   UINT72(
       "uint72",
       (v, params) -> params.addUint72(v),
