@@ -3,10 +3,10 @@ package org.hiero.spring.sample.dto.network;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hiero.base.data.NetworkStake;
 
-/**
- * Response DTO for Network Stake Information.
- */
-@Schema(name = "Network: Stake", description = "Response DTO containing network staking status and parameters.")
+/** Response DTO for Network Stake Information. */
+@Schema(
+    name = "Network: Stake",
+    description = "Response DTO containing network staking status and parameters.")
 public record NetworkStakeResponse(
     long maxStakeReward,
     long maxStakeRewardPerHbar,
@@ -20,8 +20,7 @@ public record NetworkStakeResponse(
     double stakingRewardFeeFraction,
     long stakingRewardRate,
     long stakingStartThreshold,
-    long unreservedStakingRewardBalance
-) {
+    long unreservedStakingRewardBalance) {
   public static NetworkStakeResponse fromDomain(NetworkStake stake) {
     return new NetworkStakeResponse(
         stake.maxStakeReward(),
@@ -36,7 +35,6 @@ public record NetworkStakeResponse(
         stake.stakingRewardFeeFraction(),
         stake.stakingRewardRate(),
         stake.stakingStartThreshold(),
-        stake.unreservedStakingRewardBalance()
-    );
+        stake.unreservedStakingRewardBalance());
   }
 }

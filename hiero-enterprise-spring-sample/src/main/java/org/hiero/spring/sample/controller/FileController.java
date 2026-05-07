@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 /**
- * REST controller for Hiero file operations.
- * Provides endpoints for creating, deleting, updating and querying files on the network.
+ * REST controller for Hiero file operations. Provides endpoints for creating, deleting, updating
+ * and querying files on the network.
  */
 @Tag(name = "Files", description = "Operations related to Hiero File Service (HFS)")
 @RestController
@@ -31,10 +32,10 @@ public class FileController {
     this.fileClient = Objects.requireNonNull(fileClient, "fileClient must not be null");
   }
 
-  /**
-   * Creates a new file.
-   */
-  @Operation(summary = "Create a new file", description = "Creates a new file on the Hiero network with the provided content.")
+  /** Creates a new file. */
+  @Operation(
+      summary = "Create a new file",
+      description = "Creates a new file on the Hiero network with the provided content.")
   @PostMapping
   public String createFile(@RequestBody final FileCreateRequest request) {
     try {
@@ -50,28 +51,27 @@ public class FileController {
     }
   }
 
-  /**
-   * Deletes a file.
-   */
-  @Operation(summary = "Delete a file", description = "Deletes an existing file from the Hiero network.")
+  /** Deletes a file. */
+  @Operation(
+      summary = "Delete a file",
+      description = "Deletes an existing file from the Hiero network.")
   @DeleteMapping("/{fileId}")
   public String deleteFile(@PathVariable("fileId") final String fileId) {
     try {
       fileClient.deleteFile(fileId.trim());
-      return "File " + fileId + " deleted successfully!";
+      return "File " + HtmlUtils.htmlEscape(fileId) + " deleted successfully!";
     } catch (final Exception e) {
       throw new RuntimeException("Failed to delete file: " + fileId, e);
     }
   }
 
-  /**
-   * Updates an existing file (Content and/or Expiration Time).
-   */
-  @Operation(summary = "Update a file", description = "Updates the content or expiration time of an existing file.")
+  /** Updates an existing file (Content and/or Expiration Time). */
+  @Operation(
+      summary = "Update a file",
+      description = "Updates the content or expiration time of an existing file.")
   @PostMapping("/{fileId}")
   public String updateFile(
-      @PathVariable("fileId") final String fileId,
-      @RequestBody final FileUpdateRequest request) {
+      @PathVariable("fileId") final String fileId, @RequestBody final FileUpdateRequest request) {
     try {
       final FileId fid = FileId.fromString(fileId.trim());
       if (request.content() != null) {
@@ -80,16 +80,16 @@ public class FileController {
       if (request.expirationTime() != null) {
         fileClient.updateExpirationTime(fid, request.getExpirationInstant());
       }
-      return "File " + fileId + " updated successfully!";
+      return "File " + HtmlUtils.htmlEscape(fileId) + " updated successfully!";
     } catch (final Exception e) {
       throw new RuntimeException("Failed to update file: " + fileId, e);
     }
   }
 
-  /**
-   * Retrieves the content of a file (returned as Base64 string).
-   */
-  @Operation(summary = "Get file content", description = "Retrieves the byte content of a file, encoded as a Base64 string.")
+  /** Retrieves the content of a file (returned as Base64 string). */
+  @Operation(
+      summary = "Get file content",
+      description = "Retrieves the byte content of a file, encoded as a Base64 string.")
   @GetMapping("/{fileId}/content")
   public String getFileContent(@PathVariable("fileId") final String fileId) {
     try {
@@ -100,9 +100,7 @@ public class FileController {
     }
   }
 
-  /**
-   * Retrieves the size of a file in bytes.
-   */
+  /** Retrieves the size of a file in bytes. */
   @Operation(summary = "Get file size", description = "Retrieves the size of a file in bytes.")
   @GetMapping("/{fileId}/size")
   public Integer getFileSize(@PathVariable("fileId") final String fileId) {

@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.TopicId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Objects;
-import java.util.Optional;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
@@ -23,10 +22,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
-/**
- * REST controller for Hiero Consensus Service (Topic) operations.
- */
+/** REST controller for Hiero Consensus Service (Topic) operations. */
 @Tag(name = "Consensus Topics", description = "Operations related to Hiero Consensus Service (HCS)")
 @RestController
 @RequestMapping("/api/v1/hiero/topics")
@@ -38,19 +36,22 @@ public class TopicController {
 
   public TopicController(final TopicClient topicClient, final TopicRepository topicRepository) {
     this.topicClient = Objects.requireNonNull(topicClient, "topicClient must not be null");
-    this.topicRepository = Objects.requireNonNull(topicRepository, "topicRepository must not be null");
+    this.topicRepository =
+        Objects.requireNonNull(topicRepository, "topicRepository must not be null");
   }
 
-  /**
-   * Creates a new topic.
-   */
-  @Operation(summary = "Create a new topic", description = "Creates a new public or private HCS topic.")
+  /** Creates a new topic. */
+  @Operation(
+      summary = "Create a new topic",
+      description = "Creates a new public or private HCS topic.")
   @PostMapping
   public String createTopic(@RequestBody final TopicCreateRequest request) {
     try {
       final TopicId topicId;
-      final PrivateKey adminKey = request.adminKey() != null ? PrivateKey.fromString(request.adminKey()) : null;
-      final PrivateKey submitKey = request.submitKey() != null ? PrivateKey.fromString(request.submitKey()) : null;
+      final PrivateKey adminKey =
+          request.adminKey() != null ? PrivateKey.fromString(request.adminKey()) : null;
+      final PrivateKey submitKey =
+          request.submitKey() != null ? PrivateKey.fromString(request.submitKey()) : null;
       final String memo = request.memo() != null ? request.memo() : "";
 
       if (submitKey != null) {
@@ -72,10 +73,10 @@ public class TopicController {
     }
   }
 
-  /**
-   * Updates an existing topic.
-   */
-  @Operation(summary = "Update a topic", description = "Updates an existing HCS topic's memo or keys.")
+  /** Updates an existing topic. */
+  @Operation(
+      summary = "Update a topic",
+      description = "Updates an existing HCS topic's memo or keys.")
   @PutMapping
   public String updateTopic(@RequestBody final TopicUpdateRequest request) {
     try {
@@ -84,17 +85,20 @@ public class TopicController {
       }
       final TopicId topicId = TopicId.fromString(request.topicId().trim());
       final String memo = request.memo() != null ? request.memo() : "";
-      
-      if (request.adminKey() != null && request.updatedAdminKey() != null && request.submitKey() != null) {
-          topicClient.updateTopic(topicId, 
-              PrivateKey.fromString(request.adminKey().trim()), 
-              PrivateKey.fromString(request.updatedAdminKey().trim()), 
-              PrivateKey.fromString(request.submitKey().trim()), 
-              memo);
+
+      if (request.adminKey() != null
+          && request.updatedAdminKey() != null
+          && request.submitKey() != null) {
+        topicClient.updateTopic(
+            topicId,
+            PrivateKey.fromString(request.adminKey().trim()),
+            PrivateKey.fromString(request.updatedAdminKey().trim()),
+            PrivateKey.fromString(request.submitKey().trim()),
+            memo);
       } else if (request.adminKey() != null) {
-          topicClient.updateTopic(topicId, PrivateKey.fromString(request.adminKey().trim()), memo);
+        topicClient.updateTopic(topicId, PrivateKey.fromString(request.adminKey().trim()), memo);
       } else {
-          topicClient.updateTopic(topicId, memo);
+        topicClient.updateTopic(topicId, memo);
       }
       return "Topic " + topicId.toString() + " updated successfully!";
     } catch (final Exception e) {
@@ -102,29 +106,28 @@ public class TopicController {
     }
   }
 
-  /**
-   * Deletes a topic.
-   */
+  /** Deletes a topic. */
   @Operation(summary = "Delete a topic", description = "Deletes an existing HCS topic.")
   @DeleteMapping("/{topicId}")
   public String deleteTopic(@PathVariable("topicId") final String topicId) {
     try {
       topicClient.deleteTopic(topicId.trim());
-      return "Topic " + topicId + " deleted successfully!";
+      return "Topic " + HtmlUtils.htmlEscape(topicId) + " deleted successfully!";
     } catch (final Exception e) {
       throw new RuntimeException("Failed to delete topic", e);
     }
   }
 
-  /**
-   * Submits a message to a topic.
-   */
-  @Operation(summary = "Submit a message", description = "Submits a message to a specific HCS topic.")
+  /** Submits a message to a topic. */
+  @Operation(
+      summary = "Submit a message",
+      description = "Submits a message to a specific HCS topic.")
   @PostMapping("/message")
   public String submitMessage(@RequestBody final TopicMessageRequest request) {
     try {
       if (request.topicId() == null || request.message() == null) {
-        throw new IllegalArgumentException("Missing required fields: topicId and message are mandatory.");
+        throw new IllegalArgumentException(
+            "Missing required fields: topicId and message are mandatory.");
       }
       final String trimmedTopicId = request.topicId().trim();
       if (request.submitKey() != null) {
@@ -132,31 +135,32 @@ public class TopicController {
       } else {
         topicClient.submitMessage(trimmedTopicId, request.message());
       }
-      return "Message submitted successfully to topic " + request.topicId();
+      return "Message submitted successfully to topic " + HtmlUtils.htmlEscape(request.topicId());
     } catch (final Exception e) {
       throw new RuntimeException("Failed to submit message", e);
     }
   }
 
-  /**
-   * Retrieves info for a specific topic.
-   */
-  @Operation(summary = "Get topic information", description = "Retrieves detailed information about an HCS topic from the mirror node.")
+  /** Retrieves info for a specific topic. */
+  @Operation(
+      summary = "Get topic information",
+      description = "Retrieves detailed information about an HCS topic from the mirror node.")
   @GetMapping("/{topicId}/info")
   public Topic getTopicInfo(@PathVariable("topicId") final String topicId) {
     try {
       final String trimmedTopicId = topicId.trim();
-      return topicRepository.findTopicById(trimmedTopicId)
+      return topicRepository
+          .findTopicById(trimmedTopicId)
           .orElseThrow(() -> new RuntimeException("Topic not found: " + trimmedTopicId));
     } catch (final Exception e) {
       throw new RuntimeException("Failed to retrieve topic info", e);
     }
   }
 
-  /**
-   * Retrieves messages for a specific topic.
-   */
-  @Operation(summary = "Get topic messages", description = "Retrieves a list of messages submitted to a specific HCS topic.")
+  /** Retrieves messages for a specific topic. */
+  @Operation(
+      summary = "Get topic messages",
+      description = "Retrieves a list of messages submitted to a specific HCS topic.")
   @GetMapping("/{topicId}/message")
   public Page<TopicMessage> getTopicMessages(@PathVariable("topicId") final String topicId) {
     try {
@@ -166,18 +170,25 @@ public class TopicController {
     }
   }
 
-  /**
-   * Retrieves a specific message by its sequence number.
-   */
-  @Operation(summary = "Get topic message by sequence", description = "Retrieves a specific message from an HCS topic by its sequence number.")
+  /** Retrieves a specific message by its sequence number. */
+  @Operation(
+      summary = "Get topic message by sequence",
+      description = "Retrieves a specific message from an HCS topic by its sequence number.")
   @GetMapping("/{topicId}/message/{sequenceNumber}")
   public TopicMessage getTopicMessageBySequenceNumber(
       @PathVariable("topicId") final String topicId,
       @PathVariable("sequenceNumber") final long sequenceNumber) {
     try {
       final String trimmedTopicId = topicId.trim();
-      return topicRepository.getMessageBySequenceNumber(trimmedTopicId, sequenceNumber)
-          .orElseThrow(() -> new RuntimeException("Message not found for Topic: " + trimmedTopicId + " Sequence: " + sequenceNumber));
+      return topicRepository
+          .getMessageBySequenceNumber(trimmedTopicId, sequenceNumber)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Message not found for Topic: "
+                          + trimmedTopicId
+                          + " Sequence: "
+                          + sequenceNumber));
     } catch (final Exception e) {
       throw new RuntimeException("Failed to retrieve topic message", e);
     }

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for Hiero block operations.
- * This controller provides endpoints for querying block information from the mirror node.
+ * REST controller for Hiero block operations. This controller provides endpoints for querying block
+ * information from the mirror node.
  */
 @Tag(name = "Blocks", description = "Operations related to Hiero network blocks (Mirror Node)")
 @RestController
@@ -32,7 +32,9 @@ public class BlockController {
    *
    * @return A page of blocks.
    */
-  @Operation(summary = "Get all blocks", description = "Retrieves a paginated list of blocks from the Hiero mirror node.")
+  @Operation(
+      summary = "Get all blocks",
+      description = "Retrieves a paginated list of blocks from the Hiero mirror node.")
   @GetMapping
   public Page<Block> getBlocks() {
     try {
@@ -48,11 +50,14 @@ public class BlockController {
    * @param number The block number.
    * @return The block details.
    */
-  @Operation(summary = "Get block by number", description = "Retrieves details of a specific block by its block number.")
+  @Operation(
+      summary = "Get block by number",
+      description = "Retrieves details of a specific block by its block number.")
   @GetMapping("/{number}")
   public Block getBlockByNumber(@PathVariable("number") final long number) {
     try {
-      return blockRepository.findByNumber(number)
+      return blockRepository
+          .findByNumber(number)
           .orElseThrow(() -> new RuntimeException("Block not found: " + number));
     } catch (final Exception e) {
       throw new RuntimeException("Failed to query block by number: " + number, e);
