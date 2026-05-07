@@ -6,6 +6,10 @@ import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.Configuration;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.HieroException;
@@ -17,11 +21,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 @HelidonTest
 @AddBean(ClientProvider.class)
 @Configuration(useExisting = true)
@@ -30,9 +29,9 @@ public class TopicClientTest {
   @BeforeAll
   static void setup() {
     final Config build =
-      ConfigProviderResolver.instance().getBuilder().withSources(new TestConfigSource()).build();
+        ConfigProviderResolver.instance().getBuilder().withSources(new TestConfigSource()).build();
     ConfigProviderResolver.instance()
-      .registerConfig(build, Thread.currentThread().getContextClassLoader());
+        .registerConfig(build, Thread.currentThread().getContextClassLoader());
   }
 
   @Inject private TopicClient topicClient;
@@ -47,11 +46,11 @@ public class TopicClientTest {
     hieroTestUtils.waitForMirrorNodeRecords();
 
     final SubscriptionHandle handler =
-      topicClient.subscribeTopic(
-        topicId,
-        (message) -> {
-          messages.add(new String(message.contents));
-        });
+        topicClient.subscribeTopic(
+            topicId,
+            (message) -> {
+              messages.add(new String(message.contents));
+            });
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -74,12 +73,12 @@ public class TopicClientTest {
     hieroTestUtils.waitForMirrorNodeRecords();
 
     final SubscriptionHandle handler =
-      topicClient.subscribeTopic(
-        topicId,
-        (message) -> {
-          messages.add(new String(message.contents));
-        },
-        limit);
+        topicClient.subscribeTopic(
+            topicId,
+            (message) -> {
+              messages.add(new String(message.contents));
+            },
+            limit);
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -104,9 +103,9 @@ public class TopicClientTest {
     hieroTestUtils.waitForMirrorNodeRecords();
 
     final IllegalArgumentException e =
-      Assertions.assertThrows(
-        IllegalArgumentException.class,
-        () -> topicClient.subscribeTopic(topicId, (message) -> {}, limit));
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, limit));
 
     Assertions.assertEquals(msg, e.getMessage());
   }
@@ -120,8 +119,8 @@ public class TopicClientTest {
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
     final SubscriptionHandle handler =
-      Assertions.assertDoesNotThrow(
-        () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end));
+        Assertions.assertDoesNotThrow(
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end));
 
     Assertions.assertNotNull(handler);
     handler.unsubscribe();
@@ -136,9 +135,9 @@ public class TopicClientTest {
     final Instant invalidEnd = start.minus(Duration.ofMinutes(1));
 
     final IllegalArgumentException e2 =
-      Assertions.assertThrows(
-        IllegalArgumentException.class,
-        () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, invalidEnd));
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, invalidEnd));
 
     Assertions.assertEquals("endTime cannot be before startTime", e2.getMessage());
   }
