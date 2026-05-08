@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.hiero.base.data.AccountBalance;
@@ -39,8 +40,9 @@ class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
   void balanceAndNetworkNodeQueriesCallMirrorNodeEndpoints() throws Exception {
     final AccountId accountId = AccountId.fromString("0.0.1001");
     final String balancesPath = "/api/v1/balances";
-    final String balancesByAccountPath = "/api/v1/balances";
+    final String balancesByAccountPath = "/api/v1/balances?account.id=0.0.1001";
     final String nodesPath = "/api/v1/network/nodes";
+    final String nodeByIdPath = "/api/v1/network/nodes?node.id=0";
     respondWith(balancesPath, balancesJson());
     respondWith(nodesPath, networkNodesJson());
     final MirrorNodeClientImpl client =
@@ -53,7 +55,7 @@ class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
     final NetworkNode node = client.queryNetworkNodeById(0).orElseThrow();
 
     assertEquals(
-        List.of(balancesPath, balancesByAccountPath, balancesPath, nodesPath, nodesPath),
+        List.of(balancesPath, balancesByAccountPath, balancesPath, nodesPath, nodeByIdPath),
         requestedPaths);
     assertEquals(1, balances.getSize());
     assertEquals(1, balancesByAccount.getSize());
@@ -66,9 +68,13 @@ class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
     server.createContext(
         path,
         exchange -> {
-          requestedPaths.add(exchange.getRequestURI().getPath());
+          requestedPaths.add(requestPath(exchange.getRequestURI()));
           respond(exchange, body);
         });
+  }
+
+  private static String requestPath(URI uri) {
+    return uri.getRawQuery() == null ? uri.getPath() : uri.getPath() + "?" + uri.getRawQuery();
   }
 
   private String baseUrl() {
