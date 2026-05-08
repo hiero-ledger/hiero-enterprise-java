@@ -15,6 +15,9 @@ public class HieroProperties {
   @NestedConfigurationProperty
   private HieroNetworkProperties network = new HieroNetworkProperties();
 
+  @NestedConfigurationProperty
+  private HieroHealthProperties health = new HieroHealthProperties();
+
   public String getAccountId() {
     return this.accountId;
   }
@@ -37,5 +40,13 @@ public class HieroProperties {
 
   public void setNetwork(HieroNetworkProperties network) {
     this.network = network;
+  }
+
+  public HieroHealthProperties getHealth() {
+    return health;
+  }
+
+  public void setHealth(HieroHealthProperties health) {
+    this.health = health;
   }
 }

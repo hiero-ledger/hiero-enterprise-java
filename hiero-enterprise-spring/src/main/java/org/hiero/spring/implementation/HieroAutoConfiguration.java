@@ -53,7 +53,7 @@ import org.springframework.web.context.annotation.ApplicationScope;
 
 @AutoConfiguration
 @EnableConfigurationProperties({HieroProperties.class, HieroNetworkProperties.class})
-@Import({MicrometerSupportConfig.class})
+@Import({MicrometerSupportConfig.class, HieroHealthAutoConfiguration.class})
 public class HieroAutoConfiguration {
 
   private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
