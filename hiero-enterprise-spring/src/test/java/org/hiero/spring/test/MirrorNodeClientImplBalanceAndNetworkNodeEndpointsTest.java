@@ -1,52 +1,64 @@
 package org.hiero.spring.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.Page;
 import org.hiero.spring.implementation.MirrorNodeClientImpl;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
-  private HttpServer server;
-  private final List<String> requestedPaths = new CopyOnWriteArrayList<>();
-
-  @BeforeEach
-  void startServer() throws IOException {
-    server = HttpServer.create(new InetSocketAddress(0), 0);
-    server.start();
-  }
-
-  @AfterEach
-  void stopServer() {
-    server.stop(0);
-  }
-
   @Test
+  @SuppressWarnings({"rawtypes", "unchecked"})
   void balanceAndNetworkNodeQueriesCallMirrorNodeEndpoints() throws Exception {
+    final List<String> requestedPaths = new ArrayList<>();
+    final RestClient.Builder restClientBuilder = mock(RestClient.Builder.class);
+    final RestClient restClient = mock(RestClient.class);
+    final RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+    final RestClient.RequestHeadersSpec headersSpec = mock(RestClient.RequestHeadersSpec.class);
+    final RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
+
+    when(restClientBuilder.build()).thenReturn(restClient);
+    when(restClientBuilder.clone()).thenReturn(restClientBuilder);
+    when(restClient.mutate()).thenReturn(restClientBuilder);
+    when(restClient.get()).thenReturn(uriSpec);
+    when(uriSpec.uri(any(Function.class)))
+        .thenAnswer(
+            invocation -> {
+              final Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
+              requestedPaths.add(
+                  requestPath(uriFunction.apply(UriComponentsBuilder.newInstance())));
+              return headersSpec;
+            });
+    when(headersSpec.accept(APPLICATION_JSON)).thenReturn(headersSpec);
+    when(headersSpec.retrieve()).thenReturn(responseSpec);
+    when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+    when(responseSpec.toEntity(String.class))
+        .thenAnswer(
+            invocation ->
+                ResponseEntity.ok(responseBodyFor(requestedPaths.get(requestedPaths.size() - 1))));
+
     final AccountId accountId = AccountId.fromString("0.0.1001");
     final String balancesPath = "/api/v1/balances";
     final String balancesByAccountPath = "/api/v1/balances?account.id=0.0.1001";
     final String nodesPath = "/api/v1/network/nodes";
     final String nodeByIdPath = "/api/v1/network/nodes?node.id=0";
-    respondWith(balancesPath, balancesJson());
-    respondWith(nodesPath, networkNodesJson());
-    final MirrorNodeClientImpl client =
-        new MirrorNodeClientImpl(RestClient.builder().baseUrl(baseUrl()));
+    final MirrorNodeClientImpl client = new MirrorNodeClientImpl(restClientBuilder);
 
     final Page<AccountBalance> balances = client.queryBalances();
     final Page<AccountBalance> balancesByAccount = client.queryBalancesByAccount(accountId);
@@ -64,30 +76,15 @@ class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
     assertEquals(0, node.nodeId());
   }
 
-  private void respondWith(String path, String body) {
-    server.createContext(
-        path,
-        exchange -> {
-          requestedPaths.add(requestPath(exchange.getRequestURI()));
-          respond(exchange, body);
-        });
-  }
-
   private static String requestPath(URI uri) {
     return uri.getRawQuery() == null ? uri.getPath() : uri.getPath() + "?" + uri.getRawQuery();
   }
 
-  private String baseUrl() {
-    return "http://localhost:" + server.getAddress().getPort();
-  }
-
-  private static void respond(HttpExchange exchange, String body) throws IOException {
-    final byte[] bytes = body.getBytes();
-    exchange.getResponseHeaders().add("Content-Type", "application/json");
-    exchange.sendResponseHeaders(200, bytes.length);
-    try (OutputStream outputStream = exchange.getResponseBody()) {
-      outputStream.write(bytes);
+  private static String responseBodyFor(String path) {
+    if (path.startsWith("/api/v1/network/nodes")) {
+      return networkNodesJson();
     }
+    return balancesJson();
   }
 
   private static String balancesJson() {
