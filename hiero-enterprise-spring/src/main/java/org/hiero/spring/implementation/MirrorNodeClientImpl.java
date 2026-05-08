@@ -12,6 +12,7 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
+import org.hiero.base.data.MappedPage;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
@@ -176,12 +177,23 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
 
   @Override
   public @NonNull Page<NftMetadata> findNftTypesByOwner(AccountId ownerId) {
-    throw new UnsupportedOperationException("Not yet implemented");
+    Objects.requireNonNull(ownerId, "ownerId must not be null");
+    try {
+      return new MappedPage<>(queryTokensForAccount(ownerId), this::resolveNftMetadata);
+    } catch (final HieroException e) {
+      throw new IllegalStateException("Error querying NFT types for owner " + ownerId, e);
+    }
   }
 
   @Override
   public @NonNull Page<NftMetadata> findAllNftTypes() {
-    throw new UnsupportedOperationException("Not yet implemented");
+    final String path = "/api/v1/tokens?type=NON_FUNGIBLE_UNIQUE";
+    final Function<JsonNode, List<Token>> dataExtractionFunction =
+        node -> jsonConverter.toTokens(node);
+    final Page<Token> tokens =
+        new RestBasedPage<>(
+            objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+    return new MappedPage<>(tokens, this::resolveNftMetadata);
   }
 
   @Override

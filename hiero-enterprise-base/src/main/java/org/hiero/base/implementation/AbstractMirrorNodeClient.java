@@ -3,6 +3,7 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -103,7 +105,29 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
 
   @Override
   public @NonNull Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
-    throw new UnsupportedOperationException("Not yet implemented");
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return queryTokenById(tokenId)
+        .filter(tokenInfo -> tokenInfo.type() == TokenType.NON_FUNGIBLE_UNIQUE)
+        .map(
+            tokenInfo ->
+                new NftMetadata(
+                    tokenInfo.tokenId(),
+                    tokenInfo.name(),
+                    tokenInfo.symbol(),
+                    tokenInfo.treasuryAccountId()));
+  }
+
+  protected final @NonNull Optional<NftMetadata> resolveNftMetadata(@NonNull final Token token) {
+    Objects.requireNonNull(token, "token must not be null");
+    if (token.type() != TokenType.NON_FUNGIBLE_UNIQUE || token.tokenId() == null) {
+      return Optional.empty();
+    }
+    try {
+      return getNftMetadata(token.tokenId());
+    } catch (final HieroException e) {
+      throw new IllegalStateException(
+          "Error resolving NFT metadata for token " + token.tokenId(), e);
+    }
   }
 
   @Override
