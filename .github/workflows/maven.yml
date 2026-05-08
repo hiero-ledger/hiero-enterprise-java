@@ -41,14 +41,11 @@ jobs:
 
       - name: Wait for Mirror Node
         run: |
-          # Node REST (mirror-1-rest) no longer serves /api/v1/network/* as of mirror-node ~0.15x; those routes
-          # moved to REST-Java (mirror-1-restjava, port-forwarded to 8084 by hiero-solo-action). Probe readiness
-          # the same way the Helm charts do.
           echo "Waiting for Mirror Node REST (Node.js) on http://localhost:5551..."
           until curl --output /dev/null --silent --fail http://localhost:5551/health/readiness; do
             echo "Mirror Node (rest) not ready, waiting..."
             kubectl get svc -n solo || true
-            curl --silent http://localhost:5551/health/readiness || echo "No response from Node REST readiness"
+            curl --silent http://localhost:5551/health/readiness || echo "No response from mirrorNode REST readiness"
             sleep 5
           done
           echo "Waiting for Mirror Node REST-Java on http://localhost:8084..."
