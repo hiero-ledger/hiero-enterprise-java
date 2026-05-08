@@ -38,12 +38,7 @@ jobs:
         uses: hiero-ledger/hiero-solo-action@328bc84c3b00a990a151418144fd682a4eb76ea6 # v0.19.0
         with:
           installMirrorNode: true
-          hieroVersion: v0.66.0
-          mirrorNodeVersion: v0.138.0
-          mirrorNodePortRest: 5551
-          mirrorNodePortGrpc: 5600
-          mirrorNodePortWeb3Rest: 8545
-
+          
       - name: Wait for Mirror Node
         run: |
           echo "Waiting for Mirror Node REST API to be ready on http://localhost:5551..."
