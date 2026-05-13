@@ -1,0 +1,6 @@
+/* Navbar/header primary color */
+[data-md-color-primary="hiero"] {
+  --md-primary-fg-color:        #b91b56;
+  --md-primary-fg-color--light: #b91b56;
+  --md-primary-fg-color--dark:  #b91b56;
+}
