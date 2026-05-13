@@ -1,5 +1,20 @@
 # MicroProfile Integration
 
-<!-- TODO: Add MicroProfile/Quarkus setup, configuration, available clients and usage. -->
+MicroProfile integration exposes `AccountClient` via CDI.
 
-Placeholder: technical documentation for the MicroProfile integration (hiero-enterprise-microprofile) will be added here.
+## Hook lifecycle usage
+
+Use `AccountClient.updateAccountHooks(...)` to create and/or delete hooks in one account update transaction.
+
+```java
+@Inject AccountClient accountClient;
+
+HookDetails hookToCreate =
+    new HookDetails(
+        HookExtensionPoint.ACCOUNT_ALLOWANCE_HOOK,
+        1001L,
+        new EvmHook(ContractId.fromString("0.0.5001")),
+        null);
+
+accountClient.updateAccountHooks(account, List.of(hookToCreate), List.of(77L));
+```

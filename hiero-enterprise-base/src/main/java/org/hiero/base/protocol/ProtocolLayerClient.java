@@ -180,19 +180,6 @@ public interface ProtocolLayerClient {
       @NonNull AccountDeleteRequest request) throws HieroException;
 
   /**
-   * Executes an account hook update transaction.
-   *
-   * @param request the request containing hooks to create and hooks to delete on an account
-   * @return the result of the account hook update transaction
-   * @throws HieroException if the transaction could not be executed
-   */
-  @NonNull
-  default AccountHookUpdateResult executeAccountHookUpdateTransaction(
-      @NonNull AccountHookUpdateRequest request) throws HieroException {
-    throw new UnsupportedOperationException("Account hook update transaction is not implemented.");
-  }
-
-  /**
    * Executes an account update transaction.
    *
    * @param request the request containing the details of the account update transaction
@@ -201,6 +188,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull AccountUpdateResult executeAccountUpdateTransaction(
       @NonNull AccountUpdateRequest request) throws HieroException;
+
+  /**
+   * Executes an account hook update transaction.
+   *
+   * @param request the request containing the details of the account hook update transaction
+   * @return the result of the account hook update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull AccountHookUpdateResult executeAccountHookUpdateTransaction(
+      @NonNull AccountHookUpdateRequest request) throws HieroException;
 
   /**
    * Executes a token create transaction.

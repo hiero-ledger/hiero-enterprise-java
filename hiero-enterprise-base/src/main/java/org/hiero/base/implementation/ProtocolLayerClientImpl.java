@@ -58,6 +58,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -405,6 +407,30 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     final TransactionReceipt receipt =
         executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
     return new AccountUpdateResult(receipt.transactionId, receipt.status);
+  }
+
+  @Override
+  @NonNull
+  public AccountHookUpdateResult executeAccountHookUpdateTransaction(
+      @NonNull final AccountHookUpdateRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    final AccountUpdateTransaction transaction =
+        new AccountUpdateTransaction()
+            .setMaxTransactionFee(request.maxTransactionFee())
+            .setTransactionValidDuration(request.transactionValidDuration())
+            .setAccountId(request.toUpdate().accountId());
+
+    for (final var hookToCreate : request.hooksToCreate()) {
+      transaction.addHookToCreate(hookToCreate.toHederaSdkType());
+    }
+    for (final Long hookIdToDelete : request.hooksToDelete()) {
+      transaction.addHookToDelete(hookIdToDelete);
+    }
+
+    sign(transaction, request.toUpdate().privateKey());
+    final TransactionReceipt receipt =
+        executeTransactionAndWaitOnReceipt(transaction, TransactionType.ACCOUNT_UPDATE);
+    return new AccountHookUpdateResult(receipt.transactionId, receipt.status);
   }
 
   public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)

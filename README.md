@@ -131,6 +131,7 @@ The following services are available in spring and microprofile:
 
 - `org.hiero.base.HieroContext`: component that provides the information about the Hiero network and the operator account
 - `org.hiero.base.AccountClient`: to interact with accounts
+- `org.hiero.base.HookClient`: to interact with hook storage updates
 - `org.hiero.base.FileClient`: to interact with files
 - `org.hiero.base.FungibleTokenClient`: to interact with fungible tokens
 - `org.hiero.base.NftClient`: to interact with NFTs

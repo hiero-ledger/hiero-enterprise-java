@@ -95,6 +95,20 @@ public interface AccountClient {
   void updateAccountMemo(@NonNull Account account, @NonNull String memo) throws HieroException;
 
   /**
+   * Updates account hooks by creating and/or deleting hooks in one update transaction.
+   *
+   * @param account the account to update
+   * @param hooksToCreate hook definitions to create
+   * @param hooksToDelete hook ids to delete
+   * @throws HieroException if the account could not be updated
+   */
+  void updateAccountHooks(
+      @NonNull Account account,
+      @NonNull List<HookDetails> hooksToCreate,
+      @NonNull List<Long> hooksToDelete)
+      throws HieroException;
+
+  /**
    * Updates both key and memo of the given account.
    *
    * @param account the account to update
@@ -142,7 +156,7 @@ public interface AccountClient {
       throws HieroException {
     Objects.requireNonNull(account, "account must not be null");
     Objects.requireNonNull(hookDetails, "hookDetails must not be null");
-    updateHooks(account, List.of(hookDetails), List.of());
+    updateAccountHooks(account, List.of(hookDetails), List.of());
   }
 
   /** Deletes a hook from an account. */
@@ -151,7 +165,7 @@ public interface AccountClient {
     if (hookId < 0) {
       throw new IllegalArgumentException("hookId must be non-negative");
     }
-    updateHooks(account, List.of(), List.of(hookId));
+    updateAccountHooks(account, List.of(), List.of(hookId));
   }
 
   /** Updates account hooks by creating and/or deleting hooks. */
@@ -160,6 +174,6 @@ public interface AccountClient {
       @NonNull List<HookDetails> hooksToCreate,
       @NonNull List<Long> hookIdsToDelete)
       throws HieroException {
-    throw new UnsupportedOperationException("Account hook management is not implemented yet.");
+    updateAccountHooks(account, hooksToCreate, hookIdsToDelete);
   }
 }

@@ -1,6 +1,8 @@
 package org.hiero.spring.test;
 
+import org.hiero.base.AccountClient;
 import org.hiero.base.FileClient;
+import org.hiero.base.HookClient;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
@@ -16,6 +18,10 @@ public class ServicesTest {
 
   @Autowired private ContractVerificationClient verificationClient;
 
+  @Autowired private AccountClient accountClient;
+
+  @Autowired private HookClient hookClient;
+
   @Autowired private FileClient fileServiceClient;
 
   @Autowired private SmartContractClient smartContractServiceClient;
@@ -24,6 +30,8 @@ public class ServicesTest {
   void testServices() throws Exception {
     Assertions.assertNotNull(protocolLayerClient);
     Assertions.assertNotNull(verificationClient);
+    Assertions.assertNotNull(accountClient);
+    Assertions.assertNotNull(hookClient);
     Assertions.assertNotNull(fileServiceClient);
     Assertions.assertNotNull(smartContractServiceClient);
   }

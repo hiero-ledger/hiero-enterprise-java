@@ -3,16 +3,19 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import java.util.List;
 import java.util.Objects;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.HookDetails;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.jspecify.annotations.NonNull;
 
@@ -74,6 +77,20 @@ public class AccountClientImpl implements AccountClient {
     Objects.requireNonNull(memo, "memo must not be null");
     final AccountUpdateRequest request = AccountUpdateRequest.updateMemo(account, memo);
     client.executeAccountUpdateTransaction(request);
+  }
+
+  @Override
+  public void updateAccountHooks(
+      @NonNull final Account account,
+      @NonNull final List<HookDetails> hooksToCreate,
+      @NonNull final List<Long> hooksToDelete)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    Objects.requireNonNull(hooksToCreate, "hooksToCreate must not be null");
+    Objects.requireNonNull(hooksToDelete, "hooksToDelete must not be null");
+    final AccountHookUpdateRequest request =
+        AccountHookUpdateRequest.of(account, hooksToCreate, hooksToDelete);
+    client.executeAccountHookUpdateTransaction(request);
   }
 
   @Override
