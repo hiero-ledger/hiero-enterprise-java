@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.ContractLog;
+import org.hiero.base.data.ContractResult;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.ContractRepository;
 import org.hiero.base.mirrornode.MirrorNodeClient;
@@ -35,5 +37,21 @@ public class ContractRepositoryImpl implements ContractRepository {
   @Override
   public Optional<Contract> findById(@NonNull final ContractId contractId) throws HieroException {
     return mirrorNodeClient.queryContractById(contractId);
+  }
+
+  @NonNull
+  @Override
+  public Page<ContractResult> findResultsById(@NonNull final ContractId contractId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    return mirrorNodeClient.queryContractResults(contractId);
+  }
+
+  @NonNull
+  @Override
+  public Page<ContractLog> findLogsById(@NonNull final ContractId contractId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    return mirrorNodeClient.queryContractLogs(contractId);
   }
 }
