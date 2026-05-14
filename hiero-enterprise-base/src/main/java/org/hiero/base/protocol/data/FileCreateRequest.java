@@ -17,7 +17,7 @@ public record FileCreateRequest(
 
   private static final String DEFAULT_FILE_MEMO = "";
 
-  public static final int FILE_CREATE_MAX_SIZE = 2048;
+  public static final int FILE_CREATE_MAX_SIZE = 4096;
 
   public static final int FILE_MAX_SIZE = 1_024_000;
 

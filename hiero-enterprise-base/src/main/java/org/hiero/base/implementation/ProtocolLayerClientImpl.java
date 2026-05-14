@@ -111,7 +111,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   private static final Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
-  public static final int DEFAULT_GAS = 5_000_000;
+  public static final int DEFAULT_GAS = 500_000;
 
   private final List<TransactionListener> listeners;
 

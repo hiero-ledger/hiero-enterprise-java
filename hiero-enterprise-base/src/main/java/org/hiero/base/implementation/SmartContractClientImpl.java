@@ -16,6 +16,7 @@ import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCreateRequest;
 import org.hiero.base.protocol.data.ContractCreateResult;
+import org.hiero.base.contract.proxy.SmartContractProxyFactory;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,11 +30,14 @@ public class SmartContractClientImpl implements SmartContractClient {
 
   private final FileClient fileClient;
 
+  private final SmartContractProxyFactory proxyFactory;
+
   public SmartContractClientImpl(
       @NonNull final ProtocolLayerClient protocolLayerClient, FileClient fileClient) {
     this.protocolLayerClient =
         Objects.requireNonNull(protocolLayerClient, "protocolLayerClient must not be null");
     this.fileClient = Objects.requireNonNull(fileClient, "fileClient must not be null");
+    this.proxyFactory = new SmartContractProxyFactory(this);
   }
 
   @NonNull
@@ -100,5 +104,17 @@ public class SmartContractClientImpl implements SmartContractClient {
       throw new HieroException(
           "Failed to call function '" + functionName + "' on contract with id " + contractId, e);
     }
+  }
+
+  @NonNull
+  @Override
+  public <T> T createProxy(@NonNull Class<T> interfaceClass) {
+    return proxyFactory.createProxy(interfaceClass);
+  }
+
+  @NonNull
+  @Override
+  public <T> T createProxy(@NonNull Class<T> interfaceClass, @NonNull ContractId contractId) {
+    return proxyFactory.createProxy(interfaceClass, contractId);
   }
 }
