@@ -36,7 +36,10 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   @Override
   public @NonNull final Optional<Nft> queryNftsByTokenIdAndSerial(
       @NonNull final TokenId tokenId, final long serialNumber) throws HieroException {
-    final JSON json = getRestClient().queryNftsByTokenIdAndSerial(tokenId, serialNumber);
+    final JSON json =
+        TracingSupport.withinSpanWithHieroException(
+            "hiero.mirrornode.queryNftsByTokenIdAndSerial",
+            () -> getRestClient().queryNftsByTokenIdAndSerial(tokenId, serialNumber));
     return getJsonConverter().toNft(json);
   }
 
@@ -44,7 +47,9 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   public @NonNull final Optional<AccountInfo> queryAccount(@NonNull final AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final JSON json = getRestClient().queryAccount(accountId);
+    final JSON json =
+        TracingSupport.withinSpanWithHieroException(
+            "hiero.mirrornode.queryAccount", () -> getRestClient().queryAccount(accountId));
     return getJsonConverter().toAccountInfo(json);
   }
 
@@ -82,7 +87,10 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   @NonNull
   public final Optional<TransactionInfo> queryTransaction(@NonNull String transactionId)
       throws HieroException {
-    final JSON json = getRestClient().queryTransaction(transactionId);
+    final JSON json =
+        TracingSupport.withinSpanWithHieroException(
+            "hiero.mirrornode.queryTransaction",
+            () -> getRestClient().queryTransaction(transactionId));
     return getJsonConverter().toTransactionInfo(json);
   }
 

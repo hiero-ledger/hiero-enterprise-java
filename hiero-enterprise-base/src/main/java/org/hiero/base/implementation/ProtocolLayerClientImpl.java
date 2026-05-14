@@ -44,10 +44,12 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import io.opentelemetry.api.trace.Span;
 import org.hiero.base.HieroContext;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.ContractParam;
+import org.hiero.base.implementation.TracingSupport;
 import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import org.hiero.base.interceptors.ReceiveRecordInterceptor.ReceiveRecordHandler;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -726,42 +728,50 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     Objects.requireNonNull(transaction, "transaction must not be null");
     Objects.requireNonNull(type, "type must not be null");
     try {
-      log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
-      final TransactionResponse response = transaction.execute(hieroContext.getClient());
-      listeners.forEach(
-          listener -> {
+      return TracingSupport.withinSpanWithHieroException(
+          "hiero.transaction." + type.name().toLowerCase(),
+          () -> {
+            Span.current().setAttribute("hiero.transaction.type", type.name());
+            log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
+            final TransactionResponse response = transaction.execute(hieroContext.getClient());
+            Span.current().setAttribute("hiero.transaction.id", response.transactionId.toString());
+            listeners.forEach(
+                listener -> {
+                  try {
+                    listener.transactionSubmitted(type, response.transactionId);
+                  } catch (Exception e) {
+                    log.error("Failed to notify listener", e);
+                  }
+                });
             try {
-              listener.transactionSubmitted(type, response.transactionId);
+              log.debug(
+                  "Waiting for receipt of transaction '{}' of type {}",
+                  response.transactionId,
+                  transaction.getClass().getSimpleName());
+              final TransactionReceipt receipt = response.getReceipt(hieroContext.getClient());
+              Span.current().setAttribute("hiero.status.code", receipt.status.toString());
+              listeners.forEach(
+                  listener -> {
+                    try {
+                      listener.transactionHandled(type, response.transactionId, receipt.status);
+                    } catch (Exception e) {
+                      log.error("Failed to notify listener", e);
+                    }
+                  });
+              return receipt;
             } catch (Exception e) {
-              log.error("Failed to notify listener", e);
+              throw new HieroException(
+                  "Failed to receive receipt of transaction '"
+                      + response.transactionId
+                      + "' of type "
+                      + transaction.getClass(),
+                  e);
             }
           });
-      try {
-        log.debug(
-            "Waiting for receipt of transaction '{}' of type {}",
-            response.transactionId,
-            transaction.getClass().getSimpleName());
-        final TransactionReceipt receipt = response.getReceipt(hieroContext.getClient());
-        listeners.forEach(
-            listener -> {
-              try {
-                listener.transactionHandled(type, response.transactionId, receipt.status);
-              } catch (Exception e) {
-                log.error("Failed to notify listener", e);
-              }
-            });
-        return receipt;
-      } catch (Exception e) {
-        throw new HieroException(
-            "Failed to receive receipt of transaction '"
-                + response.transactionId
-                + "' of type "
-                + transaction.getClass(),
-            e);
-      }
+    } catch (final HieroException e) {
+      throw e;
     } catch (final Exception e) {
-      throw new HieroException(
-          "Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
+      throw new HieroException("Unexpected error during transaction execution", e);
     }
   }
 
@@ -794,10 +804,17 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       throws HieroException {
     Objects.requireNonNull(query, "query must not be null");
     try {
-      log.debug("Sending query of type {}", query.getClass().getSimpleName());
-      return query.execute(hieroContext.getClient());
-    } catch (Exception e) {
-      throw new HieroException("Failed to execute query", e);
+      return TracingSupport.withinSpanWithHieroException(
+          "hiero.query." + query.getClass().getSimpleName().toLowerCase(),
+          () -> {
+            Span.current().setAttribute("hiero.query.type", query.getClass().getSimpleName());
+            log.debug("Sending query of type {}", query.getClass().getSimpleName());
+            return query.execute(hieroContext.getClient());
+          });
+    } catch (final HieroException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new HieroException("Unexpected error during query execution", e);
     }
   }
 
