@@ -18,7 +18,6 @@ import org.hiero.microprofile.ClientProvider;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @HelidonTest
@@ -38,7 +37,6 @@ public class TopicClientTest {
   @Inject private HieroTestUtils hieroTestUtils;
 
   @Test
-  @Disabled
   void testSubscribeTopic() throws Exception {
     final String msg = "Hello Hiero";
     final List<String> messages = new ArrayList<>();
@@ -63,7 +61,6 @@ public class TopicClientTest {
   }
 
   @Test
-  @Disabled
   void testSubscribeTopicWithLimit() throws Exception {
     final String msg = "Hello Hiero";
     final long limit = 1;
@@ -94,7 +91,6 @@ public class TopicClientTest {
   }
 
   @Test
-  @Disabled
   void testSubscribeTopicWithInvalidLimit() throws HieroException {
     final String msg = "limit must be -1 (infinite) or greater than 0";
     final long limit = -2;
@@ -111,7 +107,6 @@ public class TopicClientTest {
   }
 
   @Test
-  @Disabled
   void testSubscribeTopicWithStartAndEndTime() throws HieroException {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -127,7 +122,6 @@ public class TopicClientTest {
   }
 
   @Test
-  @Disabled
   void testSubscribeTopicWithStartAndEndTimeWithInvalidParams() throws HieroException {
     final TopicId topicId = topicClient.createTopic();
 
