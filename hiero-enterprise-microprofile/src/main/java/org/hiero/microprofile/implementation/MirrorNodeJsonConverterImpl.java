@@ -3,6 +3,7 @@ package org.hiero.microprofile.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -38,6 +39,8 @@ import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
+import org.hiero.base.data.Schedule;
+import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
@@ -952,6 +955,34 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   }
 
   @Override
+  public @NonNull Optional<Schedule> toSchedule(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final String transactionBody = stringOrNull(jsonObject, "transaction_body");
+      return Optional.of(
+          new Schedule(
+              ScheduleId.fromString(jsonObject.getString("schedule_id")),
+              publicKeyOrNull(jsonObject, "admin_key"),
+              jsonObject.getBoolean("deleted"),
+              parseTimestamp(jsonObject.getString("consensus_timestamp")),
+              AccountId.fromString(jsonObject.getString("creator_account_id")),
+              timestampOrNull(jsonObject, "executed_timestamp"),
+              timestampOrNull(jsonObject, "expiration_time"),
+              jsonObject.getString("memo"),
+              accountIdOrNull(jsonObject, "payer_account_id"),
+              scheduleSignatures(jsonObject.getJsonArray("signatures")),
+              transactionBody == null ? null : Base64.getDecoder().decode(transactionBody),
+              jsonObject.getBoolean("wait_for_expiry")));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
   public @NonNull List<Block> toBlocks(@NonNull JsonObject jsonObject) {
     Objects.requireNonNull(jsonObject, "jsonObject must not be null");
     if (!jsonObject.containsKey("blocks")) {
@@ -968,5 +999,104 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  @Override
+  public @NonNull Page<Schedule> toSchedulePage(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return new SinglePage<>(List.of());
+    }
+
+    try {
+      return new SinglePage<>(toSchedules(jsonObject));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<Schedule> toSchedules(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("schedules")) {
+      return List.of();
+    }
+    final JsonArray schedulesArray = jsonObject.getJsonArray("schedules");
+    if (schedulesArray == null) {
+      throw new IllegalArgumentException("No schedules array in JSON");
+    }
+    if (schedulesArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(schedulesArray)
+        .map(n -> toSchedule(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<ScheduleSignature> toScheduleSignature(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ScheduleSignature(
+              parseTimestamp(jsonObject.getString("consensus_timestamp")),
+              jsonObject.getString("public_key_prefix"),
+              jsonObject.getString("signature"),
+              jsonObject.getString("type")));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private List<ScheduleSignature> scheduleSignatures(final JsonArray jsonArray) {
+    if (jsonArray == null || jsonArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(jsonArray)
+        .map(n -> toScheduleSignature(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private PublicKey publicKeyOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return PublicKey.fromString(jsonObject.getJsonObject(fieldName).getString("key"));
+  }
+
+  private AccountId accountIdOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    final String value = stringOrNull(jsonObject, fieldName);
+    return value == null ? null : AccountId.fromString(value);
+  }
+
+  private String stringOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getString(fieldName);
+  }
+
+  private Instant timestampOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    final String value = stringOrNull(jsonObject, fieldName);
+    return value == null ? null : parseTimestamp(value);
+  }
+
+  private Instant parseTimestamp(@NonNull String value) {
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 }

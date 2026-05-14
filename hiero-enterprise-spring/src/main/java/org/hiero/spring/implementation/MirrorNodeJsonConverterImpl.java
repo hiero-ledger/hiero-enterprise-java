@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.DelegateContractId;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -39,6 +40,8 @@ import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
+import org.hiero.base.data.Schedule;
+import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
@@ -855,6 +858,133 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull Optional<Schedule> toSchedule(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final byte[] transactionBody =
+          node.get("transaction_body").isNull()
+              ? null
+              : Base64.getDecoder().decode(node.get("transaction_body").asText());
+      return Optional.of(
+          new Schedule(
+              ScheduleId.fromString(node.get("schedule_id").asText()),
+              publicKeyOrNull(node, "admin_key"),
+              node.get("deleted").asBoolean(),
+              parseTimestamp(node.get("consensus_timestamp").asText()),
+              AccountId.fromString(node.get("creator_account_id").asText()),
+              timestampOrNull(node, "executed_timestamp"),
+              timestampOrNull(node, "expiration_time"),
+              node.get("memo").asText(),
+              accountIdOrNull(node, "payer_account_id"),
+              scheduleSignatures(node.get("signatures")),
+              transactionBody,
+              node.get("wait_for_expiry").asBoolean()));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull Page<Schedule> toSchedulePage(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return new SinglePage<>(List.of());
+    }
+
+    try {
+      return new SinglePage<>(toSchedules(node));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<Schedule> toSchedules(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("schedules")) {
+      return List.of();
+    }
+    final JsonNode schedulesNode = node.get("schedules");
+    if (!schedulesNode.isArray()) {
+      throw new IllegalArgumentException("Schedules node is not an array: " + schedulesNode);
+    }
+    return jsonArrayToStream(schedulesNode)
+        .map(n -> toSchedule(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<ScheduleSignature> toScheduleSignature(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new ScheduleSignature(
+              parseTimestamp(node.get("consensus_timestamp").asText()),
+              node.get("public_key_prefix").asText(),
+              node.get("signature").asText(),
+              node.get("type").asText()));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private List<ScheduleSignature> scheduleSignatures(final JsonNode node) {
+    if (node == null || node.isNull() || !node.isArray()) {
+      return List.of();
+    }
+    return jsonArrayToStream(node)
+        .map(n -> toScheduleSignature(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private PublicKey publicKeyOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return PublicKey.fromString(field.get("key").asText());
+  }
+
+  private AccountId accountIdOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return AccountId.fromString(field.asText());
+  }
+
+  private Instant timestampOrNull(@NonNull JsonNode node, @NonNull String fieldName) {
+    final JsonNode field = node.get(fieldName);
+    if (field == null || field.isNull()) {
+      return null;
+    }
+    return parseTimestamp(field.asText());
+  }
+
+  private Instant parseTimestamp(@NonNull String value) {
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 
   private @NonNull Key parseProtoBufEncodedKey(@NonNull String key) throws Exception {
