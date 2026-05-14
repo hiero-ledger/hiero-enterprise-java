@@ -7,7 +7,8 @@ import com.hedera.hashgraph.sdk.TokenType;
 import java.util.List;
 import java.util.Objects;
 import org.hiero.base.FungibleTokenClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
+import org.hiero.base.HieroValidationException;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -34,14 +35,14 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
   }
 
   @Override
-  public TokenId createToken(@NonNull String name, @NonNull String symbol) throws HieroException {
+  public TokenId createToken(@NonNull String name, @NonNull String symbol) throws HieroBaseException {
     return createToken(name, symbol, operationalAccount);
   }
 
   @Override
   public TokenId createToken(
       @NonNull String name, @NonNull String symbol, @NonNull PrivateKey supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     return createToken(name, symbol, operationalAccount, supplyKey);
   }
 
@@ -51,7 +52,7 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
       @NonNull String symbol,
       @NonNull AccountId treasuryAccountId,
       @NonNull PrivateKey treasuryKey)
-      throws HieroException {
+      throws HieroBaseException {
     return createToken(
         name, symbol, treasuryAccountId, treasuryKey, operationalAccount.privateKey());
   }
@@ -63,18 +64,22 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
       @NonNull AccountId treasuryAccountId,
       @NonNull PrivateKey treasuryKey,
       @NonNull PrivateKey supplyKey)
-      throws HieroException {
-    final TokenCreateRequest request =
-        TokenCreateRequest.of(
-            name, symbol, treasuryAccountId, treasuryKey, TokenType.FUNGIBLE_COMMON, supplyKey);
-    final TokenCreateResult result = client.executeTokenCreateTransaction(request);
-    return result.tokenId();
+      throws HieroBaseException {
+    try {
+      final TokenCreateRequest request =
+          TokenCreateRequest.of(
+              name, symbol, treasuryAccountId, treasuryKey, TokenType.FUNGIBLE_COMMON, supplyKey);
+      final TokenCreateResult result = client.executeTokenCreateTransaction(request);
+      return result.tokenId();
+    } catch (IllegalArgumentException e) {
+      throw new HieroValidationException(e.getMessage(), e);
+    }
   }
 
   @Override
   public void associateToken(
       @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     final TokenAssociateRequest request = TokenAssociateRequest.of(tokenId, accountId, accountKey);
     client.executeTokenAssociateTransaction(request);
   }
@@ -82,12 +87,12 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
   @Override
   public void associateToken(
       @NonNull List<TokenId> tokenIds, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenIds, "tokenIds must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
     if (tokenIds.isEmpty()) {
-      throw new IllegalArgumentException("tokenIds must not be empty");
+      throw new HieroValidationException("tokenIds must not be empty");
     }
     final TokenAssociateRequest request = TokenAssociateRequest.of(tokenIds, accountId, accountKey);
     client.executeTokenAssociateTransaction(request);
@@ -96,7 +101,7 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
   @Override
   public void dissociateToken(
       @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
@@ -108,12 +113,12 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
   @Override
   public void dissociateToken(
       @NonNull List<TokenId> tokenIds, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenIds, "tokenIds must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
     if (tokenIds.isEmpty()) {
-      throw new IllegalArgumentException("tokenIds must not be empty");
+      throw new HieroValidationException("tokenIds must not be empty");
     }
     final TokenDissociateRequest request =
         TokenDissociateRequest.of(tokenIds, accountId, accountKey);
@@ -121,26 +126,30 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
   }
 
   @Override
-  public long mintToken(@NonNull TokenId tokenId, long amount) throws HieroException {
+  public long mintToken(@NonNull TokenId tokenId, long amount) throws HieroBaseException {
     return mintToken(tokenId, operationalAccount.privateKey(), amount);
   }
 
   @Override
   public long mintToken(@NonNull TokenId tokenId, @NonNull PrivateKey supplyKey, long amount)
-      throws HieroException {
-    final TokenMintRequest request = TokenMintRequest.of(tokenId, supplyKey, amount);
-    final TokenMintResult result = client.executeMintTokenTransaction(request);
-    return result.totalSupply();
+      throws HieroBaseException {
+    try {
+      final TokenMintRequest request = TokenMintRequest.of(tokenId, supplyKey, amount);
+      final TokenMintResult result = client.executeMintTokenTransaction(request);
+      return result.totalSupply();
+    } catch (IllegalArgumentException e) {
+      throw new HieroValidationException(e.getMessage(), e);
+    }
   }
 
   @Override
-  public long burnToken(@NonNull TokenId tokenId, long amount) throws HieroException {
+  public long burnToken(@NonNull TokenId tokenId, long amount) throws HieroBaseException {
     return burnToken(tokenId, amount, operationalAccount.privateKey());
   }
 
   @Override
   public long burnToken(@NonNull TokenId tokenId, long amount, @NonNull PrivateKey supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     final TokenBurnRequest request = TokenBurnRequest.of(tokenId, supplyKey, amount);
     final TokenBurnResult result = client.executeBurnTokenTransaction(request);
     return result.totalSupply();
@@ -148,7 +157,7 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
 
   @Override
   public void transferToken(@NonNull TokenId tokenId, @NonNull AccountId toAccountId, long amount)
-      throws HieroException {
+      throws HieroBaseException {
     transferToken(tokenId, operationalAccount, toAccountId, amount);
   }
 
@@ -159,7 +168,7 @@ public class FungibleTokenClientImpl implements FungibleTokenClient {
       @NonNull PrivateKey fromAccountKey,
       @NonNull AccountId toAccountId,
       long amount)
-      throws HieroException {
+      throws HieroBaseException {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, fromAccountId, toAccountId, fromAccountKey, amount);
     client.executeTransferTransaction(request);

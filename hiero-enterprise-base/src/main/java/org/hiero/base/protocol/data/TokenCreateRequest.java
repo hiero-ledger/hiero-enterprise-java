@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.TokenType;
 import java.time.Duration;
 import java.util.Objects;
 import org.hiero.base.data.Account;
+import org.hiero.base.HieroValidationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

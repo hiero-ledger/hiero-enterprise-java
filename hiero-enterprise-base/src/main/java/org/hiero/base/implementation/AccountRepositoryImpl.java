@@ -3,7 +3,7 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.MirrorNodeClient;
@@ -18,7 +18,7 @@ public class AccountRepositoryImpl implements AccountRepository {
   }
 
   @Override
-  public Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HieroException {
+  public Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HieroBaseException {
     return mirrorNodeClient.queryAccount(accountId);
   }
 }

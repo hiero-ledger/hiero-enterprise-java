@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.TopicClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -46,7 +46,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldCreateTopicWithOperationalAccountPrivateKeyAsAdminKey() throws HieroException {
+  void shouldCreateTopicWithOperationalAccountPrivateKeyAsAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
@@ -75,7 +75,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldCreateTopicWithMemoAndOperationalAccountPrivateKeyAsAdminKey() throws HieroException {
+  void shouldCreateTopicWithMemoAndOperationalAccountPrivateKeyAsAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
@@ -105,7 +105,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldCreateTopicForGivenAdminKey() throws HieroException {
+  void shouldCreateTopicForGivenAdminKey() throws HieroBaseException {
     // mock
     final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
     final TopicId topicId = TopicId.fromString("1.2.3");
@@ -141,7 +141,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldCreatePrivateTopicWithOperationalAccountPrivateKeyAsAdminKey() throws HieroException {
+  void shouldCreatePrivateTopicWithOperationalAccountPrivateKeyAsAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
@@ -173,7 +173,7 @@ public class TopicClientImplTest {
 
   @Test
   void shouldCreatePrivateTopicWithMemoAndOperationalAccountPrivateKeyAsAdminKey()
-      throws HieroException {
+      throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
@@ -205,7 +205,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldCreatePrivateTopicForGivenAdminKey() throws HieroException {
+  void shouldCreatePrivateTopicForGivenAdminKey() throws HieroBaseException {
     // mock
     final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
     final TopicId topicId = TopicId.fromString("1.2.3");
@@ -242,7 +242,7 @@ public class TopicClientImplTest {
 
   @Test
   void shouldUpdateTopicAllPropertiesAndUseOperatorAccountPrivateKeyAsAdminKey()
-      throws HieroException {
+      throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -273,7 +273,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldUpdateTopicMemoAndUseOperatorAccountPrivateKeyAsAdminKey() throws HieroException {
+  void shouldUpdateTopicMemoAndUseOperatorAccountPrivateKeyAsAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -302,7 +302,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldUpdateTopicAllPropertiesForGivenAdminKey() throws HieroException {
+  void shouldUpdateTopicAllPropertiesForGivenAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -331,7 +331,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldThrowExceptionForNullParamOnUpdateTopic() throws HieroException {
+  void shouldThrowExceptionForNullParamOnUpdateTopic() throws HieroBaseException {
     Assertions.assertThrows(
         NullPointerException.class, () -> topicClient.updateTopic(null, null, null, null));
     Assertions.assertThrows(
@@ -340,7 +340,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldUpdateAdminKeyAndUseOperatorAccountPrivateKeyAsAdminKey() throws HieroException {
+  void shouldUpdateAdminKeyAndUseOperatorAccountPrivateKeyAsAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -369,7 +369,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldUpdateAdminKeyForGivenAdminKey() throws HieroException {
+  void shouldUpdateAdminKeyForGivenAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -396,7 +396,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldThrowExceptionForNullParamOnUpdateAdminKey() throws HieroException {
+  void shouldThrowExceptionForNullParamOnUpdateAdminKey() throws HieroBaseException {
     Assertions.assertThrows(
         NullPointerException.class, () -> topicClient.updateAdminKey(null, null));
     Assertions.assertThrows(
@@ -404,7 +404,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldUpdateSubmitKeyAndUseOperatorAccountPrivateKeyAsAdminKey() throws HieroException {
+  void shouldUpdateSubmitKeyAndUseOperatorAccountPrivateKeyAsAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -433,7 +433,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldUpdateSubmitKeyForGivenAdminKey() throws HieroException {
+  void shouldUpdateSubmitKeyForGivenAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicUpdateResult topicUpdateResult = Mockito.mock(TopicUpdateResult.class);
@@ -468,7 +468,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldDeleteTopicAndUseDefaultAdminKey() throws HieroException {
+  void shouldDeleteTopicAndUseDefaultAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicDeleteResult topicDeleteResult = Mockito.mock(TopicDeleteResult.class);
@@ -494,7 +494,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldDeleteTopicAndUseGivenAdminKey() throws HieroException {
+  void shouldDeleteTopicAndUseGivenAdminKey() throws HieroBaseException {
     // mock
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicDeleteResult topicDeleteResult = Mockito.mock(TopicDeleteResult.class);
@@ -526,7 +526,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldSubmitMessageToTopic() throws HieroException {
+  void shouldSubmitMessageToTopic() throws HieroBaseException {
     // mock
     final TopicSubmitMessageResult topicSubmitMessageResult =
         Mockito.mock(TopicSubmitMessageResult.class);
@@ -552,7 +552,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldSubmitMessageToPrivateTopic() throws HieroException {
+  void shouldSubmitMessageToPrivateTopic() throws HieroBaseException {
     // mock
     final TopicSubmitMessageResult topicSubmitMessageResult =
         Mockito.mock(TopicSubmitMessageResult.class);
@@ -579,7 +579,7 @@ public class TopicClientImplTest {
   }
 
   @Test
-  void shouldThrowExceptionIfMessageGreaterThanMaxLenOnSubmitMessage() throws HieroException {
+  void shouldThrowExceptionIfMessageGreaterThanMaxLenOnSubmitMessage() throws HieroBaseException {
     final String e_message = "Message cannot be longer than 1024 bytes";
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");

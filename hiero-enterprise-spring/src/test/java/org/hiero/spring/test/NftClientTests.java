@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import org.hiero.base.AccountClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.junit.jupiter.api.Assertions;
@@ -96,14 +96,14 @@ public class NftClientTests {
   }
 
   @Test
-  void testAssociateNftThrowExceptionForInvalidId() throws HieroException {
+  void testAssociateNftThrowExceptionForInvalidId() throws HieroBaseException {
     // given
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final Account userAccount = accountClient.createAccount(1);
 
     // then
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> nftClient.associateNft(tokenId, userAccount.accountId(), userAccount.privateKey()));
   }
 
@@ -149,7 +149,7 @@ public class NftClientTests {
   }
 
   @Test
-  void testDissociateNft() throws HieroException {
+  void testDissociateNft() throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final TokenId tokenId = nftClient.createNftType(name, symbol);
@@ -161,18 +161,18 @@ public class NftClientTests {
   }
 
   @Test
-  void testDissociateNftThrowExceptionIfTokenNotAssociate() throws HieroException {
+  void testDissociateNftThrowExceptionIfTokenNotAssociate() throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final TokenId tokenId = nftClient.createNftType(name, symbol);
     final Account userAccount = accountClient.createAccount(1);
 
     Assertions.assertThrows(
-        HieroException.class, () -> nftClient.dissociateNft(tokenId, userAccount));
+        HieroBaseException.class, () -> nftClient.dissociateNft(tokenId, userAccount));
   }
 
   @Test
-  void testDissociateNftWithMultipleTokens() throws HieroException {
+  void testDissociateNftWithMultipleTokens() throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final TokenId tokenId1 = nftClient.createNftType(name, symbol);
@@ -189,7 +189,7 @@ public class NftClientTests {
 
   @Test
   void testDissociateNftWithMultipleTokensThrowExceptionIfTokenNotAssociated()
-      throws HieroException {
+      throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final TokenId tokenId1 = nftClient.createNftType(name, symbol);
@@ -200,12 +200,12 @@ public class NftClientTests {
     nftClient.associateNft(tokenId1, userAccount);
 
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> nftClient.dissociateNft(List.of(tokenId1, tokenId2), userAccount));
   }
 
   @Test
-  void testDissociateNftThrowExceptionIfListEmpty() throws HieroException {
+  void testDissociateNftThrowExceptionIfListEmpty() throws HieroBaseException {
     final Account account = accountClient.createAccount(1);
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> nftClient.dissociateNft(List.of(), account));
@@ -246,7 +246,7 @@ public class NftClientTests {
     final long serial = 1L;
     // then
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () ->
             nftClient.transferNft(
                 tokenId,
@@ -255,7 +255,7 @@ public class NftClientTests {
                 treasuryAccount.privateKey(),
                 userAccount.accountId()));
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () ->
             nftClient.transferNfts(
                 tokenId,
@@ -289,7 +289,7 @@ public class NftClientTests {
   }
 
   @Test
-  void burnNft() throws HieroException {
+  void burnNft() throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final byte[] metadata1 = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
@@ -305,7 +305,7 @@ public class NftClientTests {
   }
 
   @Test
-  void burnNfts() throws HieroException {
+  void burnNfts() throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final byte[] metadata1 = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
@@ -321,21 +321,21 @@ public class NftClientTests {
   }
 
   @Test
-  void burnNftThrowExceptionForUnMintToken() throws HieroException {
+  void burnNftThrowExceptionForUnMintToken() throws HieroBaseException {
     final String name = "Test NFT";
     final String symbol = "TST";
     final TokenId tokenId = nftClient.createNftType(name, symbol);
     final Account supplierAccount = accountClient.createAccount();
     final long serial = 1L;
 
-    Assertions.assertThrows(HieroException.class, () -> nftClient.burnNft(tokenId, serial));
+    Assertions.assertThrows(HieroBaseException.class, () -> nftClient.burnNft(tokenId, serial));
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> nftClient.burnNft(tokenId, serial, supplierAccount.privateKey()));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClient.burnNfts(tokenId, Set.of(serial)));
+        HieroBaseException.class, () -> nftClient.burnNfts(tokenId, Set.of(serial)));
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> nftClient.burnNfts(tokenId, Set.of(serial), supplierAccount.privateKey()));
   }
 
@@ -345,14 +345,14 @@ public class NftClientTests {
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final long serial = 1L;
 
-    Assertions.assertThrows(HieroException.class, () -> nftClient.burnNft(tokenId, serial));
+    Assertions.assertThrows(HieroBaseException.class, () -> nftClient.burnNft(tokenId, serial));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClient.burnNft(tokenId, serial, privateKey));
+        HieroBaseException.class, () -> nftClient.burnNft(tokenId, serial, privateKey));
 
     Assertions.assertThrows(
-        HieroException.class, () -> nftClient.burnNfts(tokenId, Set.of(serial)));
+        HieroBaseException.class, () -> nftClient.burnNfts(tokenId, Set.of(serial)));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClient.burnNfts(tokenId, Set.of(serial), privateKey));
+        HieroBaseException.class, () -> nftClient.burnNfts(tokenId, Set.of(serial), privateKey));
   }
 
   @Test

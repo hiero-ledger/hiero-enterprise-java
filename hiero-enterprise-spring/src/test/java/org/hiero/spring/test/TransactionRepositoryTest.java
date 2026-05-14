@@ -3,7 +3,7 @@ package org.hiero.spring.test;
 import com.hedera.hashgraph.sdk.AccountId;
 import java.util.List;
 import org.hiero.base.AccountClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Page;
@@ -26,7 +26,7 @@ public class TransactionRepositoryTest {
   @Autowired private HieroTestUtils hieroTestUtils;
 
   @Test
-  void testFindTransactionByAccountId() throws HieroException {
+  void testFindTransactionByAccountId() throws HieroBaseException {
     final Account account = accountClient.createAccount(1);
     hieroTestUtils.waitForMirrorNodeRecords(account.accountId());
     final Page<TransactionInfo> page = transactionRepository.findByAccount(account.accountId());
@@ -38,7 +38,7 @@ public class TransactionRepositoryTest {
 
   @Test
   void testFindTransactionByAccountIdGiveEmptyListForAccountIdWithZeroTransaction()
-      throws HieroException {
+      throws HieroBaseException {
     final AccountId accountId = AccountId.fromString("0.0.0");
     hieroTestUtils.waitForMirrorNodeRecords();
     final Page<TransactionInfo> page = transactionRepository.findByAccount(accountId);
@@ -49,7 +49,7 @@ public class TransactionRepositoryTest {
   }
 
   @Test
-  void testFindTransactionByAccountIdAndType() throws HieroException {
+  void testFindTransactionByAccountIdAndType() throws HieroBaseException {
     final Account account = accountClient.createAccount(1);
     hieroTestUtils.waitForMirrorNodeRecords();
     final Page<TransactionInfo> page =
@@ -59,7 +59,7 @@ public class TransactionRepositoryTest {
   }
 
   @Test
-  void testFindTransactionByAccountIdAndResult() throws HieroException {
+  void testFindTransactionByAccountIdAndResult() throws HieroBaseException {
     final Account account = accountClient.createAccount(1);
     hieroTestUtils.waitForMirrorNodeRecords();
     final Page<TransactionInfo> page =
@@ -68,7 +68,7 @@ public class TransactionRepositoryTest {
   }
 
   @Test
-  void testFindTransactionByAccountIdAndBalanceModification() throws HieroException {
+  void testFindTransactionByAccountIdAndBalanceModification() throws HieroBaseException {
     final Account account = accountClient.createAccount(1);
     hieroTestUtils.waitForMirrorNodeRecords();
     final Page<TransactionInfo> page =

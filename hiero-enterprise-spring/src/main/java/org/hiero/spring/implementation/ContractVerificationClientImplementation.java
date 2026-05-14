@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.StreamSupport;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.base.verification.ContractVerificationState;
@@ -45,11 +45,11 @@ public class ContractVerificationClientImplementation implements ContractVerific
   }
 
   @NonNull
-  private String getChainId() throws HieroException {
+  private String getChainId() throws HieroBaseException {
     return hieroConfig
         .chainId()
         .map(id -> Long.toString(id))
-        .orElseThrow(() -> new HieroException("Chain ID is not set"));
+        .orElseThrow(() -> new HieroBaseException("Chain ID is not set"));
   }
 
   private void handleError(
@@ -87,7 +87,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
       @NonNull final ContractId contractId,
       @NonNull final String contractName,
       @NonNull final Map<String, String> files)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(contractId, "contractId must not be null");
     Objects.requireNonNull(contractName, "contractName must not be null");
     Objects.requireNonNull(files, "files must not be null");
@@ -143,13 +143,13 @@ public class ContractVerificationClientImplementation implements ContractVerific
         throw new RuntimeException("No result in response");
       }
     } catch (Exception e) {
-      throw new HieroException("Error verification step", e);
+      throw new HieroBaseException("Error verification step", e);
     }
   }
 
   @Override
   public ContractVerificationState checkVerification(@NonNull final ContractId contractId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(contractId, "contractId must not be null");
 
     final String uri =
@@ -207,7 +207,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
         throw new RuntimeException("Result is not an array");
       }
     } catch (Exception e) {
-      throw new HieroException("Error verification step", e);
+      throw new HieroBaseException("Error verification step", e);
     }
   }
 
@@ -216,7 +216,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
       @NonNull final ContractId contractId,
       @NonNull final String fileName,
       @NonNull final String fileContent)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(contractId, "contractId must not be null");
     Objects.requireNonNull(fileName, "fileName must not be null");
     Objects.requireNonNull(fileContent, "fileContent must not be null");
@@ -263,7 +263,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
         throw new RuntimeException("Result is not an array");
       }
     } catch (Exception e) {
-      throw new HieroException("Error verification step", e);
+      throw new HieroBaseException("Error verification step", e);
     }
   }
 }

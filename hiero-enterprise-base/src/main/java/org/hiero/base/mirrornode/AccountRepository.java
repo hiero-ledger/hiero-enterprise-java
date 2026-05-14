@@ -3,7 +3,7 @@ package org.hiero.base.mirrornode;
 import com.hedera.hashgraph.sdk.AccountId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.AccountInfo;
 import org.jspecify.annotations.NonNull;
 
@@ -17,19 +17,19 @@ public interface AccountRepository {
    *
    * @param accountId id of the account
    * @return {@link Optional} containing the found AccountInfo or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HieroException;
+  @NonNull Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HieroBaseException;
 
   /**
    * Return the AccountInfo of a given accountId.
    *
    * @param accountId id of the account
    * @return {@link Optional} containing the found AccountInfo or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Optional<AccountInfo> findById(@NonNull String accountId) throws HieroException {
+  default Optional<AccountInfo> findById(@NonNull String accountId) throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return findById(AccountId.fromString(accountId));
   }

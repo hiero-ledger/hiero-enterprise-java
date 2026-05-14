@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.TransactionListener;
@@ -65,7 +65,7 @@ public class HieroTestUtils implements Serializable {
                 + String.format("%09d", transactionId.validStart.getNano());
         try {
           done = mirrorNodeClient.queryTransaction(transactionIdString).isPresent();
-        } catch (HieroException e) {
+        } catch (HieroBaseException e) {
           throw new RuntimeException("Error in mirror node query!", e);
         }
         if (!done) {

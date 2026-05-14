@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
@@ -20,28 +20,28 @@ public interface NftRepository {
    * Return all NFT types.
    *
    * @return first page of NFT types
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Page<NftMetadata> findAllTypes() throws HieroException;
+  @NonNull Page<NftMetadata> findAllTypes() throws HieroBaseException;
 
   /**
    * Return all NFT types owned by the given owner.
    *
    * @param ownerId id of the owner account
    * @return first page of NFT types
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Page<NftMetadata> findTypesByOwner(@NonNull AccountId ownerId) throws HieroException;
+  @NonNull Page<NftMetadata> findTypesByOwner(@NonNull AccountId ownerId) throws HieroBaseException;
 
   /**
    * Return all NFT types owned by the given owner.
    *
    * @param ownerId id of the owner account
    * @return first page of NFT types
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Page<NftMetadata> findTypesByOwner(@NonNull String ownerId) throws HieroException {
+  default Page<NftMetadata> findTypesByOwner(@NonNull String ownerId) throws HieroBaseException {
     Objects.requireNonNull(ownerId, "ownerId must not be null");
     return findTypesByOwner(AccountId.fromString(ownerId));
   }
@@ -51,19 +51,19 @@ public interface NftRepository {
    *
    * @param ownerId id of the owner account
    * @return list of NFTs
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Page<Nft> findByOwner(@NonNull AccountId ownerId) throws HieroException;
+  @NonNull Page<Nft> findByOwner(@NonNull AccountId ownerId) throws HieroBaseException;
 
   /**
    * Return all NFTs that are owned by the given owner.
    *
    * @param ownerId id of the owner account
    * @return list of NFTs
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Page<Nft> findByOwner(@NonNull String ownerId) throws HieroException {
+  default Page<Nft> findByOwner(@NonNull String ownerId) throws HieroBaseException {
     Objects.requireNonNull(ownerId, "ownerId must not be null");
     return findByOwner(AccountId.fromString(ownerId));
   }
@@ -73,19 +73,19 @@ public interface NftRepository {
    *
    * @param tokenId id of the token type
    * @return list of NFTs
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Page<Nft> findByType(@NonNull TokenId tokenId) throws HieroException;
+  @NonNull Page<Nft> findByType(@NonNull TokenId tokenId) throws HieroBaseException;
 
   /**
    * Return all NFTs of a given type.
    *
    * @param tokenId id of the token type
    * @return list of NFTs
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Page<Nft> findByType(@NonNull String tokenId) throws HieroException {
+  default Page<Nft> findByType(@NonNull String tokenId) throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return findByType(TokenId.fromString(tokenId));
   }
@@ -96,10 +96,10 @@ public interface NftRepository {
    * @param tokenId id of the token type
    * @param serialNumber serial of the nft instance
    * @return {@link Optional} containing the found NFT or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull Optional<Nft> findByTypeAndSerial(@NonNull TokenId tokenId, long serialNumber)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Return the NFTs of a given type with the given serial.
@@ -107,11 +107,11 @@ public interface NftRepository {
    * @param tokenId id of the token type
    * @param serialNumber serial of the nft instance
    * @return {@link Optional} containing the found NFT or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
   default Optional<Nft> findByTypeAndSerial(@NonNull String tokenId, long serialNumber)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return findByTypeAndSerial(TokenId.fromString(tokenId), serialNumber);
   }
@@ -122,10 +122,10 @@ public interface NftRepository {
    * @param ownerId id of the owner
    * @param tokenId id of the token type
    * @return list of NFTs
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull Page<Nft> findByOwnerAndType(@NonNull AccountId ownerId, @NonNull TokenId tokenId)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Return all NFTs of a given type owned by a specific account.
@@ -133,11 +133,11 @@ public interface NftRepository {
    * @param ownerId id of the owner
    * @param tokenId id of the token type
    * @return list of NFTs
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
   default Page<Nft> findByOwnerAndType(@NonNull String ownerId, @NonNull String tokenId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(ownerId, "ownerId must not be null");
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return findByOwnerAndType(AccountId.fromString(ownerId), TokenId.fromString(tokenId));
@@ -150,10 +150,10 @@ public interface NftRepository {
    * @param tokenId id of the token type
    * @param serialNumber serial of the nft instance
    * @return {@link Optional} containing the found NFT or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull Optional<Nft> findByOwnerAndTypeAndSerial(
-      @NonNull AccountId owner, @NonNull TokenId tokenId, long serialNumber) throws HieroException;
+      @NonNull AccountId owner, @NonNull TokenId tokenId, long serialNumber) throws HieroBaseException;
 
   /**
    * Return the NFT of a given type and serial owned by a specific account.
@@ -162,11 +162,11 @@ public interface NftRepository {
    * @param tokenId id of the token type
    * @param serialNumber serial of the nft instance
    * @return {@link Optional} containing the found NFT or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
   default Optional<Nft> findByOwnerAndTypeAndSerial(
-      @NonNull String owner, @NonNull String tokenId, long serialNumber) throws HieroException {
+      @NonNull String owner, @NonNull String tokenId, long serialNumber) throws HieroBaseException {
     Objects.requireNonNull(owner, "owner must not be null");
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return findByOwnerAndTypeAndSerial(
@@ -178,10 +178,10 @@ public interface NftRepository {
    *
    * @param tokenId id of the token type
    * @return {@link Optional} containing the found NFT metadata or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Optional<NftMetadata> getNftMetadata(@NonNull String tokenId) throws HieroException {
+  default Optional<NftMetadata> getNftMetadata(@NonNull String tokenId) throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return getNftMetadata(TokenId.fromString(tokenId));
   }
@@ -191,19 +191,19 @@ public interface NftRepository {
    *
    * @param tokenId id of the token type
    * @return {@link Optional} containing the found NFT metadata or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<NftMetadata> getNftMetadata(@NonNull TokenId tokenId) throws HieroException;
+  @NonNull Optional<NftMetadata> getNftMetadata(@NonNull TokenId tokenId) throws HieroBaseException;
 
   /**
    * Return the NFT metadata of a given NFT.
    *
    * @param nft NFT instance
    * @return {@link Optional} containing the found NFT metadata or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Optional<NftMetadata> getNftMetadata(@NonNull Nft nft) throws HieroException {
+  default Optional<NftMetadata> getNftMetadata(@NonNull Nft nft) throws HieroBaseException {
     Objects.requireNonNull(nft, "nft must not be null");
     return getNftMetadata(nft.tokenId());
   }

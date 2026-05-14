@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.hedera.hashgraph.sdk.FileId;
 import java.time.Instant;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.implementation.FileClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.FileAppendRequest;
@@ -41,7 +41,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testCreateFile() throws HieroException {
+  void testCreateFile() throws HieroBaseException {
     // mock
     final FileId fileId = FileId.fromString("1.2.3");
     final FileCreateResult fileCreateResult = Mockito.mock(FileCreateResult.class);
@@ -63,7 +63,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testCreateFileForSizeGreaterThanFileCreateMaxSize() throws HieroException {
+  void testCreateFileForSizeGreaterThanFileCreateMaxSize() throws HieroBaseException {
     // mock
     final FileId fileId = FileId.fromString("1.2.3");
     final FileCreateResult fileCreateResult = Mockito.mock(FileCreateResult.class);
@@ -100,8 +100,8 @@ public class FileClientImplTest {
     final byte[] contents = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
 
     // then
-    final HieroException exception =
-        Assertions.assertThrows(HieroException.class, () -> fileClientImpl.createFile(contents));
+    final HieroBaseException exception =
+        Assertions.assertThrows(HieroBaseException.class, () -> fileClientImpl.createFile(contents));
     Assertions.assertTrue(exception.getMessage().contains(message));
   }
 
@@ -129,7 +129,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testUpdateFile() throws HieroException {
+  void testUpdateFile() throws HieroBaseException {
     // mock
     final FileUpdateResult fileUpdateResult = Mockito.mock(FileUpdateResult.class);
 
@@ -148,7 +148,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testUpdateFileForSizeGreaterThanFileCreateMaxSize() throws HieroException {
+  void testUpdateFileForSizeGreaterThanFileCreateMaxSize() throws HieroBaseException {
     // mock
     final FileUpdateResult fileUpdateResult = Mockito.mock(FileUpdateResult.class);
     final FileAppendResult fileAppendResult = Mockito.mock(FileAppendResult.class);
@@ -175,7 +175,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testUpdateFileThrowsExceptionForInvalidFileId() throws HieroException {
+  void testUpdateFileThrowsExceptionForInvalidFileId() throws HieroBaseException {
     final String message = "Failed to execute transaction of type FileUpdateTransaction";
 
     // given
@@ -184,11 +184,11 @@ public class FileClientImplTest {
 
     // then
     when(protocolLayerClient.executeFileUpdateRequestTransaction(any(FileUpdateRequest.class)))
-        .thenThrow(new HieroException(message));
+        .thenThrow(new HieroBaseException(message));
 
-    final HieroException exception =
+    final HieroBaseException exception =
         Assertions.assertThrows(
-            HieroException.class, () -> fileClientImpl.updateFile(fileId, updatedContent));
+            HieroBaseException.class, () -> fileClientImpl.updateFile(fileId, updatedContent));
     Assertions.assertTrue(exception.getMessage().contains(message));
   }
 
@@ -202,9 +202,9 @@ public class FileClientImplTest {
     final byte[] updatedContent = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
 
     // then
-    final HieroException exception =
+    final HieroBaseException exception =
         Assertions.assertThrows(
-            HieroException.class, () -> fileClientImpl.updateFile(fileId, updatedContent));
+            HieroBaseException.class, () -> fileClientImpl.updateFile(fileId, updatedContent));
     Assertions.assertTrue(exception.getMessage().contains(message));
   }
 
@@ -230,7 +230,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testGetFileSize() throws HieroException {
+  void testGetFileSize() throws HieroBaseException {
     // mocks
     final int size = 10;
     final FileInfoResponse response = Mockito.mock(FileInfoResponse.class);
@@ -250,15 +250,15 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testGetFileSizeThrowsExceptionForInvalidId() throws HieroException {
+  void testGetFileSizeThrowsExceptionForInvalidId() throws HieroBaseException {
     // given
     final FileId fileId = FileId.fromString("1.2.3");
 
     // then
     when(protocolLayerClient.executeFileInfoQuery(any(FileInfoRequest.class)))
-        .thenThrow(new HieroException("Failed to execute query"));
+        .thenThrow(new HieroBaseException("Failed to execute query"));
 
-    Assertions.assertThrows(HieroException.class, () -> fileClientImpl.getSize(fileId));
+    Assertions.assertThrows(HieroBaseException.class, () -> fileClientImpl.getSize(fileId));
   }
 
   @Test
@@ -272,7 +272,7 @@ public class FileClientImplTest {
 
   // tests for deletefile method
   @Test
-  public void testIsDeleted_FileIsDeleted() throws HieroException {
+  public void testIsDeleted_FileIsDeleted() throws HieroBaseException {
     // Given
     FileId fileId = FileId.fromString("0.0.123");
     FileInfoResponse response = mock(FileInfoResponse.class);
@@ -287,7 +287,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  public void testIsDeleted_FileIsNotDeleted() throws HieroException {
+  public void testIsDeleted_FileIsNotDeleted() throws HieroBaseException {
     // Given
     FileId fileId = FileId.fromString("0.0.123");
     FileInfoResponse response = mock(FileInfoResponse.class);
@@ -316,7 +316,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testReadFile() throws HieroException {
+  void testReadFile() throws HieroBaseException {
     // mock
     final FileContentsResponse fileContentsResponse = Mockito.mock(FileContentsResponse.class);
     final byte[] content = "Hello Hiero!".getBytes();
@@ -337,16 +337,16 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testReadFileThrowsExceptionForInvalidId() throws HieroException {
+  void testReadFileThrowsExceptionForInvalidId() throws HieroBaseException {
     // given
     final FileId fileId = FileId.fromString("1.2.3");
     final String message = "Failed to read file with fileId " + fileId;
 
     when(protocolLayerClient.executeFileContentsQuery(any(FileContentsRequest.class)))
-        .thenThrow(new HieroException("Failed to execute query"));
+        .thenThrow(new HieroBaseException("Failed to execute query"));
 
-    final HieroException exception =
-        Assertions.assertThrows(HieroException.class, () -> fileClientImpl.readFile(fileId));
+    final HieroBaseException exception =
+        Assertions.assertThrows(HieroBaseException.class, () -> fileClientImpl.readFile(fileId));
 
     Assertions.assertTrue(exception.getMessage().contains(message));
   }
@@ -363,7 +363,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testUpdateExpirationTime() throws HieroException {
+  void testUpdateExpirationTime() throws HieroBaseException {
     // mock
     final FileUpdateResult fileUpdateResult = Mockito.mock(FileUpdateResult.class);
 
@@ -399,7 +399,7 @@ public class FileClientImplTest {
   }
 
   @Test
-  void testUpdateExpirationTimeThrowsExceptionForInvalidId() throws HieroException {
+  void testUpdateExpirationTimeThrowsExceptionForInvalidId() throws HieroBaseException {
     final String message = "Failed to execute transaction of type FileUpdateTransaction";
 
     // given
@@ -408,11 +408,11 @@ public class FileClientImplTest {
 
     // then
     when(protocolLayerClient.executeFileUpdateRequestTransaction(any(FileUpdateRequest.class)))
-        .thenThrow(new HieroException(message));
+        .thenThrow(new HieroBaseException(message));
 
-    final HieroException exception =
+    final HieroBaseException exception =
         Assertions.assertThrows(
-            HieroException.class,
+            HieroBaseException.class,
             () -> fileClientImpl.updateExpirationTime(fileId, expirationTime));
 
     Assertions.assertTrue(exception.getMessage().contains(message));

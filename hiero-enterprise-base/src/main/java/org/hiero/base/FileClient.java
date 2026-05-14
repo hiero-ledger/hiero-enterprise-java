@@ -18,9 +18,9 @@ public interface FileClient {
    *
    * @param contents the contents of the file
    * @return the ID of the new file
-   * @throws HieroException if the file could not be created
+   * @throws HieroBaseException if the file could not be created
    */
-  @NonNull FileId createFile(@NonNull byte[] contents) throws HieroException;
+  @NonNull FileId createFile(@NonNull byte[] contents) throws HieroBaseException;
 
   /**
    * Create a new file with the given contents and expiration time.
@@ -28,20 +28,20 @@ public interface FileClient {
    * @param contents the contents of the file
    * @param expirationTime the expiration time of the file
    * @return the ID of the new file
-   * @throws HieroException if the file could not be created
+   * @throws HieroBaseException if the file could not be created
    */
   @NonNull FileId createFile(@NonNull byte[] contents, @NonNull Instant expirationTime)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new file with the given contents.
    *
    * @param fileId the ID of the file to update
    * @return the ID of the new file
-   * @throws HieroException if the file could not be created
+   * @throws HieroBaseException if the file could not be created
    */
   @NonNull
-  default byte[] readFile(@NonNull String fileId) throws HieroException {
+  default byte[] readFile(@NonNull String fileId) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     return readFile(FileId.fromString(fileId));
   }
@@ -51,17 +51,17 @@ public interface FileClient {
    *
    * @param fileId the ID of the file to read
    * @return the contents of the file
-   * @throws HieroException if the file could not be read
+   * @throws HieroBaseException if the file could not be read
    */
-  @NonNull byte[] readFile(@NonNull FileId fileId) throws HieroException;
+  @NonNull byte[] readFile(@NonNull FileId fileId) throws HieroBaseException;
 
   /**
    * Delete a file.
    *
    * @param fileId the ID of the file to delete
-   * @throws HieroException if the file could not be deleted
+   * @throws HieroBaseException if the file could not be deleted
    */
-  default void deleteFile(@NonNull String fileId) throws HieroException {
+  default void deleteFile(@NonNull String fileId) throws HieroBaseException {
     deleteFile(FileId.fromString(fileId));
   }
 
@@ -69,53 +69,53 @@ public interface FileClient {
    * Delete a file.
    *
    * @param fileId the ID of the file to delete
-   * @throws HieroException if the file could not be deleted
+   * @throws HieroBaseException if the file could not be deleted
    */
-  void deleteFile(@NonNull FileId fileId) throws HieroException;
+  void deleteFile(@NonNull FileId fileId) throws HieroBaseException;
 
   /**
    * Update the contents of a file.
    *
    * @param fileId the ID of the file to update
    * @param content the new contents of the file
-   * @throws HieroException if the file could not be updated
+   * @throws HieroBaseException if the file could not be updated
    */
-  void updateFile(@NonNull FileId fileId, byte[] content) throws HieroException;
+  void updateFile(@NonNull FileId fileId, byte[] content) throws HieroBaseException;
 
   /**
    * Update the expiration time of a file.
    *
    * @param fileId the ID of the file to update
    * @param expirationTime the new expiration time of the file
-   * @throws HieroException if the file could not be updated
+   * @throws HieroBaseException if the file could not be updated
    */
   void updateExpirationTime(@NonNull FileId fileId, @NonNull Instant expirationTime)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Check if a file is deleted.
    *
    * @param fileId the ID of the file to check
    * @return true if the file is deleted, false otherwise
-   * @throws HieroException if the file could not be checked
+   * @throws HieroBaseException if the file could not be checked
    */
-  boolean isDeleted(@NonNull FileId fileId) throws HieroException;
+  boolean isDeleted(@NonNull FileId fileId) throws HieroBaseException;
 
   /**
    * Get the size of a file.
    *
    * @param fileId the ID of the file to check
    * @return the size of the file
-   * @throws HieroException if the file could not be checked
+   * @throws HieroBaseException if the file could not be checked
    */
-  int getSize(@NonNull FileId fileId) throws HieroException;
+  int getSize(@NonNull FileId fileId) throws HieroBaseException;
 
   /**
    * Get the expiration time of a file.
    *
    * @param fileId the ID of the file to check
    * @return the expiration time of the file
-   * @throws HieroException if the file could not be checked
+   * @throws HieroBaseException if the file could not be checked
    */
-  @NonNull Instant getExpirationTime(@NonNull FileId fileId) throws HieroException;
+  @NonNull Instant getExpirationTime(@NonNull FileId fileId) throws HieroBaseException;
 }

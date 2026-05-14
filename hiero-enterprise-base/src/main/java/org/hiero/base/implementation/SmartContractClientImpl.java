@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 import org.hiero.base.FileClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.data.ContractCallResult;
 import org.hiero.base.data.ContractParam;
@@ -40,7 +40,7 @@ public class SmartContractClientImpl implements SmartContractClient {
   @Override
   public ContractId createContract(
       @NonNull final FileId fileId, @Nullable final ContractParam<?>... constructorParams)
-      throws HieroException {
+      throws HieroBaseException {
     try {
       final ContractCreateRequest request;
       if (constructorParams == null) {
@@ -52,7 +52,7 @@ public class SmartContractClientImpl implements SmartContractClient {
           protocolLayerClient.executeContractCreateTransaction(request);
       return result.contractId();
     } catch (Exception e) {
-      throw new HieroException("Failed to create contract with fileId " + fileId, e);
+      throw new HieroBaseException("Failed to create contract with fileId " + fileId, e);
     }
   }
 
@@ -60,14 +60,14 @@ public class SmartContractClientImpl implements SmartContractClient {
   @Override
   public ContractId createContract(
       @NonNull final byte[] contents, @Nullable final ContractParam<?>... constructorParams)
-      throws HieroException {
+      throws HieroBaseException {
     try {
       final FileId fileId = fileClient.createFile(contents);
       final ContractId contract = createContract(fileId, constructorParams);
       fileClient.deleteFile(fileId);
       return contract;
     } catch (Exception e) {
-      throw new HieroException("Failed to create contract out of byte array", e);
+      throw new HieroBaseException("Failed to create contract out of byte array", e);
     }
   }
 
@@ -75,12 +75,12 @@ public class SmartContractClientImpl implements SmartContractClient {
   @Override
   public ContractId createContract(
       @NonNull final Path pathToBin, @Nullable final ContractParam<?>... constructorParams)
-      throws HieroException {
+      throws HieroBaseException {
     try {
       final byte[] bytes = Files.readAllBytes(pathToBin);
       return createContract(bytes, constructorParams);
     } catch (Exception e) {
-      throw new HieroException("Failed to create contract from path " + pathToBin, e);
+      throw new HieroBaseException("Failed to create contract from path " + pathToBin, e);
     }
   }
 
@@ -90,14 +90,14 @@ public class SmartContractClientImpl implements SmartContractClient {
       @NonNull final ContractId contractId,
       @NonNull final String functionName,
       @Nullable ContractParam<?>... params)
-      throws HieroException {
+      throws HieroBaseException {
     try {
       final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
       final ContractFunctionResult result =
           protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
       return new ContractCallResultImpl(result);
     } catch (Exception e) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "Failed to call function '" + functionName + "' on contract with id " + contractId, e);
     }
   }

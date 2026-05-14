@@ -2,7 +2,7 @@ package org.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
@@ -34,7 +34,7 @@ public class TopicRepositoryTest {
   }
 
   // @Test
-  // void testFindTopicById() throws HieroException {
+  // void testFindTopicById() throws HieroBaseException {
   //     final TopicId topicId = topicClient.createTopic();
   //     hieroTestUtils.waitForMirrorNodeRecords();
 
@@ -45,7 +45,7 @@ public class TopicRepositoryTest {
   // }
 
   @Test
-  void testFindTopicByIdReturnsEmptyOptional() throws HieroException {
+  void testFindTopicByIdReturnsEmptyOptional() throws HieroBaseException {
     final TopicId topicId = TopicId.fromString("0.0.0");
     final Optional<Topic> result = topicRepository.findTopicById(topicId);
 
@@ -54,7 +54,7 @@ public class TopicRepositoryTest {
   }
 
   @Test
-  void testGetMessagesByTopicId() throws HieroException {
+  void testGetMessagesByTopicId() throws HieroBaseException {
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Hiero");
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -66,7 +66,7 @@ public class TopicRepositoryTest {
   }
 
   @Test
-  void testGetMessagesByTopicIdReturnsEmptyList() throws HieroException {
+  void testGetMessagesByTopicIdReturnsEmptyList() throws HieroBaseException {
     final TopicId topicId = TopicId.fromString("1.2.3");
     final Page<TopicMessage> result = topicRepository.getMessages(topicId);
     Assertions.assertNotNull(result);
@@ -74,7 +74,7 @@ public class TopicRepositoryTest {
   }
 
   @Test
-  void testGetMessagesByTopicIdAndSequenceNumber() throws HieroException {
+  void testGetMessagesByTopicIdAndSequenceNumber() throws HieroBaseException {
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Hiero 1");
     topicClient.submitMessage(topicId, "Hello Hiero 2");
@@ -88,7 +88,7 @@ public class TopicRepositoryTest {
   }
 
   @Test
-  void testGetMessagesByTopicIdAndSequenceNumberReturnEmptyOptional() throws HieroException {
+  void testGetMessagesByTopicIdAndSequenceNumberReturnEmptyOptional() throws HieroBaseException {
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Hiero 1");
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -100,7 +100,7 @@ public class TopicRepositoryTest {
   }
 
   @Test
-  void testGetMessagesByTopicIdAndSequenceNumberThrowsException() throws HieroException {
+  void testGetMessagesByTopicIdAndSequenceNumberThrowsException() throws HieroBaseException {
     final TopicId topicId = TopicId.fromString("0.0.0");
     Assertions.assertThrows(
         IllegalArgumentException.class,

@@ -3,7 +3,7 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.ContractId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.ContractRepository;
@@ -27,13 +27,13 @@ public class ContractRepositoryImpl implements ContractRepository {
 
   @NonNull
   @Override
-  public Page<Contract> findAll() throws HieroException {
+  public Page<Contract> findAll() throws HieroBaseException {
     return mirrorNodeClient.queryContracts();
   }
 
   @NonNull
   @Override
-  public Optional<Contract> findById(@NonNull final ContractId contractId) throws HieroException {
+  public Optional<Contract> findById(@NonNull final ContractId contractId) throws HieroBaseException {
     return mirrorNodeClient.queryContractById(contractId);
   }
 }

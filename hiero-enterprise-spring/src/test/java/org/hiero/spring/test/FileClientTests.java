@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.IntStream;
 import org.hiero.base.FileClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.protocol.data.FileCreateRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -77,7 +77,7 @@ public class FileClientTests {
     final byte[] contents = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
 
     // then
-    Assertions.assertThrows(HieroException.class, () -> fileClient.createFile(contents));
+    Assertions.assertThrows(HieroBaseException.class, () -> fileClient.createFile(contents));
   }
 
   @Test
@@ -139,7 +139,7 @@ public class FileClientTests {
   @Test
   void testReadFileThrowsExceptionForInvalidId() {
     final FileId fileId = FileId.fromString("1.2.3");
-    Assertions.assertThrows(HieroException.class, () -> fileClient.readFile(fileId));
+    Assertions.assertThrows(HieroBaseException.class, () -> fileClient.readFile(fileId));
   }
 
   @Test
@@ -168,7 +168,7 @@ public class FileClientTests {
   }
 
   @Test
-  void testUpdateFileForSizeGreaterThanCreateFileSize() throws HieroException {
+  void testUpdateFileForSizeGreaterThanCreateFileSize() throws HieroBaseException {
     // given
     final byte[] contents = "Hello, Hiero!".getBytes();
     final FileId fileId = fileClient.createFile(contents);
@@ -190,11 +190,11 @@ public class FileClientTests {
 
     // then
     Assertions.assertThrows(
-        HieroException.class, () -> fileClient.updateFile(fileId, updatedContent));
+        HieroBaseException.class, () -> fileClient.updateFile(fileId, updatedContent));
   }
 
   @Test
-  void testUpdateFileThrowExceptionIfSizeExceedMaxSize() throws HieroException {
+  void testUpdateFileThrowExceptionIfSizeExceedMaxSize() throws HieroBaseException {
     // given
     final byte[] contents = "Hello, Hiero!".getBytes();
     final FileId fileId = fileClient.createFile(contents);
@@ -202,11 +202,11 @@ public class FileClientTests {
 
     // then
     Assertions.assertThrows(
-        HieroException.class, () -> fileClient.updateFile(fileId, updatedContent));
+        HieroBaseException.class, () -> fileClient.updateFile(fileId, updatedContent));
   }
 
   @Test
-  void testUpdateFileThrowsErrorForNullValues() throws HieroException {
+  void testUpdateFileThrowsErrorForNullValues() throws HieroBaseException {
     // given
     final byte[] contents = "Hello, Hiero!".getBytes();
     final FileId fileId = fileClient.createFile(contents);
@@ -240,7 +240,7 @@ public class FileClientTests {
     fileClient.deleteFile(fileId);
 
     // then
-    Assertions.assertThrows(HieroException.class, () -> fileClient.readFile(fileId));
+    Assertions.assertThrows(HieroBaseException.class, () -> fileClient.readFile(fileId));
   }
 
   @Test
@@ -253,7 +253,7 @@ public class FileClientTests {
     fileClient.deleteFile(fileId);
 
     // when
-    Assertions.assertThrows(HieroException.class, () -> fileClient.deleteFile(fileId));
+    Assertions.assertThrows(HieroBaseException.class, () -> fileClient.deleteFile(fileId));
   }
 
   @Test
@@ -291,7 +291,7 @@ public class FileClientTests {
     final FileId invalidFileId = FileId.fromString("1.2.3");
     // then
     Assertions.assertThrows(
-        HieroException.class, () -> fileClient.getExpirationTime(invalidFileId));
+        HieroBaseException.class, () -> fileClient.getExpirationTime(invalidFileId));
   }
 
   @Test
@@ -327,7 +327,7 @@ public class FileClientTests {
   }
 
   @Test
-  void testUpdateExpirationTimeThrowsExceptionForPastExpirationTime() throws HieroException {
+  void testUpdateExpirationTimeThrowsExceptionForPastExpirationTime() throws HieroBaseException {
     // given
     final byte[] contents = "Hello, Hiero!".getBytes();
     final Instant definedExpirationTime = Instant.now().minusSeconds(1);
@@ -347,11 +347,11 @@ public class FileClientTests {
 
     // then
     Assertions.assertThrows(
-        HieroException.class, () -> fileClient.updateExpirationTime(fileId, definedExpirationTime));
+        HieroBaseException.class, () -> fileClient.updateExpirationTime(fileId, definedExpirationTime));
   }
 
   @Test
-  void testUpdateExpirationTimeThrowsExceptionForNullArgs() throws HieroException {
+  void testUpdateExpirationTimeThrowsExceptionForNullArgs() throws HieroBaseException {
     // given
     final byte[] contents = "Hello, Hiero!".getBytes();
     final Instant definedExpirationTime = Instant.now().plusSeconds(120);
@@ -368,7 +368,7 @@ public class FileClientTests {
   }
 
   @Test
-  void testGetFileSize() throws HieroException {
+  void testGetFileSize() throws HieroBaseException {
     final byte[] contents = "Hello, Hiero!".getBytes();
     final FileId fileId = fileClient.createFile(contents);
     final int size = fileClient.getSize(fileId);
@@ -379,6 +379,6 @@ public class FileClientTests {
   @Test
   void testGetFileSizeThrowsExceptionForInvalidId() {
     final FileId invalidFileId = FileId.fromString("1.2.3");
-    Assertions.assertThrows(HieroException.class, () -> fileClient.getSize(invalidFileId));
+    Assertions.assertThrows(HieroBaseException.class, () -> fileClient.getSize(invalidFileId));
   }
 }

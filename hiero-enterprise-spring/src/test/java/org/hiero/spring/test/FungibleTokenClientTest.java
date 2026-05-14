@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
 import org.hiero.base.AccountClient;
 import org.hiero.base.FungibleTokenClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Account;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ public class FungibleTokenClientTest {
   @Autowired private AccountClient accountClient;
 
   @Test
-  void createToken() throws HieroException {
+  void createToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
 
@@ -29,7 +29,7 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void testAssociateToken() throws HieroException {
+  void testAssociateToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final TokenId tokenId = tokenClient.createToken(name, symbol);
@@ -40,14 +40,14 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void testAssociateTokenThrowExceptionForInvalidId() throws HieroException {
+  void testAssociateTokenThrowExceptionForInvalidId() throws HieroBaseException {
     // given
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final Account userAccount = accountClient.createAccount(1);
 
     // then
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () ->
             tokenClient.associateToken(tokenId, userAccount.accountId(), userAccount.privateKey()));
   }
@@ -63,7 +63,7 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void testAssociateTokenWithMultipleToken() throws HieroException {
+  void testAssociateTokenWithMultipleToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
 
@@ -92,7 +92,7 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void testDissociateToken() throws HieroException {
+  void testDissociateToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final TokenId tokenId = tokenClient.createToken(name, symbol);
@@ -104,18 +104,18 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void testDissociateTokenThrowExceptionIfTokenNotAssociate() throws HieroException {
+  void testDissociateTokenThrowExceptionIfTokenNotAssociate() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final TokenId tokenId = tokenClient.createToken(name, symbol);
     final Account account = accountClient.createAccount(1);
 
     Assertions.assertThrows(
-        HieroException.class, () -> tokenClient.dissociateToken(tokenId, account));
+        HieroBaseException.class, () -> tokenClient.dissociateToken(tokenId, account));
   }
 
   @Test
-  void testDissociateTokenWithMultipleToken() throws HieroException {
+  void testDissociateTokenWithMultipleToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final TokenId tokenId1 = tokenClient.createToken(name, symbol);
@@ -131,7 +131,7 @@ public class FungibleTokenClientTest {
 
   @Test
   void testDissociateTokenWithMultipleTokenThrowExceptionIfTokenNotAssociate()
-      throws HieroException {
+      throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final TokenId tokenId1 = tokenClient.createToken(name, symbol);
@@ -141,19 +141,19 @@ public class FungibleTokenClientTest {
     tokenClient.associateToken(tokenId1, account);
 
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> tokenClient.dissociateToken(List.of(tokenId1, tokenId2), account));
   }
 
   @Test
-  void testDissociateTokenThrowExceptionIfListEmpty() throws HieroException {
+  void testDissociateTokenThrowExceptionIfListEmpty() throws HieroBaseException {
     final Account account = accountClient.createAccount(1);
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> tokenClient.dissociateToken(List.of(), account));
   }
 
   @Test
-  void mintToken() throws HieroException {
+  void mintToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final Long amount = 1L;
@@ -165,7 +165,7 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void burnToken() throws HieroException {
+  void burnToken() throws HieroBaseException {
     final String name = "TOKEN";
     final String symbol = "FT";
     final long amount = 1L;
@@ -178,7 +178,7 @@ public class FungibleTokenClientTest {
   }
 
   @Test
-  void transferToken() throws HieroException {
+  void transferToken() throws HieroBaseException {
     final Account toAccount = accountClient.createAccount(1);
     final String name = "TOKEN";
     final String symbol = "FT";

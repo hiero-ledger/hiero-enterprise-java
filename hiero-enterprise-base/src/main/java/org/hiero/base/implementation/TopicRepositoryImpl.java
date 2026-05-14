@@ -3,7 +3,7 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -20,20 +20,20 @@ public class TopicRepositoryImpl implements TopicRepository {
   }
 
   @Override
-  public @NonNull Optional<Topic> findTopicById(TopicId topicId) throws HieroException {
+  public @NonNull Optional<Topic> findTopicById(TopicId topicId) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return mirrorNodeClient.queryTopicById(topicId);
   }
 
   @Override
-  public @NonNull Page<TopicMessage> getMessages(TopicId topicId) throws HieroException {
+  public @NonNull Page<TopicMessage> getMessages(TopicId topicId) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return mirrorNodeClient.queryTopicMessages(topicId);
   }
 
   @Override
   public @NonNull Optional<TopicMessage> getMessageBySequenceNumber(
-      TopicId topicId, long sequenceNumber) throws HieroException {
+      TopicId topicId, long sequenceNumber) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     if (sequenceNumber < 1) {
       throw new IllegalArgumentException("sequenceNumber must be greater than 0");

@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Token;
@@ -22,23 +22,23 @@ public class TokenRepositoryImpl implements TokenRepository {
   }
 
   @Override
-  public Page<Token> findByAccount(@NonNull AccountId accountId) throws HieroException {
+  public Page<Token> findByAccount(@NonNull AccountId accountId) throws HieroBaseException {
     return mirrorNodeClient.queryTokensForAccount(accountId);
   }
 
   @Override
-  public Optional<TokenInfo> findById(@NonNull TokenId tokenId) throws HieroException {
+  public Optional<TokenInfo> findById(@NonNull TokenId tokenId) throws HieroBaseException {
     return mirrorNodeClient.queryTokenById(tokenId);
   }
 
   @Override
-  public Page<Balance> getBalances(@NonNull TokenId tokenId) throws HieroException {
+  public Page<Balance> getBalances(@NonNull TokenId tokenId) throws HieroBaseException {
     return mirrorNodeClient.queryTokenBalances(tokenId);
   }
 
   @Override
   public Page<Balance> getBalancesForAccount(@NonNull TokenId tokenId, @NonNull AccountId accountId)
-      throws HieroException {
+      throws HieroBaseException {
     return mirrorNodeClient.queryTokenBalancesForAccount(tokenId, accountId);
   }
 }

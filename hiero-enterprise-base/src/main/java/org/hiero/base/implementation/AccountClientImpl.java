@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.Objects;
 import org.hiero.base.AccountClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
@@ -26,13 +26,13 @@ public class AccountClientImpl implements AccountClient {
 
   @NonNull
   @Override
-  public Account createAccount(@NonNull Hbar initialBalance) throws HieroException {
+  public Account createAccount(@NonNull Hbar initialBalance) throws HieroBaseException {
     if (initialBalance == null) {
       throw new NullPointerException("initialBalance must not be null");
     }
 
     if (initialBalance.toTinybars() < 0) {
-      throw new HieroException("Invalid initial balance: must be non-negative");
+      throw new HieroBaseException("Invalid initial balance: must be non-negative");
     }
 
     try {
@@ -40,26 +40,26 @@ public class AccountClientImpl implements AccountClient {
       final AccountCreateResult result = client.executeAccountCreateTransaction(request);
       return result.newAccount();
     } catch (IllegalArgumentException e) {
-      throw new HieroException("Error while creating Account", e);
+      throw new HieroBaseException("Error while creating Account", e);
     }
   }
 
   @Override
-  public void deleteAccount(@NonNull Account account) throws HieroException {
+  public void deleteAccount(@NonNull Account account) throws HieroBaseException {
     final AccountDeleteRequest request = AccountDeleteRequest.of(account);
     client.executeAccountDeleteTransaction(request);
   }
 
   @Override
   public void deleteAccount(@NonNull Account account, @NonNull Account toAccount)
-      throws HieroException {
+      throws HieroBaseException {
     final AccountDeleteRequest request = AccountDeleteRequest.of(account, toAccount);
     client.executeAccountDeleteTransaction(request);
   }
 
   @Override
   public @NonNull Account updateAccountKey(
-      @NonNull Account account, @NonNull PrivateKey updatedPrivateKey) throws HieroException {
+      @NonNull Account account, @NonNull PrivateKey updatedPrivateKey) throws HieroBaseException {
     Objects.requireNonNull(account, "account must not be null");
     Objects.requireNonNull(updatedPrivateKey, "updatedPrivateKey must not be null");
     final AccountUpdateRequest request = AccountUpdateRequest.updateKey(account, updatedPrivateKey);
@@ -69,7 +69,7 @@ public class AccountClientImpl implements AccountClient {
 
   @Override
   public void updateAccountMemo(@NonNull Account account, @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "account must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
     final AccountUpdateRequest request = AccountUpdateRequest.updateMemo(account, memo);
@@ -79,7 +79,7 @@ public class AccountClientImpl implements AccountClient {
   @Override
   public @NonNull Account updateAccount(
       @NonNull Account account, @NonNull PrivateKey updatedPrivateKey, @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "account must not be null");
     Objects.requireNonNull(updatedPrivateKey, "updatedPrivateKey must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
@@ -90,14 +90,14 @@ public class AccountClientImpl implements AccountClient {
 
   @NonNull
   @Override
-  public Hbar getAccountBalance(@NonNull AccountId account) throws HieroException {
+  public Hbar getAccountBalance(@NonNull AccountId account) throws HieroBaseException {
     final AccountBalanceRequest request = AccountBalanceRequest.of(account);
     final AccountBalanceResponse response = client.executeAccountBalanceQuery(request);
     return response.hbars();
   }
 
   @Override
-  public @NonNull Hbar getOperatorAccountBalance() throws HieroException {
+  public @NonNull Hbar getOperatorAccountBalance() throws HieroBaseException {
     return getAccountBalance(client.getOperatorAccountId());
   }
 }

@@ -1,7 +1,7 @@
 package org.hiero.spring.test;
 
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.ContractRepository;
@@ -22,7 +22,7 @@ public class ContractRepositoryTest {
   }
 
   @Test
-  void testFindAll() throws HieroException {
+  void testFindAll() throws HieroBaseException {
     // when
     final Page<Contract> contracts = contractRepository.findAll();
 
@@ -32,7 +32,7 @@ public class ContractRepositoryTest {
   }
 
   @Test
-  void testFindByIdWithNonExistentContract() throws HieroException {
+  void testFindByIdWithNonExistentContract() throws HieroBaseException {
     // given
     final String nonExistentContractId = "0.0.999999";
 

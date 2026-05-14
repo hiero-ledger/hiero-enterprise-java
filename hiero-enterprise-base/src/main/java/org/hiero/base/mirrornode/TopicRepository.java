@@ -3,7 +3,7 @@ package org.hiero.base.mirrornode;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -19,19 +19,19 @@ public interface TopicRepository {
    *
    * @param topicId id of the topic
    * @return Optional of Topic
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<Topic> findTopicById(TopicId topicId) throws HieroException;
+  @NonNull Optional<Topic> findTopicById(TopicId topicId) throws HieroBaseException;
 
   /**
    * Return Topic for given topicId.
    *
    * @param topicId id of the topic
    * @return Optional of Topic
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Optional<Topic> findTopicById(String topicId) throws HieroException {
+  default Optional<Topic> findTopicById(String topicId) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return findTopicById(TopicId.fromString(topicId));
   }
@@ -41,19 +41,19 @@ public interface TopicRepository {
    *
    * @param topicId id of the topic
    * @return Page of TopicMessage
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Page<TopicMessage> getMessages(TopicId topicId) throws HieroException;
+  @NonNull Page<TopicMessage> getMessages(TopicId topicId) throws HieroBaseException;
 
   /**
    * Return TopicMessages for given topicId.
    *
    * @param topicId id of the topic
    * @return Page of TopicMessage
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Page<TopicMessage> getMessages(String topicId) throws HieroException {
+  default Page<TopicMessage> getMessages(String topicId) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return getMessages(TopicId.fromString(topicId));
   }
@@ -65,10 +65,10 @@ public interface TopicRepository {
    * @param topicId id of the topic
    * @param sequenceNumber sequenceNumber of the message
    * @return Optional of TopicMessage
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull Optional<TopicMessage> getMessageBySequenceNumber(TopicId topicId, long sequenceNumber)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Return TopicMessage for given topicId.
@@ -76,11 +76,11 @@ public interface TopicRepository {
    * @param topicId id of the topic
    * @param sequenceNumber sequenceNumber of the message
    * @return Optional of TopicMessage
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
   default Optional<TopicMessage> getMessageBySequenceNumber(String topicId, long sequenceNumber)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return getMessageBySequenceNumber(TopicId.fromString(topicId), sequenceNumber);
   }

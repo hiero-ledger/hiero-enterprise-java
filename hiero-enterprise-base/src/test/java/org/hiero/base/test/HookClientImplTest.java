@@ -11,7 +11,7 @@ import com.hedera.hashgraph.sdk.HookEntityId;
 import com.hedera.hashgraph.sdk.HookId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.List;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.implementation.HookClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.HookStoreRequest;
@@ -36,7 +36,7 @@ public class HookClientImplTest {
   }
 
   @Test
-  void shouldStoreHookWithSingleSigner() throws HieroException {
+  void shouldStoreHookWithSingleSigner() throws HieroBaseException {
     final HookStoreResult result = Mockito.mock(HookStoreResult.class);
     final HookId hookId = new HookId(new HookEntityId(new ContractId(0, 0, 1234)), 1L);
     final List<EvmHookStorageUpdate> storageUpdates =
@@ -57,7 +57,7 @@ public class HookClientImplTest {
   }
 
   @Test
-  void shouldStoreHookWithMultipleSigners() throws HieroException {
+  void shouldStoreHookWithMultipleSigners() throws HieroBaseException {
     final HookStoreResult result = Mockito.mock(HookStoreResult.class);
     final HookId hookId = new HookId(new HookEntityId(new ContractId(0, 0, 1234)), 1L);
     final List<EvmHookStorageUpdate> storageUpdates =

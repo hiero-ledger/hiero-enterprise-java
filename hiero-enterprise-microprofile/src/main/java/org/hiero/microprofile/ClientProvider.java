@@ -13,6 +13,7 @@ import org.hiero.base.NftClient;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.TopicClient;
 import org.hiero.base.config.HieroConfig;
+import org.hiero.base.HieroConfigurationException;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.implementation.AccountRepositoryImpl;
 import org.hiero.base.implementation.BlockRepositoryImpl;
@@ -56,14 +57,14 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
-  HieroConfig createHieroConfig() {
+  HieroConfig createHieroConfig() throws HieroConfigurationException {
     return new HieroConfigImpl(configuration, networkConfiguration);
   }
 
   @NonNull
   @Produces
   @ApplicationScoped
-  HieroContext createHieroContext(@NonNull final HieroConfig hieroConfig) {
+  HieroContext createHieroContext(@NonNull final HieroConfig hieroConfig) throws HieroConfigurationException {
     return hieroConfig.createHieroContext();
   }
 
@@ -142,11 +143,11 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
-  MirrorNodeClient createMirrorNodeClient(@NonNull final HieroConfig hieroConfig) {
+  MirrorNodeClient createMirrorNodeClient(@NonNull final HieroConfig hieroConfig) throws HieroConfigurationException {
     final String target =
         hieroConfig.getMirrorNodeAddresses().stream()
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No mirror node addresses configured"));
+            .orElseThrow(() -> new HieroConfigurationException("No mirror node addresses configured"));
     final MirrorNodeRestClientImpl restClient = new MirrorNodeRestClientImpl(target);
     final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();
     return new MirrorNodeClientImpl(restClient, jsonConverter);

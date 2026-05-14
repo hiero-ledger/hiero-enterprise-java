@@ -3,14 +3,14 @@ package org.hiero.base;
 import org.jspecify.annotations.NonNull;
 
 /** Represents an exception that occurred while interacting with a Hiero network. */
-public class HieroException extends Exception {
+public class HieroBaseException extends Exception {
 
   /**
    * Constructs a new Exception with the specified detail message.
    *
    * @param message The detail message.
    */
-  public HieroException(@NonNull String message) {
+  public HieroBaseException(@NonNull String message) {
     super(message);
   }
 
@@ -20,7 +20,7 @@ public class HieroException extends Exception {
    * @param message The detail message.
    * @param cause The cause.
    */
-  public HieroException(@NonNull String message, @NonNull Throwable cause) {
+  public HieroBaseException(@NonNull String message, @NonNull Throwable cause) {
     super(message, cause);
   }
 }

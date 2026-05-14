@@ -1,7 +1,7 @@
 package org.hiero.spring.test;
 
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.BlockRepository;
@@ -21,7 +21,7 @@ public class BlockRepositoryTest {
   }
 
   @Test
-  void testFindAll() throws HieroException {
+  void testFindAll() throws HieroBaseException {
     // when
     final Page<Block> blocks = blockRepository.findAll();
 
@@ -31,7 +31,7 @@ public class BlockRepositoryTest {
   }
 
   @Test
-  void testFindByNumberWithNonExistentBlock() throws HieroException {
+  void testFindByNumberWithNonExistentBlock() throws HieroBaseException {
     // given
     final long nonExistentBlockNumber = 999999999L;
 
@@ -44,7 +44,7 @@ public class BlockRepositoryTest {
   }
 
   @Test
-  void testFindByHashWithNonExistentBlock() throws HieroException {
+  void testFindByHashWithNonExistentBlock() throws HieroBaseException {
     // given
     final String nonExistentBlockHash =
         "0x0000000000000000000000000000000000000000000000000000000000000000";

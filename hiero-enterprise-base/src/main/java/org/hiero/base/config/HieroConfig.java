@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.hiero.base.HieroContext;
+import org.hiero.base.HieroConfigurationException;
 import org.hiero.base.data.Account;
 import org.jspecify.annotations.NonNull;
 
@@ -68,7 +69,7 @@ public interface HieroConfig {
    * @return the Hiero context
    */
   @NonNull
-  default HieroContext createHieroContext() {
+  default HieroContext createHieroContext() throws HieroConfigurationException {
     final Account operatorAccount = getOperatorAccount();
     final Client client = createClient();
     return new HieroContext() {
@@ -91,7 +92,7 @@ public interface HieroConfig {
    * @return the client
    */
   @NonNull
-  default Client createClient() {
+  default Client createClient() throws HieroConfigurationException {
     try {
       final Map<String, AccountId> nodes =
           getConsensusNodes().stream()
@@ -104,7 +105,7 @@ public interface HieroConfig {
       getRequestTimeout().ifPresent(client::setRequestTimeout);
       return client;
     } catch (final Exception e) {
-      throw new IllegalArgumentException("Can not create client for custom network", e);
+      throw new HieroConfigurationException("Can not create client for custom network", e);
     }
   }
 }

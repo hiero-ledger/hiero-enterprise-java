@@ -2,7 +2,7 @@ package org.hiero.base.mirrornode;
 
 import java.util.List;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
@@ -18,31 +18,31 @@ public interface NetworkRepository {
    * Return the ExchangeRates for network.
    *
    * @return {@link Optional} containing the ExchangeRates or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<ExchangeRates> exchangeRates() throws HieroException;
+  @NonNull Optional<ExchangeRates> exchangeRates() throws HieroBaseException;
 
   /**
    * Return the List of NetworkFee for network.
    *
    * @return {@link List} containing NetworkFee or empty list
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull List<NetworkFee> fees() throws HieroException;
+  @NonNull List<NetworkFee> fees() throws HieroBaseException;
 
   /**
    * Return the NetworkStake for network.
    *
    * @return {@link Optional} containing NetworkStake or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<NetworkStake> stake() throws HieroException;
+  @NonNull Optional<NetworkStake> stake() throws HieroBaseException;
 
   /**
    * Return the NetworkSupplies for network.
    *
    * @return {@link Optional} containing NetworkSupplies or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<NetworkSupplies> supplies() throws HieroException;
+  @NonNull Optional<NetworkSupplies> supplies() throws HieroBaseException;
 }

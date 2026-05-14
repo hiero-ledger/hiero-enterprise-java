@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
@@ -35,45 +35,45 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
 
   @Override
   public @NonNull final Optional<Nft> queryNftsByTokenIdAndSerial(
-      @NonNull final TokenId tokenId, final long serialNumber) throws HieroException {
+      @NonNull final TokenId tokenId, final long serialNumber) throws HieroBaseException {
     final JSON json = getRestClient().queryNftsByTokenIdAndSerial(tokenId, serialNumber);
     return getJsonConverter().toNft(json);
   }
 
   @Override
   public @NonNull final Optional<AccountInfo> queryAccount(@NonNull final AccountId accountId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     final JSON json = getRestClient().queryAccount(accountId);
     return getJsonConverter().toAccountInfo(json);
   }
 
   @Override
-  public @NonNull final Optional<ExchangeRates> queryExchangeRates() throws HieroException {
+  public @NonNull final Optional<ExchangeRates> queryExchangeRates() throws HieroBaseException {
     final JSON json = getRestClient().queryExchangeRates();
     return getJsonConverter().toExchangeRates(json);
   }
 
   @Override
-  public @NonNull final List<NetworkFee> queryNetworkFees() throws HieroException {
+  public @NonNull final List<NetworkFee> queryNetworkFees() throws HieroBaseException {
     final JSON json = getRestClient().queryNetworkFees();
     return getJsonConverter().toNetworkFees(json);
   }
 
   @Override
-  public @NonNull final Optional<NetworkStake> queryNetworkStake() throws HieroException {
+  public @NonNull final Optional<NetworkStake> queryNetworkStake() throws HieroBaseException {
     final JSON json = getRestClient().queryNetworkStake();
     return getJsonConverter().toNetworkStake(json);
   }
 
   @Override
-  public @NonNull final Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException {
+  public @NonNull final Optional<NetworkSupplies> queryNetworkSupplies() throws HieroBaseException {
     final JSON json = getRestClient().queryNetworkSupplies();
     return getJsonConverter().toNetworkSupplies(json);
   }
 
   @NonNull
-  public final Optional<TokenInfo> queryTokenById(@NonNull TokenId tokenId) throws HieroException {
+  public final Optional<TokenInfo> queryTokenById(@NonNull TokenId tokenId) throws HieroBaseException {
     final JSON json = getRestClient().queryTokenById(tokenId);
     return getJsonConverter().toTokenInfo(json);
   }
@@ -81,14 +81,14 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   @Override
   @NonNull
   public final Optional<TransactionInfo> queryTransaction(@NonNull String transactionId)
-      throws HieroException {
+      throws HieroBaseException {
     final JSON json = getRestClient().queryTransaction(transactionId);
     return getJsonConverter().toTransactionInfo(json);
   }
 
   @Override
   @NonNull
-  public final Optional<Topic> queryTopicById(TopicId topicId) throws HieroException {
+  public final Optional<Topic> queryTopicById(TopicId topicId) throws HieroBaseException {
     final JSON json = getRestClient().queryTopicById(topicId);
     return getJsonConverter().toTopic(json);
   }
@@ -96,32 +96,32 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   @Override
   @NonNull
   public final Optional<TopicMessage> queryTopicMessageBySequenceNumber(
-      TopicId topicId, long sequenceNumber) throws HieroException {
+      TopicId topicId, long sequenceNumber) throws HieroBaseException {
     final JSON json = getRestClient().queryTopicMessageBySequenceNumber(topicId, sequenceNumber);
     return getJsonConverter().toTopicMessage(json);
   }
 
   @Override
-  public @NonNull Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
+  public @NonNull Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroBaseException {
     throw new UnsupportedOperationException("Not yet implemented");
   }
 
   @Override
-  public @NonNull Page<Contract> queryContracts() throws HieroException {
+  public @NonNull Page<Contract> queryContracts() throws HieroBaseException {
     final JSON json = getRestClient().queryContracts();
     return getJsonConverter().toContractPage(json);
   }
 
   @Override
   public @NonNull Optional<Contract> queryContractById(@NonNull final ContractId contractId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(contractId, "contractId must not be null");
     final JSON json = getRestClient().queryContractById(contractId);
     return getJsonConverter().toContract(json);
   }
 
   @Override
-  public @NonNull Optional<Block> queryBlockByNumber(long number) throws HieroException {
+  public @NonNull Optional<Block> queryBlockByNumber(long number) throws HieroBaseException {
     if (number < 0) {
       throw new IllegalArgumentException("Block number must not be negative");
     }
@@ -130,7 +130,7 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   }
 
   @Override
-  public @NonNull Optional<Block> queryBlockByHash(@NonNull String hash) throws HieroException {
+  public @NonNull Optional<Block> queryBlockByHash(@NonNull String hash) throws HieroBaseException {
     Objects.requireNonNull(hash, "hash must not be null");
     final JSON json = getRestClient().queryBlock(hash);
     return getJsonConverter().toBlock(json);

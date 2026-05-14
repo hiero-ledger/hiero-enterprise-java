@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.hiero.base.FileClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.data.ContractCallResult;
 import org.junit.jupiter.api.Assertions;
@@ -90,7 +90,7 @@ public class ContractServiceTest {
 
     // then
     Assertions.assertThrows(
-        HieroException.class, () -> smartContractClient.createContract(content));
+        HieroBaseException.class, () -> smartContractClient.createContract(content));
   }
 
   @Test
@@ -118,7 +118,7 @@ public class ContractServiceTest {
 
     // when
     Assertions.assertThrows(
-        HieroException.class, () -> smartContractClient.createContract(path, string("Hello")));
+        HieroBaseException.class, () -> smartContractClient.createContract(path, string("Hello")));
   }
 
   @Test
@@ -146,7 +146,7 @@ public class ContractServiceTest {
 
     // when
     Assertions.assertThrows(
-        HieroException.class, () -> smartContractClient.callContractFunction(contract, "invalid"));
+        HieroBaseException.class, () -> smartContractClient.callContractFunction(contract, "invalid"));
   }
 
   @Test
@@ -175,7 +175,7 @@ public class ContractServiceTest {
 
     // then
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> smartContractClient.callContractFunction(contract, "get", int256(123)));
   }
 

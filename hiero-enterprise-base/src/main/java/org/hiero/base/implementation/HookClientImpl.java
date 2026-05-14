@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.HookId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.List;
 import java.util.Objects;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.HookClient;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.HookStoreRequest;
@@ -24,7 +24,7 @@ public class HookClientImpl implements HookClient {
       @NonNull final HookId hookId,
       @NonNull final List<EvmHookStorageUpdate> storageUpdates,
       @NonNull final PrivateKey signerKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(signerKey, "signerKey must not be null");
     storeHook(hookId, storageUpdates, List.of(signerKey));
   }
@@ -34,7 +34,7 @@ public class HookClientImpl implements HookClient {
       @NonNull final HookId hookId,
       @NonNull final List<EvmHookStorageUpdate> storageUpdates,
       @NonNull final List<PrivateKey> signerKeys)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(hookId, "hookId must not be null");
     Objects.requireNonNull(storageUpdates, "storageUpdates must not be null");
     Objects.requireNonNull(signerKeys, "signerKeys must not be null");

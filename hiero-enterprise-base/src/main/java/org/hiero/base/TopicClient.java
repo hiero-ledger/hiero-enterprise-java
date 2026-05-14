@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
+import org.hiero.base.HieroSecurityException;
 
 /**
  * Interface for interacting with a Hiero network. This interface provides methods for interacting
@@ -17,27 +18,27 @@ public interface TopicClient {
    * Create a new Topic. The operator account privateKey is used as adminKey for topic.
    *
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  @NonNull TopicId createTopic() throws HieroException;
+  @NonNull TopicId createTopic() throws HieroBaseException;
 
   /**
    * Create a new Topic. With an adminKey.
    *
    * @param adminKey the adminKey for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  @NonNull TopicId createTopic(@NonNull PrivateKey adminKey) throws HieroException;
+  @NonNull TopicId createTopic(@NonNull PrivateKey adminKey) throws HieroBaseException;
 
   /**
    * Create a new Topic.
    *
    * @param memo the memo for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  @NonNull TopicId createTopic(@NonNull String memo) throws HieroException;
+  @NonNull TopicId createTopic(@NonNull String memo) throws HieroBaseException;
 
   /**
    * Create a new Topic.
@@ -45,19 +46,19 @@ public interface TopicClient {
    * @param adminKey the adminKey for the topic
    * @param memo the memo for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   @NonNull TopicId createTopic(@NonNull PrivateKey adminKey, @NonNull String memo)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new private Topic.
    *
    * @param submitKey the submitKey for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  @NonNull TopicId createPrivateTopic(@NonNull PrivateKey submitKey) throws HieroException;
+  @NonNull TopicId createPrivateTopic(@NonNull PrivateKey submitKey) throws HieroBaseException;
 
   /**
    * Create a new private Topic.
@@ -65,10 +66,10 @@ public interface TopicClient {
    * @param adminKey the adminKey for the topic
    * @param submitKey the submitKey for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   @NonNull TopicId createPrivateTopic(@NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new private Topic.
@@ -76,10 +77,10 @@ public interface TopicClient {
    * @param submitKey the submitKey for the topic
    * @param memo the memo for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   @NonNull TopicId createPrivateTopic(@NonNull PrivateKey submitKey, @NonNull String memo)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new private Topic.
@@ -88,20 +89,20 @@ public interface TopicClient {
    * @param submitKey the submitKey for the topic
    * @param memo the memo for the topic
    * @return the ID of the new Topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   @NonNull TopicId createPrivateTopic(
       @NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey, @NonNull String memo)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update a Topic. The operator account privateKey is used as adminKey for updating topic.
    *
    * @param topicId the topicId of topic to update
    * @param memo the memo for the topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  void updateTopic(@NonNull TopicId topicId, @NonNull String memo) throws HieroException;
+  void updateTopic(@NonNull TopicId topicId, @NonNull String memo) throws HieroBaseException;
 
   /**
    * Update a Topic.
@@ -109,10 +110,10 @@ public interface TopicClient {
    * @param topicId the topicId of topic to update
    * @param adminKey the adminKey for topic
    * @param memo the memo for the topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateTopic(@NonNull TopicId topicId, @NonNull PrivateKey adminKey, @NonNull String memo)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update a Topic. The operator account privateKey is used as adminKey for updating topic.
@@ -121,14 +122,14 @@ public interface TopicClient {
    * @param updatedAdminKey the new adminKey for topic
    * @param submitKey the new submit for topic
    * @param memo the memo for the topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateTopic(
       @NonNull TopicId topicId,
       @NonNull PrivateKey updatedAdminKey,
       @NonNull PrivateKey submitKey,
       @NonNull String memo)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update a Topic.
@@ -138,7 +139,7 @@ public interface TopicClient {
    * @param updatedAdminKey the new adminKey for topic
    * @param submitKey the new submit for topic
    * @param memo the memo for the topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateTopic(
       @NonNull TopicId topicId,
@@ -146,7 +147,7 @@ public interface TopicClient {
       @NonNull PrivateKey updatedAdminKey,
       @NonNull PrivateKey submitKey,
       @NonNull String memo)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update adminKey for Topic. The operator account privateKey is used as adminKey for updating
@@ -154,10 +155,10 @@ public interface TopicClient {
    *
    * @param topicId the topicId of topic to update
    * @param updatedAdminKey the new adminKey for topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateAdminKey(@NonNull TopicId topicId, @NonNull PrivateKey updatedAdminKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update adminKey for Topic.
@@ -165,11 +166,11 @@ public interface TopicClient {
    * @param topicId the topicId of topic to update
    * @param adminKey the adminKey of topic
    * @param updatedAdminKey the new adminKey for topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateAdminKey(
       @NonNull TopicId topicId, @NonNull PrivateKey adminKey, @NonNull PrivateKey updatedAdminKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update submitKey for Topic. The operator account privateKey is used as adminKey for updating
@@ -177,10 +178,10 @@ public interface TopicClient {
    *
    * @param topicId the topicId of topic to update
    * @param submitKey the new submitKey for topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateSubmitKey(@NonNull TopicId topicId, @NonNull PrivateKey submitKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Update submitKey for Topic.
@@ -188,27 +189,27 @@ public interface TopicClient {
    * @param topicId the topicId of topic to update
    * @param adminKey the adminKey of topic
    * @param submitKey the new submitKey for topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void updateSubmitKey(
       @NonNull TopicId topicId, @NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Delete a Topic.
    *
    * @param topicId the topicId of topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  void deleteTopic(@NonNull TopicId topicId) throws HieroException;
+  void deleteTopic(@NonNull TopicId topicId) throws HieroBaseException;
 
   /**
    * Delete a Topic.
    *
    * @param topicId the topicId of topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  default void deleteTopic(@NonNull String topicId) throws HieroException {
+  default void deleteTopic(@NonNull String topicId) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     deleteTopic(TopicId.fromString(topicId));
   }
@@ -218,21 +219,25 @@ public interface TopicClient {
    * Delete a Topic.
    *
    * @param topicId the topicId of topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  void deleteTopic(@NonNull TopicId topicId, @NonNull PrivateKey adminKey) throws HieroException;
+  void deleteTopic(@NonNull TopicId topicId, @NonNull PrivateKey adminKey) throws HieroBaseException;
 
   /**
    * Delete a Topic.
    *
    * @param topicId the topicId of topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   default void deleteTopic(@NonNull String topicId, @NonNull String adminKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(adminKey, "adminKey cannot be null");
-    deleteTopic(TopicId.fromString(topicId), PrivateKey.fromString(adminKey));
+    try {
+      deleteTopic(TopicId.fromString(topicId), PrivateKey.fromString(adminKey));
+    } catch (IllegalArgumentException e) {
+      throw new HieroSecurityException("Invalid private key format", e);
+    }
   }
   ;
 
@@ -241,19 +246,19 @@ public interface TopicClient {
    *
    * @param topicId the topicId of topic
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  void submitMessage(@NonNull TopicId topicId, @NonNull byte[] message) throws HieroException;
+  void submitMessage(@NonNull TopicId topicId, @NonNull byte[] message) throws HieroBaseException;
 
   /**
    * Submit a message to a Topic.
    *
    * @param topicId the topicId of topic
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   default void submitMessage(@NonNull String topicId, @NonNull byte[] message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(message, "message cannot be null");
     submitMessage(TopicId.fromString(topicId), message);
@@ -265,19 +270,19 @@ public interface TopicClient {
    *
    * @param topicId the topicId of topic
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
-  void submitMessage(@NonNull TopicId topicId, @NonNull String message) throws HieroException;
+  void submitMessage(@NonNull TopicId topicId, @NonNull String message) throws HieroBaseException;
 
   /**
    * Submit a message to a Topic.
    *
    * @param topicId the topicId of topic
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   default void submitMessage(@NonNull String topicId, @NonNull String message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(message, "message cannot be null");
     submitMessage(TopicId.fromString(topicId), message);
@@ -290,28 +295,31 @@ public interface TopicClient {
    * @param topicId the topicId of topic
    * @param submitKey the submit key for submitting message
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void submitMessage(
       @NonNull TopicId topicId, @NonNull PrivateKey submitKey, @NonNull byte[] message)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Submit a message to a Topic.
    *
    * @param topicId the topicId of topic
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   default void submitMessage(
       @NonNull String topicId, @NonNull String submitKey, @NonNull byte[] message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(submitKey, "submitKey cannot be null");
     Objects.requireNonNull(message, "message cannot be null");
-    submitMessage(TopicId.fromString(topicId), PrivateKey.fromString(submitKey), message);
+    try {
+      submitMessage(TopicId.fromString(topicId), PrivateKey.fromString(submitKey), message);
+    } catch (IllegalArgumentException e) {
+      throw new HieroSecurityException("Invalid private key format", e);
+    }
   }
-  ;
 
   /**
    * Submit a message to a Topic.
@@ -319,26 +327,29 @@ public interface TopicClient {
    * @param topicId the topicId of topic
    * @param submitKey the submit key for submitting message
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   void submitMessage(
       @NonNull TopicId topicId, @NonNull PrivateKey submitKey, @NonNull String message)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Submit a message to a Topic.
    *
    * @param topicId the topicId of topic
    * @param message the message to send to topic
-   * @throws HieroException if the Topic could not be created
+   * @throws HieroBaseException if the Topic could not be created
    */
   default void submitMessage(
       @NonNull String topicId, @NonNull String submitKey, @NonNull String message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(submitKey, "submitKey cannot be null");
     Objects.requireNonNull(message, "message cannot be null");
-    submitMessage(TopicId.fromString(topicId), PrivateKey.fromString(submitKey), message);
+    try {
+      submitMessage(TopicId.fromString(topicId), PrivateKey.fromString(submitKey), message);
+    } catch (IllegalArgumentException e) {
+      throw new HieroSecurityException("Invalid private key format", e);
+    }
   }
-  ;
 }

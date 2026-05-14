@@ -15,13 +15,13 @@ public interface HookClient {
    * @param hookId hook identifier
    * @param storageUpdates storage updates to apply
    * @param signerKey signer key required by the hook
-   * @throws HieroException on failure
+   * @throws HieroBaseException on failure
    */
   void storeHook(
       @NonNull HookId hookId,
       @NonNull List<EvmHookStorageUpdate> storageUpdates,
       @NonNull PrivateKey signerKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Store hook updates using specific signer keys.
@@ -29,11 +29,11 @@ public interface HookClient {
    * @param hookId hook identifier
    * @param storageUpdates storage updates to apply
    * @param signerKeys signer keys required by the hook
-   * @throws HieroException on failure
+   * @throws HieroBaseException on failure
    */
   void storeHook(
       @NonNull HookId hookId,
       @NonNull List<EvmHookStorageUpdate> storageUpdates,
       @NonNull List<PrivateKey> signerKeys)
-      throws HieroException;
+      throws HieroBaseException;
 }

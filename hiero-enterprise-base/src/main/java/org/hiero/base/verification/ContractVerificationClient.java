@@ -3,7 +3,7 @@ package org.hiero.base.verification;
 import com.hedera.hashgraph.sdk.ContractId;
 import java.util.HashMap;
 import java.util.Map;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -18,10 +18,10 @@ public interface ContractVerificationClient {
    *
    * @param contractId contract to check
    * @return verification state
-   * @throws HieroException if an error happens in communication with a Hiero network
+   * @throws HieroBaseException if an error happens in communication with a Hiero network
    */
   @NonNull ContractVerificationState checkVerification(@NonNull ContractId contractId)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Check the verification state of a file that is part of a contract.
@@ -32,11 +32,11 @@ public interface ContractVerificationClient {
    * @return true if the contract contains is verified and contains a file with the given name and
    *     content
    * @throws IllegalStateException if contract is not verified
-   * @throws HieroException if an error happens in communication with a Hiero network
+   * @throws HieroBaseException if an error happens in communication with a Hiero network
    */
   boolean checkVerification(
       @NonNull ContractId contractId, @NonNull String fileName, @NonNull String fileContent)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Try to verify a contract.
@@ -47,7 +47,7 @@ public interface ContractVerificationClient {
    * @param contractMetadata contract metadata
    * @return verification state
    * @throws IllegalStateException if contract is already verified
-   * @throws HieroException if an error happens in communication with a Hiero network
+   * @throws HieroBaseException if an error happens in communication with a Hiero network
    */
   @NonNull
   default ContractVerificationState verify(
@@ -55,7 +55,7 @@ public interface ContractVerificationClient {
       @NonNull final String contractName,
       @NonNull final String contractSource,
       final String contractMetadata)
-      throws HieroException {
+      throws HieroBaseException {
     final Map<String, String> files = new HashMap<>();
     files.put(contractName + ".sol", contractSource);
     if (contractMetadata != null) {
@@ -72,11 +72,11 @@ public interface ContractVerificationClient {
    * @param files contract files
    * @return verification state
    * @throws IllegalStateException if contract is already verified
-   * @throws HieroException if an error happens in communication with a Hiero network
+   * @throws HieroBaseException if an error happens in communication with a Hiero network
    */
   @NonNull ContractVerificationState verify(
       @NonNull ContractId contractId,
       @NonNull String contractName,
       @NonNull Map<String, String> files)
-      throws HieroException;
+      throws HieroBaseException;
 }

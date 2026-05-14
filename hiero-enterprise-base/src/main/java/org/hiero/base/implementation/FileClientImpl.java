@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
 import org.hiero.base.FileClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.FileAppendRequest;
 import org.hiero.base.protocol.data.FileContentsRequest;
@@ -33,22 +33,22 @@ public class FileClientImpl implements FileClient {
   }
 
   @Override
-  public FileId createFile(@NonNull final byte[] contents) throws HieroException {
+  public FileId createFile(@NonNull final byte[] contents) throws HieroBaseException {
     return createFileImpl(contents, null);
   }
 
   @Override
   public FileId createFile(@NonNull final byte[] contents, @NonNull final Instant expirationTime)
-      throws HieroException {
+      throws HieroBaseException {
     return createFileImpl(contents, expirationTime);
   }
 
   private FileId createFileImpl(
       @NonNull final byte[] contents, @Nullable final Instant expirationTime)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(contents, "contents must not be null");
     if (contents.length > FileCreateRequest.FILE_MAX_SIZE) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
     }
     if (expirationTime != null && expirationTime.isBefore(Instant.now())) {
@@ -91,35 +91,35 @@ public class FileClientImpl implements FileClient {
 
   @NonNull
   @Override
-  public byte[] readFile(@NonNull final FileId fileId) throws HieroException {
+  public byte[] readFile(@NonNull final FileId fileId) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     try {
       final FileContentsRequest request = FileContentsRequest.of(fileId);
       final FileContentsResponse response = protocolLayerClient.executeFileContentsQuery(request);
       return response.contents();
     } catch (Exception e) {
-      throw new HieroException("Failed to read file with fileId " + fileId, e);
+      throw new HieroBaseException("Failed to read file with fileId " + fileId, e);
     }
   }
 
   @Override
-  public void deleteFile(@NonNull final FileId fileId) throws HieroException {
+  public void deleteFile(@NonNull final FileId fileId) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     try {
       final FileDeleteRequest request = FileDeleteRequest.of(fileId);
       protocolLayerClient.executeFileDeleteTransaction(request);
     } catch (Exception e) {
-      throw new HieroException("Failed to delete file with fileId " + fileId, e);
+      throw new HieroBaseException("Failed to delete file with fileId " + fileId, e);
     }
   }
 
   @Override
   public void updateFile(@NonNull final FileId fileId, @NonNull final byte[] content)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     Objects.requireNonNull(content, "content must not be null");
     if (content.length > FileCreateRequest.FILE_MAX_SIZE) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
     }
     if (content.length <= FileCreateRequest.FILE_CREATE_MAX_SIZE) {
@@ -151,7 +151,7 @@ public class FileClientImpl implements FileClient {
 
   @Override
   public void updateExpirationTime(
-      @NonNull final FileId fileId, @NonNull final Instant expirationTime) throws HieroException {
+      @NonNull final FileId fileId, @NonNull final Instant expirationTime) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     Objects.requireNonNull(expirationTime, "expirationTime must not be null");
 
@@ -163,7 +163,7 @@ public class FileClientImpl implements FileClient {
   }
 
   @Override
-  public boolean isDeleted(@NonNull final FileId fileId) throws HieroException {
+  public boolean isDeleted(@NonNull final FileId fileId) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     final FileInfoRequest request = FileInfoRequest.of(fileId);
     final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
@@ -171,7 +171,7 @@ public class FileClientImpl implements FileClient {
   }
 
   @Override
-  public int getSize(@NonNull final FileId fileId) throws HieroException {
+  public int getSize(@NonNull final FileId fileId) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     final FileInfoRequest request = FileInfoRequest.of(fileId);
     final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
@@ -179,7 +179,7 @@ public class FileClientImpl implements FileClient {
   }
 
   @Override
-  public Instant getExpirationTime(@NonNull final FileId fileId) throws HieroException {
+  public Instant getExpirationTime(@NonNull final FileId fileId) throws HieroBaseException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     final FileInfoRequest request = FileInfoRequest.of(fileId);
     final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);

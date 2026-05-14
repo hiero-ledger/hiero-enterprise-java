@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.Objects;
 import java.util.function.Function;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.implementation.MirrorNodeRestClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,11 +27,11 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonNode> 
     restClient = restClientBuilder.build();
   }
 
-  public JsonNode doGetCall(String path) throws HieroException {
+  public JsonNode doGetCall(String path) throws HieroBaseException {
     return doGetCall(builder -> builder.path(path).build());
   }
 
-  public JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HieroException {
+  public JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HieroBaseException {
     final ResponseEntity<String> responseEntity =
         restClient
             .get()
@@ -63,7 +63,7 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonNode> 
       }
       return objectMapper.readTree(body);
     } catch (JsonProcessingException e) {
-      throw new HieroException("Error parsing body as JSON: " + body, e);
+      throw new HieroBaseException("Error parsing body as JSON: " + body, e);
     }
   }
 }

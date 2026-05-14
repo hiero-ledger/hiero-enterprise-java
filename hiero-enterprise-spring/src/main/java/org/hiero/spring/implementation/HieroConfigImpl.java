@@ -13,6 +13,7 @@ import org.hiero.base.config.ConsensusNode;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.config.NetworkSettings;
 import org.hiero.base.data.Account;
+import org.hiero.base.HieroConfigurationException;
 import org.jspecify.annotations.NonNull;
 
 public class HieroConfigImpl implements HieroConfig {
@@ -31,7 +32,7 @@ public class HieroConfigImpl implements HieroConfig {
 
   private final Duration requestTimeout;
 
-  public HieroConfigImpl(@NonNull final HieroProperties properties) {
+  public HieroConfigImpl(@NonNull final HieroProperties properties) throws HieroConfigurationException {
     Objects.requireNonNull(properties, "properties must not be null");
 
     Objects.requireNonNull(properties.getPrivateKey(), "privateKey must not be null");
@@ -78,20 +79,20 @@ public class HieroConfigImpl implements HieroConfig {
     }
   }
 
-  private static AccountId parseAccountId(final String accountId) {
+  private static AccountId parseAccountId(final String accountId) throws HieroConfigurationException {
     try {
       return AccountId.fromString(accountId);
     } catch (Exception e) {
-      throw new IllegalArgumentException(
+      throw new HieroConfigurationException(
           "Can not parse 'accountId' property: '" + accountId + "'", e);
     }
   }
 
-  private static PrivateKey parsePrivateKey(final String privateKey) {
+  private static PrivateKey parsePrivateKey(final String privateKey) throws HieroConfigurationException {
     try {
       return PrivateKey.fromString(privateKey);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Can not parse 'privateKey' property", e);
+      throw new HieroConfigurationException("Can not parse 'privateKey' property", e);
     }
   }
 

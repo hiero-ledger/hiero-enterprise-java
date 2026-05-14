@@ -5,7 +5,7 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.implementation.MirrorNodeRestClient;
 import org.jspecify.annotations.NonNull;
 
@@ -18,7 +18,7 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonObject
   }
 
   @Override
-  public @NonNull JsonObject doGetCall(@NonNull String path) throws HieroException {
+  public @NonNull JsonObject doGetCall(@NonNull String path) throws HieroBaseException {
     Client client = ClientBuilder.newClient();
     Response response = client.target(target).path(path).request(MediaType.APPLICATION_JSON).get();
 
@@ -27,7 +27,7 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonObject
     }
 
     if (response.getStatus() >= 400) {
-      throw new HieroException("Mirror Node call failed with status " + response.getStatus());
+      throw new HieroBaseException("Mirror Node call failed with status " + response.getStatus());
     }
 
     return response.readEntity(JsonObject.class);

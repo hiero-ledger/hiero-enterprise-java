@@ -3,7 +3,7 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.AccountId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
@@ -24,14 +24,14 @@ public class TransactionRepositoryImpl implements TransactionRepository {
   @NonNull
   @Override
   public Page<TransactionInfo> findByAccount(@NonNull final AccountId accountId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return this.mirrorNodeClient.queryTransactionsByAccount(accountId);
   }
 
   @Override
   public @NonNull Page<TransactionInfo> findByAccountAndType(
-      @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroException {
+      @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(type, "type must not be null");
     return mirrorNodeClient.queryTransactionsByAccountAndType(accountId, type);
@@ -39,7 +39,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
   @Override
   public @NonNull Page<TransactionInfo> findByAccountAndResult(
-      @NonNull AccountId accountId, @NonNull Result result) throws HieroException {
+      @NonNull AccountId accountId, @NonNull Result result) throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(result, "result must not be null");
     return mirrorNodeClient.queryTransactionsByAccountAndResult(accountId, result);
@@ -47,7 +47,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
   @Override
   public @NonNull Page<TransactionInfo> findByAccountAndModification(
-      @NonNull AccountId accountId, @NonNull BalanceModification type) throws HieroException {
+      @NonNull AccountId accountId, @NonNull BalanceModification type) throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(type, "type must not be null");
     return mirrorNodeClient.queryTransactionsByAccountAndModification(accountId, type);
@@ -56,7 +56,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
   @NonNull
   @Override
   public Optional<TransactionInfo> findById(@NonNull final String transactionId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(transactionId, "transactionId must not be null");
     return this.mirrorNodeClient.queryTransaction(transactionId);
   }

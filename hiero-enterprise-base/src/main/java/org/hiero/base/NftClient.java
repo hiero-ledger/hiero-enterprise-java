@@ -24,10 +24,10 @@ public interface NftClient {
    * @param name the name of the NFT type
    * @param symbol the symbol of the NFT type
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull TokenId createNftType(@NonNull String name, @NonNull String symbol)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new NFT type. The operator account is used as treasury account for the NFT type.
@@ -36,11 +36,11 @@ public interface NftClient {
    * @param symbol the symbol of the NFT type
    * @param supplierKey the private key of the supplier account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull TokenId createNftType(
       @NonNull String name, @NonNull String symbol, @NonNull PrivateKey supplierKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new NFT type. The operator account is used as treasury account for the NFT type.
@@ -49,12 +49,12 @@ public interface NftClient {
    * @param symbol the symbol of the NFT type
    * @param supplierKey the private key of the supplier account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull
   default TokenId createNftType(
       @NonNull String name, @NonNull String symbol, @NonNull String supplierKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(supplierKey, "supplierKey must not be null");
     return createNftType(name, symbol, PrivateKey.fromString(supplierKey));
   }
@@ -67,14 +67,14 @@ public interface NftClient {
    * @param treasuryAccountId the ID of the treasury account
    * @param treasuryKey the private key of the treasury account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull TokenId createNftType(
       @NonNull String name,
       @NonNull String symbol,
       @NonNull AccountId treasuryAccountId,
       @NonNull PrivateKey treasuryKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new NFT type. The operator account is used as supplier account for the NFT type.
@@ -84,7 +84,7 @@ public interface NftClient {
    * @param treasuryAccountId the ID of the treasury account
    * @param treasuryKey the private key of the treasury account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull
   default TokenId createNftType(
@@ -92,7 +92,7 @@ public interface NftClient {
       @NonNull String symbol,
       @NonNull String treasuryAccountId,
       @NonNull String treasuryKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
     Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
     return createNftType(
@@ -106,12 +106,12 @@ public interface NftClient {
    * @param symbol the symbol of the NFT type
    * @param treasuryAccount the treasury account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull
   default TokenId createNftType(
       @NonNull String name, @NonNull String symbol, @NonNull Account treasuryAccount)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
     return createNftType(name, symbol, treasuryAccount.accountId(), treasuryAccount.privateKey());
   }
@@ -125,7 +125,7 @@ public interface NftClient {
    * @param treasuryKey the private key of the treasury account
    * @param supplierKey the private key of the supplier account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull TokenId createNftType(
       @NonNull String name,
@@ -133,7 +133,7 @@ public interface NftClient {
       @NonNull AccountId treasuryAccountId,
       @NonNull PrivateKey treasuryKey,
       @NonNull PrivateKey supplierKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new NFT type.
@@ -144,7 +144,7 @@ public interface NftClient {
    * @param treasuryKey the private key of the treasury account
    * @param supplierKey the private key of the supplier account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull
   default TokenId createNftType(
@@ -153,7 +153,7 @@ public interface NftClient {
       @NonNull String treasuryAccountId,
       @NonNull String treasuryKey,
       @NonNull String supplierKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
     Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
     Objects.requireNonNull(supplierKey, "supplierKey must not be null");
@@ -173,7 +173,7 @@ public interface NftClient {
    * @param treasuryAccount the treasury account
    * @param supplierKey the private key of the supplier account
    * @return the ID of the new NFT type
-   * @throws HieroException if the NFT type could not be created
+   * @throws HieroBaseException if the NFT type could not be created
    */
   @NonNull
   default TokenId createNftType(
@@ -181,7 +181,7 @@ public interface NftClient {
       @NonNull String symbol,
       @NonNull Account treasuryAccount,
       @NonNull PrivateKey supplierKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
     return createNftType(
         name, symbol, treasuryAccount.accountId(), treasuryAccount.privateKey(), supplierKey);
@@ -195,11 +195,11 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param accountId the ID of the account
    * @param accountKey the private key of the account
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   void associateNft(
       @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Associate an account with an NFT type. If an account is associated with an NFT type, the
@@ -209,11 +209,11 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param accountId the ID of the account
    * @param accountKey the private key of the account
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   default void associateNft(
       @NonNull String tokenId, @NonNull String accountId, @NonNull String accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
@@ -230,10 +230,10 @@ public interface NftClient {
    *
    * @param tokenId the ID of the NFT type
    * @param account the account
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   default void associateNft(@NonNull TokenId tokenId, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "account must not be null");
     associateNft(tokenId, account.accountId(), account.privateKey());
   }
@@ -246,11 +246,11 @@ public interface NftClient {
    * @param tokenIds the List of ID for NFT type
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   void associateNft(
       @NonNull List<TokenId> tokenIds, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Associate an account with an NFT type. If an account is associated with an NFT type, the
@@ -259,10 +259,10 @@ public interface NftClient {
    *
    * @param tokenIds the List of ID for NFT type
    * @param account the account
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   default void associateNft(@NonNull List<TokenId> tokenIds, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "accountId must not be null");
     associateNft(tokenIds, account.accountId(), account.privateKey());
   }
@@ -274,11 +274,11 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   void dissociateNft(
       @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Dissociate an account with an NFT type.
@@ -286,11 +286,11 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   default void dissociateNft(
       @NonNull String tokenId, @NonNull String accountId, @NonNull String accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
@@ -306,10 +306,10 @@ public interface NftClient {
    *
    * @param tokenId the ID of the NFT type
    * @param account the account
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   default void dissociateNft(@NonNull TokenId tokenId, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateNft(tokenId, account.accountId(), account.privateKey());
   }
@@ -321,21 +321,21 @@ public interface NftClient {
    * @param tokenIds the List of ID for NFT type
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   void dissociateNft(
       @NonNull List<TokenId> tokenIds, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Dissociate an account with an NFT type.
    *
    * @param tokenIds the List of ID for NFT type
    * @param account the account
-   * @throws HieroException if the account could not be associated with the NFT type
+   * @throws HieroBaseException if the account could not be associated with the NFT type
    */
   default void dissociateNft(@NonNull List<TokenId> tokenIds, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateNft(tokenIds, account.accountId(), account.privateKey());
   }
@@ -348,9 +348,9 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param metadata the metadata of the NFT
    * @return the serial number of the new NFT
-   * @throws HieroException if the NFT could not be minted
+   * @throws HieroBaseException if the NFT could not be minted
    */
-  long mintNft(@NonNull TokenId tokenId, @NonNull byte[] metadata) throws HieroException;
+  long mintNft(@NonNull TokenId tokenId, @NonNull byte[] metadata) throws HieroBaseException;
 
   /**
    * Mint a new NFT of the given type. The NFT is minted by the operator account. The operator
@@ -359,9 +359,9 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param metadata the metadata of the NFT
    * @return the serial number of the new NFT
-   * @throws HieroException if the NFT could not be minted
+   * @throws HieroBaseException if the NFT could not be minted
    */
-  default long mintNft(@NonNull String tokenId, @NonNull byte[] metadata) throws HieroException {
+  default long mintNft(@NonNull String tokenId, @NonNull byte[] metadata) throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return mintNft(TokenId.fromString(tokenId), metadata);
   }
@@ -373,10 +373,10 @@ public interface NftClient {
    * @param metadata the metadata of the NFT
    * @param supplyKey the private key of the supply account
    * @return the serial number of the new NFT
-   * @throws HieroException if the NFT could not be minted
+   * @throws HieroBaseException if the NFT could not be minted
    */
   long mintNft(@NonNull TokenId tokenId, @NonNull PrivateKey supplyKey, @NonNull byte[] metadata)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Mint a new NFT of the given type.
@@ -385,10 +385,10 @@ public interface NftClient {
    * @param metadata the metadata of the NFT
    * @param supplyKey the private key of the supply account
    * @return the serial number of the new NFT
-   * @throws HieroException if the NFT could not be minted
+   * @throws HieroBaseException if the NFT could not be minted
    */
   default long mintNft(@NonNull String tokenId, @NonNull String supplyKey, @NonNull byte[] metadata)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
     return mintNft(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), metadata);
@@ -401,10 +401,10 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param metadata the metadata of the NFTs
    * @return the serial numbers of the new NFTs
-   * @throws HieroException if the NFTs could not be minted
+   * @throws HieroBaseException if the NFTs could not be minted
    */
   @NonNull List<Long> mintNfts(@NonNull TokenId tokenId, @NonNull byte[]... metadata)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Mint new NFTs of the given type. The NFTs are minted by the operator account. The operator
@@ -413,11 +413,11 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param metadata the metadata of the NFTs
    * @return the serial numbers of the new NFTs
-   * @throws HieroException if the NFTs could not be minted
+   * @throws HieroBaseException if the NFTs could not be minted
    */
   @NonNull
   default List<Long> mintNfts(@NonNull String tokenId, @NonNull byte[]... metadata)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return mintNfts(TokenId.fromString(tokenId), metadata);
   }
@@ -429,11 +429,11 @@ public interface NftClient {
    * @param metadata the metadata of the NFTs
    * @param supplyKey the private key of the supply account
    * @return the serial numbers of the new NFTs
-   * @throws HieroException if the NFTs could not be minted
+   * @throws HieroBaseException if the NFTs could not be minted
    */
   @NonNull List<Long> mintNfts(
       @NonNull TokenId tokenId, @NonNull PrivateKey supplyKey, @NonNull byte[]... metadata)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Mint new NFTs of the given type.
@@ -442,12 +442,12 @@ public interface NftClient {
    * @param metadata the metadata of the NFTs
    * @param supplyKey the private key of the supply account
    * @return the serial numbers of the new NFTs
-   * @throws HieroException if the NFTs could not be minted
+   * @throws HieroBaseException if the NFTs could not be minted
    */
   @NonNull
   default List<Long> mintNfts(
       @NonNull String tokenId, @NonNull String supplyKey, @NonNull byte[]... metadata)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
     return mintNfts(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), metadata);
@@ -458,9 +458,9 @@ public interface NftClient {
    *
    * @param tokenId the ID of the NFT type
    * @param serialNumber the serial number of the NFT
-   * @throws HieroException if the NFT could not be burned
+   * @throws HieroBaseException if the NFT could not be burned
    */
-  default void burnNft(@NonNull TokenId tokenId, long serialNumber) throws HieroException {
+  default void burnNft(@NonNull TokenId tokenId, long serialNumber) throws HieroBaseException {
     burnNfts(tokenId, Set.of(serialNumber));
   }
 
@@ -470,10 +470,10 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param serialNumber the serial number of the NFT
    * @param supplyKey the private key of the supply account
-   * @throws HieroException if the NFT could not be burned
+   * @throws HieroBaseException if the NFT could not be burned
    */
   default void burnNft(@NonNull TokenId tokenId, long serialNumber, @NonNull PrivateKey supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     burnNfts(tokenId, Set.of(serialNumber), supplyKey);
   }
 
@@ -482,9 +482,9 @@ public interface NftClient {
    *
    * @param tokenId the ID of the NFT type
    * @param serialNumbers the serial numbers of the NFTs
-   * @throws HieroException if the NFTs could not be burned
+   * @throws HieroBaseException if the NFTs could not be burned
    */
-  void burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers) throws HieroException;
+  void burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers) throws HieroBaseException;
 
   /**
    * Burn NFTs.
@@ -492,11 +492,11 @@ public interface NftClient {
    * @param tokenId the ID of the NFT type
    * @param serialNumbers the serial numbers of the NFTs
    * @param supplyKey the private key of the supply account
-   * @throws HieroException
+   * @throws HieroBaseException
    */
   void burnNfts(
       @NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers, @NonNull PrivateKey supplyKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Transfer an NFT to another account.
@@ -506,7 +506,7 @@ public interface NftClient {
    * @param fromAccountId the ID of the account that holds the NFT
    * @param fromAccountKey the private key of the account that holds the NFT
    * @param toAccountId the ID of the account that should receive the NFT
-   * @throws HieroException if the NFT could not be transferred
+   * @throws HieroBaseException if the NFT could not be transferred
    */
   void transferNft(
       @NonNull TokenId tokenId,
@@ -514,7 +514,7 @@ public interface NftClient {
       @NonNull AccountId fromAccountId,
       @NonNull PrivateKey fromAccountKey,
       @NonNull AccountId toAccountId)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Transfer an NFT to another account.
@@ -523,14 +523,14 @@ public interface NftClient {
    * @param serialNumber the serial number of the NFT
    * @param fromAccount the account that holds the NFT
    * @param toAccountId the ID of the account that should receive the NFT
-   * @throws HieroException if the NFT could not be transferred
+   * @throws HieroBaseException if the NFT could not be transferred
    */
   default void transferNft(
       @NonNull TokenId tokenId,
       long serialNumber,
       @NonNull Account fromAccount,
       @NonNull AccountId toAccountId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(fromAccount, "fromAccount must not be null");
     transferNft(
         tokenId, serialNumber, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
@@ -544,7 +544,7 @@ public interface NftClient {
    * @param fromAccountId the ID of the account that holds the NFTs
    * @param fromAccountKey the private key of the account that holds the NFTs
    * @param toAccountId the ID of the account that should receive the NFTs
-   * @throws HieroException if the NFTs could not be transferred
+   * @throws HieroBaseException if the NFTs could not be transferred
    */
   void transferNfts(
       @NonNull TokenId tokenId,
@@ -552,7 +552,7 @@ public interface NftClient {
       @NonNull AccountId fromAccountId,
       @NonNull PrivateKey fromAccountKey,
       @NonNull AccountId toAccountId)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Transfer NFTs to another account.
@@ -561,14 +561,14 @@ public interface NftClient {
    * @param serialNumbers the serial numbers of the NFTs
    * @param fromAccount the account that holds the NFTs
    * @param toAccountId the ID of the account that should receive the NFTs
-   * @throws HieroException if the NFTs could not be transferred
+   * @throws HieroBaseException if the NFTs could not be transferred
    */
   default void transferNfts(
       @NonNull TokenId tokenId,
       @NonNull List<Long> serialNumbers,
       @NonNull Account fromAccount,
       @NonNull AccountId toAccountId)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(fromAccount, "fromAccount must not be null");
     transferNfts(
         tokenId, serialNumbers, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);

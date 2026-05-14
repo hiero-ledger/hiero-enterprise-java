@@ -15,7 +15,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.base.verification.ContractVerificationState;
@@ -37,17 +37,17 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
     webClient = ClientBuilder.newBuilder().build();
   }
 
-  private String getChainId() throws HieroException {
+  private String getChainId() throws HieroBaseException {
     return hieroConfig
         .chainId()
         .map(id -> Long.toString(id))
-        .orElseThrow(() -> new HieroException("Chain ID is not set"));
+        .orElseThrow(() -> new HieroBaseException("Chain ID is not set"));
   }
 
   @NonNull
   @Override
   public ContractVerificationState checkVerification(@NonNull ContractId contractId)
-      throws HieroException {
+      throws HieroBaseException {
     throw new UnsupportedOperationException("Not implemented");
   }
 
@@ -59,7 +59,7 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
   @Override
   public boolean checkVerification(
       @NonNull ContractId contractId, @NonNull String fileName, @NonNull String fileContent)
-      throws HieroException {
+      throws HieroBaseException {
     final ContractVerificationState state = checkVerification(contractId);
     if (state != ContractVerificationState.FULL) {
       throw new IllegalStateException("Contract is not verified");
@@ -90,7 +90,7 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       final String content = result.getString("content");
       return Objects.equals(content, fileContent);
     } catch (Exception e) {
-      throw new HieroException("Error verification step", e);
+      throw new HieroBaseException("Error verification step", e);
     }
   }
 
@@ -100,7 +100,7 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       @NonNull ContractId contractId,
       @NonNull String contractName,
       @NonNull Map<String, String> files)
-      throws HieroException {
+      throws HieroBaseException {
     throw new UnsupportedOperationException("Not implemented");
   }
 }

@@ -2,7 +2,7 @@ package org.hiero.base.implementation;
 
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.BlockRepository;
@@ -19,17 +19,17 @@ public class BlockRepositoryImpl implements BlockRepository {
   }
 
   @Override
-  public @NonNull Page<Block> findAll() throws HieroException {
+  public @NonNull Page<Block> findAll() throws HieroBaseException {
     return mirrorNodeClient.queryBlocks();
   }
 
   @Override
-  public @NonNull Optional<Block> findByNumber(long number) throws HieroException {
+  public @NonNull Optional<Block> findByNumber(long number) throws HieroBaseException {
     return mirrorNodeClient.queryBlockByNumber(number);
   }
 
   @Override
-  public @NonNull Optional<Block> findByHash(@NonNull String hash) throws HieroException {
+  public @NonNull Optional<Block> findByHash(@NonNull String hash) throws HieroBaseException {
     Objects.requireNonNull(hash, "hash must not be null");
     return mirrorNodeClient.queryBlockByHash(hash);
   }

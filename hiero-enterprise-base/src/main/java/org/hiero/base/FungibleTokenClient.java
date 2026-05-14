@@ -24,9 +24,9 @@ public interface FungibleTokenClient {
    * @param name the name of the token
    * @param symbol the symbol of the token
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
-  @NonNull TokenId createToken(@NonNull String name, @NonNull String symbol) throws HieroException;
+  @NonNull TokenId createToken(@NonNull String name, @NonNull String symbol) throws HieroBaseException;
 
   /**
    * Create a new token. The operator account is used treasury account for the token.
@@ -35,11 +35,11 @@ public interface FungibleTokenClient {
    * @param symbol the symbol of the token
    * @param supplyKey the private key of the supplier account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull TokenId createToken(
       @NonNull String name, @NonNull String symbol, @NonNull PrivateKey supplyKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new token. The operator account is used as treasury account for the token.
@@ -48,12 +48,12 @@ public interface FungibleTokenClient {
    * @param symbol the symbol of the token
    * @param supplyKey the private key of the supplier account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull
   default TokenId createToken(
       @NonNull String name, @NonNull String symbol, @NonNull String supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
@@ -68,14 +68,14 @@ public interface FungibleTokenClient {
    * @param treasuryAccountId the ID of the treasury account
    * @param treasuryKey the private key of the treasury account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull TokenId createToken(
       @NonNull String name,
       @NonNull String symbol,
       @NonNull AccountId treasuryAccountId,
       @NonNull PrivateKey treasuryKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new token.
@@ -85,7 +85,7 @@ public interface FungibleTokenClient {
    * @param treasuryAccountId the ID of the treasury account
    * @param treasuryKey the private key of the treasury account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull
   default TokenId createToken(
@@ -93,7 +93,7 @@ public interface FungibleTokenClient {
       @NonNull String symbol,
       @NonNull String treasuryAccountId,
       @NonNull String treasuryKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
@@ -109,12 +109,12 @@ public interface FungibleTokenClient {
    * @param symbol the symbol of the token
    * @param treasuryAccount the treasury account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull
   default TokenId createToken(
       @NonNull String name, @NonNull String symbol, @NonNull Account treasuryAccount)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
@@ -130,7 +130,7 @@ public interface FungibleTokenClient {
    * @param treasuryKey the private key of the treasury account
    * @param supplyKey the private key of the supplier account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull TokenId createToken(
       @NonNull String name,
@@ -138,7 +138,7 @@ public interface FungibleTokenClient {
       @NonNull AccountId treasuryAccountId,
       @NonNull PrivateKey treasuryKey,
       @NonNull PrivateKey supplyKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Create a new token.
@@ -149,7 +149,7 @@ public interface FungibleTokenClient {
    * @param treasuryKey the private key of the treasury account
    * @param supplyKey the private key of the supplier account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull
   default TokenId createToken(
@@ -158,7 +158,7 @@ public interface FungibleTokenClient {
       @NonNull String treasuryAccountId,
       @NonNull String treasuryKey,
       @NonNull String supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
@@ -180,7 +180,7 @@ public interface FungibleTokenClient {
    * @param supplyKey the private key of the supplier account
    * @param treasuryAccount the treasury account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull
   default TokenId createToken(
@@ -188,7 +188,7 @@ public interface FungibleTokenClient {
       @NonNull String symbol,
       @NonNull Account treasuryAccount,
       @NonNull PrivateKey supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
@@ -205,7 +205,7 @@ public interface FungibleTokenClient {
    * @param supplyKey the private key of the supplier account
    * @param treasuryAccount the treasury account
    * @return the ID of the new token
-   * @throws HieroException if the token could not be created
+   * @throws HieroBaseException if the token could not be created
    */
   @NonNull
   default TokenId createToken(
@@ -213,7 +213,7 @@ public interface FungibleTokenClient {
       @NonNull String symbol,
       @NonNull Account treasuryAccount,
       @NonNull String supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
@@ -232,11 +232,11 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param accountId the ID of the account
    * @param accountKey the private key of the account
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   void associateToken(
       @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Associate an account with token.
@@ -244,11 +244,11 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param accountId the ID of the account
    * @param accountKey the private key of the account
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   default void associateToken(
       @NonNull TokenId tokenId, @NonNull String accountId, @NonNull String accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
     associateToken(tokenId, AccountId.fromString(accountId), PrivateKey.fromString(accountKey));
@@ -259,10 +259,10 @@ public interface FungibleTokenClient {
    *
    * @param tokenId the ID of the token
    * @param account the account
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   default void associateToken(@NonNull TokenId tokenId, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "account must not be null");
     associateToken(tokenId, account.accountId(), account.privateKey());
   }
@@ -273,21 +273,21 @@ public interface FungibleTokenClient {
    * @param tokenIds list of the ID of the token
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   void associateToken(
       @NonNull List<TokenId> tokenIds, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Associate an account with token.
    *
    * @param tokenIds list of the ID of the token
    * @param account the account
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   default void associateToken(@NonNull List<TokenId> tokenIds, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "accountId must not be null");
     associateToken(tokenIds, account.accountId(), account.privateKey());
   }
@@ -299,11 +299,11 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   void dissociateToken(
       @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Dissociate an account with token.
@@ -311,11 +311,11 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   default void dissociateToken(
       @NonNull String tokenId, @NonNull String accountId, @NonNull String accountKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
@@ -331,10 +331,10 @@ public interface FungibleTokenClient {
    *
    * @param tokenId the ID of the token
    * @param account the account
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   default void dissociateToken(@NonNull TokenId tokenId, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateToken(tokenId, account.accountId(), account.privateKey());
   }
@@ -346,21 +346,21 @@ public interface FungibleTokenClient {
    * @param tokenIds list of the ID of the token
    * @param accountId the accountId
    * @param accountKey the account privateKey
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   void dissociateToken(
       @NonNull List<TokenId> tokenIds, @NonNull AccountId accountId, @NonNull PrivateKey accountKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Dissociate an account with token.
    *
    * @param tokenIds list of the ID of the token
    * @param account the account
-   * @throws HieroException if the account could not be associated with the token
+   * @throws HieroBaseException if the account could not be associated with the token
    */
   default void dissociateToken(@NonNull List<TokenId> tokenIds, @NonNull Account account)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateToken(tokenIds, account.accountId(), account.privateKey());
   }
@@ -372,9 +372,9 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param amount amount to mint to the Treasury Account
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be minted
+   * @throws HieroBaseException if the token could not be minted
    */
-  long mintToken(@NonNull TokenId tokenId, long amount) throws HieroException;
+  long mintToken(@NonNull TokenId tokenId, long amount) throws HieroBaseException;
 
   /**
    * Mint a Token.
@@ -382,9 +382,9 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param amount amount to mint to the Treasury Account
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be minted
+   * @throws HieroBaseException if the token could not be minted
    */
-  default long mintToken(@NonNull String tokenId, long amount) throws HieroException {
+  default long mintToken(@NonNull String tokenId, long amount) throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return mintToken(TokenId.fromString(tokenId), amount);
   }
@@ -396,10 +396,10 @@ public interface FungibleTokenClient {
    * @param amount amount to mint to the Treasury Account
    * @param supplyKey the private key of the supply account
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be minted
+   * @throws HieroBaseException if the token could not be minted
    */
   long mintToken(@NonNull TokenId tokenId, @NonNull PrivateKey supplyKey, long amount)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Mint a Token.
@@ -408,10 +408,10 @@ public interface FungibleTokenClient {
    * @param amount amount to mint to the Treasury Account
    * @param supplyKey the private key of the supply account
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be minted
+   * @throws HieroBaseException if the token could not be minted
    */
   default long mintToken(@NonNull String tokenId, @NonNull String supplyKey, long amount)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
     return mintToken(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), amount);
@@ -423,9 +423,9 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param amount amount to burn
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be burned
+   * @throws HieroBaseException if the token could not be burned
    */
-  long burnToken(@NonNull TokenId tokenId, long amount) throws HieroException;
+  long burnToken(@NonNull TokenId tokenId, long amount) throws HieroBaseException;
 
   /**
    * Burn a Token.
@@ -434,10 +434,10 @@ public interface FungibleTokenClient {
    * @param amount amount to burn
    * @param supplyKey the private key of the supply account
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be burned
+   * @throws HieroBaseException if the token could not be burned
    */
   long burnToken(@NonNull TokenId tokenId, long amount, @NonNull PrivateKey supplyKey)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Burn a Token.
@@ -446,10 +446,10 @@ public interface FungibleTokenClient {
    * @param amount amount to burn
    * @param supplyKey the private key of the supply account
    * @return totalSupply for the token
-   * @throws HieroException if the token could not be burned
+   * @throws HieroBaseException if the token could not be burned
    */
   default long burnToken(@NonNull TokenId tokenId, long amount, @NonNull String supplyKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
     return burnToken(tokenId, amount, PrivateKey.fromString(supplyKey));
@@ -461,10 +461,10 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param amount the value of token to transfer
    * @param toAccountId the ID of the account that should receive the token
-   * @throws HieroException if the token could not be transferred
+   * @throws HieroBaseException if the token could not be transferred
    */
   void transferToken(@NonNull TokenId tokenId, @NonNull AccountId toAccountId, long amount)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Transfer a Token to another account.
@@ -472,10 +472,10 @@ public interface FungibleTokenClient {
    * @param tokenId the ID of the token
    * @param amount the value of token to transfer
    * @param toAccountId the ID of the account that should receive the token
-   * @throws HieroException if the token could not be transferred
+   * @throws HieroBaseException if the token could not be transferred
    */
   default void transferToken(@NonNull TokenId tokenId, @NonNull String toAccountId, long amount)
-      throws HieroException {
+      throws HieroBaseException {
     transferToken(tokenId, AccountId.fromString(toAccountId), amount);
   }
 
@@ -487,7 +487,7 @@ public interface FungibleTokenClient {
    * @param fromAccountId the ID of the account that holds the token
    * @param fromAccountKey the private key of the account that holds the token
    * @param toAccountId the ID of the account that should receive the token
-   * @throws HieroException if the token could not be transferred
+   * @throws HieroBaseException if the token could not be transferred
    */
   void transferToken(
       @NonNull TokenId tokenId,
@@ -495,7 +495,7 @@ public interface FungibleTokenClient {
       @NonNull PrivateKey fromAccountKey,
       @NonNull AccountId toAccountId,
       long amount)
-      throws HieroException;
+      throws HieroBaseException;
 
   /**
    * Transfer a Token to another account.
@@ -504,14 +504,14 @@ public interface FungibleTokenClient {
    * @param amount the value of token to transfer
    * @param fromAccount the account that holds the token
    * @param toAccountId the ID of the account that should receive the token
-   * @throws HieroException if the token could not be transferred
+   * @throws HieroBaseException if the token could not be transferred
    */
   default void transferToken(
       @NonNull TokenId tokenId,
       @NonNull Account fromAccount,
       @NonNull AccountId toAccountId,
       long amount)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(fromAccount, "fromAccount must not be null");
     Objects.requireNonNull(toAccountId, "toAccountId must not be null");
@@ -526,7 +526,7 @@ public interface FungibleTokenClient {
    * @param fromAccountId the ID of the account that holds the token
    * @param fromAccountKey the private key of the account that holds the token
    * @param toAccountId the ID of the account that should receive the token
-   * @throws HieroException if the token could not be transferred
+   * @throws HieroBaseException if the token could not be transferred
    */
   default void transferToken(
       @NonNull TokenId tokenId,
@@ -534,7 +534,7 @@ public interface FungibleTokenClient {
       @NonNull String fromAccountKey,
       @NonNull String toAccountId,
       long amount)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
     Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");

@@ -3,7 +3,7 @@ package org.hiero.base.implementation;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -23,12 +23,12 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public @NonNull TopicId createTopic() throws HieroException {
+  public @NonNull TopicId createTopic() throws HieroBaseException {
     return createTopic(operationalAccount.privateKey());
   }
 
   @Override
-  public @NonNull TopicId createTopic(@NonNull PrivateKey adminKey) throws HieroException {
+  public @NonNull TopicId createTopic(@NonNull PrivateKey adminKey) throws HieroBaseException {
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     TopicCreateRequest request = TopicCreateRequest.of(adminKey);
     TopicCreateResult result = client.executeTopicCreateTransaction(request);
@@ -36,14 +36,14 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public @NonNull TopicId createTopic(@NonNull String memo) throws HieroException {
+  public @NonNull TopicId createTopic(@NonNull String memo) throws HieroBaseException {
     Objects.requireNonNull(memo, "memo must not be null");
     return createTopic(operationalAccount.privateKey(), memo);
   }
 
   @Override
   public @NonNull TopicId createTopic(@NonNull PrivateKey adminKey, @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
     TopicCreateRequest request = TopicCreateRequest.of(adminKey, memo);
@@ -52,14 +52,14 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public @NonNull TopicId createPrivateTopic(@NonNull PrivateKey submitKey) throws HieroException {
+  public @NonNull TopicId createPrivateTopic(@NonNull PrivateKey submitKey) throws HieroBaseException {
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     return createPrivateTopic(operationalAccount.privateKey(), submitKey);
   }
 
   @Override
   public @NonNull TopicId createPrivateTopic(
-      @NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey) throws HieroException {
+      @NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey) throws HieroBaseException {
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     TopicCreateRequest request = TopicCreateRequest.of(adminKey, submitKey);
@@ -69,7 +69,7 @@ public class TopicClientImpl implements TopicClient {
 
   @Override
   public @NonNull TopicId createPrivateTopic(@NonNull PrivateKey submitKey, @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
     return createPrivateTopic(operationalAccount.privateKey(), submitKey, memo);
@@ -78,7 +78,7 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public @NonNull TopicId createPrivateTopic(
       @NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey, @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
@@ -88,7 +88,7 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public void updateTopic(@NonNull TopicId topicId, @NonNull String memo) throws HieroException {
+  public void updateTopic(@NonNull TopicId topicId, @NonNull String memo) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
     updateTopic(topicId, operationalAccount.privateKey(), memo);
@@ -97,7 +97,7 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public void updateTopic(
       @NonNull TopicId topicId, @NonNull PrivateKey adminKey, @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
@@ -111,7 +111,7 @@ public class TopicClientImpl implements TopicClient {
       @NonNull PrivateKey updatedAdminKey,
       @NonNull PrivateKey submitKey,
       @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(memo, "memo must not be null");
@@ -125,7 +125,7 @@ public class TopicClientImpl implements TopicClient {
       @NonNull PrivateKey updatedAdminKey,
       @NonNull PrivateKey submitKey,
       @NonNull String memo)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
@@ -137,7 +137,7 @@ public class TopicClientImpl implements TopicClient {
 
   @Override
   public void updateAdminKey(@NonNull TopicId topicId, @NonNull PrivateKey updatedAdminKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(updatedAdminKey, "updatedAdminKey must not be null");
     updateAdminKey(topicId, operationalAccount.privateKey(), updatedAdminKey);
@@ -146,7 +146,7 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public void updateAdminKey(
       @NonNull TopicId topicId, @NonNull PrivateKey adminKey, @NonNull PrivateKey updatedAdminKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(updatedAdminKey, "updatedAdminKey must not be null");
@@ -157,7 +157,7 @@ public class TopicClientImpl implements TopicClient {
 
   @Override
   public void updateSubmitKey(@NonNull TopicId topicId, @NonNull PrivateKey submitKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     updateSubmitKey(topicId, operationalAccount.privateKey(), submitKey);
@@ -166,7 +166,7 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public void updateSubmitKey(
       @NonNull TopicId topicId, @NonNull PrivateKey adminKey, @NonNull PrivateKey submitKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
@@ -175,7 +175,7 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public void deleteTopic(@NonNull TopicId topicId) throws HieroException {
+  public void deleteTopic(@NonNull TopicId topicId) throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     TopicDeleteRequest request = TopicDeleteRequest.of(operationalAccount.privateKey(), topicId);
     client.executeTopicDeleteTransaction(request);
@@ -183,7 +183,7 @@ public class TopicClientImpl implements TopicClient {
 
   @Override
   public void deleteTopic(@NonNull TopicId topicId, @NonNull PrivateKey adminKey)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     TopicDeleteRequest request = TopicDeleteRequest.of(adminKey, topicId);
@@ -192,7 +192,7 @@ public class TopicClientImpl implements TopicClient {
 
   @Override
   public void submitMessage(@NonNull TopicId topicId, @NonNull String message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(message, "message must not be null");
     submitMessage(topicId, message.getBytes());
@@ -200,7 +200,7 @@ public class TopicClientImpl implements TopicClient {
 
   @Override
   public void submitMessage(@NonNull TopicId topicId, @NonNull byte[] message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(message, "message must not be null");
     TopicSubmitMessageRequest request = TopicSubmitMessageRequest.of(topicId, message);
@@ -210,7 +210,7 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public void submitMessage(
       @NonNull TopicId topicId, @NonNull PrivateKey submitKey, @NonNull String message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(message, "message must not be null");
@@ -220,7 +220,7 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public void submitMessage(
       @NonNull TopicId topicId, @NonNull PrivateKey submitKey, @NonNull byte[] message)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(message, "message must not be null");

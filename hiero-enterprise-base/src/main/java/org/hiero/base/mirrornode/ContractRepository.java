@@ -3,7 +3,7 @@ package org.hiero.base.mirrornode;
 import com.hedera.hashgraph.sdk.ContractId;
 import java.util.Objects;
 import java.util.Optional;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.Page;
 import org.jspecify.annotations.NonNull;
@@ -18,28 +18,28 @@ public interface ContractRepository {
    * Return all contracts.
    *
    * @return first page of contracts
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Page<Contract> findAll() throws HieroException;
+  @NonNull Page<Contract> findAll() throws HieroBaseException;
 
   /**
    * Return a contract by its contract ID.
    *
    * @param contractId id of the contract
    * @return {@link Optional} containing the found contract or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
-  @NonNull Optional<Contract> findById(@NonNull ContractId contractId) throws HieroException;
+  @NonNull Optional<Contract> findById(@NonNull ContractId contractId) throws HieroBaseException;
 
   /**
    * Return a contract by its contract ID.
    *
    * @param contractId id of the contract
    * @return {@link Optional} containing the found contract or null
-   * @throws HieroException if the search fails
+   * @throws HieroBaseException if the search fails
    */
   @NonNull
-  default Optional<Contract> findById(@NonNull String contractId) throws HieroException {
+  default Optional<Contract> findById(@NonNull String contractId) throws HieroBaseException {
     Objects.requireNonNull(contractId, "contractId must not be null");
     return findById(ContractId.fromString(contractId));
   }

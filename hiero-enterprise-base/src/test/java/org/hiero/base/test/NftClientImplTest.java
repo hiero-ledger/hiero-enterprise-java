@@ -12,7 +12,8 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
 import java.util.Set;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
+import org.hiero.base.HieroValidationException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -60,7 +61,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testCreateNftWithNameAndSymbol() throws HieroException {
+  void testCreateNftWithNameAndSymbol() throws HieroBaseException {
     // mock
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final AccountId accountId = AccountId.fromString("1.2.3");
@@ -98,7 +99,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testCreateNftWithNameSymbolAndSupplier() throws HieroException {
+  void testCreateNftWithNameSymbolAndSupplier() throws HieroBaseException {
     // mock
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final AccountId accountId = AccountId.fromString("1.2.3");
@@ -137,7 +138,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testCreateNftWithNameSymbolTreasuryAccountIdAndKey() throws HieroException {
+  void testCreateNftWithNameSymbolTreasuryAccountIdAndKey() throws HieroBaseException {
     // mock
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -174,7 +175,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testCreateNftWithAllParam() throws HieroException {
+  void testCreateNftWithAllParam() throws HieroBaseException {
     // mock
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
@@ -225,7 +226,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testTransferNft() throws HieroException {
+  void testTransferNft() throws HieroBaseException {
     // mock
     final TokenTransferResult tokenTransferResult = Mockito.mock(TokenTransferResult.class);
 
@@ -253,7 +254,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testTransferNfts() throws HieroException {
+  void testTransferNfts() throws HieroBaseException {
     // mock
     final TokenTransferResult tokenTransferResult = Mockito.mock(TokenTransferResult.class);
 
@@ -281,7 +282,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testTransferNftThrowsExceptionForInvalidTokenId() throws HieroException {
+  void testTransferNftThrowsExceptionForInvalidTokenId() throws HieroBaseException {
     // given
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId fromAccount = AccountId.fromString("1.2.3");
@@ -292,11 +293,11 @@ public class NftClientImplTest {
     // when
     when(protocolLayerClient.executeTransferTransaction(any(TokenTransferRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenTransferTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenTransferTransaction"));
 
     // then
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> nftClientImpl.transferNft(tokenId, serial, fromAccount, fromAccountKey, toAccount));
   }
 
@@ -312,16 +313,16 @@ public class NftClientImplTest {
     final PrivateKey fromAccountKey = PrivateKey.generateECDSA();
     final long serial = -1L;
 
-    IllegalArgumentException e1 =
+    HieroValidationException e1 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () ->
                 nftClientImpl.transferNft(tokenId, serial, fromAccount, fromAccountKey, toAccount));
     Assertions.assertEquals(e1Message, e1.getMessage());
 
-    IllegalArgumentException e2 =
+    HieroValidationException e2 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () ->
                 nftClientImpl.transferNfts(
                     tokenId, List.of(), fromAccount, fromAccountKey, toAccount));
@@ -337,7 +338,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testBurnNft() throws HieroException {
+  void testBurnNft() throws HieroBaseException {
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final TokenBurnResult tokenBurnRequest = Mockito.mock(TokenBurnResult.class);
 
@@ -360,7 +361,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testBurnNftWithSupplyKey() throws HieroException {
+  void testBurnNftWithSupplyKey() throws HieroBaseException {
     final TokenBurnResult tokenBurnRequest = Mockito.mock(TokenBurnResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -381,7 +382,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testBurnNfts() throws HieroException {
+  void testBurnNfts() throws HieroBaseException {
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final TokenBurnResult tokenBurnRequest = Mockito.mock(TokenBurnResult.class);
 
@@ -404,7 +405,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testBurnNftsWithSupplyKey() throws HieroException {
+  void testBurnNftsWithSupplyKey() throws HieroBaseException {
     final TokenBurnResult tokenBurnRequest = Mockito.mock(TokenBurnResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -425,7 +426,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testBurnNftThrowsExceptionForInvalidTokenId() throws HieroException {
+  void testBurnNftThrowsExceptionForInvalidTokenId() throws HieroBaseException {
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final long serials = 1L;
@@ -433,15 +434,15 @@ public class NftClientImplTest {
     when(operationalAccount.privateKey()).thenReturn(privateKey);
     when(protocolLayerClient.executeBurnTokenTransaction(any(TokenBurnRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenBurnTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenBurnTransaction"));
 
-    Assertions.assertThrows(HieroException.class, () -> nftClientImpl.burnNft(tokenId, serials));
+    Assertions.assertThrows(HieroBaseException.class, () -> nftClientImpl.burnNft(tokenId, serials));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.burnNft(tokenId, serials, privateKey));
+        HieroBaseException.class, () -> nftClientImpl.burnNft(tokenId, serials, privateKey));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.burnNfts(tokenId, Set.of(serials)));
+        HieroBaseException.class, () -> nftClientImpl.burnNfts(tokenId, Set.of(serials)));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.burnNfts(tokenId, Set.of(serials), privateKey));
+        HieroBaseException.class, () -> nftClientImpl.burnNfts(tokenId, Set.of(serials), privateKey));
   }
 
   @Test
@@ -457,7 +458,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testAssociateNft() throws HieroException {
+  void testAssociateNft() throws HieroBaseException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -479,7 +480,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testAssociateNftWithAccount() throws HieroException {
+  void testAssociateNftWithAccount() throws HieroBaseException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey privateKey = PrivateKey.generateECDSA();
@@ -503,7 +504,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testAssociateNftThrowsExceptionForInvalidId() throws HieroException {
+  void testAssociateNftThrowsExceptionForInvalidId() throws HieroBaseException {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
@@ -511,12 +512,12 @@ public class NftClientImplTest {
 
     when(protocolLayerClient.executeTokenAssociateTransaction(any(TokenAssociateRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenAssociateTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenAssociateTransaction"));
 
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.associateNft(tokenId, accountId, accountKey));
+        HieroBaseException.class, () -> nftClientImpl.associateNft(tokenId, accountId, accountKey));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.associateNft(tokenId, account));
+        HieroBaseException.class, () -> nftClientImpl.associateNft(tokenId, account));
   }
 
   @Test
@@ -529,7 +530,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testAssociateNftWithMultipleToken() throws HieroException {
+  void testAssociateNftWithMultipleToken() throws HieroBaseException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
 
     final TokenId tokenId1 = TokenId.fromString("1.2.3");
@@ -557,15 +558,15 @@ public class NftClientImplTest {
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
 
-    IllegalArgumentException e =
+    HieroValidationException e =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> nftClientImpl.associateNft(List.of(), accountId, accountKey));
     Assertions.assertEquals("tokenIds must not be empty", e.getMessage());
   }
 
   @Test
-  void testDissociateNft() throws HieroException {
+  void testDissociateNft() throws HieroBaseException {
     final TokenDissociateResult tokenDissociateResult = Mockito.mock(TokenDissociateResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -587,7 +588,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testDissociateNftThrowsExceptionForInvalidId() throws HieroException {
+  void testDissociateNftThrowsExceptionForInvalidId() throws HieroBaseException {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
@@ -595,12 +596,12 @@ public class NftClientImplTest {
 
     when(protocolLayerClient.executeTokenDissociateTransaction(any(TokenDissociateRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenDissociateTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenDissociateTransaction"));
 
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.dissociateNft(tokenId, accountId, accountKey));
+        HieroBaseException.class, () -> nftClientImpl.dissociateNft(tokenId, accountId, accountKey));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.dissociateNft(tokenId, account));
+        HieroBaseException.class, () -> nftClientImpl.dissociateNft(tokenId, account));
   }
 
   @Test
@@ -612,7 +613,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testDissociateNftWithMultipleToken() throws HieroException {
+  void testDissociateNftWithMultipleToken() throws HieroBaseException {
     final TokenDissociateResult tokenDissociateResult = Mockito.mock(TokenDissociateResult.class);
 
     final TokenId tokenId1 = TokenId.fromString("1.2.3");
@@ -640,15 +641,15 @@ public class NftClientImplTest {
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
 
-    IllegalArgumentException e =
+    HieroValidationException e =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> nftClientImpl.dissociateNft(List.of(), accountId, accountKey));
     Assertions.assertEquals("tokenIds must not be empty", e.getMessage());
   }
 
   @Test
-  void testMintNft() throws HieroException {
+  void testMintNft() throws HieroBaseException {
     final TokenMintResult tokenMintResult = Mockito.mock(TokenMintResult.class);
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
 
@@ -675,7 +676,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testMintNftWithSupplyKey() throws HieroException {
+  void testMintNftWithSupplyKey() throws HieroBaseException {
     final TokenMintResult tokenMintResult = Mockito.mock(TokenMintResult.class);
 
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
@@ -709,12 +710,12 @@ public class NftClientImplTest {
 
     when(operationalAccount.privateKey()).thenReturn(supplyKey);
 
-    final IllegalArgumentException e1 =
+    final HieroValidationException e1 =
         Assertions.assertThrows(
-            IllegalArgumentException.class, () -> nftClientImpl.mintNft(tokenId, metadata));
-    final IllegalArgumentException e2 =
+            HieroValidationException.class, () -> nftClientImpl.mintNft(tokenId, metadata));
+    final HieroValidationException e2 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> nftClientImpl.mintNft(tokenId, supplyKey, metadata));
 
     Assertions.assertEquals(message, e1.getMessage());
@@ -722,7 +723,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testMintNftThrowExceptionForInvalidId() throws HieroException {
+  void testMintNftThrowExceptionForInvalidId() throws HieroBaseException {
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final byte[] metadata = "Hello Hiero".getBytes();
@@ -730,11 +731,11 @@ public class NftClientImplTest {
     when(operationalAccount.privateKey()).thenReturn(supplyKey);
     when(protocolLayerClient.executeMintTokenTransaction(any(TokenMintRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenTransferTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenTransferTransaction"));
 
-    Assertions.assertThrows(HieroException.class, () -> nftClientImpl.mintNft(tokenId, metadata));
+    Assertions.assertThrows(HieroBaseException.class, () -> nftClientImpl.mintNft(tokenId, metadata));
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.mintNft(tokenId, supplyKey, metadata));
+        HieroBaseException.class, () -> nftClientImpl.mintNft(tokenId, supplyKey, metadata));
   }
 
   @Test
@@ -757,7 +758,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testMintNfts() throws HieroException {
+  void testMintNfts() throws HieroBaseException {
     final List<Long> serials = List.of(1L, 2L);
     final TokenMintResult tokenMintResult = Mockito.mock(TokenMintResult.class);
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
@@ -786,7 +787,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testMintNftsWithSupplyKey() throws HieroException {
+  void testMintNftsWithSupplyKey() throws HieroBaseException {
     final List<Long> serials = List.of(1L, 2L);
     final TokenMintResult tokenMintResult = Mockito.mock(TokenMintResult.class);
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
@@ -823,13 +824,13 @@ public class NftClientImplTest {
 
     when(operationalAccount.privateKey()).thenReturn(supplyKey);
 
-    final IllegalArgumentException e1 =
+    final HieroValidationException e1 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> nftClientImpl.mintNfts(tokenId, metadata1, metadata2));
-    final IllegalArgumentException e2 =
+    final HieroValidationException e2 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> nftClientImpl.mintNfts(tokenId, supplyKey, metadata1, metadata2));
 
     Assertions.assertEquals(message, e1.getMessage());
@@ -837,7 +838,7 @@ public class NftClientImplTest {
   }
 
   @Test
-  void testMintNftsThrowExceptionForInvalidId() throws HieroException {
+  void testMintNftsThrowExceptionForInvalidId() throws HieroBaseException {
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final byte[] metadata1 = "Hello Hiero1".getBytes();
@@ -846,12 +847,12 @@ public class NftClientImplTest {
     when(operationalAccount.privateKey()).thenReturn(supplyKey);
     when(protocolLayerClient.executeMintTokenTransaction(any(TokenMintRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenTransferTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenTransferTransaction"));
 
     Assertions.assertThrows(
-        HieroException.class, () -> nftClientImpl.mintNfts(tokenId, metadata1, metadata2));
+        HieroBaseException.class, () -> nftClientImpl.mintNfts(tokenId, metadata1, metadata2));
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> nftClientImpl.mintNfts(tokenId, supplyKey, metadata1, metadata2));
   }
 

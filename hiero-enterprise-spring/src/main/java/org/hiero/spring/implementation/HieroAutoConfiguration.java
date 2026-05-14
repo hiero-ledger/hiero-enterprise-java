@@ -12,6 +12,8 @@ import org.hiero.base.NftClient;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.TopicClient;
 import org.hiero.base.config.HieroConfig;
+import org.hiero.base.HieroConfigurationException;
+import org.hiero.base.HieroValidationException;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.implementation.AccountRepositoryImpl;
 import org.hiero.base.implementation.BlockRepositoryImpl;
@@ -60,13 +62,13 @@ public class HieroAutoConfiguration {
 
   @Bean
   @ApplicationScope
-  HieroConfig hieroConfig(final HieroProperties properties) {
+  HieroConfig hieroConfig(final HieroProperties properties) throws HieroConfigurationException {
     return new HieroConfigImpl(properties);
   }
 
   @Bean
   @ApplicationScope
-  HieroContext hieroContext(final HieroConfig hieroConfig) {
+  HieroContext hieroContext(final HieroConfig hieroConfig) throws HieroConfigurationException {
     return hieroConfig.createHieroContext();
   }
 
@@ -125,11 +127,11 @@ public class HieroAutoConfiguration {
       name = "mirrorNodeSupported",
       havingValue = "true",
       matchIfMissing = true)
-  MirrorNodeClient mirrorNodeClient(final HieroContext hieroContext) {
+  MirrorNodeClient mirrorNodeClient(final HieroContext hieroContext) throws HieroValidationException {
     final String mirrorNodeEndpoint;
     final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
     if (mirrorNetwork.isEmpty()) {
-      throw new IllegalArgumentException("Mirror node endpoint must be set");
+      throw new HieroValidationException("Mirror node endpoint must be set");
     }
     mirrorNodeEndpoint = mirrorNetwork.get(0);
     final String baseUri;
@@ -156,7 +158,7 @@ public class HieroAutoConfiguration {
               + ":"
               + mirrorNodeEndpointPort;
     } catch (Exception e) {
-      throw new IllegalArgumentException(
+      throw new HieroValidationException(
           "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
     }
     RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);

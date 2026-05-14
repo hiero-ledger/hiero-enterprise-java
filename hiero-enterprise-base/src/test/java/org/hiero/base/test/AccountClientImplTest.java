@@ -9,7 +9,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -36,7 +36,7 @@ public class AccountClientImplTest {
   }
 
   @Test
-  public void testGetAccountBalanceValidPositiveBalance() throws HieroException {
+  public void testGetAccountBalanceValidPositiveBalance() throws HieroBaseException {
     AccountId accountId = AccountId.fromString("0.0.12345");
     Hbar expectedBalance = new Hbar(10);
 
@@ -54,7 +54,7 @@ public class AccountClientImplTest {
   }
 
   @Test
-  public void testGetAccountBalanceZeroBalance() throws HieroException {
+  public void testGetAccountBalanceZeroBalance() throws HieroBaseException {
     AccountId accountId = AccountId.fromString("0.0.67890");
     Hbar expectedBalance = new Hbar(0);
 
@@ -71,15 +71,15 @@ public class AccountClientImplTest {
   }
 
   @Test
-  public void testGetAccountBalanceInvalidAccountThrowsException() throws HieroException {
+  public void testGetAccountBalanceInvalidAccountThrowsException() throws HieroBaseException {
     AccountId invalidAccountId = AccountId.fromString("0.0.9999999");
 
     when(mockProtocolLayerClient.executeAccountBalanceQuery(
             ArgumentMatchers.any(AccountBalanceRequest.class)))
-        .thenThrow(new HieroException("Invalid account"));
+        .thenThrow(new HieroBaseException("Invalid account"));
 
     assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> {
           accountClientImpl.getAccountBalance(invalidAccountId);
         });
@@ -95,7 +95,7 @@ public class AccountClientImplTest {
   }
 
   @Test
-  public void testGetAccountBalanceProtocolLayerClientFails() throws HieroException {
+  public void testGetAccountBalanceProtocolLayerClientFails() throws HieroBaseException {
     AccountId accountId = AccountId.fromString("0.0.12345");
 
     when(mockProtocolLayerClient.executeAccountBalanceQuery(
@@ -111,7 +111,7 @@ public class AccountClientImplTest {
 
   // tests for createAccount method
   @Test
-  void testCreateAccountSuccessful() throws HieroException {
+  void testCreateAccountSuccessful() throws HieroBaseException {
     Hbar initialBalance = Hbar.from(100);
 
     AccountCreateResult mockResult = mock(AccountCreateResult.class);
@@ -140,26 +140,26 @@ public class AccountClientImplTest {
   @Test
   void testCreateAccount_invalidInitialBalance_negative() {
     Hbar initialBalance = Hbar.from(-100);
-    HieroException exception =
-        assertThrows(HieroException.class, () -> accountClientImpl.createAccount(initialBalance));
+    HieroBaseException exception =
+        assertThrows(HieroBaseException.class, () -> accountClientImpl.createAccount(initialBalance));
 
     assertTrue(exception.getMessage().contains("Invalid initial balance"));
   }
 
   @Test
-  void testCreateAccountHieroExceptionThrown() throws HieroException {
+  void testCreateAccountHieroBaseExceptionThrown() throws HieroBaseException {
     Hbar initialBalance = Hbar.from(100);
 
     when(mockProtocolLayerClient.executeAccountCreateTransaction(any(AccountCreateRequest.class)))
-        .thenThrow(new HieroException("Transaction failed"));
+        .thenThrow(new HieroBaseException("Transaction failed"));
 
     Exception exception =
-        assertThrows(HieroException.class, () -> accountClientImpl.createAccount(initialBalance));
+        assertThrows(HieroBaseException.class, () -> accountClientImpl.createAccount(initialBalance));
     assertEquals("Transaction failed", exception.getMessage());
   }
 
   @Test
-  void testUpdateAccountKeySuccessful() throws HieroException {
+  void testUpdateAccountKeySuccessful() throws HieroBaseException {
     Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
     PrivateKey updatedPrivateKey = PrivateKey.generateECDSA();
     when(mockProtocolLayerClient.executeAccountUpdateTransaction(any(AccountUpdateRequest.class)))
@@ -176,7 +176,7 @@ public class AccountClientImplTest {
   }
 
   @Test
-  void testUpdateAccountMemoSuccessful() throws HieroException {
+  void testUpdateAccountMemoSuccessful() throws HieroBaseException {
     Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
     String memo = "updated-memo";
     ArgumentCaptor<AccountUpdateRequest> requestCaptor =
@@ -196,7 +196,7 @@ public class AccountClientImplTest {
   }
 
   @Test
-  void testUpdateAccountMemoBlankMemoSuccessful() throws HieroException {
+  void testUpdateAccountMemoBlankMemoSuccessful() throws HieroBaseException {
     Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
     String memo = " ";
     ArgumentCaptor<AccountUpdateRequest> requestCaptor =
@@ -216,7 +216,7 @@ public class AccountClientImplTest {
   }
 
   @Test
-  void testUpdateAccountSuccessful() throws HieroException {
+  void testUpdateAccountSuccessful() throws HieroBaseException {
     Account account = Account.of(AccountId.fromString("0.0.12345"), PrivateKey.generateECDSA());
     PrivateKey updatedPrivateKey = PrivateKey.generateECDSA();
     String memo = "updated-memo";

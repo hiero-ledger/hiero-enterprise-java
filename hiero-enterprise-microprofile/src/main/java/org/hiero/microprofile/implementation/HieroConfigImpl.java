@@ -11,6 +11,7 @@ import org.hiero.base.config.ConsensusNode;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.config.NetworkSettings;
 import org.hiero.base.data.Account;
+import org.hiero.base.HieroConfigurationException;
 import org.hiero.microprofile.HieroNetworkConfiguration;
 import org.hiero.microprofile.HieroOperatorConfiguration;
 import org.jspecify.annotations.NonNull;
@@ -37,13 +38,17 @@ public class HieroConfigImpl implements HieroConfig {
 
   public HieroConfigImpl(
       @NonNull final HieroOperatorConfiguration configuration,
-      @NonNull final HieroNetworkConfiguration networkConfiguration) {
+      @NonNull final HieroNetworkConfiguration networkConfiguration) throws HieroConfigurationException {
     Objects.requireNonNull(configuration, "configuration must not be null");
     Objects.requireNonNull(networkConfiguration, "networkConfiguration must not be null");
 
-    final AccountId operatorAccountId = AccountId.fromString(configuration.getAccountId());
-    final PrivateKey operatorPrivateKey = PrivateKey.fromString(configuration.getPrivateKey());
-    operatorAccount = Account.of(operatorAccountId, operatorPrivateKey);
+    try {
+      final AccountId operatorAccountId = AccountId.fromString(configuration.getAccountId());
+      final PrivateKey operatorPrivateKey = PrivateKey.fromString(configuration.getPrivateKey());
+      operatorAccount = Account.of(operatorAccountId, operatorPrivateKey);
+    } catch (Exception e) {
+      throw new HieroConfigurationException("Can not parse operator configuration", e);
+    }
     requestTimeoutInMs = networkConfiguration.getRequestTimeoutInMs().orElse(null);
     final Optional<NetworkSettings> networkSettings =
         networkConfiguration

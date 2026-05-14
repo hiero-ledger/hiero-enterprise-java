@@ -11,7 +11,8 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
 import java.util.List;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
+import org.hiero.base.HieroValidationException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.FungibleTokenClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -51,7 +52,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testCreateToken() throws HieroException {
+  void testCreateToken() throws HieroBaseException {
     final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey privateKey = PrivateKey.generateECDSA();
@@ -85,7 +86,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testCreateTokenWithSupplyKey() throws HieroException {
+  void testCreateTokenWithSupplyKey() throws HieroBaseException {
     final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey privateKey = PrivateKey.generateECDSA();
@@ -120,7 +121,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testCreateTokenWithAccountIdAndTreasuryKey() throws HieroException {
+  void testCreateTokenWithAccountIdAndTreasuryKey() throws HieroBaseException {
     final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
     final AccountId treasuryAccountId = AccountId.fromString("1.2.3");
     final PrivateKey treasuryKey = PrivateKey.generateECDSA();
@@ -154,7 +155,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testCreateTokenWithAccountIdAndTreasuryKeyAndSupplyKey() throws HieroException {
+  void testCreateTokenWithAccountIdAndTreasuryKeyAndSupplyKey() throws HieroBaseException {
     final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
     final AccountId treasuryAccountId = AccountId.fromString("1.2.3");
     final PrivateKey treasuryKey = PrivateKey.generateECDSA();
@@ -199,20 +200,20 @@ public class FungibleClientImplTest {
     when(operationalAccount.accountId()).thenReturn(accountId);
     when(operationalAccount.privateKey()).thenReturn(privateKey);
 
-    final IllegalArgumentException e1 =
+    final HieroValidationException e1 =
         Assertions.assertThrows(
-            IllegalArgumentException.class, () -> fungibleClientImpl.createToken(name, symbol));
-    final IllegalArgumentException e2 =
+            HieroValidationException.class, () -> fungibleClientImpl.createToken(name, symbol));
+    final HieroValidationException e2 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> fungibleClientImpl.createToken(name, symbol, supplyKey));
-    final IllegalArgumentException e3 =
+    final HieroValidationException e3 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> fungibleClientImpl.createToken(name, symbol, accountId, privateKey));
-    final IllegalArgumentException e4 =
+    final HieroValidationException e4 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> fungibleClientImpl.createToken(name, symbol, accountId, privateKey, supplyKey));
 
     Assertions.assertEquals(message, e1.getMessage());
@@ -248,7 +249,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testAssociateToken() throws HieroException {
+  void testAssociateToken() throws HieroBaseException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -270,7 +271,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testAssociateTokenWithAccount() throws HieroException {
+  void testAssociateTokenWithAccount() throws HieroBaseException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey privateKey = PrivateKey.generateECDSA();
@@ -294,7 +295,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testAssociateTokenThrowsExceptionForInvalidId() throws HieroException {
+  void testAssociateTokenThrowsExceptionForInvalidId() throws HieroBaseException {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
@@ -302,13 +303,13 @@ public class FungibleClientImplTest {
 
     when(protocolLayerClient.executeTokenAssociateTransaction(any(TokenAssociateRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenAssociateTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenAssociateTransaction"));
 
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> fungibleClientImpl.associateToken(tokenId, accountId, accountKey));
     Assertions.assertThrows(
-        HieroException.class, () -> fungibleClientImpl.associateToken(tokenId, account));
+        HieroBaseException.class, () -> fungibleClientImpl.associateToken(tokenId, account));
   }
 
   @Test
@@ -322,7 +323,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testAssociateTokenWithMultipleToken() throws HieroException {
+  void testAssociateTokenWithMultipleToken() throws HieroBaseException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
 
     final TokenId tokenId1 = TokenId.fromString("1.2.3");
@@ -350,15 +351,15 @@ public class FungibleClientImplTest {
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
 
-    IllegalArgumentException e =
+    HieroValidationException e =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> fungibleClientImpl.associateToken(List.of(), accountId, accountKey));
     Assertions.assertEquals("tokenIds must not be empty", e.getMessage());
   }
 
   @Test
-  void testDissociateToken() throws HieroException {
+  void testDissociateToken() throws HieroBaseException {
     final TokenDissociateResult tokenDissociateResult = Mockito.mock(TokenDissociateResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -380,7 +381,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testDissociateTokenThrowsExceptionForInvalidId() throws HieroException {
+  void testDissociateTokenThrowsExceptionForInvalidId() throws HieroBaseException {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
@@ -388,13 +389,13 @@ public class FungibleClientImplTest {
 
     when(protocolLayerClient.executeTokenDissociateTransaction(any(TokenDissociateRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenDissociateTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenDissociateTransaction"));
 
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> fungibleClientImpl.dissociateToken(tokenId, accountId, accountKey));
     Assertions.assertThrows(
-        HieroException.class, () -> fungibleClientImpl.dissociateToken(tokenId, account));
+        HieroBaseException.class, () -> fungibleClientImpl.dissociateToken(tokenId, account));
   }
 
   @Test
@@ -407,7 +408,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testDissociateTokenWithMultipleToken() throws HieroException {
+  void testDissociateTokenWithMultipleToken() throws HieroBaseException {
     final TokenDissociateResult tokenDissociateResult = Mockito.mock(TokenDissociateResult.class);
 
     final TokenId tokenId1 = TokenId.fromString("1.2.3");
@@ -435,15 +436,15 @@ public class FungibleClientImplTest {
     final AccountId accountId = AccountId.fromString("1.2.3");
     final PrivateKey accountKey = PrivateKey.generateECDSA();
 
-    IllegalArgumentException e =
+    HieroValidationException e =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> fungibleClientImpl.dissociateToken(List.of(), accountId, accountKey));
     Assertions.assertEquals("tokenIds must not be empty", e.getMessage());
   }
 
   @Test
-  void testMintToken() throws HieroException {
+  void testMintToken() throws HieroBaseException {
     final TokenMintResult tokenMintResult = Mockito.mock(TokenMintResult.class);
     final long totalSupply = 20;
     final PrivateKey privateKey = PrivateKey.generateECDSA();
@@ -470,7 +471,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testMintTokenWithSupplyKey() throws HieroException {
+  void testMintTokenWithSupplyKey() throws HieroBaseException {
     final TokenMintResult tokenMintResult = Mockito.mock(TokenMintResult.class);
     final long totalSupply = 20;
 
@@ -504,12 +505,12 @@ public class FungibleClientImplTest {
 
     when(operationalAccount.privateKey()).thenReturn(supplyKey);
 
-    final IllegalArgumentException e1 =
+    final HieroValidationException e1 =
         Assertions.assertThrows(
-            IllegalArgumentException.class, () -> fungibleClientImpl.mintToken(tokenId, amount));
-    final IllegalArgumentException e2 =
+            HieroValidationException.class, () -> fungibleClientImpl.mintToken(tokenId, amount));
+    final HieroValidationException e2 =
         Assertions.assertThrows(
-            IllegalArgumentException.class,
+            HieroValidationException.class,
             () -> fungibleClientImpl.mintToken(tokenId, supplyKey, amount));
 
     Assertions.assertEquals(message, e1.getMessage());
@@ -517,7 +518,7 @@ public class FungibleClientImplTest {
   }
 
   @Test
-  void testMintTokenThrowExceptionForInvalidTokenId() throws HieroException {
+  void testMintTokenThrowExceptionForInvalidTokenId() throws HieroBaseException {
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
     final TokenId tokenId = TokenId.fromString("0.0.1");
     final long amount = 10;
@@ -525,12 +526,12 @@ public class FungibleClientImplTest {
     when(operationalAccount.privateKey()).thenReturn(supplyKey);
     when(protocolLayerClient.executeMintTokenTransaction(any(TokenMintRequest.class)))
         .thenThrow(
-            new HieroException("Failed to execute transaction of type TokenMintTransaction"));
+            new HieroBaseException("Failed to execute transaction of type TokenMintTransaction"));
 
     Assertions.assertThrows(
-        HieroException.class, () -> fungibleClientImpl.mintToken(tokenId, amount));
+        HieroBaseException.class, () -> fungibleClientImpl.mintToken(tokenId, amount));
     Assertions.assertThrows(
-        HieroException.class, () -> fungibleClientImpl.mintToken(tokenId, supplyKey, amount));
+        HieroBaseException.class, () -> fungibleClientImpl.mintToken(tokenId, supplyKey, amount));
   }
 
   @Test

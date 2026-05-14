@@ -3,7 +3,7 @@ package org.hiero.base.test;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.Status;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -86,7 +86,7 @@ public class ProtocolLayerClientAccountTests {
 
     // then
     Assertions.assertThrows(
-        HieroException.class,
+        HieroBaseException.class,
         () -> protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest));
   }
 

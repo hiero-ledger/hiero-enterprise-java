@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.TokenType;
 import java.util.Optional;
 import org.hiero.base.AccountClient;
 import org.hiero.base.FungibleTokenClient;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.Balance;
@@ -51,7 +51,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testQueryTokenForAccount() throws HieroException {
+  void testQueryTokenForAccount() throws HieroBaseException {
     // given
     final String name = "TOKEN";
     final String symbol = "TSY";
@@ -72,7 +72,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testQueryTokenForAccountReturnZeroResult() throws HieroException {
+  void testQueryTokenForAccountReturnZeroResult() throws HieroBaseException {
     // given
     final String name = "TOKEN";
     final String symbol = "TSY";
@@ -91,7 +91,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testQueryTokenById() throws HieroException {
+  void testQueryTokenById() throws HieroBaseException {
     // given
     final String name = "TOKEN";
     final String symbol = "TSY";
@@ -116,7 +116,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testQueryTokenByIdReturnEmptyOptionalForInvalidId() throws HieroException {
+  void testQueryTokenByIdReturnEmptyOptionalForInvalidId() throws HieroBaseException {
     // given
     final TokenId tokenId = TokenId.fromString("1.2.3");
     // when
@@ -126,7 +126,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testGetTokenBalances() throws HieroException {
+  void testGetTokenBalances() throws HieroBaseException {
     // given
     final String name = "TOKEN";
     final String symbol = "TSY";
@@ -142,7 +142,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testGetTokenBalancesReturnEmptyResultForInvalidId() throws HieroException {
+  void testGetTokenBalancesReturnEmptyResultForInvalidId() throws HieroBaseException {
     // given
     final TokenId tokenId = TokenId.fromString("1.2.3");
     // when
@@ -152,7 +152,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testGetTokenBalancesForAccount() throws HieroException {
+  void testGetTokenBalancesForAccount() throws HieroBaseException {
     // given
     final String name = "TOKEN";
     final String symbol = "TSY";
@@ -173,7 +173,7 @@ public class TokenRepositoryTest {
   }
 
   @Test
-  void testGetTokenBalancesForAccountReturnZeroResult() throws HieroException {
+  void testGetTokenBalancesForAccountReturnZeroResult() throws HieroBaseException {
     // given
     final String name = "TOKEN";
     final String symbol = "TSY";

@@ -45,7 +45,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.hiero.base.HieroContext;
-import org.hiero.base.HieroException;
+import org.hiero.base.HieroBaseException;
+import org.hiero.base.HieroProtocolException;
+import org.hiero.base.HieroValidationException;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.ContractParam;
 import org.hiero.base.interceptors.ReceiveRecordInterceptor;
@@ -132,7 +134,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public AccountBalanceResponse executeAccountBalanceQuery(
-      @NonNull final AccountBalanceRequest request) throws HieroException {
+      @NonNull final AccountBalanceRequest request) throws HieroBaseException {
     final AccountBalanceQuery query =
         new AccountBalanceQuery()
             .setAccountId(request.accountId())
@@ -144,7 +146,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public FileContentsResponse executeFileContentsQuery(@NonNull final FileContentsRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     final FileContentsQuery query =
         new FileContentsQuery()
             .setFileId(request.fileId())
@@ -157,7 +159,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public FileInfoResponse executeFileInfoQuery(@NonNull final FileInfoRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     final FileInfoQuery query =
         new FileInfoQuery()
@@ -166,7 +168,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setMaxQueryPayment(request.maxQueryPayment());
     final FileInfo fileInfo = executeQueryAndWait(query);
     if (fileInfo.size > Integer.MAX_VALUE) {
-      throw new HieroException("File size is too large to be represented as an integer");
+      throw new HieroBaseException("File size is too large to be represented as an integer");
     }
     return new FileInfoResponse(
         request.fileId(), (int) fileInfo.size, fileInfo.isDeleted, fileInfo.expirationTime);
@@ -174,11 +176,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public FileCreateResult executeFileCreateTransaction(@NonNull final FileCreateRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     Objects.requireNonNull(request.contents(), "content must not be null");
     if (request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "File contents of 1 transaction must be less than "
               + FileCreateRequest.FILE_CREATE_MAX_SIZE
               + " bytes. Use FileAppend for larger files.");
@@ -201,11 +203,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public FileUpdateResult executeFileUpdateRequestTransaction(
-      @NonNull final FileUpdateRequest request) throws HieroException {
+      @NonNull final FileUpdateRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     if (request.contents() != null
         && request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "File contents of 1 transaction must be less than "
               + FileCreateRequest.FILE_CREATE_MAX_SIZE
               + " bytes. Use FileAppend for larger files.");
@@ -229,11 +231,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public FileAppendResult executeFileAppendRequestTransaction(
-      @NonNull final FileAppendRequest request) throws HieroException {
+      @NonNull final FileAppendRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     Objects.requireNonNull(request.contents(), "content must not be null");
     if (request.contents().length > FileCreateRequest.FILE_CREATE_MAX_SIZE) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "File contents of 1 transaction must be less than "
               + FileCreateRequest.FILE_CREATE_MAX_SIZE
               + " bytes. Use multiple FileAppend for larger files.");
@@ -253,7 +255,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public FileDeleteResult executeFileDeleteTransaction(@NonNull final FileDeleteRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     final FileDeleteTransaction transaction =
         new FileDeleteTransaction()
             .setMaxTransactionFee(request.maxTransactionFee())
@@ -266,7 +268,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public ContractCreateResult executeContractCreateTransaction(
-      @NonNull final ContractCreateRequest request) throws HieroException {
+      @NonNull final ContractCreateRequest request) throws HieroBaseException {
     final ContractFunctionParameters constructorParams =
         createParameters(request.constructorParams());
     final ContractCreateTransaction transaction =
@@ -283,7 +285,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @Override
   public ContractDeleteResult executeContractDeleteTransaction(
-      @NonNull final ContractDeleteRequest request) throws HieroException {
+      @NonNull final ContractDeleteRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     final ContractDeleteTransaction transaction =
         new ContractDeleteTransaction()
@@ -304,7 +306,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   @Override
   @NonNull
   public ContractCallResult executeContractCallTransaction(
-      @NonNull final ContractCallRequest request) throws HieroException {
+      @NonNull final ContractCallRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     final ContractFunctionParameters functionParams = createParameters(request.functionParams());
     final ContractExecuteTransaction transaction =
@@ -328,7 +330,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   @Override
   @NonNull
   public AccountCreateResult executeAccountCreateTransaction(
-      @NonNull final AccountCreateRequest request) throws HieroException {
+      @NonNull final AccountCreateRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     final PrivateKey privateKey = PrivateKey.generateED25519();
     final PublicKey publicKey = privateKey.getPublicKey();
@@ -353,7 +355,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   @Override
   @NonNull
   public AccountDeleteResult executeAccountDeleteTransaction(
-      @NonNull final AccountDeleteRequest request) throws HieroException {
+      @NonNull final AccountDeleteRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     final AccountDeleteTransaction transaction =
         new AccountDeleteTransaction()
@@ -386,7 +388,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   @Override
   @NonNull
   public AccountUpdateResult executeAccountUpdateTransaction(
-      @NonNull final AccountUpdateRequest request) throws HieroException {
+      @NonNull final AccountUpdateRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     final AccountUpdateTransaction transaction =
         new AccountUpdateTransaction()
@@ -408,7 +410,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   }
 
   public TopicCreateResult executeTopicCreateTransaction(@NonNull final TopicCreateRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     Objects.requireNonNull(request.maxTransactionFee(), "maxTransactionFee must not be null");
     Objects.requireNonNull(
@@ -430,13 +432,13 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_CREATE);
       return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute create topic transaction", e);
+      throw new HieroBaseException("Failed to execute create topic transaction", e);
     }
   }
 
   @Override
   public @NonNull TopicUpdateResult executeTopicUpdateTransaction(
-      @NonNull TopicUpdateRequest request) throws HieroException {
+      @NonNull TopicUpdateRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     Objects.requireNonNull(request.maxTransactionFee(), "maxTransactionFee must not be null");
     Objects.requireNonNull(
@@ -465,12 +467,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_UPDATE);
       return new TopicUpdateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute update topic transaction", e);
+      throw new HieroBaseException("Failed to execute update topic transaction", e);
     }
   }
 
   public TopicDeleteResult executeTopicDeleteTransaction(@NonNull final TopicDeleteRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TopicDeleteTransaction transaction =
@@ -483,12 +485,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_DELETE);
       return new TopicDeleteResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute delete topic transaction", e);
+      throw new HieroBaseException("Failed to execute delete topic transaction", e);
     }
   }
 
   public TopicSubmitMessageResult executeTopicMessageSubmitTransaction(
-      @NonNull final TopicSubmitMessageRequest request) throws HieroException {
+      @NonNull final TopicSubmitMessageRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TopicMessageSubmitTransaction transaction =
@@ -504,13 +506,13 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_MESSAGE_SUBMIT);
       return new TopicSubmitMessageResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute submit message transaction", e);
+      throw new HieroBaseException("Failed to execute submit message transaction", e);
     }
   }
 
   @Override
   public TopicMessageResult executeTopicMessageQuery(TopicMessageRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TopicMessageQuery query = new TopicMessageQuery().setTopicId(request.topicId());
@@ -527,12 +529,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           query.subscribe(hieroContext.getClient(), request.subscription());
       return new TopicMessageResult();
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute query message transaction", e);
+      throw new HieroBaseException("Failed to execute query message transaction", e);
     }
   }
 
   public TokenCreateResult executeTokenCreateTransaction(@NonNull final TokenCreateRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenCreateTransaction transaction =
@@ -549,12 +551,12 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
       return new TokenCreateResult(receipt.transactionId, receipt.status, receipt.tokenId);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute create token transaction", e);
+      throw new HieroBaseException("Failed to execute create token transaction", e);
     }
   }
 
   public TokenAssociateResult executeTokenAssociateTransaction(
-      @NonNull final TokenAssociateRequest request) throws HieroException {
+      @NonNull final TokenAssociateRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenAssociateTransaction transaction =
@@ -568,13 +570,13 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_ASSOCIATE);
       return new TokenAssociateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute associate token transaction", e);
+      throw new HieroBaseException("Failed to execute associate token transaction", e);
     }
   }
 
   @Override
   public @NonNull TokenDissociateResult executeTokenDissociateTransaction(
-      @NonNull TokenDissociateRequest request) throws HieroException {
+      @NonNull TokenDissociateRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenDissociateTransaction transaction =
@@ -588,13 +590,16 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_DISSOCIATE);
       return new TokenDissociateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute dissociate token transaction", e);
+      throw new HieroBaseException("Failed to execute dissociate token transaction", e);
     }
   }
 
   public TokenBurnResult executeBurnTokenTransaction(@NonNull final TokenBurnRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
+    if (request.amount() != null && request.amount() <= 0) {
+      throw new HieroValidationException("amount must be greater than 0");
+    }
     try {
       final TokenBurnTransaction transaction =
           new TokenBurnTransaction()
@@ -606,19 +611,21 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       } else if (request.serials() != null) {
         transaction.setSerials(List.copyOf(request.serials()));
       } else {
-        throw new IllegalArgumentException("either amount or serial must be provided");
+        throw new HieroValidationException("either amount or serial must be provided");
       }
 
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_BURN);
       return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
+    } catch (HieroBaseException e) {
+      throw e;
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute burn token transaction", e);
+      throw new HieroBaseException("Failed to execute burn token transaction", e);
     }
   }
 
   public TokenMintResult executeMintTokenTransaction(@NonNull final TokenMintRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TokenMintTransaction transaction =
@@ -631,20 +638,22 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       } else if (request.metadata() != null) {
         transaction.setMetadata(request.metadata());
       } else {
-        throw new IllegalArgumentException("either amount or metadata must be provided");
+        throw new HieroValidationException("either amount or metadata must be provided");
       }
       sign(transaction, request.supplyKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_MINT);
       return new TokenMintResult(
           receipt.transactionId, receipt.status, receipt.serials, receipt.totalSupply);
+    } catch (HieroBaseException e) {
+      throw e;
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute mint token transaction", e);
+      throw new HieroBaseException("Failed to execute mint token transaction", e);
     }
   }
 
   public TokenTransferResult executeTransferTransaction(@NonNull final TokenTransferRequest request)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final TransferTransaction transaction =
@@ -664,20 +673,22 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         transaction.addTokenTransfer(request.tokenId(), request.sender(), request.amount() * -1);
         transaction.addTokenTransfer(request.tokenId(), request.receiver(), request.amount());
       } else {
-        throw new IllegalArgumentException("either amount or serial must be provided");
+        throw new HieroValidationException("either amount or serial must be provided");
       }
       sign(transaction, request.senderKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);
       return new TokenTransferResult(receipt.transactionId, receipt.status);
+    } catch (HieroBaseException e) {
+      throw e;
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute transfer nft transaction", e);
+      throw new HieroBaseException("Failed to execute transfer nft transaction", e);
     }
   }
 
   @Override
   public @NonNull HookStoreResult executeHookStoreTransaction(
-      @NonNull final HookStoreRequest request) throws HieroException {
+      @NonNull final HookStoreRequest request) throws HieroBaseException {
     Objects.requireNonNull(request, "request must not be null");
     try {
       final HookStoreTransaction transaction =
@@ -693,7 +704,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.HOOK_STORE);
       return new HookStoreResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
-      throw new HieroException("Failed to execute hook store transaction", e);
+      throw new HieroBaseException("Failed to execute hook store transaction", e);
     }
   }
 
@@ -722,7 +733,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @NonNull
   private <T extends Transaction<T>> TransactionReceipt executeTransactionAndWaitOnReceipt(
-      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
+      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroBaseException {
     Objects.requireNonNull(transaction, "transaction must not be null");
     Objects.requireNonNull(type, "type must not be null");
     try {
@@ -751,23 +762,30 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               }
             });
         return receipt;
+      } catch (com.hedera.hashgraph.sdk.ReceiptStatusException e) {
+        throw new HieroProtocolException("Transaction failed during execution", e.receipt.status, e);
       } catch (Exception e) {
-        throw new HieroException(
+        throw new HieroBaseException(
             "Failed to receive receipt of transaction '"
                 + response.transactionId
                 + "' of type "
                 + transaction.getClass(),
             e);
       }
+    } catch (com.hedera.hashgraph.sdk.PrecheckStatusException e) {
+      throw new HieroProtocolException(
+          "Failed to execute transaction of type " + transaction.getClass().getSimpleName(),
+          e.status,
+          e);
     } catch (final Exception e) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "Failed to execute transaction of type " + transaction.getClass().getSimpleName(), e);
     }
   }
 
   @NonNull
   private <T extends Transaction<T>> TransactionRecord executeTransactionAndWaitOnRecord(
-      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroException {
+      @NonNull final T transaction, @NonNull final TransactionType type) throws HieroBaseException {
     final TransactionReceipt receipt = executeTransactionAndWaitOnReceipt(transaction, type);
     try {
       log.debug(
@@ -780,7 +798,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               transaction, receipt, r -> r.transactionId.getRecord(hieroContext.getClient()));
       return recordInterceptor.get().getRecordFor(data);
     } catch (final Exception e) {
-      throw new HieroException(
+      throw new HieroBaseException(
           "Failed to receive record of transaction '"
               + receipt.transactionId
               + "' of type "
@@ -791,13 +809,15 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   @NonNull
   private <R, Q extends Query<R, Q>> R executeQueryAndWait(@NonNull final Q query)
-      throws HieroException {
+      throws HieroBaseException {
     Objects.requireNonNull(query, "query must not be null");
     try {
       log.debug("Sending query of type {}", query.getClass().getSimpleName());
       return query.execute(hieroContext.getClient());
+    } catch (com.hedera.hashgraph.sdk.PrecheckStatusException e) {
+      throw new HieroProtocolException("Failed to execute query", e.status, e);
     } catch (Exception e) {
-      throw new HieroException("Failed to execute query", e);
+      throw new HieroBaseException("Failed to execute query", e);
     }
   }
 
