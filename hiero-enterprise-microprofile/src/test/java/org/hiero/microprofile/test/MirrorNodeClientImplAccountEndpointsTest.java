@@ -1,16 +1,24 @@
 package org.hiero.microprofile.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import java.io.StringReader;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.Page;
@@ -23,21 +31,34 @@ import org.hiero.microprofile.implementation.MirrorNodeRestClientImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 class MirrorNodeClientImplAccountEndpointsTest {
 
-  private HttpServer server;
-  private final List<String> requestedPaths = new CopyOnWriteArrayList<>();
+  private static final String BASE_URL = "http://mirror-node.test";
+
+  private MockedStatic<ClientBuilder> mockedClientBuilder;
+  private WebTarget mockBaseTarget;
+  private MirrorNodeClientImpl client;
 
   @BeforeEach
-  void startServer() throws IOException {
-    server = HttpServer.create(new InetSocketAddress(0), 0);
-    server.start();
+  void setUp() {
+    final Client mockClient = mock(Client.class);
+    mockBaseTarget = mock(WebTarget.class);
+
+    mockedClientBuilder = mockStatic(ClientBuilder.class);
+    mockedClientBuilder.when(ClientBuilder::newClient).thenReturn(mockClient);
+    when(mockClient.target(BASE_URL)).thenReturn(mockBaseTarget);
+
+    client =
+        new MirrorNodeClientImpl(
+            new MirrorNodeRestClientImpl(BASE_URL), new MirrorNodeJsonConverterImpl());
   }
 
   @AfterEach
-  void stopServer() {
-    server.stop(0);
+  void tearDown() {
+    mockedClientBuilder.close();
   }
 
   @Test
@@ -49,15 +70,12 @@ class MirrorNodeClientImplAccountEndpointsTest {
     final String stakingRewardsPath = "/api/v1/accounts/0.0.123/rewards";
     final String outstandingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/outstanding";
     final String pendingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/pending";
-    respondWith(cryptoAllowancesPath, cryptoAllowancesJson());
-    respondWith(tokenAllowancesPath, tokenAllowancesJson());
-    respondWith(nftAllowancesPath, nftAllowancesJson());
-    respondWith(stakingRewardsPath, stakingRewardsJson());
-    respondWith(outstandingAirdropsPath, tokenAirdropsJson());
-    respondWith(pendingAirdropsPath, tokenAirdropsJson());
-    final MirrorNodeClientImpl client =
-        new MirrorNodeClientImpl(
-            new MirrorNodeRestClientImpl(baseUrl()), new MirrorNodeJsonConverterImpl());
+    stubResponse(cryptoAllowancesPath, cryptoAllowancesJson());
+    stubResponse(tokenAllowancesPath, tokenAllowancesJson());
+    stubResponse(nftAllowancesPath, nftAllowancesJson());
+    stubResponse(stakingRewardsPath, stakingRewardsJson());
+    stubResponse(outstandingAirdropsPath, tokenAirdropsJson());
+    stubResponse(pendingAirdropsPath, tokenAirdropsJson());
 
     final Page<CryptoAllowance> cryptoAllowances = client.queryCryptoAllowances(accountId);
     final Page<TokenAllowance> tokenAllowances = client.queryTokenAllowances(accountId);
@@ -66,6 +84,8 @@ class MirrorNodeClientImplAccountEndpointsTest {
     final Page<TokenAirdrop> outstandingAirdrops = client.queryOutstandingAirdrops(accountId);
     final Page<TokenAirdrop> pendingAirdrops = client.queryPendingAirdrops(accountId);
 
+    final ArgumentCaptor<String> pathCaptor = ArgumentCaptor.forClass(String.class);
+    verify(mockBaseTarget, times(6)).path(pathCaptor.capture());
     assertEquals(
         List.of(
             cryptoAllowancesPath,
@@ -74,7 +94,7 @@ class MirrorNodeClientImplAccountEndpointsTest {
             stakingRewardsPath,
             outstandingAirdropsPath,
             pendingAirdropsPath),
-        requestedPaths);
+        pathCaptor.getAllValues());
     assertEquals(1, cryptoAllowances.getSize());
     assertEquals(1, tokenAllowances.getSize());
     assertEquals(1, nftAllowances.getSize());
@@ -84,26 +104,18 @@ class MirrorNodeClientImplAccountEndpointsTest {
     assertEquals(TokenId.fromString("0.0.9"), tokenAllowances.getData().get(0).tokenId());
   }
 
-  private void respondWith(String path, String body) {
-    server.createContext(
-        path,
-        exchange -> {
-          requestedPaths.add(exchange.getRequestURI().getPath());
-          respond(exchange, body);
-        });
+  private void stubResponse(String path, String body) {
+    final WebTarget pathTarget = mock(WebTarget.class);
+    final Invocation.Builder invocationBuilder = mock(Invocation.Builder.class);
+    final Response response = mock(Response.class);
+    when(mockBaseTarget.path(path)).thenReturn(pathTarget);
+    when(pathTarget.request(MediaType.APPLICATION_JSON)).thenReturn(invocationBuilder);
+    when(invocationBuilder.get()).thenReturn(response);
+    when(response.readEntity(JsonObject.class)).thenReturn(parseJson(body));
   }
 
-  private String baseUrl() {
-    return "http://localhost:" + server.getAddress().getPort();
-  }
-
-  private static void respond(HttpExchange exchange, String body) throws IOException {
-    final byte[] bytes = body.getBytes();
-    exchange.getResponseHeaders().add("Content-Type", "application/json");
-    exchange.sendResponseHeaders(200, bytes.length);
-    try (OutputStream outputStream = exchange.getResponseBody()) {
-      outputStream.write(bytes);
-    }
+  private static JsonObject parseJson(String json) {
+    return Json.createReader(new StringReader(json)).readObject();
   }
 
   private static String cryptoAllowancesJson() {
