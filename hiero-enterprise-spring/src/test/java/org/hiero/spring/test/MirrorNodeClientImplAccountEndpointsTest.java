@@ -1,16 +1,12 @@
 package org.hiero.spring.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.Page;
@@ -21,22 +17,28 @@ import org.hiero.spring.implementation.MirrorNodeClientImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 class MirrorNodeClientImplAccountEndpointsTest {
 
-  private HttpServer server;
-  private final List<String> requestedPaths = new CopyOnWriteArrayList<>();
+  private static final String BASE_URL = "http://mirror-node.test";
+
+  private MockRestServiceServer mockServer;
+  private MirrorNodeClientImpl client;
 
   @BeforeEach
-  void startServer() throws IOException {
-    server = HttpServer.create(new InetSocketAddress(0), 0);
-    server.start();
+  void setUp() {
+    final RestClient.Builder builder = RestClient.builder().baseUrl(BASE_URL);
+    mockServer = MockRestServiceServer.bindTo(builder).build();
+    client = new MirrorNodeClientImpl(builder);
   }
 
   @AfterEach
-  void stopServer() {
-    server.stop(0);
+  void tearDown() {
+    mockServer.verify();
   }
 
   @Test
@@ -48,14 +50,12 @@ class MirrorNodeClientImplAccountEndpointsTest {
     final String stakingRewardsPath = "/api/v1/accounts/0.0.123/rewards";
     final String outstandingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/outstanding";
     final String pendingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/pending";
-    respondWith(cryptoAllowancesPath, cryptoAllowancesJson());
-    respondWith(tokenAllowancesPath, tokenAllowancesJson());
-    respondWith(nftAllowancesPath, nftAllowancesJson());
-    respondWith(stakingRewardsPath, stakingRewardsJson());
-    respondWith(outstandingAirdropsPath, tokenAirdropsJson());
-    respondWith(pendingAirdropsPath, tokenAirdropsJson());
-    final MirrorNodeClientImpl client =
-        new MirrorNodeClientImpl(RestClient.builder().baseUrl(baseUrl()));
+    expect(cryptoAllowancesPath, cryptoAllowancesJson());
+    expect(tokenAllowancesPath, tokenAllowancesJson());
+    expect(nftAllowancesPath, nftAllowancesJson());
+    expect(stakingRewardsPath, stakingRewardsJson());
+    expect(outstandingAirdropsPath, tokenAirdropsJson());
+    expect(pendingAirdropsPath, tokenAirdropsJson());
 
     final Page<CryptoAllowance> cryptoAllowances = client.queryCryptoAllowances(accountId);
     final Page<TokenAllowance> tokenAllowances = client.queryTokenAllowances(accountId);
@@ -64,15 +64,6 @@ class MirrorNodeClientImplAccountEndpointsTest {
     final Page<TokenAirdrop> outstandingAirdrops = client.queryOutstandingAirdrops(accountId);
     final Page<TokenAirdrop> pendingAirdrops = client.queryPendingAirdrops(accountId);
 
-    assertEquals(
-        List.of(
-            cryptoAllowancesPath,
-            tokenAllowancesPath,
-            nftAllowancesPath,
-            stakingRewardsPath,
-            outstandingAirdropsPath,
-            pendingAirdropsPath),
-        requestedPaths);
     assertEquals(1, cryptoAllowances.getSize());
     assertEquals(1, tokenAllowances.getSize());
     assertEquals(1, nftAllowances.getSize());
@@ -82,26 +73,11 @@ class MirrorNodeClientImplAccountEndpointsTest {
     assertEquals(TokenId.fromString("0.0.9"), tokenAllowances.getData().get(0).tokenId());
   }
 
-  private void respondWith(String path, String body) {
-    server.createContext(
-        path,
-        exchange -> {
-          requestedPaths.add(exchange.getRequestURI().getPath());
-          respond(exchange, body);
-        });
-  }
-
-  private String baseUrl() {
-    return "http://localhost:" + server.getAddress().getPort();
-  }
-
-  private static void respond(HttpExchange exchange, String body) throws IOException {
-    final byte[] bytes = body.getBytes();
-    exchange.getResponseHeaders().add("Content-Type", "application/json");
-    exchange.sendResponseHeaders(200, bytes.length);
-    try (OutputStream outputStream = exchange.getResponseBody()) {
-      outputStream.write(bytes);
-    }
+  private void expect(String path, String body) {
+    mockServer
+        .expect(requestTo(BASE_URL + path))
+        .andExpect(method(HttpMethod.GET))
+        .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
   }
 
   private static String cryptoAllowancesJson() {
