@@ -38,22 +38,23 @@ jobs:
         uses: hiero-ledger/hiero-solo-action@328bc84c3b00a990a151418144fd682a4eb76ea6 # v0.19.0
         with:
           installMirrorNode: true
-          hieroVersion: v0.66.0
-          mirrorNodeVersion: v0.138.0
-          mirrorNodePortRest: 5551
-          mirrorNodePortGrpc: 5600
-          mirrorNodePortWeb3Rest: 8545
 
       - name: Wait for Mirror Node
         run: |
-          echo "Waiting for Mirror Node REST API to be ready on http://localhost:5551..."
-          until curl --output /dev/null --silent --head --fail http://localhost:5551/api/v1/network/supply; do
-            echo "Mirror Node not ready, waiting..."
-            kubectl get svc -n solo
-            curl --silent http://localhost:5551/api/v1/network/supply || echo "No response from /api/v1/network/supply"
+          echo "Waiting for Mirror Node REST (Node.js) on http://localhost:5551..."
+          until curl --output /dev/null --silent --fail http://localhost:5551/health/readiness; do
+            echo "Mirror Node (rest) not ready, waiting..."
+            kubectl get svc -n solo || true
+            curl --silent http://localhost:5551/health/readiness || echo "No response from mirrorNode REST readiness"
             sleep 5
           done
-          echo "Mirror Node REST API is ready!"
+          echo "Waiting for Mirror Node REST-Java on http://localhost:8084..."
+          until curl --output /dev/null --silent --fail http://localhost:8084/actuator/health/readiness; do
+            echo "Mirror Node (rest-java) not ready, waiting..."
+            curl --silent http://localhost:8084/actuator/health/readiness || echo "No response from REST-Java readiness"
+            sleep 5
+          done
+          echo "Mirror Node APIs are ready!"
 
       - name: Build with Maven
         env:
