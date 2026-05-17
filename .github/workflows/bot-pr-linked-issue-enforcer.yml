@@ -1,5 +1,6 @@
 # Closes pull requests immediately when they are not linked to an open issue,
 # or when the PR author is not assigned to the linked issue.
+
 name: PR Linked Issue Enforcer
 
 on:
