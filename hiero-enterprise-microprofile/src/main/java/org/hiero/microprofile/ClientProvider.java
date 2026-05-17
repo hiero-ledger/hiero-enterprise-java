@@ -1,6 +1,7 @@
 package org.hiero.microprofile;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
@@ -38,6 +39,7 @@ import org.hiero.base.mirrornode.NftRepository;
 import org.hiero.base.mirrornode.TokenRepository;
 import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.base.mirrornode.TransactionRepository;
+import org.hiero.base.interceptors.ReceiveRecordInterceptor;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.microprofile.implementation.ContractVerificationClientImpl;
@@ -52,6 +54,8 @@ public class ClientProvider {
   @Inject @ConfigProperties private HieroOperatorConfiguration configuration;
 
   @Inject @ConfigProperties private HieroNetworkConfiguration networkConfiguration;
+
+  @Inject private Instance<ReceiveRecordInterceptor> interceptors;
 
   @NonNull
   @Produces
@@ -71,7 +75,9 @@ public class ClientProvider {
   @Produces
   @ApplicationScoped
   ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroContext hieroContext) {
-    return new ProtocolLayerClientImpl(hieroContext);
+    final ProtocolLayerClientImpl client = new ProtocolLayerClientImpl(hieroContext);
+    interceptors.stream().findFirst().ifPresent(client::setRecordInterceptor);
+    return client;
   }
 
   @NonNull
