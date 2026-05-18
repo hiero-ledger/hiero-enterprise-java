@@ -1,0 +1,53 @@
+name: Release Artifacts
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.GPG_KEY_CONTENTS }}" | gpg --batch --import
+          
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "GPG_KEY_ID=$GPG_KEY_ID" >> $GITHUB_ENV
+
+          mkdir -p ~/.gnupg
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+
+      - name: Set Maven version
+        run: ./mvnw -B versions:set versions:commit -DnewVersion=${GITHUB_REF_NAME#v}
+
+      - name: Build & Stage (publication profile)
+        run: ./mvnw -B -Ppublication deploy
+
+      - name: Publish with JReleaser
+        run: ./mvnw -B -Ppublication jreleaser:full-release
+        env:
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_KEY_CONTENTS }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ env.GPG_KEY_ID }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
