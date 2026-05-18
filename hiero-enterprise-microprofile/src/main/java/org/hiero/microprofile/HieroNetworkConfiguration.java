@@ -21,10 +21,10 @@ public class HieroNetworkConfiguration {
   @ConfigProperty(name = "nodes")
   private Optional<String> nodes;
 
-  @ConfigProperty(name = "mirrornode")
-  private Optional<String> mirrornode;
-
+  @ConfigProperty(name = "request-timeout")
   private Optional<Long> requestTimeoutInMs;
+
+  public MirrorNode mirrorNode = new MirrorNode();
 
   public Optional<Long> getRequestTimeoutInMs() {
     return requestTimeoutInMs;
@@ -34,8 +34,8 @@ public class HieroNetworkConfiguration {
     return name;
   }
 
-  public Optional<String> getMirrornode() {
-    return mirrornode;
+  public MirrorNode getMirrornode() {
+    return mirrorNode;
   }
 
   public Set<ConsensusNode> getNodes() {
@@ -56,5 +56,26 @@ public class HieroNetworkConfiguration {
               return new ConsensusNode(ip, port, account);
             })
         .collect(Collectors.toUnmodifiableSet());
+  }
+
+  public static class MirrorNode {
+    @ConfigProperty(name = "hiero.network.mirrornode.rest-url")
+    Optional<String> restUrl = Optional.empty();
+
+    @ConfigProperty(name = "hiero.network.mirrornode.grpc-addresses")
+    public Optional<String> grpcAddresses = Optional.empty();
+
+    public Optional<String> getRestUrl() {
+      return restUrl;
+    }
+
+    public Set<String> getGrpcAddresses() {
+      // eg: mirrornode.mirrornode:443,testnet.mirrornode:5600
+      return grpcAddresses
+          .map(n -> n.split(","))
+          .map(n -> Stream.of(n))
+          .orElse(Stream.empty())
+          .collect(Collectors.toUnmodifiableSet());
+    }
   }
 }
