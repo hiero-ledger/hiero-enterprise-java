@@ -58,7 +58,7 @@ async function getLinkedIssues(github, prNumber, owner, repo) {
     const result = await github.graphql(query, { owner, repo, prNumber });
     const allIssues =
       result.repository.pullRequest.closingIssuesReferences.nodes || [];
-    return allIssues.filter((issue) => issue.state === 'OPEN');
+    return allIssues.filter((issue) => issue.state?.toUpperCase() === 'OPEN');
   } catch (err) {
     console.error(`GraphQL query failed for PR #${prNumber}:`, err.message);
     return null;
@@ -85,11 +85,10 @@ async function validatePR(github, pr, owner, repo) {
   return { valid: true };
 }
 
-async function closePR(github, pr, owner, repo, reason) {
-  const author = pr.user?.login || 'there';
+async function closePR(github, pr, owner, repo, reason, authorLogin) {
   const body =
     COMMENT_MARKER +
-    messages[reason].replace('{{author}}', author) +
+    messages[reason].replace('{{author}}', authorLogin) +
     messageSuffix;
 
   await github.rest.issues.createComment({
@@ -156,5 +155,5 @@ module.exports = async ({ github, context, core }) => {
     return;
   }
 
-  await closePR(github, pr, owner, repo, reason);
+  await closePR(github, pr, owner, repo, reason, authorLogin);
 };
