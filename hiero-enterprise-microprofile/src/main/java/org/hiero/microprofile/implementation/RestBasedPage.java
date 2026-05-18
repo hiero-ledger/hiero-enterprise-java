@@ -61,7 +61,7 @@ public class RestBasedPage<T> implements Page<T> {
       this.data = Collections.unmodifiableList(dataExtractionFunction.apply(jsonObject));
       this.nextPath = getNextPath(jsonObject);
     } catch (Exception e) {
-      throw new IllegalStateException("Can not parse JSON: " + e);
+      throw new IllegalStateException("Can not parse JSON", e);
     }
   }
 

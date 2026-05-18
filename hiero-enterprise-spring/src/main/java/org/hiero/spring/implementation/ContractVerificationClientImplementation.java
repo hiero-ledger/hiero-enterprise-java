@@ -56,28 +56,30 @@ public class ContractVerificationClientImplementation implements ContractVerific
       @NonNull final HttpRequest request, @NonNull final ClientHttpResponse response)
       throws IOException {
     Objects.requireNonNull(response, "response must not be null");
-    final String error;
+    final String body;
     try {
-      final String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
-      try {
-        final JsonNode rootNode = objectMapper.readTree(body);
-        final JsonNode errorNode = rootNode.get("error");
-        if (errorNode != null) {
-          error = errorNode.asText();
-        } else {
-          final JsonNode messageNode = rootNode.get("message");
-          if (messageNode != null) {
-            error = messageNode.asText();
-          } else {
-            error = body;
-          }
-        }
-      } catch (final Exception e) {
-        throw new IOException("Error parsing body as JSON: " + body, e);
-      }
+      body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
     } catch (final Exception e) {
       throw new IOException(
-          "Error (" + response.getStatusCode() + "): " + response.getStatusText());
+          "Error (" + response.getStatusCode() + "): " + response.getStatusText(), e);
+    }
+
+    final String error;
+    try {
+      final JsonNode rootNode = objectMapper.readTree(body);
+      final JsonNode errorNode = rootNode.get("error");
+      if (errorNode != null) {
+        error = errorNode.asText();
+      } else {
+        final JsonNode messageNode = rootNode.get("message");
+        if (messageNode != null) {
+          error = messageNode.asText();
+        } else {
+          error = body;
+        }
+      }
+    } catch (final Exception e) {
+      throw new IOException("Error parsing body as JSON: " + body, e);
     }
     throw new IOException("Error (" + response.getStatusCode() + "): " + error);
   }
@@ -175,12 +177,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
               .onStatus(
                   HttpStatusCode::is5xxServerError,
                   (request, response) -> {
-                    throw new RuntimeException(
-                        "Server error ("
-                            + response.getStatusCode()
-                            + ") for request '"
-                            + request.getURI()
-                            + "'");
+                    handleError(request, response);
                   })
               .body(String.class);
 
