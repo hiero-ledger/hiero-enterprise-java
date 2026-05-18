@@ -42,6 +42,7 @@ import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -57,6 +58,11 @@ import org.springframework.web.context.annotation.ApplicationScope;
 public class HieroAutoConfiguration {
 
   private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
+
+  private RestClient.Builder restClientBuilder(
+      final ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+    return restClientBuilderProvider.getIfAvailable(RestClient::builder);
+  }
 
   @Bean
   @ApplicationScope
@@ -125,7 +131,9 @@ public class HieroAutoConfiguration {
       name = "mirrorNodeSupported",
       havingValue = "true",
       matchIfMissing = true)
-  MirrorNodeClient mirrorNodeClient(final HieroContext hieroContext) {
+  MirrorNodeClient mirrorNodeClient(
+      final HieroContext hieroContext,
+      final ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
     final String mirrorNodeEndpoint;
     final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
     if (mirrorNetwork.isEmpty()) {
@@ -159,7 +167,8 @@ public class HieroAutoConfiguration {
       throw new IllegalArgumentException(
           "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
     }
-    RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
+    RestClient.Builder builder =
+        restClientBuilder(restClientBuilderProvider).clone().baseUrl(baseUri);
     return new MirrorNodeClientImpl(builder);
   }
 
@@ -234,8 +243,11 @@ public class HieroAutoConfiguration {
   }
 
   @Bean
-  ContractVerificationClient contractVerificationClient(final HieroConfig hieroConfig) {
-    return new ContractVerificationClientImplementation(hieroConfig);
+  ContractVerificationClient contractVerificationClient(
+      final HieroConfig hieroConfig,
+      final ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+    return new ContractVerificationClientImplementation(
+        hieroConfig, restClientBuilder(restClientBuilderProvider));
   }
 
   @Bean
