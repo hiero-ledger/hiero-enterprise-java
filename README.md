@@ -183,6 +183,59 @@ spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b
 
 Currently there is no running release process and we work on setting uop everything to do releases under the hiero-ledger org.
 
+## Integration Testing with Testcontainers
+
+The project provides a dedicated module `hiero-enterprise-testcontainers` for simplified integration testing using [Testcontainers](https://testcontainers.com/). This allows you to spin up a local Hiero network (including Mirror Node) automatically during your tests.
+
+### Usage
+
+Add the following dependency to your project:
+
+```xml
+<dependency>
+    <groupId>org.hiero</groupId>
+    <artifactId>hiero-enterprise-testcontainers</artifactId>
+    <version>VERSION</version>
+    <scope>test</scope>
+</dependency>
+```
+
+### Spring Boot Integration
+
+You can use `@DynamicPropertySource` to automatically configure your Spring Boot application to use the temporary container:
+
+```java
+@Testcontainers
+@SpringBootTest
+class MyIntegrationTest {
+
+    @Container
+    static HieroContainer hiero = new HieroContainer();
+
+    @DynamicPropertySource
+    static void hieroProperties(DynamicPropertyRegistry registry) {
+        HieroTestcontainers.registerProperties(registry, hiero);
+    }
+
+    @Test
+    void testSomething() {
+        // Your test logic here
+    }
+}
+```
+
+### Manual Configuration
+
+If you are not using Spring Boot, you can still use the containers manually:
+
+```java
+HieroContainer hiero = new HieroContainer();
+hiero.start();
+
+String consensusEndpoint = hiero.getConsensusEndpoint();
+String mirrorEndpoint = hiero.getMirrorRestEndpoint();
+```
+
 ## Documentation
 
 Technical documentation (getting started, architecture, Spring/MicroProfile, managed services, ADRs) is in the **[docs](docs/)** folder and is published as [GitHub Pages](https://hiero-ledger.github.io/hiero-enterprise-java/).

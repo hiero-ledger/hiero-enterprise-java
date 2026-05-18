@@ -65,6 +65,7 @@
     <jreleaser-maven-plugin.version>1.23.0</jreleaser-maven-plugin.version>
     <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
     <spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
+    <testcontainers.version>1.20.4</testcontainers.version>
   </properties>
 
   <dependencyManagement>
@@ -109,6 +110,18 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>hiero-enterprise-microprofile</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hiero-enterprise-testcontainers</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.hedera.hashgraph</groupId>
@@ -214,6 +227,7 @@
     <module>hiero-enterprise-test</module>
     <module>hiero-enterprise-spring</module>
     <module>hiero-enterprise-microprofile</module>
+    <module>hiero-enterprise-testcontainers</module>
     <module>hiero-enterprise-spring-sample</module>
     <module>hiero-enterprise-microprofile-sample</module>
   </modules>
