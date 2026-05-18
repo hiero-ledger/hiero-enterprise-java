@@ -436,6 +436,18 @@ public interface MirrorNodeClient {
     return queryTopicMessageBySequenceNumber(TopicId.fromString(topicId), sequenceNumber);
   }
 
+  /**
+   * Return TopicMessage for given consensus timestamp.
+   *
+   * <p>The timestamp string must be in seconds.nanoseconds format (e.g. "1234567890.000000001").
+   *
+   * @param consensusTimestamp the consensus timestamp in seconds.nanoseconds format
+   * @return Optional of TopicMessage
+   * @throws HieroException if the search fails
+   */
+  @NonNull Optional<TopicMessage> queryTopicMessageByConsensusTimestamp(
+      @NonNull String consensusTimestamp) throws HieroException;
+
   @NonNull Optional<NftMetadata> getNftMetadata(@NonNull TokenId tokenId) throws HieroException;
 
   @NonNull Page<NftMetadata> findNftTypesByOwner(@NonNull AccountId ownerId);

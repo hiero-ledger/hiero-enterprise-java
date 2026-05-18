@@ -638,8 +638,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         chunkInfo = new ChunkInfo(transactionId, nonce, number, total, scheduled);
       }
 
-      final Instant consensusTimestamp =
-          Instant.ofEpochSecond(node.get("consensus_timestamp").asLong());
+      final Instant consensusTimestamp = parseTimestamp(node.get("consensus_timestamp"));
       final String message = new String(Base64.getDecoder().decode(node.get("message").asText()));
       final AccountId payerAccountId = AccountId.fromString(node.get("payer_account_id").asText());
       final byte[] runningHash = node.get("running_hash").asText().getBytes();
@@ -855,6 +854,20 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  private Instant parseTimestamp(@NonNull JsonNode node) {
+    final String value = node.asText();
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 
   private @NonNull Key parseProtoBufEncodedKey(@NonNull String key) throws Exception {

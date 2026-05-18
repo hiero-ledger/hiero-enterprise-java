@@ -492,21 +492,25 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
 
     try {
-      final JsonObject chunk = jsonObject.get("chunk_info").asJsonObject();
+      final JsonValue chunkValue = jsonObject.get("chunk_info");
       ChunkInfo chunkInfo = null;
-      if (chunk != null) {
+      if (chunkValue != null && chunkValue != JsonValue.NULL) {
+        final JsonObject chunk = chunkValue.asJsonObject();
         final TransactionId transactionId =
-            TransactionId.fromString(jsonObject.getString("initial_transaction_id"));
-        final int nonce = jsonObject.getInt("nonce");
-        final int number = jsonObject.getInt("number");
-        final int total = jsonObject.getInt("total");
-        final boolean scheduled = jsonObject.getBoolean("scheduled");
+            TransactionId.fromString(chunk.getString("initial_transaction_id"));
+        final int nonce = chunk.getInt("nonce");
+        final int number = chunk.getInt("number");
+        final int total = chunk.getInt("total");
+        final boolean scheduled = chunk.getBoolean("scheduled");
         chunkInfo = new ChunkInfo(transactionId, nonce, number, total, scheduled);
       }
 
-      final Instant consensusTimestamp =
-          Instant.ofEpochSecond(
-              (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
+      final String tsStr = jsonObject.getString("consensus_timestamp");
+      final String[] tsParts = tsStr.split("\\.", 2);
+      final long tsSeconds = Long.parseLong(tsParts[0]);
+      final int tsNanos =
+          tsParts.length == 1 ? 0 : Integer.parseInt((tsParts[1] + "000000000").substring(0, 9));
+      final Instant consensusTimestamp = Instant.ofEpochSecond(tsSeconds, tsNanos);
       final String message =
           new String(Base64.getDecoder().decode(jsonObject.getString("message")));
       final AccountId payerAccountId =
