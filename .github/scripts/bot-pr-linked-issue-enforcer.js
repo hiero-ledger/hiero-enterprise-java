@@ -5,7 +5,6 @@
  * Uses GitHub's closingIssuesReferences (keywords such as "Fixes #123" in the PR body).
  */
 
-const dryRun = (process.env.DRY_RUN || 'false').toString().toLowerCase() === 'true';
 const requireAuthorAssigned =
   (process.env.REQUIRE_AUTHOR_ASSIGNED || 'true').toLowerCase() === 'true';
 
@@ -92,11 +91,6 @@ async function closePR(github, pr, owner, repo, reason) {
     COMMENT_MARKER +
     messages[reason].replace('{{author}}', author) +
     messageSuffix;
-
-  if (dryRun) {
-    console.log(`[DRY RUN] Would close PR #${pr.number} (${reason})`);
-    return;
-  }
 
   await github.rest.issues.createComment({
     owner,
