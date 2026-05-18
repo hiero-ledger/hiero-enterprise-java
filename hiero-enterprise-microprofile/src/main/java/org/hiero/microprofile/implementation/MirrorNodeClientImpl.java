@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import org.hiero.base.HieroException;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
+import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
@@ -132,6 +134,32 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens/" + tokenId + "/balances?account.id=" + accountId;
     final Function<JsonObject, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<AccountBalance> queryBalances() throws HieroException {
+    final String path = "/api/v1/balances";
+    final Function<JsonObject, List<AccountBalance>> dataExtractionFunction =
+        node -> jsonConverter.toAccountBalances(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/balances?account.id=" + accountId;
+    final Function<JsonObject, List<AccountBalance>> dataExtractionFunction =
+        node -> jsonConverter.toAccountBalances(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<NetworkNode> queryNetworkNodes() throws HieroException {
+    final String path = "/api/v1/network/nodes";
+    final Function<JsonObject, List<NetworkNode>> dataExtractionFunction =
+        node -> jsonConverter.toNetworkNodes(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 

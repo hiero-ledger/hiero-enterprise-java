@@ -21,8 +21,10 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
@@ -32,16 +34,19 @@ import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.FixedFee;
 import org.hiero.base.data.FractionalFee;
 import org.hiero.base.data.NetworkFee;
+import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
+import org.hiero.base.data.ServiceEndpoint;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenBalance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.TokenTransfer;
 import org.hiero.base.data.Topic;
@@ -188,7 +193,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public @NonNull List<NetworkFee> toNetworkFees(@NonNull JsonObject jsonObject) {
 
-    if (!jsonObject.containsKey("nfts")) {
+    if (!jsonObject.containsKey("fees")) {
       return List.of();
     }
 
@@ -205,6 +210,85 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               }
             })
         .toList();
+  }
+
+  @Override
+  public @NonNull List<NetworkNode> toNetworkNodes(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("nodes")) {
+      return List.of();
+    }
+    final JsonArray nodesArray = jsonObject.getJsonArray("nodes");
+    if (nodesArray == null) {
+      throw new IllegalArgumentException("Network nodes array is not an array: " + nodesArray);
+    }
+    if (nodesArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(nodesArray)
+        .map(n -> toNetworkNode(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull Optional<NetworkNode> toNetworkNode(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
+    if (jsonObject.containsKey("nodes")) {
+      return toNetworkNodes(jsonObject).stream().findFirst();
+    }
+    try {
+      return Optional.of(
+          new NetworkNode(
+              jsonObject.getJsonNumber("node_id").longValue(),
+              AccountId.fromString(jsonObject.getString("node_account_id")),
+              stringOrNull(jsonObject, "description"),
+              stringOrNull(jsonObject, "memo"),
+              stringOrNull(jsonObject, "public_key"),
+              stringOrNull(jsonObject, "node_cert_hash"),
+              stringOrNull(jsonObject, "file_id"),
+              booleanOrNull(jsonObject, "decline_reward"),
+              longOrZero(jsonObject, "max_stake"),
+              longOrZero(jsonObject, "min_stake"),
+              longOrZero(jsonObject, "stake"),
+              longOrZero(jsonObject, "stake_not_rewarded"),
+              longOrZero(jsonObject, "stake_rewarded"),
+              longOrZero(jsonObject, "reward_rate_start"),
+              timestampRangeOrNull(jsonObject, "staking_period"),
+              timestampRange(jsonObject.getJsonObject("timestamp")),
+              toServiceEndpoints(jsonObject),
+              keyOrStringOrNull(jsonObject, "admin_key")));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private List<ServiceEndpoint> toServiceEndpoints(@NonNull JsonObject jsonObject) {
+    if (!jsonObject.containsKey("service_endpoints") || jsonObject.isNull("service_endpoints")) {
+      return List.of();
+    }
+    final JsonArray serviceEndpointsArray = jsonObject.getJsonArray("service_endpoints");
+    if (serviceEndpointsArray == null) {
+      throw new IllegalArgumentException(
+          "Service endpoints array is not an array: " + serviceEndpointsArray);
+    }
+    if (serviceEndpointsArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(serviceEndpointsArray)
+        .map(n -> toServiceEndpoint(n.asJsonObject()))
+        .toList();
+  }
+
+  private ServiceEndpoint toServiceEndpoint(@NonNull JsonObject jsonObject) {
+    return new ServiceEndpoint(
+        stringOrNull(jsonObject, "ip_address_v4"),
+        stringOrNull(jsonObject, "domain_name"),
+        jsonObject.getInt("port"));
   }
 
   @Override
@@ -782,6 +866,82 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
   }
 
+  @Override
+  public @NonNull Optional<BalanceSnapshot> toBalanceSnapshot(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new BalanceSnapshot(
+              parseTimestamp(jsonObject.getString("timestamp")), toAccountBalances(jsonObject)));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<AccountBalance> toAccountBalances(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("balances")) {
+      return List.of();
+    }
+    final JsonArray balancesArray = jsonObject.getJsonArray("balances");
+    if (balancesArray == null) {
+      throw new IllegalArgumentException(
+          "Account balances array is not an array: " + balancesArray);
+    }
+    if (balancesArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(balancesArray)
+        .map(n -> toAccountBalance(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<AccountBalance> toAccountBalance(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new AccountBalance(
+              AccountId.fromString(jsonObject.getString("account")),
+              jsonObject.getJsonNumber("balance").longValue(),
+              toTokenBalances(jsonObject)));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private List<TokenBalance> toTokenBalances(@NonNull JsonObject jsonObject) {
+    if (!jsonObject.containsKey("tokens") || jsonObject.isNull("tokens")) {
+      return List.of();
+    }
+    final JsonArray tokensArray = jsonObject.getJsonArray("tokens");
+    if (tokensArray == null) {
+      throw new IllegalArgumentException("Token balances array is not an array: " + tokensArray);
+    }
+    if (tokensArray.isEmpty()) {
+      return List.of();
+    }
+    return jsonArrayToStream(tokensArray).map(n -> toTokenBalance(n.asJsonObject())).toList();
+  }
+
+  private TokenBalance toTokenBalance(@NonNull JsonObject jsonObject) {
+    try {
+      return new TokenBalance(
+          TokenId.fromString(jsonObject.getString("token_id")),
+          jsonObject.getJsonNumber("balance").longValue());
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
   // Contract-related methods
 
   @Override
@@ -968,5 +1128,75 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  private Long longOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getJsonNumber(fieldName).longValue();
+  }
+
+  private long longOrZero(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    final Long value = longOrNull(jsonObject, fieldName);
+    return value == null ? 0L : value;
+  }
+
+  private String stringOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getString(fieldName);
+  }
+
+  private Boolean booleanOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return jsonObject.getBoolean(fieldName);
+  }
+
+  private String keyOrStringOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    if (jsonObject.get(fieldName).getValueType() == JsonValue.ValueType.OBJECT
+        && jsonObject.getJsonObject(fieldName).containsKey("key")) {
+      return jsonObject.getJsonObject(fieldName).getString("key");
+    }
+    return jsonObject.getString(fieldName);
+  }
+
+  private TimestampRange timestampRangeOrNull(
+      @NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return timestampRange(jsonObject.getJsonObject(fieldName));
+  }
+
+  private TimestampRange timestampRange(@NonNull JsonObject jsonObject) {
+    return new TimestampRange(
+        timestampOrNull(jsonObject, "from"), timestampOrNull(jsonObject, "to"));
+  }
+
+  private Instant timestampOrNull(@NonNull JsonObject jsonObject, @NonNull String fieldName) {
+    if (!jsonObject.containsKey(fieldName) || jsonObject.isNull(fieldName)) {
+      return null;
+    }
+    return parseTimestamp(jsonObject.getString(fieldName));
+  }
+
+  private Instant parseTimestamp(@NonNull String value) {
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos;
+    if (parts.length == 1) {
+      nanos = 0;
+    } else {
+      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
+      nanos = Integer.parseInt(paddedNanos);
+    }
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 }

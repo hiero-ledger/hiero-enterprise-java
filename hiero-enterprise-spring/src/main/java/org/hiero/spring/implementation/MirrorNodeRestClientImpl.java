@@ -28,7 +28,13 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonNode> 
   }
 
   public JsonNode doGetCall(String path) throws HieroException {
-    return doGetCall(builder -> builder.path(path).build());
+    final int queryIndex = path.indexOf('?');
+    if (queryIndex < 0) {
+      return doGetCall(builder -> builder.path(path).build());
+    }
+    final String pathOnly = path.substring(0, queryIndex);
+    final String query = path.substring(queryIndex + 1);
+    return doGetCall(builder -> builder.path(pathOnly).query(query).build());
   }
 
   public JsonNode doGetCall(Function<UriBuilder, URI> uriFunction) throws HieroException {
