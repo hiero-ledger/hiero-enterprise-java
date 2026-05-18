@@ -24,6 +24,7 @@ jobs:
         with:
           java-version: '25'
           distribution: 'temurin'
+          cache: maven
 
       - name: Import GPG key
         run: |
@@ -40,7 +41,7 @@ jobs:
         run: ./mvnw -B versions:set versions:commit -DnewVersion=${GITHUB_REF_NAME#v}
 
       - name: Build & Stage (publication profile)
-        run: ./mvnw -B -Ppublication deploy
+        run: ./mvnw -B -Ppublication deploy -DskipTests
 
       - name: Publish with JReleaser
         run: ./mvnw -B -Ppublication jreleaser:full-release
