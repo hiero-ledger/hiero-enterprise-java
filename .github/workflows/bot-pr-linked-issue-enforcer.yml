@@ -4,7 +4,7 @@
 name: PR Linked Issue Enforcer
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, edited, reopened, synchronize]
   workflow_dispatch:
     inputs:
