@@ -223,30 +223,23 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
 
     try {
-      final String transactionId = jsonObject.getString("transaction_id");
-      final byte[] bytes = getNullableString(jsonObject, "bytes").orElse("").getBytes();
-      final long chargedTxFee = jsonObject.getJsonNumber("charged_tx_fee").longValue();
-      final Instant consensusTimestamp =
-          Instant.ofEpochSecond(
-              (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
-      final String entityId = getNullableString(jsonObject, "entity_id").orElse(null);
-      final String maxFee = jsonObject.getString("max_fee");
-      final byte[] memo = jsonObject.getString("memo_base64").getBytes();
-      final TransactionType name = TransactionType.from(jsonObject.getString("name"));
-      final String _node = getNullableString(jsonObject, "node").orElse(null);
-      final int nonce = jsonObject.getInt("nonce");
+      final String transactionId = getRequiredString(jsonObject, "transaction_id");
+      final byte[] bytes = getNullableBytes(jsonObject, "bytes");
+      final long chargedTxFee = getLong(jsonObject, "charged_tx_fee");
+      final Instant consensusTimestamp = getTimestamp(jsonObject, "consensus_timestamp");
+      final String entityId = getNullableString(jsonObject, "entity_id");
+      final String maxFee = getRequiredString(jsonObject, "max_fee");
+      final byte[] memo = getNullableBytes(jsonObject, "memo_base64");
+      final TransactionType name = TransactionType.from(getRequiredString(jsonObject, "name"));
+      final String _node = getNullableString(jsonObject, "node");
+      final int nonce = getInt(jsonObject, "nonce");
       final Instant parentConsensusTimestamp =
-          jsonObject.isNull("parent_consensus_timestamp")
-              ? null
-              : Instant.ofEpochSecond(
-                  (long) Double.parseDouble(jsonObject.getString("parent_consensus_timestamp")));
-      final String result = jsonObject.getString("result");
-      final boolean scheduled = jsonObject.getBoolean("scheduled");
-      final byte[] transactionHash = jsonObject.getString("transaction_hash").getBytes();
-      final String validDurationSeconds = jsonObject.getString("valid_duration_seconds");
-      final Instant validStartTimestamp =
-          Instant.ofEpochSecond(
-              (long) Double.parseDouble(jsonObject.getString("valid_start_timestamp")));
+          getTimestamp(jsonObject, "parent_consensus_timestamp");
+      final String result = getRequiredString(jsonObject, "result");
+      final boolean scheduled = getBoolean(jsonObject, "scheduled");
+      final byte[] transactionHash = getNullableBytes(jsonObject, "transaction_hash");
+      final String validDurationSeconds = getRequiredString(jsonObject, "valid_duration_seconds");
+      final Instant validStartTimestamp = getTimestamp(jsonObject, "valid_start_timestamp");
 
       final List<NftTransfer> nftTransfers =
           jsonArrayToStream(jsonObject.getJsonArray("nft_transfers"))
@@ -313,49 +306,45 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   private Transfer toTransfer(JsonValue node) {
     final JsonObject jsonObject = node.asJsonObject();
-    final AccountId account = AccountId.fromString(jsonObject.getString("account"));
-    final long amount = jsonObject.getJsonNumber("amount").longValue();
-    final boolean isApproval = jsonObject.getBoolean("is_approval");
+    final AccountId account = AccountId.fromString(getRequiredString(jsonObject, "account"));
+    final long amount = getLong(jsonObject, "amount");
+    final boolean isApproval = getBoolean(jsonObject, "is_approval");
 
     return new Transfer(account, amount, isApproval);
   }
 
   private TokenTransfer toTokenTransfer(JsonValue node) {
     final JsonObject jsonObject = node.asJsonObject();
-    final TokenId tokenId = TokenId.fromString(jsonObject.getString("token_id"));
-    final AccountId account = AccountId.fromString(jsonObject.getString("account"));
-    final long amount = jsonObject.getJsonNumber("amount").longValue();
-    final boolean isApproval = jsonObject.getBoolean("is_approval");
+    final TokenId tokenId = TokenId.fromString(getRequiredString(jsonObject, "token_id"));
+    final AccountId account = AccountId.fromString(getRequiredString(jsonObject, "account"));
+    final long amount = getLong(jsonObject, "amount");
+    final boolean isApproval = getBoolean(jsonObject, "is_approval");
 
     return new TokenTransfer(tokenId, account, amount, isApproval);
   }
 
   private StakingRewardTransfer toStakingRewardTransfer(JsonValue node) {
     final JsonObject jsonObject = node.asJsonObject();
-    final AccountId account = AccountId.fromString(jsonObject.getString("account"));
-    long amount = jsonObject.getJsonNumber("amount").longValue();
+    final AccountId account = AccountId.fromString(getRequiredString(jsonObject, "account"));
+    long amount = getLong(jsonObject, "amount");
 
     return new StakingRewardTransfer(account, amount);
   }
 
   private NftTransfer toNftTransfer(JsonValue node) {
     final JsonObject jsonObject = node.asJsonObject();
-    final boolean isApproval = jsonObject.getBoolean("is_approval");
+    final boolean isApproval = getBoolean(jsonObject, "is_approval");
+    final String receiverAccount = getNullableString(jsonObject, "receiver_account_id");
     final AccountId receiverAccountId =
-        AccountId.fromString(jsonObject.getString("receiver_account_id"));
+        receiverAccount == null ? null : AccountId.fromString(receiverAccount);
+    final String senderAccount = getNullableString(jsonObject, "sender_account_id");
     final AccountId senderAccountId =
-        AccountId.fromString(jsonObject.getString("sender_account_id"));
-    final long serialNumber = jsonObject.getJsonNumber("serial_number").longValue();
-    final TokenId tokenId = TokenId.fromString(jsonObject.getString("token_id"));
+        senderAccount == null ? null : AccountId.fromString(senderAccount);
+    final long serialNumber = getLong(jsonObject, "serial_number");
+    final String token = getNullableString(jsonObject, "token_id");
+    final TokenId tokenId = token == null ? null : TokenId.fromString(token);
 
     return new NftTransfer(isApproval, receiverAccountId, senderAccountId, serialNumber, tokenId);
-  }
-
-  private Optional<String> getNullableString(JsonObject jsonObject, String key) {
-    if (!jsonObject.containsKey(key) || jsonObject.isNull(key)) {
-      return Optional.empty();
-    }
-    return Optional.of(jsonObject.getString(key));
   }
 
   @Override
@@ -379,8 +368,84 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @NonNull
   private Stream<JsonValue> jsonArrayToStream(@NonNull final JsonArray jsonObject) {
+    if (jsonObject == null || jsonObject.isEmpty()) {
+      return Stream.empty();
+    }
     return StreamSupport.stream(
         Spliterators.spliteratorUnknownSize(jsonObject.iterator(), Spliterator.ORDERED), false);
+  }
+
+  private static String getRequiredString(JsonObject jsonObject, String name) {
+    final String value = getNullableString(jsonObject, name);
+    if (value == null) {
+      throw new IllegalArgumentException("Required JSON field is null: " + name);
+    }
+    return value;
+  }
+
+  private static String getNullableString(JsonObject jsonObject, String name) {
+    if (!jsonObject.containsKey(name) || jsonObject.isNull(name)) {
+      return null;
+    }
+    final JsonValue value = jsonObject.get(name);
+    return switch (value.getValueType()) {
+      case STRING -> jsonObject.getString(name);
+      case NUMBER -> jsonObject.getJsonNumber(name).toString();
+      case TRUE -> "true";
+      case FALSE -> "false";
+      case NULL -> null;
+      default -> value.toString();
+    };
+  }
+
+  private static byte[] getNullableBytes(JsonObject jsonObject, String name) {
+    final String value = getNullableString(jsonObject, name);
+    return value == null ? null : value.getBytes();
+  }
+
+  private static long getLong(JsonObject jsonObject, String name) {
+    if (!jsonObject.containsKey(name) || jsonObject.isNull(name)) {
+      throw new IllegalArgumentException("Required JSON field is null: " + name);
+    }
+    if (jsonObject.get(name).getValueType() == JsonValue.ValueType.NUMBER) {
+      return jsonObject.getJsonNumber(name).longValue();
+    }
+    return Long.parseLong(getRequiredString(jsonObject, name));
+  }
+
+  private static int getInt(JsonObject jsonObject, String name) {
+    if (!jsonObject.containsKey(name) || jsonObject.isNull(name)) {
+      throw new IllegalArgumentException("Required JSON field is null: " + name);
+    }
+    if (jsonObject.get(name).getValueType() == JsonValue.ValueType.NUMBER) {
+      return jsonObject.getJsonNumber(name).intValue();
+    }
+    return Integer.parseInt(getRequiredString(jsonObject, name));
+  }
+
+  private static boolean getBoolean(JsonObject jsonObject, String name) {
+    if (!jsonObject.containsKey(name) || jsonObject.isNull(name)) {
+      throw new IllegalArgumentException("Required JSON field is null: " + name);
+    }
+    if (jsonObject.get(name).getValueType() == JsonValue.ValueType.TRUE) {
+      return true;
+    }
+    if (jsonObject.get(name).getValueType() == JsonValue.ValueType.FALSE) {
+      return false;
+    }
+    return Boolean.parseBoolean(getRequiredString(jsonObject, name));
+  }
+
+  private static Instant getTimestamp(JsonObject jsonObject, String name) {
+    final String value = getNullableString(jsonObject, name);
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    final String[] parts = value.split("\\.", 2);
+    final long seconds = Long.parseLong(parts[0]);
+    final int nanos =
+        parts.length == 1 ? 0 : Integer.parseInt((parts[1] + "000000000").substring(0, 9));
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 
   @Override
