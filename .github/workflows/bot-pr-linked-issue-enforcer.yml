@@ -1,5 +1,10 @@
 # Closes pull requests immediately when they are not linked to an open issue,
 # or when the PR author is not assigned to the linked issue.
+#
+# Uses pull_request so the workflow can be tested from a feature branch before
+# it exists on main. After merging to main, consider adding pull_request_target
+# as well so fork PRs can be closed (pull_request only has write access for
+# same-repository branches).
 
 name: PR Linked Issue Enforcer
 
@@ -29,12 +34,18 @@ concurrency:
 
 jobs:
   enforce-linked-issue:
+    # pull_request cannot write to fork PRs; skip those until pull_request_target is enabled on main.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout enforcer scripts
         uses: actions/checkout@v6.0.2
         with:
-          ref: main
+          # pull_request: merge commit includes scripts from the PR branch.
+          # workflow_dispatch: tip of the selected branch.
+          ref: ${{ github.sha }}
+          sparse-checkout: .github/scripts
+          sparse-checkout-cone-mode: false
 
       - name: Enforce linked issue and assignment
         uses: actions/github-script@v7
