@@ -48,18 +48,31 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
   @Override
   public @NonNull Page<Nft> queryNftsByAccount(@NonNull AccountId accountId) throws HieroException {
-    throw new RuntimeException("Not implemented");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/nfts";
+    final Function<JsonObject, List<Nft>> dataExtractionFunction =
+        node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
   public @NonNull Page<Nft> queryNftsByAccountAndTokenId(
       @NonNull AccountId accountId, @NonNull TokenId tokenId) throws HieroException {
-    throw new RuntimeException("Not implemented");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    final String path = "/api/v1/tokens/" + tokenId + "/nfts?account.id=" + accountId;
+    final Function<JsonObject, List<Nft>> dataExtractionFunction =
+        node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
   public @NonNull Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) throws HieroException {
-    throw new RuntimeException("Not implemented");
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    final String path = "/api/v1/tokens/" + tokenId + "/nfts";
+    final Function<JsonObject, List<Nft>> dataExtractionFunction =
+        node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
   @Override
