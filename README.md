@@ -124,6 +124,15 @@ For most of the part, the sample application is the same as the Spring Boot samp
 
 A sample project can be found at https://github.com/hendrikebbers/quarkus-hiero-sample
 
+## Concrete Samples
+
+This repository contains concrete sample modules for framework integrations:
+
+- `hiero-enterprise-spring-sample`
+- `hiero-enterprise-microprofile-sample` (Quarkus)
+
+Shared sample conventions (configuration contract and operation scope) are documented in [docs/samples.md](docs/samples.md).
+
 ## Managed services
 
 The module provides a set of managed services that can be used to interact with a Hiero network.
