@@ -516,7 +516,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final AccountId payerAccountId =
           AccountId.fromString(jsonObject.getString("payer_account_id"));
       final byte[] runningHash = jsonObject.getString("running_hash").getBytes();
-      final int runningHashVersion = jsonObject.getInt("running_hash_version");
+      final int runningHashVersion = jsonObject.getJsonNumber("running_hash_version").intValue();
       final long sequenceNumber = jsonObject.getJsonNumber("sequence_number").longValue();
       final TopicId topicId = TopicId.fromString(jsonObject.getString("topic_id"));
 
