@@ -45,7 +45,67 @@ public class NftRepositoryTest {
   @Inject private HieroContext hieroContext;
 
   @Test
-  void findMintedNftsByTypeOwnerAndOwnerAndType() throws Exception {
+  void findMintedNftsByType() throws Exception {
+    final NftFixture fixture = createMintedNftFixture();
+
+    final Page<Nft> nftsByType = nftRepository.findByType(fixture.tokenId());
+
+    assertContainsNft(
+        nftsByType.getData(),
+        fixture.tokenId(),
+        fixture.serials().get(0),
+        fixture.owner(),
+        fixture.metadata1());
+    assertContainsNft(
+        nftsByType.getData(),
+        fixture.tokenId(),
+        fixture.serials().get(1),
+        fixture.owner(),
+        fixture.metadata2());
+  }
+
+  @Test
+  void findMintedNftsByOwner() throws Exception {
+    final NftFixture fixture = createMintedNftFixture();
+
+    final Page<Nft> nftsByOwner = nftRepository.findByOwner(fixture.owner());
+
+    assertContainsNft(
+        nftsByOwner.getData(),
+        fixture.tokenId(),
+        fixture.serials().get(0),
+        fixture.owner(),
+        fixture.metadata1());
+    assertContainsNft(
+        nftsByOwner.getData(),
+        fixture.tokenId(),
+        fixture.serials().get(1),
+        fixture.owner(),
+        fixture.metadata2());
+  }
+
+  @Test
+  void findMintedNftsByOwnerAndType() throws Exception {
+    final NftFixture fixture = createMintedNftFixture();
+
+    final Page<Nft> nftsByOwnerAndType =
+        nftRepository.findByOwnerAndType(fixture.owner(), fixture.tokenId());
+
+    assertContainsNft(
+        nftsByOwnerAndType.getData(),
+        fixture.tokenId(),
+        fixture.serials().get(0),
+        fixture.owner(),
+        fixture.metadata1());
+    assertContainsNft(
+        nftsByOwnerAndType.getData(),
+        fixture.tokenId(),
+        fixture.serials().get(1),
+        fixture.owner(),
+        fixture.metadata2());
+  }
+
+  private NftFixture createMintedNftFixture() throws Exception {
     final String name = "Tokemon cards";
     final String symbol = "TOK";
     final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
@@ -60,17 +120,11 @@ public class NftRepositoryTest {
     nftClient.transferNft(tokenId, serials.get(1), hieroContext.getOperatorAccount(), newOwner);
     Thread.sleep(10_000);
 
-    final Page<Nft> nftsByType = nftRepository.findByType(tokenId);
-    final Page<Nft> nftsByOwner = nftRepository.findByOwner(newOwner);
-    final Page<Nft> nftsByOwnerAndType = nftRepository.findByOwnerAndType(newOwner, tokenId);
-
-    assertContainsNft(nftsByType.getData(), tokenId, serials.get(0), newOwner, metadata1);
-    assertContainsNft(nftsByType.getData(), tokenId, serials.get(1), newOwner, metadata2);
-    assertContainsNft(nftsByOwner.getData(), tokenId, serials.get(0), newOwner, metadata1);
-    assertContainsNft(nftsByOwner.getData(), tokenId, serials.get(1), newOwner, metadata2);
-    assertContainsNft(nftsByOwnerAndType.getData(), tokenId, serials.get(0), newOwner, metadata1);
-    assertContainsNft(nftsByOwnerAndType.getData(), tokenId, serials.get(1), newOwner, metadata2);
+    return new NftFixture(tokenId, serials, newOwner, metadata1, metadata2);
   }
+
+  private record NftFixture(
+      TokenId tokenId, List<Long> serials, AccountId owner, byte[] metadata1, byte[] metadata2) {}
 
   private static void assertContainsNft(
       final List<Nft> nfts,
