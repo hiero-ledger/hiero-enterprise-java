@@ -20,12 +20,12 @@ Thank you for your interest in contributing to Hiero Hiero Enterprise Java!
 
 **Get Started By Reading:**
 
-- [Readme](reamde.md)
+- [Readme](README.md)
 - [Getting Started](docs/getting-started.md)
 
 **Quick Start:**
 
-1. Find/create an issue → [Issues](https://github.com/hiero-ledger/hiero-sdk-python/issues)
+1. Find/create an issue → [Issues](https://github.com/hiero-ledger/hiero-enterprise-java/issues)
 2. Get assigned (comment "I'd like to work on this")
 3. Read [Getting Started](docs/getting-started.md)
 5. GPG and DCO sign commits [Quickstart Signing](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/signing.md)
@@ -35,7 +35,7 @@ Thank you for your interest in contributing to Hiero Hiero Enterprise Java!
 - [Signing Guide](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/signing.md)
 - [Rebasing Guide](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/rebasing.md)
 - [Merge Conflicts Guide](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/merge_conflicts.md)
-- [Testing Guide](docs/sdk_developers/testing.md)
+- [Testing Guide](docs/testing-forks.md)
 
 
 #### ⚠️ A Note on Breaking Changes
