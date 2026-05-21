@@ -53,6 +53,8 @@ public class ClientProvider {
 
   @Inject @ConfigProperties private HieroNetworkConfiguration networkConfiguration;
 
+  @Inject private jakarta.enterprise.inject.Instance<io.opentelemetry.api.trace.Tracer> tracerInstance;
+
   @NonNull
   @Produces
   @ApplicationScoped
@@ -71,7 +73,8 @@ public class ClientProvider {
   @Produces
   @ApplicationScoped
   ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroContext hieroContext) {
-    return new ProtocolLayerClientImpl(hieroContext);
+    io.opentelemetry.api.trace.Tracer tracer = tracerInstance.isResolvable() ? tracerInstance.get() : null;
+    return new ProtocolLayerClientImpl(hieroContext, tracer);
   }
 
   @NonNull
@@ -149,7 +152,8 @@ public class ClientProvider {
             .orElseThrow(() -> new IllegalStateException("No mirror node addresses configured"));
     final MirrorNodeRestClientImpl restClient = new MirrorNodeRestClientImpl(target);
     final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();
-    return new MirrorNodeClientImpl(restClient, jsonConverter);
+    io.opentelemetry.api.trace.Tracer tracer = tracerInstance.isResolvable() ? tracerInstance.get() : null;
+    return new MirrorNodeClientImpl(restClient, jsonConverter, tracer);
   }
 
   @NonNull

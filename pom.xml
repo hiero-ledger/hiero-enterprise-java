@@ -65,6 +65,7 @@
     <jreleaser-maven-plugin.version>1.23.0</jreleaser-maven-plugin.version>
     <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
     <spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
+    <opentelemetry.version>1.38.0</opentelemetry.version>
   </properties>
 
   <dependencyManagement>
@@ -205,6 +206,13 @@
         <groupId>com.google.auto.service</groupId>
         <artifactId>auto-service-annotations</artifactId>
         <version>${google.auto.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-bom</artifactId>
+        <version>${opentelemetry.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

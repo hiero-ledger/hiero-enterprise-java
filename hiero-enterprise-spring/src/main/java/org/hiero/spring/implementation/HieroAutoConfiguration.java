@@ -53,7 +53,7 @@ import org.springframework.web.context.annotation.ApplicationScope;
 
 @AutoConfiguration
 @EnableConfigurationProperties({HieroProperties.class, HieroNetworkProperties.class})
-@Import({MicrometerSupportConfig.class})
+@Import({MicrometerSupportConfig.class, TracingSupportConfig.class})
 public class HieroAutoConfiguration {
 
   private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
@@ -73,8 +73,10 @@ public class HieroAutoConfiguration {
   @Bean
   ProtocolLayerClient protocolLevelClient(
       final HieroContext hieroContext,
-      @Autowired(required = false) final ReceiveRecordInterceptor interceptor) {
-    ProtocolLayerClientImpl protocolLayerClient = new ProtocolLayerClientImpl(hieroContext);
+      @Autowired(required = false) final ReceiveRecordInterceptor interceptor,
+      final org.springframework.beans.factory.ObjectProvider<io.opentelemetry.api.trace.Tracer> tracerProvider) {
+    ProtocolLayerClientImpl protocolLayerClient =
+        new ProtocolLayerClientImpl(hieroContext, tracerProvider.getIfAvailable());
     if (interceptor != null) {
       protocolLayerClient.setRecordInterceptor(interceptor);
     }
@@ -125,7 +127,9 @@ public class HieroAutoConfiguration {
       name = "mirrorNodeSupported",
       havingValue = "true",
       matchIfMissing = true)
-  MirrorNodeClient mirrorNodeClient(final HieroContext hieroContext) {
+  MirrorNodeClient mirrorNodeClient(
+      final HieroContext hieroContext,
+      final org.springframework.beans.factory.ObjectProvider<io.opentelemetry.api.trace.Tracer> tracerProvider) {
     final String mirrorNodeEndpoint;
     final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
     if (mirrorNetwork.isEmpty()) {
@@ -160,7 +164,7 @@ public class HieroAutoConfiguration {
           "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
     }
     RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
-    return new MirrorNodeClientImpl(builder);
+    return new MirrorNodeClientImpl(builder, tracerProvider.getIfAvailable());
   }
 
   @Bean

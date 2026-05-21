@@ -27,4 +27,6 @@ module org.hiero.base {
   requires com.google.protobuf; // TODO: We should not have the need to use it
   requires static org.jspecify;
   requires com.google.auto.service;
+  requires io.opentelemetry.api;
+  requires io.opentelemetry.context;
 }
