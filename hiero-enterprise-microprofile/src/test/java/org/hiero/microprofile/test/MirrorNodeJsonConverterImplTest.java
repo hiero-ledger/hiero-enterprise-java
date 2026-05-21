@@ -21,7 +21,7 @@ class MirrorNodeJsonConverterImplTest {
         .add("payer_account_id", "0.0.1234")
         .add("running_hash", "abc")
         .add("running_hash_version", 3)
-        .add("sequence_number", "1")
+        .add("sequence_number", 1)
         .add("topic_id", "0.0.5678");
   }
 
