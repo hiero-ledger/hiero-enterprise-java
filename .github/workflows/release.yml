@@ -45,20 +45,7 @@ jobs:
           echo "use-agent" >> ~/.gnupg/gpg.conf
 
       - name: Set Maven version
-        run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          ./mvnw -B versions:set versions:commit -DnewVersion=$VERSION
-
-      - name: Commit version changes
-        uses: planetscale/ghcommit-action@25309d8005ac7c3bcd61d3fe19b69e0fe47dbdde # v0.2.20
-        with:
-          commit_message: "chore: bump pom version to ${{ env.VERSION }}"
-          repo: ${{ github.repository }}
-          branch: master
-          file_pattern: '**/pom.xml'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./mvnw -B versions:set versions:commit -DnewVersion=${GITHUB_REF_NAME#v}
 
       - name: Build & Stage
         run: ./mvnw -B -Ppublication deploy -DskipTests
