@@ -8,13 +8,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
+import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
@@ -271,6 +274,24 @@ public interface MirrorNodeClient {
    * @throws HieroException if an error occurs
    */
   @NonNull Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException;
+
+  @NonNull Optional<BalanceSnapshot> queryBalanceSnapshot() throws HieroException;
+
+  @NonNull Page<AccountBalance> queryBalances() throws HieroException;
+
+  @NonNull Page<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
+      throws HieroException;
+
+  @NonNull
+  default Page<AccountBalance> queryBalancesByAccount(@NonNull String accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return queryBalancesByAccount(AccountId.fromString(accountId));
+  }
+
+  @NonNull Page<NetworkNode> queryNetworkNodes() throws HieroException;
+
+  @NonNull Optional<NetworkNode> queryNetworkNodeById(long nodeId) throws HieroException;
 
   /**
    * Return Tokens associated with given accountId.

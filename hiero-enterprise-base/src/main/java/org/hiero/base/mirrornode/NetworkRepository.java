@@ -5,8 +5,10 @@ import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
+import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
+import org.hiero.base.data.Page;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -45,4 +47,8 @@ public interface NetworkRepository {
    * @throws HieroException if the search fails
    */
   @NonNull Optional<NetworkSupplies> supplies() throws HieroException;
+
+  @NonNull Page<NetworkNode> nodes() throws HieroException;
+
+  @NonNull Optional<NetworkNode> nodeById(long nodeId) throws HieroException;
 }
