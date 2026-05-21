@@ -23,6 +23,8 @@ import org.hiero.base.implementation.MirrorNodeJsonConverter;
 import org.hiero.base.implementation.MirrorNodeRestClient;
 import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import io.opentelemetry.api.trace.Tracer;
 
 public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
@@ -32,6 +34,14 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
   public MirrorNodeClientImpl(
       MirrorNodeRestClientImpl restClient, MirrorNodeJsonConverter<JsonObject> jsonConverter) {
+    this(restClient, jsonConverter, null);
+  }
+
+  public MirrorNodeClientImpl(
+      MirrorNodeRestClientImpl restClient,
+      MirrorNodeJsonConverter<JsonObject> jsonConverter,
+      @Nullable Tracer tracer) {
+    super(tracer);
     this.restClient = Objects.requireNonNull(restClient, "restClient must not be null");
     this.jsonConverter = Objects.requireNonNull(jsonConverter, "jsonConverter must not be null");
   }

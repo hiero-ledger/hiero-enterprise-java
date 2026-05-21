@@ -45,6 +45,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.TracerProvider;
 import org.hiero.base.HieroContext;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
@@ -106,6 +108,7 @@ import org.hiero.base.protocol.data.TopicUpdateRequest;
 import org.hiero.base.protocol.data.TopicUpdateResult;
 import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,11 +122,19 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
 
   private final HieroContext hieroContext;
 
+  private final Tracer tracer;
+
   private final AtomicReference<ReceiveRecordInterceptor> recordInterceptor =
       new AtomicReference<>(ReceiveRecordInterceptor.DEFAULT_INTERCEPTOR);
 
   public ProtocolLayerClientImpl(@NonNull final HieroContext hieroContext) {
+    this(hieroContext, null);
+  }
+
+  public ProtocolLayerClientImpl(
+      @NonNull final HieroContext hieroContext, @Nullable final Tracer tracer) {
     this.hieroContext = Objects.requireNonNull(hieroContext, "hieroContext must not be null");
+    this.tracer = tracer != null ? tracer : TracerProvider.noop().get("org.hiero.enterprise");
     listeners = new CopyOnWriteArrayList<>();
   }
 
@@ -729,6 +740,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     Objects.requireNonNull(type, "type must not be null");
     try {
       return TracingSupport.withinSpanWithHieroException(
+          tracer,
           "hiero.transaction." + type.name().toLowerCase(),
           () -> {
             Span.current().setAttribute("hiero.transaction.type", type.name());
@@ -805,6 +817,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     Objects.requireNonNull(query, "query must not be null");
     try {
       return TracingSupport.withinSpanWithHieroException(
+          tracer,
           "hiero.query." + query.getClass().getSimpleName().toLowerCase(),
           () -> {
             Span.current().setAttribute("hiero.query.type", query.getClass().getSimpleName());

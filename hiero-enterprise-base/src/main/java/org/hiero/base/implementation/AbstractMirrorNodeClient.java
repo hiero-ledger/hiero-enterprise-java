@@ -24,8 +24,21 @@ import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.TracerProvider;
 
 public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient {
+
+  protected final Tracer tracer;
+
+  protected AbstractMirrorNodeClient() {
+    this(null);
+  }
+
+  protected AbstractMirrorNodeClient(@Nullable final Tracer tracer) {
+    this.tracer = tracer != null ? tracer : TracerProvider.noop().get("org.hiero.enterprise");
+  }
 
   @NonNull
   protected abstract MirrorNodeRestClient<JSON> getRestClient();
@@ -38,6 +51,7 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
       @NonNull final TokenId tokenId, final long serialNumber) throws HieroException {
     final JSON json =
         TracingSupport.withinSpanWithHieroException(
+            tracer,
             "hiero.mirrornode.queryNftsByTokenIdAndSerial",
             () -> getRestClient().queryNftsByTokenIdAndSerial(tokenId, serialNumber));
     return getJsonConverter().toNft(json);
@@ -49,6 +63,7 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
     Objects.requireNonNull(accountId, "accountId must not be null");
     final JSON json =
         TracingSupport.withinSpanWithHieroException(
+            tracer,
             "hiero.mirrornode.queryAccount", () -> getRestClient().queryAccount(accountId));
     return getJsonConverter().toAccountInfo(json);
   }
@@ -89,6 +104,7 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
       throws HieroException {
     final JSON json =
         TracingSupport.withinSpanWithHieroException(
+            tracer,
             "hiero.mirrornode.queryTransaction",
             () -> getRestClient().queryTransaction(transactionId));
     return getJsonConverter().toTransactionInfo(json);

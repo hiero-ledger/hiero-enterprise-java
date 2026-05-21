@@ -29,18 +29,23 @@ public final class TracingSupport {
   /**
    * Execute a supplier within a new span.
    *
+   * @param tracer the tracer to use
    * @param spanName the name of the span
    * @param supplier the supplier to execute
    * @param <T> the type of the result
    * @return the result
    */
-  public static <T> T withinSpan(@NonNull final String spanName, @NonNull final Supplier<T> supplier) {
-    return withinSpan(spanName, null, supplier);
+  public static <T> T withinSpan(
+      @NonNull final Tracer tracer,
+      @NonNull final String spanName,
+      @NonNull final Supplier<T> supplier) {
+    return withinSpan(tracer, spanName, null, supplier);
   }
 
   /**
    * Execute a supplier within a new span with custom attributes.
    *
+   * @param tracer the tracer to use
    * @param spanName the name of the span
    * @param attributesConfigurer a configurer for the span attributes
    * @param supplier the supplier to execute
@@ -48,10 +53,11 @@ public final class TracingSupport {
    * @return the result
    */
   public static <T> T withinSpan(
+      @NonNull final Tracer tracer,
       @NonNull final String spanName,
       @Nullable final SpanAttributesConfigurer attributesConfigurer,
       @NonNull final Supplier<T> supplier) {
-    final SpanBuilder spanBuilder = getTracer().spanBuilder(spanName);
+    final SpanBuilder spanBuilder = tracer.spanBuilder(spanName);
     if (attributesConfigurer != null) {
       attributesConfigurer.configure(spanBuilder);
     }
@@ -69,6 +75,7 @@ public final class TracingSupport {
   /**
    * Execute an operation that may throw a HieroException within a new span.
    *
+   * @param tracer the tracer to use
    * @param spanName the name of the span
    * @param operation the operation to execute
    * @param <T> the type of the result
@@ -76,9 +83,11 @@ public final class TracingSupport {
    * @throws HieroException if the operation fails
    */
   public static <T> T withinSpanWithHieroException(
-      @NonNull final String spanName, @NonNull final HieroOperation<T> operation)
+      @NonNull final Tracer tracer,
+      @NonNull final String spanName,
+      @NonNull final HieroOperation<T> operation)
       throws HieroException {
-    final Span span = getTracer().spanBuilder(spanName).startSpan();
+    final Span span = tracer.spanBuilder(spanName).startSpan();
     try (var ignored = span.makeCurrent()) {
       return operation.execute();
     } catch (final HieroException e) {

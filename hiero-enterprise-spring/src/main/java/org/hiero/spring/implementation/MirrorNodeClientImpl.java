@@ -24,6 +24,8 @@ import org.hiero.base.implementation.MirrorNodeJsonConverter;
 import org.hiero.base.implementation.MirrorNodeRestClient;
 import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import io.opentelemetry.api.trace.Tracer;
 import org.springframework.web.client.RestClient;
 
 public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
@@ -42,6 +44,18 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
    * @param restClientBuilder the builder for the REST client that must have the base URL set
    */
   public MirrorNodeClientImpl(final RestClient.Builder restClientBuilder) {
+    this(restClientBuilder, null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param restClientBuilder the builder for the REST client that must have the base URL set
+   * @param tracer the tracer to use
+   */
+  public MirrorNodeClientImpl(
+      final RestClient.Builder restClientBuilder, @Nullable final Tracer tracer) {
+    super(tracer);
     Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null");
     mirrorNodeRestClient = new MirrorNodeRestClientImpl(restClientBuilder);
     jsonConverter = new MirrorNodeJsonConverterImpl();
