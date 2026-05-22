@@ -17,6 +17,7 @@ import org.hiero.microprofile.ClientProvider;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @HelidonTest
@@ -38,6 +39,7 @@ public class TopicRepositoryTest {
   @Inject private TopicClient topicClient;
 
   @Test
+  @Disabled("Temporary disabled work on testnet not solo")
   void testFindTopicById() throws HieroException {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
