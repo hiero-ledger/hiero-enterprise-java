@@ -36,10 +36,6 @@ jobs:
       - name: Import GPG key
         run: |
           echo "${{ secrets.GPG_KEY_CONTENTS }}" | gpg --batch --import
-          
-          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
-          echo "GPG_KEY_ID=$GPG_KEY_ID" >> $GITHUB_ENV
-
           mkdir -p ~/.gnupg
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "use-agent" >> ~/.gnupg/gpg.conf
@@ -54,7 +50,6 @@ jobs:
         run: ./mvnw -B -Ppublication jreleaser:full-release
         env:
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_KEY_CONTENTS }}
-          JRELEASER_GPG_PUBLIC_KEY: ${{ env.GPG_KEY_ID }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
