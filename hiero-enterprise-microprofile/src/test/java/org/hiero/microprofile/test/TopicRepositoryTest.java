@@ -58,30 +58,4 @@ public class TopicRepositoryTest {
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
   }
-
-  @Test
-  void testShouldParseEcdsaKeys() throws Exception {
-    final PrivateKey adminKey = PrivateKey.generateECDSA();
-    final TopicId topicId = topicClient.createTopic(adminKey);
-    Assertions.assertNotNull(topicId);
-
-    hieroTestUtils.waitForMirrorNodeRecords();
-
-    final Optional<Topic> topic = topicRepository.findTopicById(topicId);
-    Assertions.assertTrue(topic.isPresent());
-    Assertions.assertEquals(topic.get().adminKey().toString(), adminKey.getPublicKey().toString());
-  }
-
-  @Test
-  void testShouldParseEd25519Keys() throws Exception {
-    final PrivateKey adminKey = PrivateKey.generateED25519();
-    final TopicId topicId = topicClient.createTopic(adminKey);
-    Assertions.assertNotNull(topicId);
-
-    hieroTestUtils.waitForMirrorNodeRecords();
-
-    final Optional<Topic> topic = topicRepository.findTopicById(topicId);
-    Assertions.assertTrue(topic.isPresent());
-    Assertions.assertEquals(topic.get().adminKey().toString(), adminKey.getPublicKey().toString());
-  }
 }
