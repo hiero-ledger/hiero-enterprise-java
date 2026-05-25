@@ -1,0 +1,42 @@
+# Closes pull requests immediately when they are not linked to an open issue,
+# or when the PR author is not assigned to the linked issue.
+
+name: PR Linked Issue Enforcer
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to check
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: linked-issue-enforcer-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  enforce-linked-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+
+      - name: Enforce linked issue and assignment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number || '' }}
+          REQUIRE_AUTHOR_ASSIGNED: 'true'
+        with:
+          script: |
+            const script = require('./.github/scripts/bot-pr-linked-issue-enforcer.js');
+            await script({ github, context, core });

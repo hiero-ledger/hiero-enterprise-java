@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
@@ -117,5 +118,21 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
     Objects.requireNonNull(contractId, "contractId must not be null");
     final JSON json = getRestClient().queryContractById(contractId);
     return getJsonConverter().toContract(json);
+  }
+
+  @Override
+  public @NonNull Optional<Block> queryBlockByNumber(long number) throws HieroException {
+    if (number < 0) {
+      throw new IllegalArgumentException("Block number must not be negative");
+    }
+    final JSON json = getRestClient().queryBlock(String.valueOf(number));
+    return getJsonConverter().toBlock(json);
+  }
+
+  @Override
+  public @NonNull Optional<Block> queryBlockByHash(@NonNull String hash) throws HieroException {
+    Objects.requireNonNull(hash, "hash must not be null");
+    final JSON json = getRestClient().queryBlock(hash);
+    return getJsonConverter().toBlock(json);
   }
 }

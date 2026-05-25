@@ -17,7 +17,7 @@ public record Account(
     @NonNull AccountId accountId, @NonNull PublicKey publicKey, @NonNull PrivateKey privateKey) {
 
   public Account {
-    Objects.requireNonNull(accountId, "newAccountId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(publicKey, "publicKey must not be null");
     Objects.requireNonNull(privateKey, "privateKey must not be null");
   }

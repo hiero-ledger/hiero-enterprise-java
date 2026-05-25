@@ -23,7 +23,7 @@ public record AccountCreateResult(
     Objects.requireNonNull(transactionHash, "transactionHash must not be null");
     Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
     Objects.requireNonNull(transactionFee, "transactionFee must not be null");
-    Objects.requireNonNull(newAccount, "newAccountId must not be null");
+    Objects.requireNonNull(newAccount, "newAccount must not be null");
     if (transactionFee.toTinybars() < 0) {
       throw new IllegalArgumentException("transactionFee must be non-negative");
     }

@@ -1,6 +1,7 @@
 package org.hiero.spring.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.hiero.base.HieroException;
@@ -36,10 +37,12 @@ public class ContractVerificationUtility {
   void doFullVerification(
       ContractId contractId, String contractName, String contractSource, String contractMetadata)
       throws HieroException {
-    doFullVerification(
-        contractId,
-        contractName,
-        Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
+    final Map<String, String> files = new HashMap<>();
+    files.put(contractName + ".sol", contractSource);
+    if (contractMetadata != null) {
+      files.put("metadata.json", contractMetadata);
+    }
+    doFullVerification(contractId, contractName, files);
   }
 
   /**

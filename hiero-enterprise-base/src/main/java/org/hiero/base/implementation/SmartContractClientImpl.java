@@ -32,7 +32,7 @@ public class SmartContractClientImpl implements SmartContractClient {
   public SmartContractClientImpl(
       @NonNull final ProtocolLayerClient protocolLayerClient, FileClient fileClient) {
     this.protocolLayerClient =
-        Objects.requireNonNull(protocolLayerClient, "protocolLevelClient must not be null");
+        Objects.requireNonNull(protocolLayerClient, "protocolLayerClient must not be null");
     this.fileClient = Objects.requireNonNull(fileClient, "fileClient must not be null");
   }
 

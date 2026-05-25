@@ -9,7 +9,7 @@ public record AccountBalanceRequest(
     @NonNull AccountId accountId, Hbar queryPayment, Hbar maxQueryPayment) implements QueryRequest {
 
   public AccountBalanceRequest {
-    Objects.requireNonNull(accountId, "newAccountId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
   }
 
   @NonNull
@@ -19,7 +19,7 @@ public record AccountBalanceRequest(
 
   @NonNull
   public static AccountBalanceRequest of(@NonNull String accountId) {
-    Objects.requireNonNull(accountId, "newAccountId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
     return of(AccountId.fromString(accountId));
   }
 

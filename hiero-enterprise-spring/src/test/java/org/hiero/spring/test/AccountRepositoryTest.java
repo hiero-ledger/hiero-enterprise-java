@@ -35,4 +35,13 @@ public class AccountRepositoryTest {
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
   }
+
+  @Test
+  void updateAccountMemo() throws Exception {
+    // given
+    final Account account = accountClient.createAccount();
+
+    // when / then
+    Assertions.assertDoesNotThrow(() -> accountClient.updateAccountMemo(account, ""));
+  }
 }

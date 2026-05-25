@@ -14,7 +14,7 @@ public record ContractCallRequest(
     @NonNull Duration transactionValidDuration,
     @NonNull ContractId contractId,
     @NonNull String functionName,
-    @NonNull List<ContractParam<?>> constructorParams)
+    @NonNull List<ContractParam<?>> functionParams)
     implements TransactionRequest {
 
   public ContractCallRequest {
@@ -22,12 +22,12 @@ public record ContractCallRequest(
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
     Objects.requireNonNull(contractId, "contractId is required");
     Objects.requireNonNull(functionName, "functionName is required");
-    Objects.requireNonNull(constructorParams, "constructorParams is required");
+    Objects.requireNonNull(functionParams, "functionParams is required");
     if (maxTransactionFee.toTinybars() < 0) {
-      throw new IllegalArgumentException("maxTransactionFee must be at >= null");
+      throw new IllegalArgumentException("maxTransactionFee must be non-negative");
     }
     if (!transactionValidDuration.isPositive()) {
-      throw new IllegalArgumentException("transactionValidDuration must be at >= zero");
+      throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
     if (functionName.isBlank() || functionName.contains(" ")) {
       throw new IllegalArgumentException("functionName must not be blank or contain spaces");
@@ -38,20 +38,20 @@ public record ContractCallRequest(
   public static ContractCallRequest of(
       @NonNull String contractId,
       @NonNull String functionName,
-      @Nullable ContractParam<?>... constructorParams) {
+      @Nullable ContractParam<?>... functionParams) {
     Objects.requireNonNull(contractId, "contractId must not be null");
-    return of(ContractId.fromString(contractId), functionName, constructorParams);
+    return of(ContractId.fromString(contractId), functionName, functionParams);
   }
 
   @NonNull
   public static ContractCallRequest of(
       @NonNull ContractId contractId,
       @NonNull String functionName,
-      @Nullable ContractParam<?>... constructorParams) {
-    if (constructorParams == null) {
+      @Nullable ContractParam<?>... functionParams) {
+    if (functionParams == null) {
       return of(contractId, functionName, List.of());
     } else {
-      return of(contractId, functionName, List.of(constructorParams));
+      return of(contractId, functionName, List.of(functionParams));
     }
   }
 
@@ -59,21 +59,21 @@ public record ContractCallRequest(
   public static ContractCallRequest of(
       @NonNull String contractId,
       @NonNull String functionName,
-      @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull List<ContractParam<?>> functionParams) {
     Objects.requireNonNull(contractId, "contractId must not be null");
-    return of(ContractId.fromString(contractId), functionName, constructorParams);
+    return of(ContractId.fromString(contractId), functionName, functionParams);
   }
 
   @NonNull
   public static ContractCallRequest of(
       @NonNull ContractId contractId,
       @NonNull String functionName,
-      @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull List<ContractParam<?>> functionParams) {
     return new ContractCallRequest(
         DEFAULT_MAX_TRANSACTION_FEE,
         DEFAULT_TRANSACTION_VALID_DURATION,
         contractId,
         functionName,
-        List.copyOf(constructorParams));
+        List.copyOf(functionParams));
   }
 }

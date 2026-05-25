@@ -29,7 +29,7 @@ public class FileClientImpl implements FileClient {
 
   public FileClientImpl(@NonNull final ProtocolLayerClient protocolLayerClient) {
     this.protocolLayerClient =
-        Objects.requireNonNull(protocolLayerClient, "protocolLevelClient must not be null");
+        Objects.requireNonNull(protocolLayerClient, "protocolLayerClient must not be null");
   }
 
   @Override

@@ -8,6 +8,10 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountHookUpdateRequest;
+import org.hiero.base.protocol.data.AccountHookUpdateResult;
+import org.hiero.base.protocol.data.AccountUpdateRequest;
+import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCallResult;
 import org.hiero.base.protocol.data.ContractCreateRequest;
@@ -26,6 +30,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HookStoreRequest;
+import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -174,6 +180,29 @@ public interface ProtocolLayerClient {
       @NonNull AccountDeleteRequest request) throws HieroException;
 
   /**
+   * Executes an account hook update transaction.
+   *
+   * @param request the request containing hooks to create and hooks to delete on an account
+   * @return the result of the account hook update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull
+  default AccountHookUpdateResult executeAccountHookUpdateTransaction(
+      @NonNull AccountHookUpdateRequest request) throws HieroException {
+    throw new UnsupportedOperationException("Account hook update transaction is not implemented.");
+  }
+
+  /**
+   * Executes an account update transaction.
+   *
+   * @param request the request containing the details of the account update transaction
+   * @return the result of the account update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull AccountUpdateResult executeAccountUpdateTransaction(
+      @NonNull AccountUpdateRequest request) throws HieroException;
+
+  /**
    * Executes a token create transaction.
    *
    * @param request the request containing the details of the token create transaction
@@ -232,6 +261,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenTransferResult executeTransferTransaction(
       @NonNull final TokenTransferRequest request) throws HieroException;
+
+  /**
+   * Executes a hook store transaction.
+   *
+   * @param request the request containing the details of the hook store transaction
+   * @return the result of the hook store transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull HookStoreResult executeHookStoreTransaction(@NonNull final HookStoreRequest request)
+      throws HieroException;
 
   /**
    * Executes a topic create transaction.

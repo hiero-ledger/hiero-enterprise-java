@@ -89,7 +89,7 @@ public interface TransactionRepository {
   default Page<TransactionInfo> findByAccountAndResult(
       @NonNull String accountId, @NonNull Result result) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    Objects.requireNonNull(result, "type must not be null");
+    Objects.requireNonNull(result, "result must not be null");
     return findByAccountAndResult(AccountId.fromString(accountId), result);
   }
   ;

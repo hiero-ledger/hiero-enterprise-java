@@ -20,7 +20,7 @@ public interface ReceiveRecordInterceptor {
   /**
    * Intercept the call for receiving a record for a transaction.
    *
-   * @param handler the handler that will be used to receive the record
+   * @param handler the record handler to invoke
    * @return the record for the transaction
    * @throws Exception if the interceptor fails
    */
@@ -31,7 +31,7 @@ public interface ReceiveRecordInterceptor {
    *
    * @param transaction the transaction for which the record is received
    * @param receipt the receipt for the transaction
-   * @param function the function that will be used to receive the record
+   * @param function the callback that fetches the record from the receipt
    */
   record ReceiveRecordHandler(
       @NonNull Transaction transaction,
@@ -41,7 +41,7 @@ public interface ReceiveRecordInterceptor {
     public ReceiveRecordHandler {
       Objects.requireNonNull(transaction, "transaction must not be null");
       Objects.requireNonNull(receipt, "receipt must not be null");
-      Objects.requireNonNull(function, "handler must not be null");
+      Objects.requireNonNull(function, "function must not be null");
     }
 
     /**

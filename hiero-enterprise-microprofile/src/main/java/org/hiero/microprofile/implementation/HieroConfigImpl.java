@@ -93,11 +93,11 @@ public class HieroConfigImpl implements HieroConfig {
 
   @Override
   public @NonNull Optional<Long> chainId() {
-    return Optional.empty();
+    return Optional.ofNullable(chainId);
   }
 
   @Override
   public @NonNull Optional<String> relayUrl() {
-    return Optional.empty();
+    return Optional.ofNullable(relayUrl);
   }
 }
