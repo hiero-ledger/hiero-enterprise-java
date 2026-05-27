@@ -81,6 +81,12 @@ public interface MirrorNodeRestClient<JSON> {
     return doGetCall("/api/v1/contracts/" + contractId);
   }
 
+  @NonNull
+  default JSON queryContractLogs(@NonNull final ContractId contractId) throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    return doGetCall("/api/v1/contracts/" + contractId + "/logs");
+  }
+
   /**
    * Queries a block by its identifier (number or hash).
    *

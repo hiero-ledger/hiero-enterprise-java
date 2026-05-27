@@ -26,6 +26,7 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.ContractLog;
 import org.hiero.base.data.CustomFee;
 import org.hiero.base.data.ExchangeRate;
 import org.hiero.base.data.ExchangeRates;
@@ -773,6 +774,71 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final long decimals = jsonObject.getJsonNumber("decimals").longValue();
 
       return Optional.of(new Balance(account, balance, decimals));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  // ContractLog-related methods
+
+  @Override
+  public @NonNull Page<ContractLog> toContractLogPage(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return new SinglePage<>(List.of());
+    }
+
+    try {
+      final List<ContractLog> logs = toContractLogs(jsonObject);
+      return new SinglePage<>(logs);
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<ContractLog> toContractLogs(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("logs")) {
+      return List.of();
+    }
+    final JsonArray logsArray = jsonObject.getJsonArray("logs");
+    if (logsArray == null) {
+      throw new IllegalArgumentException("No logs array in JSON");
+    }
+    final Spliterator<JsonValue> spliterator =
+        Spliterators.spliteratorUnknownSize(logsArray.iterator(), Spliterator.ORDERED);
+    return StreamSupport.stream(spliterator, false)
+        .map(n -> toContractLog(n.asJsonObject()))
+        .filter(optional -> optional.isPresent())
+        .map(optional -> optional.get())
+        .toList();
+  }
+
+  private Optional<ContractLog> toContractLog(JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final ContractId contractId = ContractId.fromString(jsonObject.getString("contract_id"));
+      final String transactionHash = jsonObject.getString("transaction_hash");
+      final long blockNumber = jsonObject.getJsonNumber("block_number").longValue();
+      final int logIndex = jsonObject.getInt("index");
+      final JsonArray topicsArray = jsonObject.getJsonArray("topics");
+      final List<String> topics =
+          StreamSupport.stream(
+                  Spliterators.spliteratorUnknownSize(topicsArray.iterator(), Spliterator.ORDERED),
+                  false)
+              .map(t -> t.toString().replaceAll("^\"|\"$", ""))
+              .toList();
+      final String data = jsonObject.getString("data");
+      final String timestamp = jsonObject.getString("timestamp");
+
+      return Optional.of(
+          new ContractLog(contractId, transactionHash, blockNumber, logIndex, topics, data,
+              timestamp));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }

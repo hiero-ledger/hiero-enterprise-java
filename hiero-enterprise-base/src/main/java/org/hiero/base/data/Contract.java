@@ -35,4 +35,5 @@ public record Contract(
     Objects.requireNonNull(fromTimestamp, "fromTimestamp must not be null");
     Objects.requireNonNull(toTimestamp, "toTimestamp must not be null");
   }
+
 }

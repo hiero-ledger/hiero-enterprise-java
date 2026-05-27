@@ -27,6 +27,7 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.ContractLog;
 import org.hiero.base.data.CustomFee;
 import org.hiero.base.data.ExchangeRate;
 import org.hiero.base.data.ExchangeRates;
@@ -877,6 +878,62 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           throw new IllegalArgumentException(
               "Unsupported protobuf key type: " + protoKey.getKeyCase());
     };
+  }
+
+  @Override
+  public @NonNull Page<ContractLog> toContractLogPage(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return new SinglePage<>(List.of());
+    }
+
+    try {
+      final List<ContractLog> logs = toContractLogs(node);
+      return new SinglePage<>(logs);
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<ContractLog> toContractLogs(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("logs")) {
+      return List.of();
+    }
+    final JsonNode logsNode = node.get("logs");
+    if (!logsNode.isArray()) {
+      throw new IllegalArgumentException("Logs node is not an array: " + logsNode);
+    }
+    return jsonArrayToStream(logsNode)
+        .map(n -> toContractLog(n))
+        .filter(optional -> optional.isPresent())
+        .map(optional -> optional.get())
+        .toList();
+  }
+
+  private Optional<ContractLog> toContractLog(JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final ContractId contractId = ContractId.fromString(node.get("contract_id").asText());
+      final String transactionHash = node.get("transaction_hash").asText();
+      final long blockNumber = node.get("block_number").asLong();
+      final int logIndex = node.get("index").asInt();
+      final List<String> topics =
+          jsonArrayToStream(node.get("topics")).map(t -> t.asText()).toList();
+      final String data = node.get("data").asText();
+      final String timestamp = node.get("timestamp").asText();
+
+      return Optional.of(
+          new ContractLog(contractId, transactionHash, blockNumber, logIndex, topics, data,
+              timestamp));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
   }
 
   @Override
