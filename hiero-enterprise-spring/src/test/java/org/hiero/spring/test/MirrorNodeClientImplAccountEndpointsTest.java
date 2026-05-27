@@ -1,6 +1,9 @@
 package org.hiero.spring.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -42,35 +45,89 @@ class MirrorNodeClientImplAccountEndpointsTest {
   }
 
   @Test
-  void accountEndpointQueriesCallMirrorNodeEndpoints() throws Exception {
+  void queryCryptoAllowancesMapsFields() throws Exception {
     final AccountId accountId = AccountId.fromString("0.0.123");
     final String cryptoAllowancesPath = "/api/v1/accounts/0.0.123/allowances/crypto";
-    final String tokenAllowancesPath = "/api/v1/accounts/0.0.123/allowances/tokens";
-    final String nftAllowancesPath = "/api/v1/accounts/0.0.123/allowances/nfts";
-    final String stakingRewardsPath = "/api/v1/accounts/0.0.123/rewards";
-    final String outstandingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/outstanding";
-    final String pendingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/pending";
     expect(cryptoAllowancesPath, cryptoAllowancesJson());
+
+    final Page<CryptoAllowance> result = client.queryCryptoAllowances(accountId);
+
+    final CryptoAllowance allowance = result.getData().get(0);
+    assertEquals(100L, allowance.amountGranted());
+    assertEquals(AccountId.fromString("0.0.2"), allowance.owner());
+    assertEquals(AccountId.fromString("0.0.8"), allowance.spender());
+    assertNull(allowance.timestamp().to());
+  }
+
+  @Test
+  void queryTokenAllowancesMapsFields() throws Exception {
+    final AccountId accountId = AccountId.fromString("0.0.123");
+    final String tokenAllowancesPath = "/api/v1/accounts/0.0.123/allowances/tokens";
     expect(tokenAllowancesPath, tokenAllowancesJson());
+
+    final Page<TokenAllowance> result = client.queryTokenAllowances(accountId);
+
+    final TokenAllowance allowance = result.getData().get(0);
+    assertEquals(TokenId.fromString("0.0.9"), allowance.tokenId());
+    assertEquals(75L, allowance.amount());
+    assertEquals(AccountId.fromString("0.0.2"), allowance.owner());
+  }
+
+  @Test
+  void queryNftAllowancesMapsFields() throws Exception {
+    final AccountId accountId = AccountId.fromString("0.0.123");
+    final String nftAllowancesPath = "/api/v1/accounts/0.0.123/allowances/nfts";
     expect(nftAllowancesPath, nftAllowancesJson());
+
+    final Page<NftAllowance> result = client.queryNftAllowances(accountId);
+
+    final NftAllowance allowance = result.getData().get(0);
+    assertFalse(allowance.approvedForAll());
+    assertEquals(TokenId.fromString("0.0.99"), allowance.tokenId());
+    assertNotNull(allowance.timestamp().to());
+  }
+
+  @Test
+  void queryStakingRewardsMapsFields() throws Exception {
+    final AccountId accountId = AccountId.fromString("0.0.123");
+    final String stakingRewardsPath = "/api/v1/accounts/0.0.123/rewards";
     expect(stakingRewardsPath, stakingRewardsJson());
+
+    final Page<StakingReward> result = client.queryStakingRewards(accountId);
+
+    final StakingReward reward = result.getData().get(0);
+    assertEquals(AccountId.fromString("0.0.1000"), reward.accountId());
+    assertEquals(10L, reward.amount());
+    assertEquals(1234567890L, reward.timestamp().getEpochSecond());
+    assertEquals(1, reward.timestamp().getNano());
+  }
+
+  @Test
+  void queryOutstandingAirdropsMapsFieldsWithNullSerial() throws Exception {
+    final AccountId accountId = AccountId.fromString("0.0.123");
+    final String outstandingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/outstanding";
     expect(outstandingAirdropsPath, tokenAirdropsJson());
-    expect(pendingAirdropsPath, tokenAirdropsJson());
 
-    final Page<CryptoAllowance> cryptoAllowances = client.queryCryptoAllowances(accountId);
-    final Page<TokenAllowance> tokenAllowances = client.queryTokenAllowances(accountId);
-    final Page<NftAllowance> nftAllowances = client.queryNftAllowances(accountId);
-    final Page<StakingReward> stakingRewards = client.queryStakingRewards(accountId);
-    final Page<TokenAirdrop> outstandingAirdrops = client.queryOutstandingAirdrops(accountId);
-    final Page<TokenAirdrop> pendingAirdrops = client.queryPendingAirdrops(accountId);
+    final Page<TokenAirdrop> result = client.queryOutstandingAirdrops(accountId);
 
-    assertEquals(1, cryptoAllowances.getSize());
-    assertEquals(1, tokenAllowances.getSize());
-    assertEquals(1, nftAllowances.getSize());
-    assertEquals(1, stakingRewards.getSize());
-    assertEquals(1, outstandingAirdrops.getSize());
-    assertEquals(1, pendingAirdrops.getSize());
-    assertEquals(TokenId.fromString("0.0.9"), tokenAllowances.getData().get(0).tokenId());
+    final TokenAirdrop airdrop = result.getData().get(0);
+    assertEquals(AccountId.fromString("0.0.10"), airdrop.senderId());
+    assertEquals(AccountId.fromString("0.0.15"), airdrop.receiverId());
+    assertNull(airdrop.serialNumber());
+  }
+
+  @Test
+  void queryPendingAirdropsMapsFieldsWithSerial() throws Exception {
+    final AccountId accountId = AccountId.fromString("0.0.123");
+    final String pendingAirdropsPath = "/api/v1/accounts/0.0.123/airdrops/pending";
+    expect(pendingAirdropsPath, pendingAirdropsJson());
+
+    final Page<TokenAirdrop> result = client.queryPendingAirdrops(accountId);
+
+    final TokenAirdrop airdrop = result.getData().get(0);
+    assertEquals(42L, airdrop.serialNumber());
+    assertEquals(TokenId.fromString("0.0.100"), airdrop.tokenId());
+    assertEquals(10L, airdrop.amount());
   }
 
   private void expect(String path, String body) {
@@ -158,6 +215,24 @@ class MirrorNodeClientImplAccountEndpointsTest {
               "serial_number": null,
               "timestamp": {"from": "1651560386.060890949", "to": "1651560386.661997287"},
               "token_id": "0.0.99"
+            }
+          ],
+          "links": {"next": null}
+        }
+        """;
+  }
+
+  private static String pendingAirdropsJson() {
+    return """
+        {
+          "airdrops": [
+            {
+              "amount": 10,
+              "receiver_id": "0.0.15",
+              "sender_id": "0.0.10",
+              "serial_number": 42,
+              "timestamp": {"from": "1651560386.060890949", "to": "1651560386.661997287"},
+              "token_id": "0.0.100"
             }
           ],
           "links": {"next": null}
