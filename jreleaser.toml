@@ -9,7 +9,7 @@ stagingRepositories = ["target/staging-deploy"]
 applyMavenCentralRules = true
 
 retryDelay = 20
-maxRetries = 200
+maxRetries = 400
 
 [release.github]
 owner = "hiero-ledger"

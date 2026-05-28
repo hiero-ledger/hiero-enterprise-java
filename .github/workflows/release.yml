@@ -69,7 +69,7 @@ jobs:
         run: ./mvnw -B -Ppublication deploy
 
       - name: Publish with JReleaser
-        run: ./mvnw -B -Ppublication jreleaser:full-release  --non-recursive
+        run: ./mvnw -B -Ppublication jreleaser:full-release -N
         env:
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_KEY_CONTENTS }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
