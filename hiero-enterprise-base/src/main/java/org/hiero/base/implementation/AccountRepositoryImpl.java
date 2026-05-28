@@ -5,8 +5,10 @@ import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.MirrorNodeClient;
+import org.hiero.base.mirrornode.query.AccountQuery;
 import org.jspecify.annotations.NonNull;
 
 public class AccountRepositoryImpl implements AccountRepository {
@@ -19,6 +21,13 @@ public class AccountRepositoryImpl implements AccountRepository {
 
   @Override
   public Optional<AccountInfo> findById(@NonNull AccountId accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
     return mirrorNodeClient.queryAccount(accountId);
+  }
+
+  @Override
+  public @NonNull Page<AccountInfo> findAll(@NonNull AccountQuery query) throws HieroException {
+    Objects.requireNonNull(query, "query must not be null");
+    return mirrorNodeClient.queryAccounts(query);
   }
 }

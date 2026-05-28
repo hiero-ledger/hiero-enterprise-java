@@ -10,6 +10,7 @@ import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NftRepository;
+import org.hiero.base.mirrornode.query.NftQuery;
 import org.jspecify.annotations.NonNull;
 
 public class NftRepositoryImpl implements NftRepository {
@@ -57,8 +58,16 @@ public class NftRepositoryImpl implements NftRepository {
 
   @NonNull
   @Override
-  public Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
+  public Optional<NftMetadata> getNftMetadata(@NonNull TokenId tokenId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
     return mirrorNodeClient.getNftMetadata(tokenId);
+  }
+
+  @Override
+  public @NonNull Page<Nft> findAll(@NonNull NftQuery query) throws HieroException {
+    Objects.requireNonNull(query, "query must not be null");
+    return mirrorNodeClient.queryNfts(query);
   }
 
   @NonNull
