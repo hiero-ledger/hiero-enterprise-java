@@ -43,11 +43,33 @@ jobs:
       - name: Set Maven version
         run: ./mvnw -B versions:set versions:commit -DnewVersion=${GITHUB_REF_NAME#v}
 
+      - name: Prepare Hiero Solo
+        id: solo
+        uses: hiero-ledger/hiero-solo-action@328bc84c3b00a990a151418144fd682a4eb76ea6 # v0.19.0
+        with:
+          installMirrorNode: true
+          hieroVersion: v0.66.0
+          mirrorNodeVersion: v0.138.0
+          mirrorNodePortRest: 5551
+          mirrorNodePortGrpc: 5600
+          mirrorNodePortWeb3Rest: 8545
+
+      - name: Wait for Mirror Node
+        run: |
+          echo "Waiting for Mirror Node REST API to be ready on http://localhost:5551..."
+          until curl --output /dev/null --silent --head --fail http://localhost:5551/api/v1/network/supply; do
+            echo "Mirror Node not ready, waiting..."
+            kubectl get svc -n solo
+            curl --silent http://localhost:5551/api/v1/network/supply || echo "No response from /api/v1/network/supply"
+            sleep 5
+          done
+          echo "Mirror Node REST API is ready!"
+
       - name: Build & Stage
-        run: ./mvnw -B -Ppublication deploy -DskipTests
+        run: ./mvnw -B -Ppublication deploy
 
       - name: Publish with JReleaser
-        run: ./mvnw -B -Ppublication jreleaser:full-release
+        run: ./mvnw -B -Ppublication jreleaser:full-release  --non-recursive
         env:
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_KEY_CONTENTS }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
