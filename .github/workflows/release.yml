@@ -75,6 +75,11 @@ jobs:
           echo "Mirror Node REST API is ready!"
 
       - name: Build & Stage
+        env:
+          SPRING_PROFILES_ACTIVE: solo
+          HEDERA_ACCOUNT_ID: ${{ steps.solo.outputs.accountId }}
+          HEDERA_PRIVATE_KEY: ${{ steps.solo.outputs.privateKey }}
+          HEDERA_NETWORK: hiero-solo-action
         run: ./mvnw -B -Ppublication deploy
 
       - name: Publish with JReleaser
