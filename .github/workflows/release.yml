@@ -40,8 +40,17 @@ jobs:
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "use-agent" >> ~/.gnupg/gpg.conf
 
-      - name: Set Maven version
-        run: ./mvnw -B versions:set versions:commit -DnewVersion=${GITHUB_REF_NAME#v}
+      - name: Verify POM Version
+        run: |
+          POM_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          
+          if [ "$POM_VERSION" != "$TAG_VERSION" ]; then
+            echo "Error: Version mismatch, POM version ($POM_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
+          echo "Success: POM version matches the tag"
 
       - name: Prepare Hiero Solo
         id: solo
