@@ -1,4 +1,4 @@
-[signing]
+[signing.pgp]
 active = "ALWAYS"
 armored = true
 
@@ -8,6 +8,20 @@ url = "https://central.sonatype.com/api/v1/publisher"
 stagingRepositories = ["target/staging-deploy"]
 applyMavenCentralRules = true
 
+retryDelay = 20
+maxRetries = 400
+
 [release.github]
 owner = "hiero-ledger"
 name = "hiero-enterprise-java"
+skipTag = true
+skipRelease = false
+overwrite = true
+
+[release.github.update]
+enabled = true
+sections = ["ASSETS", "BODY"]
+
+[release.github.changelog]
+enabled = true
+formatted = "ALWAYS"
