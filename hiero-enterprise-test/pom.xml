@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.hiero</groupId>
     <artifactId>hiero-enterprise</artifactId>
-    <version>0.20.0</version>
+    <version>0.21.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
