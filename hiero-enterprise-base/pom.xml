@@ -17,7 +17,6 @@
   <description>Base Library to work with Hiero in Spring and JakartaEE</description>
   <url>https://github.com/hiero-ledger/hiero-enterprise-java</url>
 
-
   <dependencies>
     <dependency>
       <groupId>com.hedera.hashgraph</groupId>
