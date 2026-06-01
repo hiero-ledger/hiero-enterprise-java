@@ -20,7 +20,6 @@ public enum LongBasedNumericDatatypes implements ParamSupplier<Long> {
   INT56("int56", (v, params) -> params.addInt56(v), -72057594037927936L, 72057594037927935L),
   UINT56("uint56", (v, params) -> params.addUint56(v), 0L, 144115188075855871L),
   INT64("int64", (v, params) -> params.addInt64(v), Long.MIN_VALUE, Long.MAX_VALUE);
-  // TODO; UINT64 but max value is > long max value
 
   private final BiConsumer<Long, ContractFunctionParameters> addParam;
 
