@@ -14,6 +14,7 @@ import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.TopicRepository;
+import org.hiero.base.util.TimestampUtils;
 import org.hiero.microprofile.ClientProvider;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -139,10 +140,7 @@ public class TopicRepositoryTest {
     Assertions.assertTrue(bySeq.isPresent());
 
     final TopicMessage original = bySeq.get();
-    final String timestamp =
-        original.consensusTimestamp().getEpochSecond()
-            + "."
-            + String.format("%09d", original.consensusTimestamp().getNano());
+    final String timestamp = TimestampUtils.format(original.consensusTimestamp());
 
     final Optional<TopicMessage> result = topicRepository.getMessageByConsensusTimestamp(timestamp);
 
@@ -160,5 +158,15 @@ public class TopicRepositoryTest {
 
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void testGetMessageByConsensusTimestampThrowsForMalformedTimestamp() {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> topicRepository.getMessageByConsensusTimestamp("not-a-timestamp"));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> topicRepository.getMessageByConsensusTimestamp("1.2.3"));
   }
 }

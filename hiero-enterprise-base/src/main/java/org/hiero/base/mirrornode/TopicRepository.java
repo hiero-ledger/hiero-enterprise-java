@@ -94,6 +94,8 @@ public interface TopicRepository {
    * @param consensusTimestamp the consensus timestamp in seconds.nanoseconds format
    * @return Optional of TopicMessage
    * @throws HieroException if the search fails
+   * @throws IllegalArgumentException if the consensus timestamp is not in seconds.nanoseconds
+   *     format
    */
   @NonNull Optional<TopicMessage> getMessageByConsensusTimestamp(@NonNull String consensusTimestamp)
       throws HieroException;
