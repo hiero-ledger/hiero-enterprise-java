@@ -15,19 +15,16 @@ import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.microprofile.ClientProvider;
+import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @HelidonTest
 @AddBean(ClientProvider.class)
 @Configuration(useExisting = true)
 public class TopicRepositoryTest {
-
-  @Inject private TopicRepository topicRepository;
-
-  @Inject private TopicClient topicClient;
-
   @BeforeAll
   static void setup() {
     final Config build =
@@ -35,6 +32,12 @@ public class TopicRepositoryTest {
     ConfigProviderResolver.instance()
         .registerConfig(build, Thread.currentThread().getContextClassLoader());
   }
+
+  @Inject private HieroTestUtils hieroTestUtils;
+
+  @Inject private TopicRepository topicRepository;
+
+  @Inject private TopicClient topicClient;
 
   @Test
   void testNullParam() {
@@ -50,60 +53,56 @@ public class TopicRepositoryTest {
   }
 
   @Test
-  void testFindTopicByIdReturnsEmptyOptional() throws HieroException {
-    // given
-    final TopicId topicId = TopicId.fromString("0.0.0");
+  @Disabled("Temporary disabled work on testnet not solo")
+  void testFindTopicById() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    hieroTestUtils.waitForMirrorNodeRecords();
 
-    // when
     final Optional<Topic> result = topicRepository.findTopicById(topicId);
 
-    // then
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isPresent());
+  }
+
+  @Test
+  void testFindTopicByIdReturnsEmptyOptional() throws HieroException {
+    final TopicId topicId = TopicId.fromString("0.0.0");
+    final Optional<Topic> result = topicRepository.findTopicById(topicId);
+
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
   }
 
   @Test
   void testGetMessagesByTopicId() throws Exception {
-    // given
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Hiero");
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
-    // when
     final Page<TopicMessage> result = topicRepository.getMessages(topicId);
 
-    // then
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getData().size());
   }
 
   @Test
   void testGetMessagesByTopicIdReturnsEmptyList() throws HieroException {
-    // given
     final TopicId topicId = TopicId.fromString("1.2.3");
-
-    // when
     final Page<TopicMessage> result = topicRepository.getMessages(topicId);
 
-    // then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.getData().isEmpty());
   }
 
   @Test
   void testGetMessagesByTopicIdAndSequenceNumber() throws Exception {
-    // given
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Hiero 1");
     topicClient.submitMessage(topicId, "Hello Hiero 2");
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
-    // when
     final Optional<TopicMessage> result = topicRepository.getMessageBySequenceNumber(topicId, 1);
 
-    // then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
     Assertions.assertEquals("Hello Hiero 1", result.get().message());
@@ -111,26 +110,20 @@ public class TopicRepositoryTest {
 
   @Test
   void testGetMessagesByTopicIdAndSequenceNumberReturnEmptyOptional() throws Exception {
-    // given
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Hiero 1");
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
-    // when
     final Optional<TopicMessage> result = topicRepository.getMessageBySequenceNumber(topicId, 2);
 
-    // then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
   }
 
   @Test
   void testGetMessagesByTopicIdAndSequenceNumberThrowsException() throws HieroException {
-    // given
     final TopicId topicId = TopicId.fromString("0.0.0");
 
-    // then
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> topicRepository.getMessageBySequenceNumber(topicId, 0));
@@ -138,11 +131,9 @@ public class TopicRepositoryTest {
 
   @Test
   void testGetMessageByConsensusTimestamp() throws Exception {
-    // given
     final TopicId topicId = topicClient.createTopic();
     topicClient.submitMessage(topicId, "Hello Timestamp");
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     final Optional<TopicMessage> bySeq = topicRepository.getMessageBySequenceNumber(topicId, 1);
     Assertions.assertTrue(bySeq.isPresent());
@@ -153,10 +144,8 @@ public class TopicRepositoryTest {
             + "."
             + String.format("%09d", original.consensusTimestamp().getNano());
 
-    // when
     final Optional<TopicMessage> result = topicRepository.getMessageByConsensusTimestamp(timestamp);
 
-    // then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
     Assertions.assertEquals(original.message(), result.get().message());
@@ -166,11 +155,9 @@ public class TopicRepositoryTest {
 
   @Test
   void testGetMessageByConsensusTimestampReturnsEmptyForUnknownTimestamp() throws HieroException {
-    // when
     final Optional<TopicMessage> result =
         topicRepository.getMessageByConsensusTimestamp("1.000000000");
 
-    // then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
   }

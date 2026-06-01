@@ -10,6 +10,7 @@ import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,16 +36,17 @@ public class TopicRepositoryTest {
         NullPointerException.class, () -> topicRepository.getMessageByConsensusTimestamp(null));
   }
 
-  // @Test
-  // void testFindTopicById() throws HieroException {
-  //     final TopicId topicId = topicClient.createTopic();
-  //     hieroTestUtils.waitForMirrorNodeRecords();
+  @Test
+  @Disabled("Temporary disabled work on testnet not solo")
+  void testFindTopicById() throws Exception {
+    final TopicId topicId = topicClient.createTopic();
+    hieroTestUtils.waitForMirrorNodeRecords();
+    System.out.println(topicId);
+    final Optional<Topic> result = topicRepository.findTopicById(topicId);
 
-  //     final Optional<Topic> result = topicRepository.findTopicById(topicId);
-
-  //     Assertions.assertNotNull(result);
-  //     Assertions.assertTrue(result.isPresent());
-  // }
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isPresent());
+  }
 
   @Test
   void testFindTopicByIdReturnsEmptyOptional() throws HieroException {

@@ -3,7 +3,6 @@ package org.hiero.spring.implementation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.DelegateContractId;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -552,10 +551,10 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final TopicId topicId = TopicId.fromString(node.get("topic_id").asText());
-      final PublicKey adminKey =
-          node.get("admin_key").isNull()
+      final Key adminKey =
+          !node.has("admin_key") || node.get("admin_key").isNull()
               ? null
-              : PublicKey.fromString(node.get("admin_key").get("key").asText());
+              : parseKey(node.get("admin_key"));
       final AccountId autoRenewAccount =
           node.get("auto_renew_account").isNull()
               ? null
@@ -564,18 +563,25 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final Instant createdTimestamp =
           Instant.ofEpochSecond(node.get("created_timestamp").asLong());
       final boolean deleted = node.get("deleted").asBoolean();
-      final PublicKey feeScheduleKey =
-          node.get("fee_schedule_key").isNull()
+      final Key feeScheduleKey =
+          !node.has("fee_schedule_key") || node.get("fee_schedule_key").isNull()
               ? null
-              : PublicKey.fromString(node.get("fee_schedule_key").get("key").asText());
+              : parseKey(node.get("fee_schedule_key"));
       final String memo = node.get("memo").asText();
-      final PublicKey submitKey =
-          node.get("submit_key").isNull()
+      final Key submitKey =
+          !node.has("submit_key") || node.get("submit_key").isNull()
               ? null
-              : PublicKey.fromString(node.get("submit_key").get("key").asText());
+              : parseKey(node.get("submit_key"));
+
+      final JsonNode timestamp = node.get("timestamp");
       final Instant fromTimestamp =
-          Instant.ofEpochSecond(node.get("timestamp").get("from").asLong());
-      final Instant toTimestamp = Instant.ofEpochSecond(node.get("timestamp").get("to").asLong());
+          !timestamp.has("from") || timestamp.get("from").isNull()
+              ? null
+              : parseInstant(timestamp.get("from").asText());
+      final Instant toTimestamp =
+          !timestamp.has("to") || timestamp.get("to").isNull()
+              ? null
+              : parseInstant(timestamp.get("to").asText());
 
       final List<FixedFee> fixedFees =
           jsonArrayToStream(node.get("custom_fees").get("fixed_fees"))
@@ -594,10 +600,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
                   })
               .toList();
 
-      final List<PublicKey> feeExemptKeyList =
-          jsonArrayToStream(node.get("fee_exempt_key_list"))
-              .map(n -> PublicKey.fromString(n.get("key").asText()))
-              .toList();
+      final List<Key> feeExemptKeyList =
+          jsonArrayToStream(node.get("fee_exempt_key_list")).map(n -> parseKey(n)).toList();
 
       return Optional.of(
           new Topic(
@@ -612,8 +616,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               submitKey,
               deleted,
               memo,
-              fromTimestamp,
-              toTimestamp));
+              new TimestampRange(fromTimestamp, toTimestamp)));
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
@@ -638,7 +641,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         chunkInfo = new ChunkInfo(transactionId, nonce, number, total, scheduled);
       }
 
-      final Instant consensusTimestamp = parseTimestamp(node.get("consensus_timestamp"));
+      final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
       final String message = new String(Base64.getDecoder().decode(node.get("message").asText()));
       final AccountId payerAccountId = AccountId.fromString(node.get("payer_account_id").asText());
       final byte[] runningHash = node.get("running_hash").asText().getBytes();
@@ -739,17 +742,10 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final ContractId contractId = ContractId.fromString(node.get("contract_id").asText());
       final Key adminKey;
 
-      if (node.get("admin_key").isNull()) {
+      if (!node.has("admin_key") || node.get("admin_key").isNull()) {
         adminKey = null;
       } else {
-        final String keyType = node.get("admin_key").get("_type").asText();
-        final String key = node.get("admin_key").get("key").asText();
-
-        if (keyType.equals("ProtobufEncoded")) {
-          adminKey = parseProtoBufEncodedKey(key);
-        } else {
-          adminKey = PublicKey.fromString(key);
-        }
+        adminKey = parseKey(node.get("admin_key"));
       }
 
       final AccountId autoRenewAccount =
@@ -856,42 +852,6 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .toList();
   }
 
-  private Instant parseTimestamp(@NonNull JsonNode node) {
-    final String value = node.asText();
-    final String[] parts = value.split("\\.", 2);
-    final long seconds = Long.parseLong(parts[0]);
-    final int nanos;
-    if (parts.length == 1) {
-      nanos = 0;
-    } else {
-      final String paddedNanos = (parts[1] + "000000000").substring(0, 9);
-      nanos = Integer.parseInt(paddedNanos);
-    }
-    return Instant.ofEpochSecond(seconds, nanos);
-  }
-
-  private @NonNull Key parseProtoBufEncodedKey(@NonNull String key) throws Exception {
-    Objects.requireNonNull(key, "key must not be null");
-    final byte[] bytes = HexFormat.of().parseHex(key);
-    final com.hedera.hashgraph.sdk.proto.Key protoKey =
-        com.hedera.hashgraph.sdk.proto.Key.parseFrom(bytes);
-
-    return switch (protoKey.getKeyCase()) {
-      case ED25519 -> PublicKey.fromBytesED25519(protoKey.getEd25519().toByteArray());
-
-      case ECDSA_SECP256K1 -> PublicKey.fromBytesECDSA(protoKey.getECDSASecp256K1().toByteArray());
-
-      case CONTRACTID -> ContractId.fromBytes(protoKey.getContractID().toByteArray());
-
-      case DELEGATABLE_CONTRACT_ID ->
-          DelegateContractId.fromBytes(protoKey.getDelegatableContractId().toByteArray());
-
-      default ->
-          throw new IllegalArgumentException(
-              "Unsupported protobuf key type: " + protoKey.getKeyCase());
-    };
-  }
-
   @Override
   public @NonNull Optional<Block> toBlock(@NonNull JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
@@ -958,5 +918,49 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(o -> o.isPresent())
         .map(o -> o.get())
         .toList();
+  }
+
+  private @NonNull Key parseKey(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "node must not be null");
+
+    String keyType = node.get("_type").asText();
+    String keyHex = node.get("key").asText();
+
+    return switch (keyType) {
+      case "ED25519" -> PublicKey.fromString(keyHex);
+
+      case "ECDSA_SECP256K1" -> PublicKey.fromStringECDSA(keyHex);
+
+      case "ProtobufEncoded" -> {
+        byte[] decodedBytes = HexFormat.of().parseHex(keyHex);
+        try {
+          yield Key.fromBytes(decodedBytes);
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Invalid Protobuf encoding", e);
+        }
+      }
+
+      default -> throw new UnsupportedOperationException("Unknown key type: " + keyType);
+    };
+  }
+
+  private static Instant parseInstant(final @NonNull String jsonStr) {
+    Objects.requireNonNull(jsonStr, "jsonStr must not be null");
+    if (jsonStr.isEmpty()) {
+      return null;
+    }
+
+    String[] parts = jsonStr.split("\\.");
+
+    long seconds = Long.parseLong(parts[0]);
+    long nanos = 0;
+
+    if (parts.length > 1) {
+      String nanoString = parts[1];
+      nanoString = String.format("%-9s", nanoString).replace(' ', '0');
+      nanos = Long.parseLong(nanoString);
+    }
+
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 }
