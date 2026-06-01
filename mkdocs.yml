@@ -8,6 +8,7 @@ repo_url: https://github.com/hiero-ledger/hiero-enterprise-java
 
 theme:
   name: material
+  variant: classic
   favicon: assets/favicon.ico
   logo: assets/logo.svg
   icon:
