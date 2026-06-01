@@ -26,37 +26,50 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download preview artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: docs-preview
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # The artifact comes from a run on PR-controlled code (possibly a fork),
-      # so pr/NR must be treated as untrusted input. We only accept a plain
-      # positive integer to prevent script/path injection.
-      - name: Read PR number
+      - name: Resolve PR number from workflow_run payload
         id: pr
-        run: |
-          raw=$(tr -d '[:space:]' < pr/NR)
-          if [[ ! "$raw" =~ ^[1-9][0-9]*$ ]]; then
-            echo "::error::Invalid PR number in artifact: '$raw'"
-            exit 1
-          fi
-          echo "number=$raw" >> "$GITHUB_OUTPUT"
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fromPayload = context.payload.workflow_run.pull_requests?.[0]?.number;
+            if (Number.isInteger(fromPayload) && fromPayload > 0) {
+              core.setOutput('number', String(fromPayload));
+              return;
+            }
+
+            const headSha = context.payload.workflow_run.head_sha;
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.payload.workflow_run.head_repository.owner.login}:${context.payload.workflow_run.head_branch}`,
+            });
+
+            const pr = prs.find((candidate) => candidate.head.sha === headSha);
+            if (!pr || !Number.isInteger(pr.number) || pr.number <= 0) {
+              core.setFailed(`Could not resolve PR number for head SHA ${headSha}`);
+              return;
+            }
+
+            core.setOutput('number', String(pr.number));
 
       - name: Deploy PR preview to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           destination_dir: "pr/${{ steps.pr.outputs.number }}"
-          keep_files: true
 
       # Pass the PR number through env rather than ${{ }} interpolation so no
       # attacker-controlled text can be expanded into the inline script body.
       - name: Comment PR with preview URL
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
         with:

@@ -44,7 +44,7 @@ jobs:
         run: zensical build --clean
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
@@ -69,17 +69,10 @@ jobs:
       - name: Build site
         run: zensical build --clean
 
-      - name: Save PR metadata
-        run: |
-          mkdir -p pr
-          echo "${{ github.event.pull_request.number }}" > pr/NR
-
       - name: Upload preview artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: docs-preview
-          path: |
-            site
-            pr
+          path: site
           if-no-files-found: error
           retention-days: 7

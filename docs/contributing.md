@@ -30,7 +30,7 @@ Two workflows drive publication:
 
 - **`.github/workflows/docs.yml`**
     - **Push to `main`:** builds the site with `zensical build --clean` and publishes it to the GitHub Pages root.
-    - **Pull request:** builds the site and uploads it (together with the PR number) as a `docs-preview` artifact. No deploy happens here, so this step is safe for PRs coming from forks.
+    - **Pull request:** builds the site and uploads it as a `docs-preview` artifact. No deploy happens here, so this step is safe for PRs coming from forks.
 - **`.github/workflows/docs-preview.yml`**
     - Triggered by the `Docs` workflow completing. It downloads the `docs-preview` artifact, deploys it to `gh-pages/pr/<number>/`, and comments the preview URL on the PR. Because it runs in the base-repo context, fork PRs also get a preview.
 
