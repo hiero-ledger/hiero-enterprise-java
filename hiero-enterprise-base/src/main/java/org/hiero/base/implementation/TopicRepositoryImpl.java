@@ -9,6 +9,7 @@ import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.TopicRepository;
+import org.hiero.base.util.TimestampUtils;
 import org.jspecify.annotations.NonNull;
 
 public class TopicRepositoryImpl implements TopicRepository {
@@ -39,5 +40,15 @@ public class TopicRepositoryImpl implements TopicRepository {
       throw new IllegalArgumentException("sequenceNumber must be greater than 0");
     }
     return mirrorNodeClient.queryTopicMessageBySequenceNumber(topicId, sequenceNumber);
+  }
+
+  @Override
+  public @NonNull Optional<TopicMessage> getMessageByConsensusTimestamp(
+      @NonNull String consensusTimestamp) throws HieroException {
+    Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
+    // Validate the format up front so malformed input fails fast instead of reaching the
+    // Mirror Node as a bad request URL.
+    TimestampUtils.parse(consensusTimestamp);
+    return mirrorNodeClient.queryTopicMessageByConsensusTimestamp(consensusTimestamp);
   }
 }

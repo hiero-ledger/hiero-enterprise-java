@@ -68,6 +68,23 @@ public interface MirrorNodeRestClient<JSON> {
     return doGetCall("/api/v1/topics/" + topicId + "/messages/" + sequenceNumber);
   }
 
+  /**
+   * Queries a topic message by consensus timestamp.
+   *
+   * <p>Uses the Mirror Node endpoint GET /api/v1/topics/messages/{timestamp}. The timestamp must be
+   * in seconds.nanoseconds format (e.g. "1234567890.000000001").
+   *
+   * @param consensusTimestamp the consensus timestamp string in seconds.nanoseconds format
+   * @return the raw JSON response
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default JSON queryTopicMessageByConsensusTimestamp(@NonNull String consensusTimestamp)
+      throws HieroException {
+    Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
+    return doGetCall("/api/v1/topics/messages/" + consensusTimestamp);
+  }
+
   @NonNull JSON doGetCall(@NonNull String path) throws HieroException;
 
   @NonNull

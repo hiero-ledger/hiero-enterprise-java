@@ -8,6 +8,7 @@ import org.hiero.base.data.Page;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.mirrornode.TopicRepository;
+import org.hiero.base.util.TimestampUtils;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -32,6 +33,8 @@ public class TopicRepositoryTest {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> topicRepository.getMessageBySequenceNumber((TopicId) null, 1));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> topicRepository.getMessageByConsensusTimestamp(null));
   }
 
   @Test
@@ -107,5 +110,45 @@ public class TopicRepositoryTest {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> topicRepository.getMessageBySequenceNumber(topicId, 0));
+  }
+
+  @Test
+  void testGetMessageByConsensusTimestamp() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    topicClient.submitMessage(topicId, "Hello Timestamp");
+    hieroTestUtils.waitForMirrorNodeRecords();
+
+    final Optional<TopicMessage> bySeq = topicRepository.getMessageBySequenceNumber(topicId, 1);
+    Assertions.assertTrue(bySeq.isPresent());
+
+    final TopicMessage original = bySeq.get();
+    final String timestamp = TimestampUtils.format(original.consensusTimestamp());
+
+    final Optional<TopicMessage> result = topicRepository.getMessageByConsensusTimestamp(timestamp);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertEquals(original.message(), result.get().message());
+    Assertions.assertEquals(original.sequenceNumber(), result.get().sequenceNumber());
+    Assertions.assertEquals(original.topicId(), result.get().topicId());
+  }
+
+  @Test
+  void testGetMessageByConsensusTimestampReturnsEmptyForUnknownTimestamp() throws HieroException {
+    final Optional<TopicMessage> result =
+        topicRepository.getMessageByConsensusTimestamp("1.000000000");
+
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void testGetMessageByConsensusTimestampThrowsForMalformedTimestamp() {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> topicRepository.getMessageByConsensusTimestamp("not-a-timestamp"));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> topicRepository.getMessageByConsensusTimestamp("1.2.3"));
   }
 }
