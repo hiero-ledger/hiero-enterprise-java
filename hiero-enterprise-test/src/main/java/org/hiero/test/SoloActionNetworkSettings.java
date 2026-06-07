@@ -20,12 +20,12 @@ public class SoloActionNetworkSettings implements NetworkSettings {
 
   @Override
   public @NonNull Set<String> getMirrorNodeAddresses() {
-    return Set.of("http://localhost:5551");
+    return Set.of("http://localhost:38081");
   }
 
   @Override
   public @NonNull Set<ConsensusNode> getConsensusNodes() {
-    return Set.of(new ConsensusNode("127.0.0.1", "50211", "0.0.3"));
+    return Set.of(new ConsensusNode("127.0.0.1", "35211", "0.0.3"));
   }
 
   @Override
@@ -35,6 +35,6 @@ public class SoloActionNetworkSettings implements NetworkSettings {
 
   @Override
   public @NonNull Optional<String> relayUrl() {
-    return Optional.of("http://localhost:7546"); // JSON-RPC-Relay port from hiero-solo-action
+    return Optional.of("http://localhost:37546"); // JSON-RPC-Relay port from hiero-solo-action
   }
 }
