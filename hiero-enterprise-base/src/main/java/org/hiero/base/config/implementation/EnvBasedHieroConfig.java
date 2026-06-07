@@ -15,7 +15,8 @@ public class EnvBasedHieroConfig implements HieroConfig {
   private final AccountId operatorAccountId;
   private final PublicKey operatorPublicKey;
   private final PrivateKey operatorPrivateKey;
-  private final String mirrorNodeAddress;
+  private final String mirrorNodeGrpcAddress;
+  private final String mirrorNodeRestUrl;
 
   private final String consensusNodeIp;
   private final String consensusNodePort;
@@ -38,7 +39,8 @@ public class EnvBasedHieroConfig implements HieroConfig {
         getEnv("HEDERA_OPERATOR_PRIVATE_KEY")
             .map(PrivateKey::fromString)
             .orElseThrow(() -> new IllegalStateException("HEDERA_OPERATOR_PRIVATE_KEY is not set"));
-    mirrorNodeAddress = getEnv("HEDERA_MIRROR_NODE_ADDRESS").orElse(null);
+    mirrorNodeGrpcAddress = getEnv("HEDERA_MIRROR_NODE_GRPC_ADDRESS").orElse(null);
+    mirrorNodeRestUrl = getEnv("HEDERA_MIRROR_NODE_REST_URL").orElse(null);
     consensusNodeIp =
         getEnv("HEDERA_CONSENSUS_NODE_IP")
             .orElseThrow(() -> new IllegalStateException("HEDERA_CONSENSUS_NODE_IP is not set"));
@@ -68,11 +70,17 @@ public class EnvBasedHieroConfig implements HieroConfig {
   }
 
   @Override
-  public @NonNull Set<String> getMirrorNodeAddresses() {
-    if (mirrorNodeAddress == null) {
+  public @NonNull Set<String> getMirrorNodeGrpcAddresses() {
+    if (mirrorNodeGrpcAddress == null) {
       return Set.of();
     }
-    return Set.of(mirrorNodeAddress);
+
+    return Set.of(mirrorNodeGrpcAddress);
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.ofNullable(mirrorNodeRestUrl);
   }
 
   @Override
