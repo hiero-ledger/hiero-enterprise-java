@@ -40,6 +40,26 @@ Today only the "DER Encoded Private Key" of the "ECDSA" key type is supported fo
 The 2 properties `spring.hiero.accountId` and `spring.hiero.privateKey` define the "operator account".
 The operator account is used as the account that sends all transactions against the Hiero network.
 
+### Metrics
+
+The Spring integration provides optional Micrometer metrics for all managed Hiero clients and repositories.
+
+- Enable/disable: `spring.hiero.metrics.enabled=true|false` (default is `true`)
+- Counter metric: `hiero.calls`
+- Timer metric: `hiero.call.duration`
+- Tags:
+  - `hiero.component` (`client` or `repository`)
+  - `hiero.type` (interface type, for example `AccountClient`)
+  - `hiero.method` (invoked method name)
+  - `hiero.outcome` (`success` or `error`)
+
+MicroProfile integration provides the same coverage when a `MetricRegistry` is available.
+It emits:
+
+- Counter metric: `hiero_calls_total`
+- Timer metric: `hiero_call_duration`
+- Tags: same keys/values as the Spring integration
+
 ### Usage
 
 To use the module, you need to add the `@EnableHiero` annotation to your Spring Boot application class.
