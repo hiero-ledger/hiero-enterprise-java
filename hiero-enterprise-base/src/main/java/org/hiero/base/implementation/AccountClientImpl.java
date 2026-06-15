@@ -14,14 +14,20 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
+import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.jspecify.annotations.NonNull;
 
 public class AccountClientImpl implements AccountClient {
 
   private final ProtocolLayerClient client;
 
-  public AccountClientImpl(@NonNull final ProtocolLayerClient client) {
+  private final Account operatorAccount;
+
+  public AccountClientImpl(
+      @NonNull final ProtocolLayerClient client, @NonNull final Account operatorAccount) {
     this.client = Objects.requireNonNull(client, "client must not be null");
+    this.operatorAccount =
+        Objects.requireNonNull(operatorAccount, "operatorAccount must not be null");
   }
 
   @NonNull
@@ -99,5 +105,34 @@ public class AccountClientImpl implements AccountClient {
   @Override
   public @NonNull Hbar getOperatorAccountBalance() throws HieroException {
     return getAccountBalance(client.getOperatorAccountId());
+  }
+
+  @Override
+  public void transferHbar(@NonNull AccountId toAccountId, @NonNull Hbar amount)
+      throws HieroException {
+    transferHbar(operatorAccount.accountId(), operatorAccount.privateKey(), toAccountId, amount);
+  }
+
+  @Override
+  public void transferHbar(
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey,
+      @NonNull AccountId toAccountId,
+      @NonNull Hbar amount)
+      throws HieroException {
+    Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+    Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    Objects.requireNonNull(amount, "amount must not be null");
+    if (amount.toTinybars() <= 0) {
+      throw new HieroException("Invalid transfer amount: must be positive");
+    }
+    try {
+      final HbarTransferRequest request =
+          HbarTransferRequest.of(fromAccountId, toAccountId, amount, fromAccountKey);
+      client.executeHbarTransferTransaction(request);
+    } catch (IllegalArgumentException e) {
+      throw new HieroException("Error while transferring HBAR", e);
+    }
   }
 }

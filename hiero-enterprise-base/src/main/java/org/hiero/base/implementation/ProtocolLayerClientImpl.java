@@ -78,6 +78,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HbarTransferRequest;
+import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -672,6 +674,26 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenTransferResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute transfer nft transaction", e);
+    }
+  }
+
+  @Override
+  public HbarTransferResult executeHbarTransferTransaction(
+      @NonNull final HbarTransferRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TransferTransaction transaction =
+          new TransferTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .addHbarTransfer(request.sender(), request.amount().negated())
+              .addHbarTransfer(request.receiver(), request.amount());
+      sign(transaction, request.senderKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);
+      return new HbarTransferResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute HBAR transfer transaction", e);
     }
   }
 

@@ -19,6 +19,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
+import org.hiero.base.protocol.data.HbarTransferRequest;
+import org.hiero.base.protocol.data.HbarTransferResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,12 +29,14 @@ import org.mockito.ArgumentMatchers;
 public class AccountClientImplTest {
 
   private ProtocolLayerClient mockProtocolLayerClient;
+  private Account operatorAccount;
   private AccountClientImpl accountClientImpl;
 
   @BeforeEach
   public void setUp() {
     mockProtocolLayerClient = mock(ProtocolLayerClient.class);
-    accountClientImpl = new AccountClientImpl(mockProtocolLayerClient);
+    operatorAccount = Account.of(AccountId.fromString("0.0.1"), PrivateKey.generateECDSA());
+    accountClientImpl = new AccountClientImpl(mockProtocolLayerClient, operatorAccount);
   }
 
   @Test
@@ -236,5 +240,60 @@ public class AccountClientImplTest {
     assertEquals(memo, request.memo());
     assertEquals(account.accountId(), updatedAccount.accountId());
     assertEquals(updatedPrivateKey, updatedAccount.privateKey());
+  }
+
+  @Test
+  void testTransferHbarFromOperatorSuccessful() throws HieroException {
+    AccountId toAccountId = AccountId.fromString("0.0.12345");
+    Hbar amount = Hbar.from(1);
+    ArgumentCaptor<HbarTransferRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarTransferRequest.class);
+    when(mockProtocolLayerClient.executeHbarTransferTransaction(any(HbarTransferRequest.class)))
+        .thenReturn(
+            new HbarTransferResult(
+                TransactionId.generate(operatorAccount.accountId()), Status.SUCCESS));
+
+    accountClientImpl.transferHbar(toAccountId, amount);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarTransferTransaction(requestCaptor.capture());
+    HbarTransferRequest request = requestCaptor.getValue();
+    assertEquals(operatorAccount.accountId(), request.sender());
+    assertEquals(toAccountId, request.receiver());
+    assertEquals(amount, request.amount());
+    assertEquals(operatorAccount.privateKey(), request.senderKey());
+  }
+
+  @Test
+  void testTransferHbarBetweenAccountsSuccessful() throws HieroException {
+    Account fromAccount = Account.of(AccountId.fromString("0.0.22222"), PrivateKey.generateECDSA());
+    AccountId toAccountId = AccountId.fromString("0.0.12345");
+    Hbar amount = Hbar.from(2);
+    ArgumentCaptor<HbarTransferRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarTransferRequest.class);
+    when(mockProtocolLayerClient.executeHbarTransferTransaction(any(HbarTransferRequest.class)))
+        .thenReturn(
+            new HbarTransferResult(
+                TransactionId.generate(fromAccount.accountId()), Status.SUCCESS));
+
+    accountClientImpl.transferHbar(fromAccount, toAccountId, amount);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarTransferTransaction(requestCaptor.capture());
+    HbarTransferRequest request = requestCaptor.getValue();
+    assertEquals(fromAccount.accountId(), request.sender());
+    assertEquals(toAccountId, request.receiver());
+    assertEquals(amount, request.amount());
+    assertEquals(fromAccount.privateKey(), request.senderKey());
+  }
+
+  @Test
+  void testTransferHbarInvalidAmountThrowsException() {
+    AccountId toAccountId = AccountId.fromString("0.0.12345");
+
+    HieroException exception =
+        assertThrows(
+            HieroException.class, () -> accountClientImpl.transferHbar(toAccountId, Hbar.ZERO));
+    assertTrue(exception.getMessage().contains("Invalid transfer amount"));
   }
 }

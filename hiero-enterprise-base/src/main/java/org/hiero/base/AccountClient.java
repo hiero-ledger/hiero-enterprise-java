@@ -137,6 +137,104 @@ public interface AccountClient {
    */
   @NonNull Hbar getOperatorAccountBalance() throws HieroException;
 
+  /**
+   * Transfers HBAR from the operator account to another account.
+   *
+   * @param toAccountId the account that receives HBAR
+   * @param amount the amount of HBAR to transfer
+   * @throws HieroException if the transfer could not be executed
+   */
+  void transferHbar(@NonNull AccountId toAccountId, @NonNull Hbar amount) throws HieroException;
+
+  /**
+   * Transfers HBAR from the operator account to another account.
+   *
+   * @param toAccountId the account that receives HBAR
+   * @param amount the amount of HBAR to transfer
+   * @throws HieroException if the transfer could not be executed
+   */
+  default void transferHbar(@NonNull String toAccountId, @NonNull Hbar amount)
+      throws HieroException {
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    transferHbar(AccountId.fromString(toAccountId), amount);
+  }
+
+  /**
+   * Transfers HBAR from the operator account to another account.
+   *
+   * @param toAccountId the account that receives HBAR
+   * @param amountInHbar the amount of HBAR to transfer
+   * @throws HieroException if the transfer could not be executed
+   */
+  default void transferHbar(@NonNull AccountId toAccountId, long amountInHbar)
+      throws HieroException {
+    if (amountInHbar <= 0) {
+      throw new IllegalArgumentException("amountInHbar must be positive");
+    }
+    transferHbar(toAccountId, Hbar.from(amountInHbar));
+  }
+
+  /**
+   * Transfers HBAR between accounts. The sending account must sign the transaction.
+   *
+   * @param fromAccountId the account that sends HBAR
+   * @param fromAccountKey the private key of the sending account
+   * @param toAccountId the account that receives HBAR
+   * @param amount the amount of HBAR to transfer
+   * @throws HieroException if the transfer could not be executed
+   */
+  void transferHbar(
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey,
+      @NonNull AccountId toAccountId,
+      @NonNull Hbar amount)
+      throws HieroException;
+
+  /**
+   * Transfers HBAR between accounts. The sending account must sign the transaction.
+   *
+   * @param fromAccount the account that sends HBAR
+   * @param toAccountId the account that receives HBAR
+   * @param amount the amount of HBAR to transfer
+   * @throws HieroException if the transfer could not be executed
+   */
+  default void transferHbar(
+      @NonNull Account fromAccount, @NonNull AccountId toAccountId, @NonNull Hbar amount)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    Objects.requireNonNull(amount, "amount must not be null");
+    transferHbar(fromAccount.accountId(), fromAccount.privateKey(), toAccountId, amount);
+  }
+
+  /**
+   * Transfers HBAR between accounts. The sending account must sign the transaction.
+   *
+   * @param fromAccountId the account that sends HBAR
+   * @param fromAccountKey the private key of the sending account
+   * @param toAccountId the account that receives HBAR
+   * @param amountInHbar the amount of HBAR to transfer
+   * @throws HieroException if the transfer could not be executed
+   */
+  default void transferHbar(
+      @NonNull String fromAccountId,
+      @NonNull String fromAccountKey,
+      @NonNull String toAccountId,
+      long amountInHbar)
+      throws HieroException {
+    Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+    Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    if (amountInHbar <= 0) {
+      throw new IllegalArgumentException("amountInHbar must be positive");
+    }
+    transferHbar(
+        AccountId.fromString(fromAccountId),
+        PrivateKey.fromString(fromAccountKey),
+        AccountId.fromString(toAccountId),
+        Hbar.from(amountInHbar));
+  }
+
   /** Adds a hook to an account. */
   default void addHook(@NonNull Account account, @NonNull HookDetails hookDetails)
       throws HieroException {

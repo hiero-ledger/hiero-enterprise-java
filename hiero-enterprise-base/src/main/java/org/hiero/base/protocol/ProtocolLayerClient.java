@@ -30,6 +30,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HbarTransferRequest;
+import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -261,6 +263,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenTransferResult executeTransferTransaction(
       @NonNull final TokenTransferRequest request) throws HieroException;
+
+  /**
+   * Executes an HBAR transfer transaction.
+   *
+   * @param request the request containing the details of the HBAR transfer transaction
+   * @return the result of the HBAR transfer transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull HbarTransferResult executeHbarTransferTransaction(
+      @NonNull final HbarTransferRequest request) throws HieroException;
 
   /**
    * Executes a hook store transaction.

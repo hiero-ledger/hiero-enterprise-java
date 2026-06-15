@@ -50,6 +50,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HbarTransferRequest;
+import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -963,6 +965,17 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testHbarTransferResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new HbarTransferResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new HbarTransferResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new HbarTransferResult(transactionId, null));
+  }
+
+  @Test
   public void testTokenMintResultCreation() {
     // Given
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
@@ -1283,6 +1296,58 @@ public class ProtocolLayerDataCreationTests {
                 sender,
                 receiver,
                 senderKey));
+  }
+
+  @Test
+  void testHbarTransferRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final AccountId sender = AccountId.fromString("0.0.5678");
+    final AccountId receiver = AccountId.fromString("0.0.9876");
+    final PrivateKey senderKey = PrivateKey.generateECDSA();
+    final Hbar amount = Hbar.from(1);
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new HbarTransferRequest(
+                maxTransactionFee, transactionValidDuration, sender, receiver, amount, senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> HbarTransferRequest.of(sender, receiver, amount, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> HbarTransferRequest.of(sender, sender, amount, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> HbarTransferRequest.of(sender, receiver, Hbar.ZERO, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HbarTransferRequest(
+                null, transactionValidDuration, sender, receiver, amount, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HbarTransferRequest(maxTransactionFee, null, sender, receiver, amount, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HbarTransferRequest(
+                maxTransactionFee, transactionValidDuration, null, receiver, amount, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HbarTransferRequest(
+                maxTransactionFee, transactionValidDuration, sender, null, amount, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HbarTransferRequest(
+                maxTransactionFee, transactionValidDuration, sender, receiver, null, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new HbarTransferRequest(
+                maxTransactionFee, transactionValidDuration, sender, receiver, amount, null));
   }
 
   @Test

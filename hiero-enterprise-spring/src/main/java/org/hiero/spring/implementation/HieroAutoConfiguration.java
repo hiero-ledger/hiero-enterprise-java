@@ -93,8 +93,9 @@ public class HieroAutoConfiguration {
   }
 
   @Bean
-  AccountClient accountClient(final ProtocolLayerClient protocolLayerClient) {
-    return new AccountClientImpl(protocolLayerClient);
+  AccountClient accountClient(
+      final ProtocolLayerClient protocolLayerClient, final HieroContext hieroContext) {
+    return new AccountClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
   }
 
   @Bean
