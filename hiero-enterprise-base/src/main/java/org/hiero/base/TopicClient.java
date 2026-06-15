@@ -397,6 +397,9 @@ public interface TopicClient {
   default SubscriptionHandle subscribeTopic(
       @NonNull String topicId, @NonNull Consumer<TopicMessage> handler, long limit)
       throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
     return subscribeTopic(TopicId.fromString(topicId), handler, limit);
   }
 
@@ -433,8 +436,14 @@ public interface TopicClient {
       @NonNull Instant startTime,
       @NonNull Instant endTime)
       throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+    Objects.requireNonNull(startTime, "startTime must not be null");
+    Objects.requireNonNull(endTime, "endtime must not be null");
+
     return subscribeTopic(TopicId.fromString(topicId), handler, startTime, endTime);
   }
+
 
   /**
    * Subscribe to a Topic
@@ -450,8 +459,8 @@ public interface TopicClient {
   SubscriptionHandle subscribeTopic(
       @NonNull TopicId topicId,
       @NonNull Consumer<TopicMessage> handler,
-      @NonNull Instant startTime,
-      @NonNull Instant endTime,
+      @Nullable Instant startTime,
+      @Nullable Instant endTime,
       long limit)
       throws HieroException;
 
@@ -473,6 +482,8 @@ public interface TopicClient {
       @Nullable Instant endTime,
       long limit)
       throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
     return subscribeTopic(TopicId.fromString(topicId), handler, startTime, endTime, limit);
   }
 }

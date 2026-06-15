@@ -229,6 +229,7 @@ public class TopicClientImpl implements TopicClient {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(message, "message must not be null");
+
     TopicSubmitMessageRequest request = TopicSubmitMessageRequest.of(topicId, submitKey, message);
     client.executeTopicMessageSubmitTransaction(request);
   }
@@ -236,6 +237,9 @@ public class TopicClientImpl implements TopicClient {
   @Override
   public SubscriptionHandle subscribeTopic(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
     return subscribeTopic(topicId, handler, null, null, -1);
   }
 
@@ -243,6 +247,9 @@ public class TopicClientImpl implements TopicClient {
   public SubscriptionHandle subscribeTopic(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, long limit)
       throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
     return subscribeTopic(topicId, handler, null, null, limit);
   }
 
@@ -253,6 +260,11 @@ public class TopicClientImpl implements TopicClient {
       @NonNull Instant startTime,
       @NonNull Instant endTime)
       throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+    Objects.requireNonNull(startTime, "startTime must not be null");
+    Objects.requireNonNull(endTime, "endtime must not be null");
+
     return subscribeTopic(topicId, handler, startTime, endTime, -1);
   }
 
