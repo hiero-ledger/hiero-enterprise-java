@@ -27,8 +27,6 @@ AccountId accountId =
 
 Page<Token> tokens =
     tokenRepository.findByAccount(accountId);
-
-System.out.println(tokens);
 ```
 
 ---
@@ -41,8 +39,6 @@ TokenId tokenId =
 
 Optional<TokenInfo> token =
     tokenRepository.findById(tokenId);
-
-token.ifPresent(System.out::println);
 ```
 
 ---
@@ -55,8 +51,6 @@ TokenId tokenId =
 
 Page<Balance> balances =
     tokenRepository.getBalances(tokenId);
-
-System.out.println(balances);
 ```
 
 
@@ -77,6 +71,4 @@ Page<Balance> balance =
         tokenId,
         accountId
     );
-
-System.out.println(balance);
 ```

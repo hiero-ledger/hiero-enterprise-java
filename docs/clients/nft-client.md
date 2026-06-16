@@ -53,14 +53,23 @@
 
 ## Create NFT Type
 
+Creates a new NFT token type that can later be minted into individual NFTs.
+
 ```java title="createNftType(String name, String symbol)"
-TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT");
+TokenId tokenId = nftClient.createNftType(
+    "Demo NFT",
+    "DNFT"
+);
 ```
 
 ```java title="createNftType(String name, String symbol, PrivateKey supplierKey)"
 PrivateKey supplierKey = PrivateKey.generateED25519();
 
-TokenId tokenId = nftClient.createNftType( "Custom NFT", "CNFT", supplierKey );
+TokenId tokenId = nftClient.createNftType(
+    "Custom NFT",
+    "CNFT",
+    supplierKey
+);
 ```
 
 ```java title="createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey)"
@@ -80,43 +89,73 @@ TokenId tokenId =
 
 ## Associate NFT
 
-```java title="associateNft(TokenId tokenId, AccountId accountId,PrivateKey accountKey)" 
-TokenId tokenId = TokenId.fromString("0.0.5000");
-AccountId accountId = AccountId.fromString("0.0.1001");
+Associates an account with one or more NFT token types before receiving NFTs.
 
-nftClient.associateNft(tokenId, accountId, accountKey);
+```java title="associateNft(TokenId tokenId, AccountId accountId,PrivateKey accountKey)" 
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+AccountId accountIdToAssociateWith =
+    AccountId.fromString("0.0.1001");
+
+nftClient.associateNft(
+    tokenId,
+    accountIdToAssociateWith,
+    accountKeyToAssociateWith
+    );
 ```
 
 ```java title="associateNft(List<TokenId> tokenIds, AccountId accountId, PrivateKey accountKey)"
-List<TokenId> tokenIds = List.of(
-    TokenId.fromString("0.0.5000"),
-    TokenId.fromString("0.0.5001")
-);
+List<TokenId> tokenIds =
+    List.of(
+        TokenId.fromString("0.0.5000"),
+        TokenId.fromString("0.0.5001")
+    );
+
+AccountId accountIdToAssociateWith =
+    AccountId.fromString("0.0.1001");
 
 nftClient.associateNft(
     tokenIds,
-    accountId,
-    accountKey
-);
+    accountIdToAssociateWith,
+    accountKeyToAssociateWith
+    );
 ```
 
 ---
 
 ## Dissociate NFT
 
+Removes one or more NFT token associations from an account.
+
 ```java title="dissociateNft(TokenId tokenId, AccountId accountId, PrivateKey accountKey)" 
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+AccountId accountIdToDissociateFrom =
+    AccountId.fromString("0.0.1001");
+
 nftClient.dissociateNft(
-  tokenId,
-  accountId,
-  accountKey
-  );
+    tokenId,
+    accountIdToDissociateFrom,
+    accountKeyToDissociateFrom
+    );
 ```
 
 ```java title="dissociateNft(List<TokenId> tokenIds, AccountId accountId, PrivateKey accountKey)"
+List<TokenId> tokenIds =
+    List.of(
+        TokenId.fromString("0.0.5000"),
+        TokenId.fromString("0.0.5001")
+    );
+
+AccountId accountIdToDissociateFrom =
+    AccountId.fromString("0.0.1001");
+
 nftClient.dissociateNft(
-    tokenIds, 
-    accountId, 
-    accountKey
+    tokenIds,
+    accountIdToDissociateFrom,
+    accountKeyToDissociateFrom
     );
 ```
 
@@ -124,33 +163,109 @@ nftClient.dissociateNft(
 
 ## Mint NFT
 
-```java title="mintNft(TokenId tokenId, byte[] metadata)" 
-byte[] metadata = "NFT metadata".getBytes();
+Creates one or more NFT instances for an NFT token type.
 
-nftClient.mintNft(tokenId, metadata);
+```java title="mintNft(TokenId tokenId, byte[] metadata)" 
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+byte[] metadata =
+    "NFT metadata".getBytes();
+
+long serialNumber =
+    nftClient.mintNft(
+        tokenId,
+        metadata
+    );
 ```
 
 
 ```java title="mintNfts(TokenId tokenId, byte[]... metadata)" 
-nftClient.mintNfts(tokenId, "NFT One".getBytes(), "NFT Two".getBytes());
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+List<Long> serialNumbers =
+    nftClient.mintNfts(
+        tokenId,
+        "NFT One".getBytes(),
+        "NFT Two".getBytes()
+    );
 ```
+
+
+```java title="mintNfts(TokenId tokenId, PrivateKey supplyKey, byte[]... metadata)" 
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+List<Long> serialNumbers =
+    nftClient.mintNfts(
+        tokenId,
+        supplyKey,
+        "NFT One".getBytes(),
+        "NFT Two".getBytes()
+    );
+```
+
+!!! info
+
+    Provide `supplyKey` when the NFT type was created with a custom supply key that is different from the configured operator account key.
+
 
 ---
 
 ## Burn NFT
 
+Permanently removes one or more NFTs from circulation.
+
 ```java title="burnNft(TokenId tokenId, long serialNumber)"
-nftClient.burnNft(tokenId, 1L);
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+nftClient.burnNft(
+    tokenId,
+    1L
+);
 ```
 
 ```java title="burnNfts(TokenId tokenId, Set<Long> serialNumbers)"
-Set<Long> serialNumbers = Set.of(1L, 2L, 3L);
-nftClient.burnNfts(tokenId, serialNumbers);
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+Set<Long> serialNumbers =
+    Set.of(1L, 2L, 3L);
+
+nftClient.burnNfts(
+    tokenId,
+    serialNumbers
+    );
 ```
+
+```java title="burnNfts(TokenId tokenId, Set<Long> serialNumbers, PrivateKey supplyKey)"
+TokenId tokenId =
+    TokenId.fromString("0.0.5000");
+
+Set<Long> serialNumbers =
+    Set.of(1L, 2L, 3L);
+
+nftClient.burnNfts(
+    tokenId,
+    serialNumbers,
+    supplyKey
+    );
+```
+
+
+!!! info
+
+    Provide `supplyKey` when the NFT type was created with a custom supply key that is different from the configured operator account key.
+
 
 ---
 
 ## Transfer NFT
+
+
+Transfers ownership of one or more NFTs between accounts.
 
 ```java title="transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)"
 AccountId sender = AccountId.fromString("0.0.1001");

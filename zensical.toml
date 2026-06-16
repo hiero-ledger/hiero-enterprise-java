@@ -37,6 +37,12 @@ nav = [
                 { "TopicRepository" = "repositories/topic-repository.md" },
                 { "TransactionRepository" = "repositories/transaction-repository.md" }
             ]}
+        ]},
+
+        { "Utilities" = [
+            { "ContractParam" = "utils/contract-param.md" },
+            { "ContractCallResult" = "utils/contract-call-result.md" },
+            { "ContractVerificationClient" = "utils/contract-verification-client.md" }
         ]}
     ]}
 ]

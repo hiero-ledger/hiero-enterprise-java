@@ -27,8 +27,6 @@ AccountId accountId = AccountId.fromString("0.0.1234");
 
 Page<TransactionInfo> transactions =
     transactionRepository.findByAccount(accountId);
-
-System.out.println(transactions);
 ```
 
 ---
@@ -43,8 +41,6 @@ Page<TransactionInfo> transactions =
         accountId,
         TransactionType.CRYPTO_TRANSFER
     );
-
-System.out.println(transactions);
 ```
 
 ---
@@ -59,8 +55,6 @@ Page<TransactionInfo> transactions =
         accountId,
         Result.SUCCESS
     );
-
-System.out.println(transactions);
 ```
 
 ---
@@ -75,8 +69,6 @@ Page<TransactionInfo> transactions =
         accountId,
         BalanceModification.DEBIT
     );
-
-System.out.println(transactions);
 ```
 
 ---
@@ -87,6 +79,4 @@ Optional<TransactionInfo> transaction =
     transactionRepository.findById(
         "0.0.1234-1234567890-000000001"
     );
-
-transaction.ifPresent(System.out::println);
 ```

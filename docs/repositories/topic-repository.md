@@ -25,8 +25,6 @@ TopicId topicId =
 
 Optional<Topic> topic =
     topicRepository.findTopicById(topicId);
-
-topic.ifPresent(System.out::println);
 ```
 
 
@@ -40,8 +38,6 @@ TopicId topicId =
 
 Page<TopicMessage> messages =
     topicRepository.getMessages(topicId);
-
-System.out.println(messages);
 ```
 
 ---
@@ -57,8 +53,6 @@ Optional<TopicMessage> message =
         topicId,
         1
     );
-
-message.ifPresent(System.out::println);
 ```
 
 

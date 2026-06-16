@@ -19,8 +19,6 @@ BlockRepository provides APIs for querying block information from a Hiero Mirror
 ```java title="findAll()"
 Page<Block> blocks =
     blockRepository.findAll();
-
-System.out.println(blocks);
 ```
 
 ---
@@ -30,8 +28,6 @@ System.out.println(blocks);
 ```java title="findByNumber(long number)"
 Optional<Block> block =
     blockRepository.findByNumber(100);
-
-block.ifPresent(System.out::println);
 ```
 
 ---
@@ -43,6 +39,4 @@ Optional<Block> block =
     blockRepository.findByHash(
         "0x123456789abcdef"
     );
-
-block.ifPresent(System.out::println);
 ```

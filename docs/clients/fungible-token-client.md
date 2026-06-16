@@ -1,6 +1,6 @@
 # Fungible Token Client
 
-FungibleTokenClient provides APIs for managing Hiero fungible tokens, including token creation, association, dissociation, minting, burning, and transferring tokens between accounts.
+`FungibleTokenClient` provides APIs for managing Hiero fungible tokens, including token creation, account association, dissociation, minting, burning, and token transfers.
 
 !!! note
 
@@ -34,14 +34,14 @@ FungibleTokenClient provides APIs for managing Hiero fungible tokens, including 
 | `dissociateToken(List<TokenId> tokenIds, AccountId accountId, PrivateKey accountKey)` | Removes multiple token associations from an account. |
 | `dissociateToken(List<TokenId> tokenIds, Account account)` | Removes multiple token associations using an account object. |
 | `mintToken(TokenId tokenId, long amount)` | Mints tokens using the operator supply account. |
-| `mintToken(String tokenId, long amount)` | Mints tokens using token ID provided as a string. |
+| `mintToken(String tokenId, long amount)` | Mints tokens using a token ID string. |
 | `mintToken(TokenId tokenId, PrivateKey supplyKey, long amount)` | Mints tokens using a custom supply key. |
-| `mintToken(String tokenId, String supplyKey, long amount)` | Mints tokens using token ID and supply key provided as strings. |
+| `mintToken(String tokenId, String supplyKey, long amount)` | Mints tokens using string-based token and supply key values. |
 | `burnToken(TokenId tokenId, long amount)` | Burns tokens using the operator supply account. |
 | `burnToken(TokenId tokenId, long amount, PrivateKey supplyKey)` | Burns tokens using a custom supply key. |
 | `burnToken(TokenId tokenId, long amount, String supplyKey)` | Burns tokens using a supply key provided as a string. |
 | `transferToken(TokenId tokenId, AccountId toAccountId, long amount)` | Transfers tokens from the operator account to another account. |
-| `transferToken(TokenId tokenId, String toAccountId, long amount)` | Transfers tokens using receiver account ID as a string. |
+| `transferToken(TokenId tokenId, String toAccountId, long amount)` | Transfers tokens using a receiver account ID string. |
 | `transferToken(TokenId tokenId, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId, long amount)` | Transfers tokens between accounts using sender credentials. |
 | `transferToken(TokenId tokenId, Account fromAccount, AccountId toAccountId, long amount)` | Transfers tokens using an existing sender account object. |
 | `transferToken(TokenId tokenId, String fromAccountId, String fromAccountKey, String toAccountId, long amount)` | Transfers tokens between accounts using string-based credentials. |
@@ -50,14 +50,14 @@ FungibleTokenClient provides APIs for managing Hiero fungible tokens, including 
 
 ## Create Token
 
+Creates a token using the configured operator account as both treasury and supply account.
+
 ```java title="createToken(String name, String symbol)"
 TokenId tokenId =
     fungibleTokenClient.createToken(
         "My Token",
         "MTK"
     );
-
-System.out.println(tokenId);
 ```
 
 ```java title="createToken(String name, String symbol, PrivateKey supplyKey)"
@@ -73,38 +73,38 @@ TokenId tokenId =
 ```
 
 ```java title="createToken(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey)"
-AccountId treasuryId =
+AccountId treasuryAccountId =
     AccountId.fromString("0.0.1234");
 
-PrivateKey treasuryKey =
+PrivateKey treasuryAccountKey =
     PrivateKey.generateED25519();
 
 TokenId tokenId =
     fungibleTokenClient.createToken(
         "My Token",
         "MTK",
-        treasuryId,
-        treasuryKey
+        treasuryAccountId,
+        treasuryAccountKey
     );
 ```
 
 ```java title="createToken(String name, String symbol, Account treasuryAccount)"
-Account treasury =
+Account treasuryAccount =
     accountClient.createAccount();
 
 TokenId tokenId =
     fungibleTokenClient.createToken(
         "My Token",
         "MTK",
-        treasury
+        treasuryAccount
     );
 ```
 
 ```java title="createToken(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplyKey)"
-AccountId treasuryId =
+AccountId treasuryAccountId =
     AccountId.fromString("0.0.1234");
 
-PrivateKey treasuryKey =
+PrivateKey treasuryAccountKey =
     PrivateKey.generateED25519();
 
 PrivateKey supplyKey =
@@ -114,8 +114,8 @@ TokenId tokenId =
     fungibleTokenClient.createToken(
         "My Token",
         "MTK",
-        treasuryId,
-        treasuryKey,
+        treasuryAccountId,
+        treasuryAccountKey,
         supplyKey
     );
 ```
@@ -124,17 +124,19 @@ TokenId tokenId =
 
 ## Associate Token
 
+Accounts must be associated with a token before they can receive or hold it.
+
 ```java title="associateToken(TokenId tokenId, AccountId accountId, PrivateKey accountKey)"
 TokenId tokenId =
     TokenId.fromString("0.0.5678");
 
-AccountId accountId =
+AccountId accountIdToAssociateWith =
     AccountId.fromString("0.0.1234");
 
 fungibleTokenClient.associateToken(
     tokenId,
-    accountId,
-    accountKey
+    accountIdToAssociateWith,
+    accountKeyToAssociateWith
 );
 ```
 
@@ -142,12 +144,12 @@ fungibleTokenClient.associateToken(
 TokenId tokenId =
     TokenId.fromString("0.0.5678");
 
-Account account =
+Account accountToAssociateWith =
     accountClient.createAccount();
 
 fungibleTokenClient.associateToken(
     tokenId,
-    account
+    accountToAssociateWith
 );
 ```
 
@@ -158,14 +160,14 @@ List<TokenId> tokens =
         TokenId.fromString("0.0.5679")
     );
 
-AccountId accountId =
+AccountId accountIdToAssociateWith =
     AccountId.fromString("0.0.1234");
 
 
 fungibleTokenClient.associateToken(
     tokens,
-    accountId,
-    accountKey
+    accountIdToAssociateWith,
+    accountKeyToAssociateWith
 );
 ```
 
@@ -173,18 +175,20 @@ fungibleTokenClient.associateToken(
 
 ## Dissociate Token
 
+Removes token associations from an account.
+
 ```java title="dissociateToken(TokenId tokenId, AccountId accountId, PrivateKey accountKey)"
 TokenId tokenId =
     TokenId.fromString("0.0.5678");
 
-AccountId accountId =
+AccountId accountIdToDissociate =
     AccountId.fromString("0.0.1234");
 
 
 fungibleTokenClient.dissociateToken(
     tokenId,
-    accountId,
-    accountKey
+    accountIdToDissociate,
+    accountKeyToDissociate
 );
 ```
 
@@ -192,12 +196,12 @@ fungibleTokenClient.dissociateToken(
 TokenId tokenId =
     TokenId.fromString("0.0.5678");
 
-Account account =
+Account accountToDissociate =
     accountClient.createAccount();
 
 fungibleTokenClient.dissociateToken(
     tokenId,
-    account
+    accountToDissociate
 );
 ```
 
@@ -208,19 +212,22 @@ List<TokenId> tokens =
         TokenId.fromString("0.0.5679")
     );
 
-AccountId accountId =
+AccountId accountIdToDissociate =
     AccountId.fromString("0.0.1234");
 
 fungibleTokenClient.dissociateToken(
     tokens,
-    accountId,
-    accountKey
+    accountIdToDissociate,
+    accountKeyToDissociate
     );
 ```
 
 ---
 
 ## Mint Token
+
+Creates additional token supply.
+
 ```java title="mintToken(TokenId tokenId, long amount)"
 TokenId tokenId =
     TokenId.fromString("0.0.5678");
@@ -230,8 +237,6 @@ long newSupply =
         tokenId,
         1000
     );
-
-System.out.println(newSupply);
 ```
 
 ```java title="mintToken(TokenId tokenId, PrivateKey supplyKey, long amount)"
@@ -247,11 +252,14 @@ fungibleTokenClient.mintToken(
 
 !!! info
     
-    Provide `supplyKey` when the token was created with a custom supply key that is different from the configured operator account key.
+    Provide `supplyKey` when the token was created with a custom supply key that differs from the configured operator account key.
 
 ---
 
 ## Burn Token
+
+Removes tokens from circulation.
+
 ```java title="burnToken(TokenId tokenId, long amount)"
 TokenId tokenId =
     TokenId.fromString("0.0.5678");
@@ -277,11 +285,13 @@ fungibleTokenClient.burnToken(
 
 !!! info
 
-    Provide `supplyKey` when the token was created with a custom supply key that is different from the configured operator account key.
+    Provide `supplyKey` when the token was created with a custom supply key that differs from the configured operator account key.
 
 ---
 
 ## Transfer Token
+
+Transfer token from one account to other
 
 ```java title="transferToken(TokenId tokenId, AccountId toAccountId, long amount)"
 TokenId tokenId =

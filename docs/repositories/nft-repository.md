@@ -32,8 +32,6 @@ AccountId ownerId =
 
 Page<NftMetadata> nftTypes =
     nftRepository.findTypesByOwner(ownerId);
-
-System.out.println(nftTypes);
 ```
 
 ---
@@ -46,8 +44,6 @@ AccountId ownerId =
 
 Page<Nft> nfts =
     nftRepository.findByOwner(ownerId);
-
-System.out.println(nfts);
 ```
 
 ---
@@ -60,8 +56,6 @@ TokenId tokenId =
 
 Page<Nft> nfts =
     nftRepository.findByType(tokenId);
-
-System.out.println(nfts);
 ```
 
 ---
@@ -77,8 +71,6 @@ Optional<Nft> nft =
         tokenId,
         1
     );
-
-nft.ifPresent(System.out::println);
 ```
 
 
@@ -98,8 +90,6 @@ Page<Nft> nfts =
         ownerId,
         tokenId
     );
-
-System.out.println(nfts);
 ```
 
 
@@ -120,6 +110,4 @@ Optional<Nft> nft =
         tokenId,
         1
     );
-
-nft.ifPresent(System.out::println);
 ```

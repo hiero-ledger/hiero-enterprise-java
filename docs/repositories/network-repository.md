@@ -20,8 +20,6 @@ NetworkRepository provides APIs for querying Hiero network information from a Mi
 ```java title="exchangeRates()"
 Optional<ExchangeRates> exchangeRates =
     networkRepository.exchangeRates();
-
-exchangeRates.ifPresent(System.out::println);
 ```
 
 ---
@@ -31,8 +29,6 @@ exchangeRates.ifPresent(System.out::println);
 ```java title="fees()"
 List<NetworkFee> fees =
     networkRepository.fees();
-
-fees.forEach(System.out::println);
 ```
 
 ---
@@ -42,8 +38,6 @@ fees.forEach(System.out::println);
 ```java title="stake()"
 Optional<NetworkStake> stake =
     networkRepository.stake();
-
-stake.ifPresent(System.out::println);
 ```
 
 ---
@@ -53,6 +47,4 @@ stake.ifPresent(System.out::println);
 ```java title="supplies()"
 Optional<NetworkSupplies> supplies =
     networkRepository.supplies();
-
-supplies.ifPresent(System.out::println);
 ```

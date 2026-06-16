@@ -1,6 +1,6 @@
 # Topic Client
 
-TopicClient provides APIs for managing Hiero Consensus Service (HCS) topics, including topic creation, updates, deletion, and message submission.
+`TopicClient` provides APIs for managing Hiero Consensus Service (HCS) topics, including topic creation, updates, deletion, and message submission.
 
 !!! note
 
@@ -46,6 +46,8 @@ TopicClient provides APIs for managing Hiero Consensus Service (HCS) topics, inc
 
 ## Create Topic
 
+Creates a public topic using the operator account as the admin key.
+
 ```java title="createTopic()"
 TopicId topicId = topicClient.createTopic();
 ```
@@ -74,6 +76,8 @@ TopicId topicId =
 ---
 
 ## Create Private Topic
+
+Private topics require a submit key for publishing messages.
 
 ```java title="createPrivateTopic(PrivateKey submitKey)"
 PrivateKey submitKey = PrivateKey.generateED25519();
@@ -118,6 +122,8 @@ TopicId topicId =
 ---
 
 ## Update Topic
+
+Update topic properties such as memo, admin key, and submit key.
 
 ```java title="updateTopic(TopicId topicId, String memo)"
 TopicId topicId =
@@ -166,6 +172,7 @@ topicClient.updateTopic(
 ---
 
 ## Update Topic Keys
+
 ```java title="updateAdminKey(TopicId topicId, PrivateKey updatedAdminKey)"
 PrivateKey newAdminKey = PrivateKey.generateED25519();
 
@@ -206,11 +213,13 @@ topicClient.updateSubmitKey(
 
 !!! info
 
-    Provide `adminKey` when the topic was created with a custom admin key that is different from the configured operator account key.
+    Provide an `adminKey` when the topic was created with a custom admin key that differs from the configured operator account key.
 
 ---
 
 ## Delete Topic
+
+Delete the topic using topicId.
 
 ```java title="deleteTopic(TopicId topicId)"
 TopicId topicId =
@@ -230,11 +239,13 @@ topicClient.deleteTopic(
 ```
 !!! info
 
-    Provide `adminKey` when the topic was created with a custom admin key that is different from the configured operator account key.
+    Provide an `adminKey` when the topic was created with a custom admin key that differs from the configured operator account key.
 
 ---
 
 ## Submit Message
+
+Submit message to the topic.
 
 ```java title="submitMessage(TopicId topicId, byte[] message)"
 TopicId topicId =

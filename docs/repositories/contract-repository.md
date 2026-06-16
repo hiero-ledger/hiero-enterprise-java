@@ -20,8 +20,6 @@ including retrieving all contracts and searching contracts by contract ID.
 ```java title="findAll()"
 Page<Contract> contracts =
     contractRepository.findAll();
-
-System.out.println(contracts);
 ```
 
 ---
@@ -34,6 +32,4 @@ ContractId contractId =
 
 Optional<Contract> contract =
     contractRepository.findById(contractId);
-
-contract.ifPresent(System.out::println);
 ```

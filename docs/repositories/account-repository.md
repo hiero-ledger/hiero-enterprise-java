@@ -22,8 +22,4 @@ AccountId accountId =
 
 Optional<AccountInfo> accountInfo =
     accountRepository.findById(accountId);
-
-accountInfo.ifPresent(info ->
-    System.out.println(info)
-);
 ```
