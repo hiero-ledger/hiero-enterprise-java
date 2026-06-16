@@ -5,6 +5,7 @@ The `hiero-enterprise-microprofile` module provides integration support for Ecli
 ---
 
 ## Dependency
+
 Add the following dependency to your `pom.xml` build configuration:
 
 ```xml
@@ -64,6 +65,7 @@ hiero.network.nodes=1.2.3.4:50211:0.0.3,5.6.7.8:50211:0.0.4
 ---
 
 ## Using Hiero Services
+
 After adding the dependency and configuration, Hiero clients can be injected directly into your application using CDI.
 
 ```java
@@ -72,7 +74,7 @@ public class HieroAccountEndpoint {
     private final AccountClient client;
 
     @Inject
-    public HieroEndpoint(final AccountClient client, final BlockRepository blockRepository) {
+    public HieroAccountEndpoint(final AccountClient client, final BlockRepository blockRepository) {
         this.client = client;
         this.blockRepository = blockRepository;
     }
@@ -91,6 +93,7 @@ public class HieroAccountEndpoint {
 ```
 
 ---
+
 ## Sample Application
 
 A complete working example is available in the repository under the [Microprofile Sample](https://github.com/hiero-ledger/hiero-enterprise-java/tree/main/hiero-enterprise-microprofile-sample) module.

@@ -54,9 +54,9 @@ jobs:
           # Normalize line endings to avoid insertion bugs
           text = text.replace("\r\n", "\n")
           if re.search(r"^site_url\s*=", text, re.M):
-              text = re.sub(r"^site_url\s*=.*$", "site_url = " + repr(url), text, count=1, flags=re.M)
+            text = re.sub(r"^site_url\s*=.*$", "site_url = " + repr(url), text, count=1, flags=re.M)
           else:
-              text = text.replace("[project]\n", "[project]\nsite_url = " + repr(url) + "\n", 1)
+            text = text.replace("[project]\n", "[project]\nsite_url = " + repr(url) + "\n", 1)
           open(path, "w", encoding="utf-8").write(text)
           PY
       - name: Build site

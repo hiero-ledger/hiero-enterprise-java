@@ -51,6 +51,7 @@ Configure your operator account credentials and target network in `application.p
 | `spring.hiero.network.requestTimeoutInMs`                                                                                                                                 | *Optional.* Network request timeout threshold in milliseconds.                                     |
 
 ---
+
 ### Configure Custom Network Nodes
 
 If your enterprise environment requires connecting to specific nodes, you can override the default named network defaults using:
@@ -90,6 +91,7 @@ If your enterprise environment requires connecting to specific nodes, you can ov
      and uses the provided node mappings instead.
 
 ---
+
 ## Enable Hiero Support
 
 Add `@EnableHiero` to your Spring Boot application:
@@ -108,6 +110,7 @@ public class Application {
 The annotation registers the required Hiero clients and infrastructure components in the Spring application context.
 
 ---
+
 ## Inject Hiero Services
 
 After enabling Hiero support, services are available as standard Spring beans and can be injected into your application components.
@@ -132,7 +135,9 @@ public class HieroAccountService {
     }
 }
 ```
+
 ---
+
 ## Sample Application
 
 A complete working example is available in the repository under the [Spring Sample](https://github.com/hiero-ledger/hiero-enterprise-java/tree/main/hiero-enterprise-spring-sample) module.

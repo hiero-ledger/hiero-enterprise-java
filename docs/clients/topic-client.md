@@ -237,6 +237,7 @@ topicClient.deleteTopic(
     adminKey
 );
 ```
+
 !!! info
 
     Provide an `adminKey` when the topic was created with a custom admin key that differs from the configured operator account key.
