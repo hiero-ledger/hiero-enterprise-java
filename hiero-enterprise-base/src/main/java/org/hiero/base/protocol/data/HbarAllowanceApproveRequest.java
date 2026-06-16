@@ -26,6 +26,12 @@ public record HbarAllowanceApproveRequest(
     if (amount.toTinybars() < 0) {
       throw new IllegalArgumentException("amount must be non-negative");
     }
+    if (transactionValidDuration.isZero() || transactionValidDuration.isNegative()) {
+      throw new IllegalArgumentException("transactionValidDuration must be positive");
+    }
+    if (amount.toTinybars() == 0) {
+      throw new IllegalArgumentException("amount must be greater than zero");
+    }
     if (owner.equals(spender)) {
       throw new IllegalArgumentException("owner and spender must be different accounts");
     }
