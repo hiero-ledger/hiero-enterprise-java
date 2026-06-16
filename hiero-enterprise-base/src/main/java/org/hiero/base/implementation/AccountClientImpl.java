@@ -14,6 +14,7 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
+import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
 import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.jspecify.annotations.NonNull;
 
@@ -133,6 +134,37 @@ public class AccountClientImpl implements AccountClient {
       client.executeHbarTransferTransaction(request);
     } catch (IllegalArgumentException e) {
       throw new HieroException("Error while transferring HBAR", e);
+    }
+  }
+
+  @Override
+  public void approveHbarAllowance(
+      @NonNull Account owner, @NonNull AccountId spenderAccountId, @NonNull Hbar amount)
+      throws HieroException {
+    Objects.requireNonNull(owner, "owner must not be null");
+    approveHbarAllowance(owner.accountId(), owner.privateKey(), spenderAccountId, amount);
+  }
+
+  @Override
+  public void approveHbarAllowance(
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerPrivateKey,
+      @NonNull AccountId spenderAccountId,
+      @NonNull Hbar amount)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerPrivateKey, "ownerPrivateKey must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    Objects.requireNonNull(amount, "amount must not be null");
+    if (amount.toTinybars() < 0) {
+      throw new HieroException("Invalid allowance amount: must be non-negative");
+    }
+    try {
+      final HbarAllowanceApproveRequest request =
+          HbarAllowanceApproveRequest.of(ownerAccountId, spenderAccountId, amount, ownerPrivateKey);
+      client.executeHbarAllowanceApproveTransaction(request);
+    } catch (IllegalArgumentException e) {
+      throw new HieroException("Error while approving HBAR allowance", e);
     }
   }
 }

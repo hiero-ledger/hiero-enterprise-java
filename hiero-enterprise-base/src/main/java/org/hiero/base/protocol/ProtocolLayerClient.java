@@ -30,6 +30,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
+import org.hiero.base.protocol.data.HbarAllowanceApproveResult;
 import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
@@ -273,6 +275,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull HbarTransferResult executeHbarTransferTransaction(
       @NonNull final HbarTransferRequest request) throws HieroException;
+
+  /**
+   * Executes an HBAR allowance approve transaction.
+   *
+   * @param request the request containing the details of the allowance approve transaction
+   * @return the result of the allowance approve transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull HbarAllowanceApproveResult executeHbarAllowanceApproveTransaction(
+      @NonNull final HbarAllowanceApproveRequest request) throws HieroException;
 
   /**
    * Executes a hook store transaction.

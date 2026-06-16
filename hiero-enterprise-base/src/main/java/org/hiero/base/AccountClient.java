@@ -235,6 +235,79 @@ public interface AccountClient {
         Hbar.from(amountInHbar));
   }
 
+  /**
+   * Approves an HBAR allowance so a spender can transfer HBAR on behalf of the owner. The owner
+   * account must sign the transaction. Set the amount to {@link Hbar#ZERO} to revoke an existing
+   * allowance.
+   *
+   * @param owner the account that owns the HBAR
+   * @param spenderAccountId the account authorized to spend on the owner's behalf
+   * @param amount the allowance amount
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveHbarAllowance(
+      @NonNull Account owner, @NonNull AccountId spenderAccountId, @NonNull Hbar amount)
+      throws HieroException;
+
+  /**
+   * Approves an HBAR allowance so a spender can transfer HBAR on behalf of the owner.
+   *
+   * @param ownerAccountId the account that owns the HBAR
+   * @param ownerPrivateKey the private key of the owner account
+   * @param spenderAccountId the account authorized to spend on the owner's behalf
+   * @param amount the allowance amount
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveHbarAllowance(
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerPrivateKey,
+      @NonNull AccountId spenderAccountId,
+      @NonNull Hbar amount)
+      throws HieroException;
+
+  /**
+   * Approves an HBAR allowance so a spender can transfer HBAR on behalf of the owner.
+   *
+   * @param owner the account that owns the HBAR
+   * @param spenderAccountId the account authorized to spend on the owner's behalf
+   * @param amountInHbar the allowance amount in HBAR
+   * @throws HieroException if the allowance could not be approved
+   */
+  default void approveHbarAllowance(
+      @NonNull Account owner, @NonNull AccountId spenderAccountId, long amountInHbar)
+      throws HieroException {
+    if (amountInHbar < 0) {
+      throw new IllegalArgumentException("amountInHbar must be non-negative");
+    }
+    approveHbarAllowance(owner, spenderAccountId, Hbar.from(amountInHbar));
+  }
+
+  /**
+   * Approves an HBAR allowance so a spender can transfer HBAR on behalf of the owner.
+   *
+   * @param owner the account that owns the HBAR
+   * @param spenderAccountId the account authorized to spend on the owner's behalf
+   * @throws HieroException if the allowance could not be approved
+   */
+  default void approveHbarAllowance(
+      @NonNull Account owner, @NonNull String spenderAccountId, long amountInHbar)
+      throws HieroException {
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    approveHbarAllowance(owner, AccountId.fromString(spenderAccountId), amountInHbar);
+  }
+
+  /**
+   * Revokes an HBAR allowance previously granted to a spender.
+   *
+   * @param owner the account that owns the HBAR
+   * @param spenderAccountId the account whose allowance is revoked
+   * @throws HieroException if the allowance could not be revoked
+   */
+  default void revokeHbarAllowance(@NonNull Account owner, @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    approveHbarAllowance(owner, spenderAccountId, Hbar.ZERO);
+  }
+
   /** Adds a hook to an account. */
   default void addHook(@NonNull Account account, @NonNull HookDetails hookDetails)
       throws HieroException {

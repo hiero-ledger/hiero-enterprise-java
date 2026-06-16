@@ -80,6 +80,8 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeHbarTransferTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeHbarAllowanceApproveTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeHookStoreTransaction(null));
   }
 }

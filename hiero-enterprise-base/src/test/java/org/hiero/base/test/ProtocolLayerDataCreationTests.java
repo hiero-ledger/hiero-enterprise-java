@@ -50,6 +50,8 @@ import org.hiero.base.protocol.data.FileInfoRequest;
 import org.hiero.base.protocol.data.FileInfoResponse;
 import org.hiero.base.protocol.data.FileUpdateRequest;
 import org.hiero.base.protocol.data.FileUpdateResult;
+import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
+import org.hiero.base.protocol.data.HbarAllowanceApproveResult;
 import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
@@ -976,6 +978,18 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testHbarAllowanceApproveResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new HbarAllowanceApproveResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new HbarAllowanceApproveResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new HbarAllowanceApproveResult(transactionId, null));
+  }
+
+  @Test
   public void testTokenMintResultCreation() {
     // Given
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
@@ -1348,6 +1362,31 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new HbarTransferRequest(
                 maxTransactionFee, transactionValidDuration, sender, receiver, amount, null));
+  }
+
+  @Test
+  void testHbarAllowanceApproveRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final AccountId owner = AccountId.fromString("0.0.5678");
+    final AccountId spender = AccountId.fromString("0.0.9876");
+    final PrivateKey ownerKey = PrivateKey.generateECDSA();
+    final Hbar amount = Hbar.from(1);
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new HbarAllowanceApproveRequest(
+                maxTransactionFee, transactionValidDuration, owner, spender, amount, ownerKey));
+    Assertions.assertDoesNotThrow(
+        () -> HbarAllowanceApproveRequest.of(owner, spender, amount, ownerKey));
+    Assertions.assertDoesNotThrow(
+        () -> HbarAllowanceApproveRequest.of(owner, spender, Hbar.ZERO, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> HbarAllowanceApproveRequest.of(owner, owner, amount, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> HbarAllowanceApproveRequest.of(owner, spender, Hbar.from(-1), ownerKey));
   }
 
   @Test

@@ -19,6 +19,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
+import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
+import org.hiero.base.protocol.data.HbarAllowanceApproveResult;
 import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -295,5 +297,48 @@ public class AccountClientImplTest {
         assertThrows(
             HieroException.class, () -> accountClientImpl.transferHbar(toAccountId, Hbar.ZERO));
     assertTrue(exception.getMessage().contains("Invalid transfer amount"));
+  }
+
+  @Test
+  void testApproveHbarAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    AccountId spenderId = AccountId.fromString("0.0.22222");
+    Hbar amount = Hbar.from(1);
+    ArgumentCaptor<HbarAllowanceApproveRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarAllowanceApproveRequest.class);
+    when(mockProtocolLayerClient.executeHbarAllowanceApproveTransaction(
+            any(HbarAllowanceApproveRequest.class)))
+        .thenReturn(
+            new HbarAllowanceApproveResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.approveHbarAllowance(owner, spenderId, amount);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
+    HbarAllowanceApproveRequest request = requestCaptor.getValue();
+    assertEquals(owner.accountId(), request.owner());
+    assertEquals(spenderId, request.spender());
+    assertEquals(amount, request.amount());
+    assertEquals(owner.privateKey(), request.ownerKey());
+  }
+
+  @Test
+  void testRevokeHbarAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    AccountId spenderId = AccountId.fromString("0.0.22222");
+    ArgumentCaptor<HbarAllowanceApproveRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarAllowanceApproveRequest.class);
+    when(mockProtocolLayerClient.executeHbarAllowanceApproveTransaction(
+            any(HbarAllowanceApproveRequest.class)))
+        .thenReturn(
+            new HbarAllowanceApproveResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.revokeHbarAllowance(owner, spenderId);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
+    assertEquals(Hbar.ZERO, requestCaptor.getValue().amount());
   }
 }
