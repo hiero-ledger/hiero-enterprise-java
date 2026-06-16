@@ -24,6 +24,13 @@
 | `getAccountBalance(AccountId accountId)` | Retrieves the HBAR balance of the specified account. |
 | `getAccountBalance(String accountId)` | Retrieves account balance using an account ID string. |
 | `getOperatorAccountBalance()` | Retrieves the balance of the configured operator account. |
+| `transferHbar(AccountId toAccountId, Hbar amount)` | Transfers HBAR from the operator account to another account. |
+| `transferHbar(String toAccountId, Hbar amount)` | Transfers HBAR from the operator account using an account ID string. |
+| `transferHbar(AccountId toAccountId, long amountInHbar)` | Transfers HBAR from the operator account using an amount specified in HBAR. |
+| `transferHbar(AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId, Hbar amount)` | Transfers HBAR between accounts using the sender account ID and private key. |
+| `transferHbar(Account fromAccount, AccountId toAccountId, Hbar amount)` | Transfers HBAR between accounts using an existing account object as the sender. |
+| `transferHbar(String fromAccountId, String fromAccountKey, String toAccountId, long amountInHbar)` | Transfers HBAR between accounts using string-based account credentials. |
+
 
 ---
 
@@ -123,3 +130,53 @@ Hbar balance =
     accountClient.getOperatorAccountBalance();
 ```
 
+### Transfer Hbar
+
+Transfer Hbar between account.
+
+```java title="transferHbar(AccountId toAccountId, Hbar amount)"
+AccountId receiverAccountId =
+    AccountId.fromString("0.0.4321");
+
+accountClient.transferHbar(
+    receiverAccountId,
+    Hbar.from(10)
+);
+```
+
+```java title="transferHbar(AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId, Hbar amount)"
+AccountId senderAccountId =
+    AccountId.fromString("0.0.1234");
+
+PrivateKey senderPrivateKey =
+    PrivateKey.generateED25519();
+
+AccountId receiverAccountId =
+    AccountId.fromString("0.0.4321");
+
+accountClient.transferHbar(
+    senderAccountId,
+    senderPrivateKey,
+    receiverAccountId,
+    Hbar.from(25)
+);
+```
+
+```java title="transferHbar(Account fromAccount, AccountId toAccountId, Hbar amount)"
+Account senderAccount =
+    accountClient.createAccount();
+
+AccountId receiverAccountId =
+    AccountId.fromString("0.0.4321");
+
+accountClient.transferHbar(
+    senderAccount,
+    receiverAccountId,
+    Hbar.from(25)
+);
+```
+
+!!! info
+
+    Transfers initiated from the operator account are signed by the configured operator account.
+    Transfers between arbitrary accounts require the sender account's private key to authorize the transaction.
