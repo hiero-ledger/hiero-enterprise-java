@@ -1,17 +1,16 @@
 name: Docs
-
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
-      - "mkdocs.yml"
+      - "zensical.toml"
       - ".github/workflows/docs.yml"
   pull_request:
     branches: [main]
     paths:
       - "docs/**"
-      - "mkdocs.yml"
+      - "zensical.toml"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
@@ -26,10 +25,8 @@ jobs:
   deploy-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
-
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -38,40 +35,48 @@ jobs:
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.x"
 
-      - name: Set cache date
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Install Zensical
+        run: pip install --require-hashes -r docs/requirements.txt
 
-      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.0
+      - name: Set site_url for GitHub Pages
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          python3 <<'PY'
+          import os, re
+          url = os.environ["SITE_URL"].rstrip("/") + "/"
+          path = "zensical.toml"
+          text = open(path, encoding="utf-8").read()
+          # Normalize line endings to avoid insertion bugs
+          text = text.replace("\r\n", "\n")
+          if re.search(r"^site_url\s*=", text, re.M):
+              text = re.sub(r"^site_url\s*=.*$", "site_url = " + repr(url), text, count=1, flags=re.M)
+          else:
+              text = text.replace("[project]\n", "[project]\nsite_url = " + repr(url) + "\n", 1)
+          open(path, "w", encoding="utf-8").write(text)
+          PY
+      - name: Build site
+        run: zensical build --clean -f zensical.toml
+
+      - name: Deploy to gh-pages (production)
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.1
         with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-
-      - name: Install MkDocs and Material
-        run: pip install mkdocs-material "pymdown-extensions"
-
-      - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          enable_jekyll: false
+          keep_files: true
 
   # PR preview: build and deploy to .../pr/<number>/
   deploy-preview:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
       pull-requests: write
-
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -80,44 +85,47 @@ jobs:
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.x"
 
-      - name: Set cache date
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Install Zensical
+        run: pip install --require-hashes -r docs/requirements.txt
 
-      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-
-      - name: Install MkDocs and Material
-        run: pip install mkdocs-material "pymdown-extensions"
+      - name: Set site_url for PR preview
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr/${{ github.event.pull_request.number }}/
+        run: |
+          python3 <<'PY'
+          import os, re
+          url = os.environ["SITE_URL"].rstrip("/") + "/"
+          path = "zensical.toml"
+          text = open(path, encoding="utf-8").read()
+          text = text.replace("\r\n", "\n")
+          if re.search(r"^site_url\s*=", text, re.M):
+            text = re.sub(r"^site_url\s*=.*$", "site_url = " + repr(url), text, count=1, flags=re.M)
+          else:
+            text = text.replace("[project]\n", "[project]\nsite_url = " + repr(url) + "\n", 1)
+          open(path, "w", encoding="utf-8").write(text)
+          PY
 
       - name: Build site
-        run: mkdocs build --strict
+        run: zensical build --clean -f zensical.toml
 
       - name: Deploy PR preview to gh-pages
-        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
-          destination_dir: "pr/${{ github.event.pull_request.number }}"
+          destination_dir: pr/${{ github.event.pull_request.number }}
+          enable_jekyll: false
           keep_files: true
 
       - name: Comment PR with preview URL
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
-            const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${{ github.event.pull_request.number }}/`;
+            const url = `https://${context.repo.owner}.github.io/${context.repo.repo}/pr/${context.issue.number}/`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
