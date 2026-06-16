@@ -1,17 +1,27 @@
 # Getting Started
 
-This guide shows the basic setup needed to use Hiero Enterprise Java in an application.
+**Hiero Enterprise Java** is an enterprise-grade framework for building Java applications on the [Hiero Network](https://hiero.org).
 
-## Choose an integration module
+It provides a framework friendly layer on top of the Hiero SDK, with built-in dependency injection, centralized configuration, and reusable services. By integrating with Spring Boot and MicroProfile, Hiero Enterprise helps developers focus on business logic rather than SDK setup and infrastructure concerns.
 
-Use one of the framework modules depending on your application:
+---
+## Choose an Integration Module
 
-- `hiero-enterprise-spring` for Spring Boot
-- `hiero-enterprise-microprofile` for MicroProfile or Quarkus
+Hiero Enterprise Java provides framework-specific integrations for modern Java applications.
 
-The base module provides the shared APIs and implementations, but most applications should start with one of the framework integrations.
+Choose the module that matches your application framework:
 
-## Spring Boot dependency
+- `hiero-enterprise-spring` for Spring Boot applications
+- `hiero-enterprise-microprofile` for MicroProfile and Quarkus applications
+
+Both modules are built on top of the Base module, which contains the shared APIs, clients, repositories, and service contracts used across the project.
+
+---
+## Add a Dependency
+
+Add the dependency for your chosen framework.
+
+### Spring Boot
 
 ```xml
 <dependency>
@@ -21,7 +31,7 @@ The base module provides the shared APIs and implementations, but most applicati
 </dependency>
 ```
 
-## MicroProfile dependency
+### MicroProfile
 
 ```xml
 <dependency>
@@ -31,39 +41,32 @@ The base module provides the shared APIs and implementations, but most applicati
 </dependency>
 ```
 
-## Required configuration
+---
+## Configure Your Application
 
-In both integrations, you need to configure:
+To connect to a Hiero network, you must configure an operator account and network settings.
 
-- an operator account ID
-- the private key for that operator account
-- the target network or custom node settings
+The following configuration is required:
 
-The project currently supports DER-encoded ECDSA private keys for the operator configuration.
+- **Operator Account ID** — the account used to submit transactions and pay transaction fees.
+- **Operator Private Key** — the private key used to sign transactions on behalf of the operator account.
+- **Network Configuration** — the target network (`testnet`, `previewnet`, or `mainnet`) or a custom node configuration.
 
-## Common setup steps
+Don't have an account yet? Create a free Testnet account using the Hedera Portal.
 
-1. Add the dependency for your framework
-2. Configure the operator account and network
-3. Enable or produce the Hiero services
-4. Inject a managed client such as `AccountClient`, `FileClient`, or `SmartContractClient`
+[Create a Testnet Account](https://portal.hedera.com){ .md-button }
 
-## Network choices
+After creating your account, keep your Account ID and private key available. You will need them when configuring Hiero Enterprise.
 
-You can use one of the predefined Hedera-based networks or provide custom nodes and a mirror node endpoint. This is useful for local or custom environments such as Solo-based setups.
+!!! warning
 
-## Running the build
+    Testnet provides 1000 HBAR for testing, which refreshes every 24 hours for development purposes.
 
-The project uses Maven and includes the Maven wrapper:
+---
+## Next Steps
 
-```bash
-./mvnw verify
-```
+Continue with one of the following guides:
 
-Some tests require real network credentials. If no account is configured, those tests will fail.
-
-## Next steps
-
-- See [Spring Boot](spring-boot.md) for Spring-specific setup.
-- See [MicroProfile](microprofile.md) for MicroProfile-specific setup.
-- See [Base / Managed Services](managed-services.md) for the available clients and repositories.
+- [Spring Boot](spring-boot.md) - Configure and use Hiero Enterprise in Spring applications.
+- [MicroProfile](microprofile.md) - Configure and use Hiero Enterprise in MicroProfile and Quarkus applications.
+- [Clients & Repositories](client-and-repository.md) - Explore the available clients and repositories services.

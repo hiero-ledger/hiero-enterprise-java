@@ -68,4 +68,4 @@ The project currently builds on top of the Hedera Java SDK and is being migrated
 - See [Getting Started](getting-started.md) for basic setup.
 - See [Spring Boot](spring-boot.md) for Spring configuration and usage.
 - See [MicroProfile](microprofile.md) for CDI and MicroProfile configuration.
-- See [Base / Managed Services](managed-services.md) for the main services exposed to applications.
+- See [Base / Managed Services](client-and-repository.md) for the main services exposed to applications.

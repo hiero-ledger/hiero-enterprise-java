@@ -1,0 +1,96 @@
+[project]
+site_name = "Hiero Enterprise Java — Technical Documentation"
+site_description = "Technical documentation for Hiero Enterprise Java (Spring & MicroProfile integrations for Hiero)"
+site_author = "Hiero Enterprise Java Team"
+repo_name = "hiero-ledger/hiero-enterprise-java"
+repo_url = "https://github.com/hiero-ledger/hiero-enterprise-java"
+extra_css = ["assets/stylesheets/extra.css"]
+
+nav = [
+    { "Home" = "index.md" },
+    { "Getting Started" = [
+        { "Get started" = "getting-started.md" },
+        { "Architecture" = "architecture.md" }
+    ]},
+    { "User Guide" = [
+        { "Spring Module" = "spring-boot.md" },
+        { "MicroProfile Module" = "microprofile.md" },
+
+        { "Clients & Repositories" = [
+            { "Overview" = "client-and-repository.md" },
+
+            { "Clients" = [
+                { "AccountClient" = "clients/account-client.md" },
+                { "FileClient" = "clients/file-client.md" },
+                { "SmartContractClient" = "clients/smart-contract-client.md" },
+                { "TopicClient" = "clients/topic-client.md" },
+                { "FungibleTokenClient" = "clients/fungible-token-client.md" },
+                { "NftClient" = "clients/nft-client.md" }
+            ]},
+            { "Repositories" = [
+                { "AccountRepository" = "repositories/account-repository.md" },
+                { "BlockRepository" = "repositories/block-repository.md" },
+                { "ContractRepository" = "repositories/contract-repository.md" },
+                { "NetworkRepository" = "repositories/network-repository.md" },
+                { "NftRepository" = "repositories/nft-repository.md" },
+                { "TokenRepository" = "repositories/token-repository.md" },
+                { "TopicRepository" = "repositories/topic-repository.md" },
+                { "TransactionRepository" = "repositories/transaction-repository.md" }
+            ]}
+        ]}
+    ]}
+]
+
+[project.theme]
+language = "en"
+logo = "assets/hiero.svg"
+favicon = "assets/favicon.ico"
+features = [
+    "announce.dismiss",
+    "content.code.copy",
+    "navigation.footer",
+    "navigation.indexes",
+    "navigation.path",
+    "navigation.sections",
+    "navigation.tabs",
+    "navigation.top",
+    "search.highlight"
+]
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "custom"
+accent = "orange"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[project.markdown_extensions.abbr]
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.def_list]
+[project.markdown_extensions.footnotes]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.toc]
+permalink = true
+[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.emoji]
+emoji_generator = "zensical.extensions.emoji.to_svg"
+emoji_index = "zensical.extensions.emoji.twemoji"
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.superfences]
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+combine_header_slug = true
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true

@@ -1,8 +1,11 @@
 # Spring Boot Integration
+The `hiero-enterprise-spring` module provides seamless Spring Boot integration for managed Hiero services, including client configuration, network setup, and dependency injection support.
 
-The `hiero-enterprise-spring` module provides Spring Boot integration for the managed Hiero services.
+---
 
 ## Dependency
+
+Add the following dependency to your `pom.xml` to pull in the Spring Boot starter:
 
 ```xml
 <dependency>
@@ -12,7 +15,82 @@ The `hiero-enterprise-spring` module provides Spring Boot integration for the ma
 </dependency>
 ```
 
-## Enable Hiero support
+---
+
+## Configuration
+
+The Spring integration automatically processes properties defined within the `spring.hiero.*` namespace.
+
+Configure your operator account credentials and target network in `application.properties` or `application.yml`.
+
+=== "application.properties"
+    ```properties
+    spring.hiero.accountId=YOUR_ACCOUNT_ID
+    spring.hiero.privateKey=YOUR_PRIVATE_KEY
+    spring.hiero.network.name=hedera-testnet
+    ```
+
+=== "application.yml"
+    ```yaml
+    spring:
+        hiero:
+            accountId: YOUR_ACCOUNT_ID
+            privateKey: YOUR_PRIVATE_KEY
+            network:
+                name: hedera-testnet
+    ```
+
+### Configuration Properties
+
+| Property                                                                                                                                                                  | Description                                                                                        |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------|
+| `spring.hiero.accountId`                                                                                                                                                  | **Required.** Your Hiero operator account ID.                                                      |
+| `spring.hiero.privateKey`                                                                                                                                                 | **Required.** Your private key used to sign transactions.                                          |
+| `spring.hiero.network.name`                                                                                                                                               | Target network name. Valid values: `hedera-mainnet`, `hedera-testnet`. (Default `hedera-mainnet`). |
+| `spring.hiero.network.mirrorNode`                                                                                                                                         | *Optional.* Explicit endpoint URL for a custom mirror node.                                        |
+| `spring.hiero.network.requestTimeoutInMs`                                                                                                                                 | *Optional.* Network request timeout threshold in milliseconds.                                     |
+
+---
+### Configure Custom Network Nodes
+
+If your enterprise environment requires connecting to specific nodes, you can override the default named network defaults using:
+
+=== "application.properties"
+    ```properties
+    spring.hiero.accountId=YOUR_ACCOUNT_ID
+    spring.hiero.privateKey=YOUR_PRIVATE_KEY
+
+    spring.hiero.network.nodes[0].ip=1.2.3.4
+    spring.hiero.network.nodes[0].port=50211
+    spring.hiero.network.nodes[0].account=0.0.3
+
+    spring.hiero.network.nodes[1].ip=5.6.7.8
+    spring.hiero.network.nodes[1].port=50211
+    spring.hiero.network.nodes[1].account=0.0.4
+    ```
+=== "application.yml"
+    ```yaml
+    spring:
+        hiero:
+            accountId: YOUR_ACCOUNT_ID
+            privateKey: YOUR_PRIVATE_KEY
+            network:
+                nodes:
+                    - ip: "1.2.3.4"
+                      port: 50211
+                      account: "0.0.3"
+                    - ip: "5.6.7.8"
+                      port: 50211
+                      account: "0.0.4"
+    ```
+
+!!! note
+    
+     When custom nodes are configured, the framework ignores the named network configuration from `spring.hiero.network.name` 
+     and uses the provided node mappings instead.
+
+---
+## Enable Hiero Support
 
 Add `@EnableHiero` to your Spring Boot application:
 
@@ -27,60 +105,35 @@ public class Application {
     }
 }
 ```
+The annotation registers the required Hiero clients and infrastructure components in the Spring application context.
 
-## Configuration
+---
+## Inject Hiero Services
 
-The Spring integration uses properties under `spring.hiero.*`.
-
-Example:
-
-```properties
-spring.hiero.accountId=0.0.53854625
-spring.hiero.privateKey=YOUR_DER_ENCODED_PRIVATE_KEY
-spring.hiero.network.name=hedera-testnet
-```
-
-Important properties:
-
-- `spring.hiero.accountId`
-- `spring.hiero.privateKey`
-- `spring.hiero.network.name`
-- `spring.hiero.network.mirrorNode`
-- `spring.hiero.network.requestTimeoutInMs`
-
-You can also provide custom nodes through `spring.hiero.network.nodes`. When custom nodes are provided, the named network is ignored.
-
-## Using managed services
-
-Once Hiero support is enabled, the main services can be injected as Spring beans.
+After enabling Hiero support, services are available as standard Spring beans and can be injected into your application components.
 
 Example:
-
 ```java
 @Service
-public class HieroFileService {
+public class HieroAccountService {
+    private final AccountClient client;
 
-    private final FileClient fileClient;
-
-    public HieroFileService(FileClient fileClient) {
-        this.fileClient = fileClient;
+    public HieroAccountService(AccountClient client) {
+        this.client = client;
     }
 
-    public String readFile(FileId fileId) {
-        return new String(fileClient.readFile(fileId));
+    public String createAccount() {
+        try {
+            final Account account = client.createAccount();
+            return "Account " + account.accountId() + " created!";
+        } catch (final HieroException e) {
+          throw new RuntimeException("Error in Hiero call", e);
+        }
     }
 }
 ```
+---
+## Sample Application
 
-## What the module provides
-
-The Spring module wires:
-
-- the Hiero configuration and context
-- protocol-layer clients
-- mirror-node clients and repositories
-- Spring-specific REST and JSON converter implementations
-
-## Sample application
-
-See the Spring sample module in the repository for a minimal example application using this integration.
+A complete working example is available in the repository under the [Spring Sample](https://github.com/hiero-ledger/hiero-enterprise-java/tree/main/hiero-enterprise-spring-sample) module.
+It demonstrates a minimal setup using this integration and recommended project structure.

@@ -1,22 +1,34 @@
 # MicroProfile Integration
 
-The `hiero-enterprise-microprofile` module provides CDI-based integration for Eclipse MicroProfile runtimes such as Quarkus.
+The `hiero-enterprise-microprofile` module provides integration support for Eclipse MicroProfile-compatible applications such as Quarkus and Helidon.
+
+---
 
 ## Dependency
+Add the following dependency to your `pom.xml` build configuration:
 
 ```xml
 <dependency>
-    <groupId>org.hiero</groupId>
-    <artifactId>hiero-enterprise-microprofile</artifactId>
-    <version>VERSION</version>
+  <groupId>org.hiero</groupId>
+  <artifactId>hiero-enterprise-microprofile</artifactId>
+  <version>VERSION</version>
 </dependency>
 ```
 
+---
+
 ## Configuration
 
-The MicroProfile integration reads configuration from the `hiero.*` namespace.
+The MicroProfile integration automatically loads configuration from the `hiero.*` property namespace.
 
-Example:
+Configuration can be provided through standard MicroProfile configuration sources, including:
+
+- `microprofile-config.properties`
+- `application.properties` (eg. Quarkus)
+- Environment variables
+
+
+Add these settings to your configuration file:
 
 ```properties
 hiero.accountId=0.0.53854625
@@ -24,50 +36,62 @@ hiero.privateKey=YOUR_DER_ENCODED_PRIVATE_KEY
 hiero.network.name=hedera-testnet
 ```
 
-Additional network-related settings include:
+### Configuration Properties
 
-- `hiero.network.nodes`
-- `hiero.network.mirrornode`
-- `hiero.network.requestTimeoutInMs`
+| Property | Description |
+|:---------|:------------|
+| `hiero.accountId` | **Required.** Your Hiero operator account ID. |
+| `hiero.privateKey` | **Required.** Your DER-encoded private key used to sign transactions. |
+| `hiero.network.name` | Target network name. Valid values: `hedera-mainnet`, `hedera-testnet`. (Default `hedera-mainnet`). |
+| `hiero.network.mirrornode` | *Optional.* Explicit endpoint URL for a custom mirror node. |
+| `hiero.network.requestTimeoutInMs` | *Optional.* Network request timeout threshold in milliseconds. |
 
-When `hiero.network.nodes` is provided, the named network setting is not used.
+### Configure Custom Network Nodes
 
-## Managed services
+If your enterprise environment requires connecting to specific nodes, you can override the default network configuration using:
 
-The module uses CDI producers to expose the same service interfaces defined in the base module.
+```properties
+hiero.accountId=YOUR_ACCOUNT_ID
+hiero.privateKey=YOUR_PRIVATE_KEY
 
-Examples include:
+hiero.network.nodes=1.2.3.4:50211:0.0.3,5.6.7.8:50211:0.0.4
+```
 
-- `AccountClient`
-- `FileClient`
-- `FungibleTokenClient`
-- `NftClient`
-- `SmartContractClient`
-- `TopicClient`
-- `MirrorNodeClient`
-- repository interfaces such as `AccountRepository`, `TokenRepository`, and `NftRepository`
+!!! note
 
-## Injection example
+    Providing custom node mappings causes the framework to ignore the named `hiero.network.name` configuration and use the provided nodes instead.
+
+---
+
+## Using Hiero Services
+After adding the dependency and configuration, Hiero clients can be injected directly into your application using CDI.
 
 ```java
-@ApplicationScoped
-public class HieroAccountService {
+@Path("/")
+public class HieroAccountEndpoint { 
+    private final AccountClient client;
 
     @Inject
-    AccountClient accountClient;
+    public HieroEndpoint(final AccountClient client, final BlockRepository blockRepository) {
+        this.client = client;
+        this.blockRepository = blockRepository;
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String createAccount() {
+        try {
+            final Account account = client.createAccount();
+            return "Account created!";
+        } catch (final HieroException e) {
+            throw new RuntimeException("Error in Hiero call", e);
+        }
+    }
 }
 ```
 
-## What the module provides
+---
+## Sample Application
 
-The MicroProfile module wires:
-
-- configuration objects for operator and network settings
-- a shared `HieroConfig` and `HieroContext`
-- CDI-produced protocol-layer clients
-- CDI-produced mirror-node clients and repositories
-- MicroProfile-specific REST and JSON converter implementations
-
-## Sample application
-
-See the MicroProfile sample module in the repository for a minimal example using this integration.
+A complete working example is available in the repository under the [Microprofile Sample](https://github.com/hiero-ledger/hiero-enterprise-java/tree/main/hiero-enterprise-microprofile-sample) module.
+It demonstrates a minimal setup using this integration and recommended project structure.
