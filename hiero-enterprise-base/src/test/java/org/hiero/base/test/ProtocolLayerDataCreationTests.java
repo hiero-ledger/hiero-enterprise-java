@@ -1422,6 +1422,27 @@ public class ProtocolLayerDataCreationTests {
         () ->
             NftAllowanceDeleteRequest.of(
                 owner, new NftId(TokenId.fromString("0.0.12345"), -1L), ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> NftAllowanceDeleteRequest.of(null, nftId, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> NftAllowanceDeleteRequest.of(owner, null, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> NftAllowanceDeleteRequest.of(owner, nftId, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new NftAllowanceDeleteRequest(
+                maxTransactionFee, transactionValidDuration, null, nftId, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new NftAllowanceDeleteRequest(
+                maxTransactionFee, transactionValidDuration, owner, null, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new NftAllowanceDeleteRequest(
+                maxTransactionFee, transactionValidDuration, owner, nftId, null));
   }
 
   @Test
