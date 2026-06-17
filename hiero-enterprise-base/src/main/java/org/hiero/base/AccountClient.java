@@ -2,7 +2,9 @@ package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
 import java.util.Objects;
 import org.hiero.base.data.Account;
@@ -297,6 +299,19 @@ public interface AccountClient {
   }
 
   /**
+   * Deletes an HBAR allowance previously granted to a spender by setting the approved amount to
+   * zero.
+   *
+   * @param owner the account that owns the HBAR
+   * @param spenderAccountId the account whose allowance is deleted
+   * @throws HieroException if the allowance could not be deleted
+   */
+  default void deleteHbarAllowance(@NonNull Account owner, @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    approveHbarAllowance(owner, spenderAccountId, Hbar.ZERO);
+  }
+
+  /**
    * Revokes an HBAR allowance previously granted to a spender.
    *
    * @param owner the account that owns the HBAR
@@ -305,7 +320,49 @@ public interface AccountClient {
    */
   default void revokeHbarAllowance(@NonNull Account owner, @NonNull AccountId spenderAccountId)
       throws HieroException {
-    approveHbarAllowance(owner, spenderAccountId, Hbar.ZERO);
+    deleteHbarAllowance(owner, spenderAccountId);
+  }
+
+  /**
+   * Deletes an NFT allowance for the given serial number. The owner account must sign the
+   * transaction.
+   *
+   * @param owner the account that owns the NFT
+   * @param nftId the NFT whose allowance is deleted
+   * @throws HieroException if the allowance could not be deleted
+   */
+  void deleteNftAllowance(@NonNull Account owner, @NonNull NftId nftId) throws HieroException;
+
+  /**
+   * Deletes an NFT allowance for the given serial number. The owner account must sign the
+   * transaction.
+   *
+   * @param ownerAccountId the account that owns the NFT
+   * @param ownerPrivateKey the private key of the owner account
+   * @param nftId the NFT whose allowance is deleted
+   * @throws HieroException if the allowance could not be deleted
+   */
+  void deleteNftAllowance(
+      @NonNull AccountId ownerAccountId, @NonNull PrivateKey ownerPrivateKey, @NonNull NftId nftId)
+      throws HieroException;
+
+  /**
+   * Deletes an NFT allowance for the given serial number. The owner account must sign the
+   * transaction.
+   *
+   * @param owner the account that owns the NFT
+   * @param tokenId the token ID of the NFT
+   * @param serial the serial number of the NFT
+   * @throws HieroException if the allowance could not be deleted
+   */
+  default void deleteNftAllowance(@NonNull Account owner, @NonNull TokenId tokenId, long serial)
+      throws HieroException {
+    Objects.requireNonNull(owner, "owner must not be null");
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    if (serial < 0) {
+      throw new IllegalArgumentException("serial must be non-negative");
+    }
+    deleteNftAllowance(owner, new NftId(tokenId, serial));
   }
 
   /** Adds a hook to an account. */

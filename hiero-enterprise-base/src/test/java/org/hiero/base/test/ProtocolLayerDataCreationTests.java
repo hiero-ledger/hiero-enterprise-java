@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HookEntityId;
 import com.hedera.hashgraph.sdk.HookId;
+import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -56,6 +57,8 @@ import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
+import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
+import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -990,6 +993,18 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testNftAllowanceDeleteResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new NftAllowanceDeleteResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new NftAllowanceDeleteResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new NftAllowanceDeleteResult(transactionId, null));
+  }
+
+  @Test
   public void testTokenMintResultCreation() {
     // Given
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
@@ -1387,6 +1402,26 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> HbarAllowanceApproveRequest.of(owner, spender, Hbar.from(-1), ownerKey));
+  }
+
+  @Test
+  void testNftAllowanceDeleteRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final AccountId owner = AccountId.fromString("0.0.5678");
+    final PrivateKey ownerKey = PrivateKey.generateECDSA();
+    final NftId nftId = new NftId(TokenId.fromString("0.0.12345"), 1L);
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new NftAllowanceDeleteRequest(
+                maxTransactionFee, transactionValidDuration, owner, nftId, ownerKey));
+    Assertions.assertDoesNotThrow(() -> NftAllowanceDeleteRequest.of(owner, nftId, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftAllowanceDeleteRequest.of(
+                owner, new NftId(TokenId.fromString("0.0.12345"), -1L), ownerKey));
   }
 
   @Test

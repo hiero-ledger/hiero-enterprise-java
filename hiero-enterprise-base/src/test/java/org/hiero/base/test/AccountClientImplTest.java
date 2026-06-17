@@ -6,8 +6,10 @@ import static org.mockito.Mockito.*;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
@@ -23,6 +25,8 @@ import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
 import org.hiero.base.protocol.data.HbarAllowanceApproveResult;
 import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
+import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
+import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -340,5 +344,46 @@ public class AccountClientImplTest {
     verify(mockProtocolLayerClient, times(1))
         .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
     assertEquals(Hbar.ZERO, requestCaptor.getValue().amount());
+  }
+
+  @Test
+  void testDeleteHbarAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    AccountId spenderId = AccountId.fromString("0.0.22222");
+    ArgumentCaptor<HbarAllowanceApproveRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarAllowanceApproveRequest.class);
+    when(mockProtocolLayerClient.executeHbarAllowanceApproveTransaction(
+            any(HbarAllowanceApproveRequest.class)))
+        .thenReturn(
+            new HbarAllowanceApproveResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.deleteHbarAllowance(owner, spenderId);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
+    assertEquals(Hbar.ZERO, requestCaptor.getValue().amount());
+  }
+
+  @Test
+  void testDeleteNftAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    NftId nftId = new NftId(TokenId.fromString("0.0.33333"), 1L);
+    ArgumentCaptor<NftAllowanceDeleteRequest> requestCaptor =
+        ArgumentCaptor.forClass(NftAllowanceDeleteRequest.class);
+    when(mockProtocolLayerClient.executeNftAllowanceDeleteTransaction(
+            any(NftAllowanceDeleteRequest.class)))
+        .thenReturn(
+            new NftAllowanceDeleteResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.deleteNftAllowance(owner, nftId);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeNftAllowanceDeleteTransaction(requestCaptor.capture());
+    NftAllowanceDeleteRequest request = requestCaptor.getValue();
+    assertEquals(owner.accountId(), request.owner());
+    assertEquals(nftId, request.nftId());
+    assertEquals(owner.privateKey(), request.ownerKey());
   }
 }

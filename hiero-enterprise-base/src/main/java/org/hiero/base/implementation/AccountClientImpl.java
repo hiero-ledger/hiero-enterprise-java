@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.Objects;
 import org.hiero.base.AccountClient;
@@ -16,6 +17,7 @@ import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
 import org.hiero.base.protocol.data.HbarTransferRequest;
+import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.jspecify.annotations.NonNull;
 
 public class AccountClientImpl implements AccountClient {
@@ -165,6 +167,29 @@ public class AccountClientImpl implements AccountClient {
       client.executeHbarAllowanceApproveTransaction(request);
     } catch (IllegalArgumentException e) {
       throw new HieroException("Error while approving HBAR allowance", e);
+    }
+  }
+
+  @Override
+  public void deleteNftAllowance(@NonNull Account owner, @NonNull NftId nftId)
+      throws HieroException {
+    Objects.requireNonNull(owner, "owner must not be null");
+    deleteNftAllowance(owner.accountId(), owner.privateKey(), nftId);
+  }
+
+  @Override
+  public void deleteNftAllowance(
+      @NonNull AccountId ownerAccountId, @NonNull PrivateKey ownerPrivateKey, @NonNull NftId nftId)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerPrivateKey, "ownerPrivateKey must not be null");
+    Objects.requireNonNull(nftId, "nftId must not be null");
+    try {
+      final NftAllowanceDeleteRequest request =
+          NftAllowanceDeleteRequest.of(ownerAccountId, nftId, ownerPrivateKey);
+      client.executeNftAllowanceDeleteTransaction(request);
+    } catch (IllegalArgumentException e) {
+      throw new HieroException("Error while deleting NFT allowance", e);
     }
   }
 }

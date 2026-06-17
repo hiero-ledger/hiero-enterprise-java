@@ -82,6 +82,8 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeHbarAllowanceApproveTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeNftAllowanceDeleteTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeHookStoreTransaction(null));
   }
 }

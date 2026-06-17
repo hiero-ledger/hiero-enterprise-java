@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
+import com.hedera.hashgraph.sdk.AccountAllowanceDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
@@ -85,6 +86,8 @@ import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
+import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
+import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -716,6 +719,25 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new HbarAllowanceApproveResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute HBAR allowance approve transaction", e);
+    }
+  }
+
+  @Override
+  public NftAllowanceDeleteResult executeNftAllowanceDeleteTransaction(
+      @NonNull final NftAllowanceDeleteRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final AccountAllowanceDeleteTransaction transaction =
+          new AccountAllowanceDeleteTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .deleteAllTokenNftAllowances(request.nftId(), request.owner());
+      sign(transaction, request.ownerKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.ALLOWANCE_DELETION);
+      return new NftAllowanceDeleteResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute NFT allowance delete transaction", e);
     }
   }
 
