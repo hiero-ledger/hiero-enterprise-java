@@ -1,6 +1,7 @@
 [signing.pgp]
 active = "ALWAYS"
 armored = true
+mode = "COMMAND"
 
 [deploy.maven.mavenCentral.release-deploy]
 active = "RELEASE"

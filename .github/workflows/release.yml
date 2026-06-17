@@ -37,11 +37,15 @@ jobs:
           cache: maven
 
       - name: Import GPG key
-        run: |
-          echo "${{ secrets.GPG_KEY_CONTENTS }}" | gpg --batch --import
-          mkdir -p ~/.gnupg
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-          echo "use-agent" >> ~/.gnupg/gpg.conf
+        id: gpg_key
+        uses: step-security/ghaction-import-gpg@c0b4a334b9b72bfaaebec86ef022a78a5b17f828 # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY_CONTENTS }}
+          passphrase: ${{ secrets.GPG_KEY_PASSPHRASE }}
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
 
       - name: Verify POM Version
         run: |
@@ -87,7 +91,6 @@ jobs:
       - name: Publish with JReleaser
         run: ./mvnw -B -Ppublication jreleaser:full-release -N
         env:
-          JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_KEY_CONTENTS }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
