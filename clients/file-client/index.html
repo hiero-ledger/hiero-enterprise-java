@@ -12,36 +12,36 @@
         <meta name="author" content="Hiero Enterprise Java Team">
       
       
-        <link rel="canonical" href="https://hiero-ledger.github.io/hiero-enterprise-java/microprofile/">
+        <link rel="canonical" href="https://hiero-ledger.github.io/hiero-enterprise-java/clients/file-client/">
       
       
-        <link rel="prev" href="../spring-boot/">
+        <link rel="prev" href="../account-client/">
       
       
-        <link rel="next" href="../client-and-repository/">
+        <link rel="next" href="../smart-contract-client/">
       
       
         
       
       
-      <link rel="icon" href="../assets/favicon.ico">
+      <link rel="icon" href="../../assets/favicon.ico">
       <meta name="generator" content="zensical-0.0.45">
     
     
       
-        <title>MicroProfile Integration - Hiero Enterprise Java — Technical Documentation</title>
+        <title>File Client - Hiero Enterprise Java — Technical Documentation</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.fba56155.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.fba56155.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
 
@@ -60,9 +60,9 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#microprofile-integration" class="md-skip">
+        <a href="#file-client" class="md-skip">
           Skip to content
         </a>
       
@@ -101,9 +101,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="./.." title="Hiero Enterprise Java — Technical Documentation" class="md-header__button md-logo" aria-label="Hiero Enterprise Java — Technical Documentation" data-md-component="logo">
+    <a href="../.." title="Hiero Enterprise Java — Technical Documentation" class="md-header__button md-logo" aria-label="Hiero Enterprise Java — Technical Documentation" data-md-component="logo">
       
-  <img src="../assets/hiero.svg" alt="Hiero Enterprise Java — Technical Documentation">
+  <img src="../../assets/hiero.svg" alt="Hiero Enterprise Java — Technical Documentation">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MicroProfile Integration
+              File Client
             
           </span>
         </div>
@@ -204,7 +204,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="./.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   Home
@@ -231,7 +231,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../getting-started/" class="md-tabs__link">
+        <a href="../../getting-started/" class="md-tabs__link">
           
   
   Getting Started
@@ -265,7 +265,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../spring-boot/" class="md-tabs__link">
+        <a href="../../spring-boot/" class="md-tabs__link">
           
   
   User Guide
@@ -298,9 +298,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="./.." title="Hiero Enterprise Java — Technical Documentation" class="md-nav__button md-logo" aria-label="Hiero Enterprise Java — Technical Documentation" data-md-component="logo">
+    <a href="../.." title="Hiero Enterprise Java — Technical Documentation" class="md-nav__button md-logo" aria-label="Hiero Enterprise Java — Technical Documentation" data-md-component="logo">
       
-  <img src="../assets/hiero.svg" alt="Hiero Enterprise Java — Technical Documentation">
+  <img src="../../assets/hiero.svg" alt="Hiero Enterprise Java — Technical Documentation">
 
     </a>
     Hiero Enterprise Java — Technical Documentation
@@ -327,7 +327,7 @@
   
   
     <li class="md-nav__item">
-      <a href="./.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -409,7 +409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -436,7 +436,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../architecture/" class="md-nav__link">
         
   
   
@@ -535,7 +535,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../spring-boot/" class="md-nav__link">
+      <a href="../../spring-boot/" class="md-nav__link">
         
   
   
@@ -543,6 +543,216 @@
     
   
   Spring Module
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../microprofile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  MicroProfile Module
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Clients & Repositories
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Clients & Repositories
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client-and-repository/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Overview
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_2" id="__nav_3_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Clients
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Clients
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../account-client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  AccountClient
 
     
   </span>
@@ -578,7 +788,7 @@
   <span class="md-ellipsis">
     
   
-  MicroProfile Module
+  FileClient
 
     
   </span>
@@ -595,7 +805,7 @@
   <span class="md-ellipsis">
     
   
-  MicroProfile Module
+  FileClient
 
     
   </span>
@@ -621,10 +831,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dependency" class="md-nav__link">
+  <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Dependency
+        Methods
       </span>
     </span>
   </a>
@@ -632,49 +842,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#create-file" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Configuration
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration-properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Configuration Properties
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configure-custom-network-nodes" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Configure Custom Network Nodes
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-hiero-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Using Hiero Services
+        Create File
       </span>
     </span>
   </a>
@@ -682,10 +853,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sample-application" class="md-nav__link">
+  <a href="#read" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sample Application
+        Read
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Delete File
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Update File
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        File Metadata
       </span>
     </span>
   </a>
@@ -707,214 +911,8 @@
   
   
   
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Clients & Repositories
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Clients & Repositories
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../client-and-repository/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Overview
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_3_2" id="__nav_3_3_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Clients
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Clients
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../clients/account-client/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  AccountClient
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../clients/file-client/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  FileClient
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../clients/smart-contract-client/" class="md-nav__link">
+      <a href="../smart-contract-client/" class="md-nav__link">
         
   
   
@@ -941,7 +939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../clients/topic-client/" class="md-nav__link">
+      <a href="../topic-client/" class="md-nav__link">
         
   
   
@@ -968,7 +966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../clients/fungible-token-client/" class="md-nav__link">
+      <a href="../fungible-token-client/" class="md-nav__link">
         
   
   
@@ -995,7 +993,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../clients/nft-client/" class="md-nav__link">
+      <a href="../nft-client/" class="md-nav__link">
         
   
   
@@ -1098,7 +1096,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/account-repository/" class="md-nav__link">
+      <a href="../../repositories/account-repository/" class="md-nav__link">
         
   
   
@@ -1125,7 +1123,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/block-repository/" class="md-nav__link">
+      <a href="../../repositories/block-repository/" class="md-nav__link">
         
   
   
@@ -1152,7 +1150,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/contract-repository/" class="md-nav__link">
+      <a href="../../repositories/contract-repository/" class="md-nav__link">
         
   
   
@@ -1179,7 +1177,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/network-repository/" class="md-nav__link">
+      <a href="../../repositories/network-repository/" class="md-nav__link">
         
   
   
@@ -1206,7 +1204,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/nft-repository/" class="md-nav__link">
+      <a href="../../repositories/nft-repository/" class="md-nav__link">
         
   
   
@@ -1233,7 +1231,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/token-repository/" class="md-nav__link">
+      <a href="../../repositories/token-repository/" class="md-nav__link">
         
   
   
@@ -1260,7 +1258,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/topic-repository/" class="md-nav__link">
+      <a href="../../repositories/topic-repository/" class="md-nav__link">
         
   
   
@@ -1287,7 +1285,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../repositories/transaction-repository/" class="md-nav__link">
+      <a href="../../repositories/transaction-repository/" class="md-nav__link">
         
   
   
@@ -1391,7 +1389,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../utils/contract-param/" class="md-nav__link">
+      <a href="../../utils/contract-param/" class="md-nav__link">
         
   
   
@@ -1418,7 +1416,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../utils/contract-call-result/" class="md-nav__link">
+      <a href="../../utils/contract-call-result/" class="md-nav__link">
         
   
   
@@ -1445,7 +1443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../utils/contract-verification-client/" class="md-nav__link">
+      <a href="../../utils/contract-verification-client/" class="md-nav__link">
         
   
   
@@ -1521,10 +1519,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dependency" class="md-nav__link">
+  <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Dependency
+        Methods
       </span>
     </span>
   </a>
@@ -1532,49 +1530,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#create-file" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Configuration
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration-properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Configuration Properties
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configure-custom-network-nodes" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Configure Custom Network Nodes
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-hiero-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Using Hiero Services
+        Create File
       </span>
     </span>
   </a>
@@ -1582,10 +1541,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sample-application" class="md-nav__link">
+  <a href="#read" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sample Application
+        Read
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Delete File
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Update File
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        File Metadata
       </span>
     </span>
   </a>
@@ -1617,7 +1609,7 @@
   
   
     <li class="md-path__item">
-      <a href="./.." class="md-path__link">
+      <a href="../.." class="md-path__link">
         
   
   <span class="md-ellipsis">
@@ -1649,11 +1641,77 @@
     
     
       <li class="md-path__item">
-        <a href="../spring-boot/" class="md-path__link">
+        <a href="../../spring-boot/" class="md-path__link">
           
   
   <span class="md-ellipsis">
     User Guide
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      <li class="md-path__item">
+        <a href="../../client-and-repository/" class="md-path__link">
+          
+  
+  <span class="md-ellipsis">
+    Clients & Repositories
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      <li class="md-path__item">
+        <a href="../account-client/" class="md-path__link">
+          
+  
+  <span class="md-ellipsis">
+    Clients
   </span>
 
         </a>
@@ -1673,102 +1731,130 @@
   
 
 
-<h1 id="microprofile-integration">MicroProfile Integration<a class="headerlink" href="#microprofile-integration" title="Permanent link">&para;</a></h1>
-<p>The <code>hiero-enterprise-microprofile</code> module provides integration support for Eclipse MicroProfile-compatible applications such as Quarkus and Helidon.</p>
+<h1 id="file-client">File Client<a class="headerlink" href="#file-client" title="Permanent link">&para;</a></h1>
+<p><code>FileClient</code> provides APIs for managing files on a Hiero network, including file creation, reading, updating, deletion, and metadata operations.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>File operations that submit transactions to the Hiero network require HBAR to pay transaction fees.
+The configured operator account is used as the transaction payer and must have sufficient HBAR balance.</p>
+</div>
 <hr />
-<h2 id="dependency">Dependency<a class="headerlink" href="#dependency" title="Permanent link">&para;</a></h2>
-<p>Add the following dependency to your <code>pom.xml</code> build configuration:</p>
-<div class="language-xml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;dependency&gt;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&lt;groupId&gt;</span>org.hiero<span class="nt">&lt;/groupId&gt;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&lt;artifactId&gt;</span>hiero-enterprise-microprofile<span class="nt">&lt;/artifactId&gt;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&lt;version&gt;</span>VERSION<span class="nt">&lt;/version&gt;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">&lt;/dependency&gt;</span>
-</span></code></pre></div>
-<hr />
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The MicroProfile integration automatically loads configuration from the <code>hiero.*</code> property namespace.</p>
-<p>Configuration can be provided through standard MicroProfile configuration sources, including:</p>
-<ul>
-<li><code>microprofile-config.properties</code></li>
-<li><code>application.properties</code> (eg. Quarkus)</li>
-<li>Environment variables</li>
-</ul>
-<p>Add these settings to your configuration file:</p>
-<div class="language-properties highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">hiero.accountId</span><span class="o">=</span><span class="s">0.0.53854625</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">hiero.privateKey</span><span class="o">=</span><span class="s">YOUR_DER_ENCODED_PRIVATE_KEY</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="na">hiero.network.name</span><span class="o">=</span><span class="s">hedera-testnet</span>
-</span></code></pre></div>
-<h3 id="configuration-properties">Configuration Properties<a class="headerlink" href="#configuration-properties" title="Permanent link">&para;</a></h3>
+<h2 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Property</th>
+<th style="text-align: left;">Method</th>
 <th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><code>hiero.accountId</code></td>
-<td style="text-align: left;"><strong>Required.</strong> Your Hiero operator account ID.</td>
+<td style="text-align: left;"><code>createFile(byte[] contents)</code></td>
+<td style="text-align: left;">Creates a new file with the provided content.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><code>hiero.privateKey</code></td>
-<td style="text-align: left;"><strong>Required.</strong> Your DER-encoded private key used to sign transactions.</td>
+<td style="text-align: left;"><code>createFile(byte[] contents, Instant expirationTime)</code></td>
+<td style="text-align: left;">Creates a new file with content and expiration time.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><code>hiero.network.name</code></td>
-<td style="text-align: left;">Target network name. Valid values: <code>hedera-mainnet</code>, <code>hedera-testnet</code>. (Default <code>hedera-mainnet</code>).</td>
+<td style="text-align: left;"><code>readFile(FileId fileId)</code></td>
+<td style="text-align: left;">Reads file contents using a file ID.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><code>hiero.network.mirrornode</code></td>
-<td style="text-align: left;"><em>Optional.</em> Explicit endpoint URL for a custom mirror node.</td>
+<td style="text-align: left;"><code>readFile(String fileId)</code></td>
+<td style="text-align: left;">Reads file contents using a file ID string.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><code>hiero.network.requestTimeoutInMs</code></td>
-<td style="text-align: left;"><em>Optional.</em> Network request timeout threshold in milliseconds.</td>
+<td style="text-align: left;"><code>deleteFile(FileId fileId)</code></td>
+<td style="text-align: left;">Deletes an existing file.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteFile(String fileId)</code></td>
+<td style="text-align: left;">Deletes a file using a file ID string.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateFile(FileId fileId, byte[] content)</code></td>
+<td style="text-align: left;">Updates the contents of an existing file.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateExpirationTime(FileId fileId, Instant expirationTime)</code></td>
+<td style="text-align: left;">Updates the file expiration time.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>isDeleted(FileId fileId)</code></td>
+<td style="text-align: left;">Checks whether a file has been deleted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>getSize(FileId fileId)</code></td>
+<td style="text-align: left;">Retrieves the file size.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>getExpirationTime(FileId fileId)</code></td>
+<td style="text-align: left;">Retrieves the file expiration time.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="configure-custom-network-nodes">Configure Custom Network Nodes<a class="headerlink" href="#configure-custom-network-nodes" title="Permanent link">&para;</a></h3>
-<p>If your enterprise environment requires connecting to specific nodes, you can override the default network configuration using:</p>
-<div class="language-properties highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="na">hiero.accountId</span><span class="o">=</span><span class="s">YOUR_ACCOUNT_ID</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">hiero.privateKey</span><span class="o">=</span><span class="s">YOUR_PRIVATE_KEY</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="na">hiero.network.nodes</span><span class="o">=</span><span class="s">1.2.3.4:50211:0.0.3,5.6.7.8:50211:0.0.4</span>
-</span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Providing custom node mappings causes the framework to ignore the named <code>hiero.network.name</code> configuration and use the provided nodes instead.</p>
-</div>
 <hr />
-<h2 id="using-hiero-services">Using Hiero Services<a class="headerlink" href="#using-hiero-services" title="Permanent link">&para;</a></h2>
-<p>After adding the dependency and configuration, Hiero clients can be injected directly into your application using CDI.</p>
-<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@Path</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HieroAccountEndpoint</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">AccountClient</span><span class="w"> </span><span class="n">client</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nd">@Inject</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">HieroAccountEndpoint</span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">AccountClient</span><span class="w"> </span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">BlockRepository</span><span class="w"> </span><span class="n">blockRepository</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">;</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">blockRepository</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blockRepository</span><span class="p">;</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="nd">@GET</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="nd">@Produces</span><span class="p">(</span><span class="n">MediaType</span><span class="p">.</span><span class="na">TEXT_PLAIN</span><span class="p">)</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">createAccount</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">            </span><span class="kd">final</span><span class="w"> </span><span class="n">Account</span><span class="w"> </span><span class="n">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">createAccount</span><span class="p">();</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;Account created!&quot;</span><span class="p">;</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">HieroException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Error in Hiero call&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="p">}</span>
+<h2 id="create-file">Create File<a class="headerlink" href="#create-file" title="Permanent link">&para;</a></h2>
+<p>Creates a new file on the Hiero network.</p>
+<div class="language-java highlight"><span class="filename">createFile(byte[] contents)</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">();</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileClient</span><span class="p">.</span><span class="na">createFile</span><span class="p">(</span><span class="n">content</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">createFile(byte[] contents, Instant expirationTime)</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Temporary file&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">();</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileClient</span><span class="p">.</span><span class="na">createFile</span><span class="p">(</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">content</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">plusSeconds</span><span class="p">(</span><span class="mi">86400</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">);</span>
 </span></code></pre></div>
 <hr />
-<h2 id="sample-application">Sample Application<a class="headerlink" href="#sample-application" title="Permanent link">&para;</a></h2>
-<p>A complete working example is available in the repository under the <a href="https://github.com/hiero-ledger/hiero-enterprise-java/tree/main/hiero-enterprise-microprofile-sample">Microprofile Sample</a> module.
-It demonstrates a minimal setup using this integration and recommended project structure.</p>
+<h2 id="read">Read<a class="headerlink" href="#read" title="Permanent link">&para;</a></h2>
+<p>Reads the contents of an existing file.</p>
+<div class="language-java highlight"><span class="filename">readFile(FileId fileId)</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileClient</span><span class="p">.</span><span class="na">readFile</span><span class="p">(</span><span class="n">fileId</span><span class="p">);</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">String</span><span class="w"> </span><span class="n">contentString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">content</span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="delete-file">Delete File<a class="headerlink" href="#delete-file" title="Permanent link">&para;</a></h2>
+<p>Deletes an existing file.</p>
+<div class="language-java highlight"><span class="filename">deleteFile(FileId fileId)</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">fileClient</span><span class="p">.</span><span class="na">deleteFile</span><span class="p">(</span><span class="n">fileId</span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="update-file">Update File<a class="headerlink" href="#update-file" title="Permanent link">&para;</a></h2>
+<p>Updates file contents or metadata.</p>
+<div class="language-java highlight"><span class="filename">updateFile(FileId fileId, byte[] content)</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">fileClient</span><span class="p">.</span><span class="na">updateFile</span><span class="p">(</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">fileId</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="s">&quot;Updated content&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">updateExpirationTime(FileId fileId, Instant expirationTime)</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">fileClient</span><span class="p">.</span><span class="na">updateExpirationTime</span><span class="p">(</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">fileId</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">plusSeconds</span><span class="p">(</span><span class="mi">172800</span><span class="p">)</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="file-metadata">File Metadata<a class="headerlink" href="#file-metadata" title="Permanent link">&para;</a></h2>
+<p>Retrieves file status and metadata information.</p>
+<div class="language-java highlight"><span class="filename">isDeleted(FileId fileId)</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileClient</span><span class="p">.</span><span class="na">isDeleted</span><span class="p">(</span><span class="n">fileId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">getSize(FileId fileId)</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileClient</span><span class="p">.</span><span class="na">getSize</span><span class="p">(</span><span class="n">fileId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">getExpirationTime(FileId fileId)</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">Instant</span><span class="w"> </span><span class="n">expiration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileClient</span><span class="p">.</span><span class="na">getExpirationTime</span><span class="p">(</span><span class="n">fileId</span><span class="p">);</span>
+</span></code></pre></div>
 
 
 
@@ -1806,7 +1892,7 @@ It demonstrates a minimal setup using this integration and recommended project s
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../spring-boot/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Spring Module">
+          <a href="../account-client/" class="md-footer__link md-footer__link--prev" aria-label="Previous: AccountClient">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
@@ -1816,20 +1902,20 @@ It demonstrates a minimal setup using this integration and recommended project s
                 Previous
               </span>
               <div class="md-ellipsis">
-                Spring Module
+                AccountClient
               </div>
             </div>
           </a>
         
         
           
-          <a href="../client-and-repository/" class="md-footer__link md-footer__link--next" aria-label="Next: Overview">
+          <a href="../smart-contract-client/" class="md-footer__link md-footer__link--next" aria-label="Next: SmartContractClient">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Overview
+                SmartContractClient
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1866,10 +1952,10 @@ It demonstrates a minimal setup using this integration and recommended project s
     
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.code.copy","navigation.footer","navigation.indexes","navigation.path","navigation.sections","navigation.tabs","navigation.top","search.highlight"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.copy","navigation.footer","navigation.indexes","navigation.path","navigation.sections","navigation.tabs","navigation.top","search.highlight"],"search":"../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.6e5f0216.min.js"></script>
+      <script src="../../assets/javascripts/bundle.6e5f0216.min.js"></script>
       
     
   </body>
