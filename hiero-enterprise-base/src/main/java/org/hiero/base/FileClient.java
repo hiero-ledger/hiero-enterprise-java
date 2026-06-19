@@ -1,6 +1,7 @@
 package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.FileId;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
@@ -91,6 +92,55 @@ public interface FileClient {
    */
   void updateExpirationTime(@NonNull FileId fileId, @NonNull Instant expirationTime)
       throws HieroException;
+
+  /**
+   * Appends new file content to the end of an existing file.
+   *
+   * @param fileId the ID of the file to append
+   * @param content the content to append
+   * @throws HieroException if the content could not be appended to the file
+   */
+  default void appendFile(@NonNull String fileId, @NonNull String content) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(content, "content must not be null");
+
+    appendFile(FileId.fromString(fileId), content.getBytes(StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Appends new file content to the end of an existing file.
+   *
+   * @param fileId the ID of the file to append
+   * @param content the content to append
+   * @throws HieroException if the content could not be appended to the file
+   */
+  default void appendFile(@NonNull FileId fileId, @NonNull String content) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(content, "content must not be null");
+
+    appendFile(fileId, content.getBytes(StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Appends new file content to the end of an existing file.
+   *
+   * @param fileId the ID of the file to append
+   * @param content the byte content to append
+   * @throws HieroException if the content could not be appended to the file
+   */
+  default void appendFile(@NonNull String fileId, byte[] content) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    appendFile(FileId.fromString(fileId), content);
+  }
+
+  /**
+   * Appends new file content to the end of an existing file.
+   *
+   * @param fileId the ID of the file to append
+   * @param content the byte content to append
+   * @throws HieroException if the content could not be appended to the file
+   */
+  void appendFile(@NonNull FileId fileId, byte[] content) throws HieroException;
 
   /**
    * Check if a file is deleted.

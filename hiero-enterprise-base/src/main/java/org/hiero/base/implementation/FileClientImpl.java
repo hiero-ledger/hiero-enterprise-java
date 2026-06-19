@@ -163,6 +163,18 @@ public class FileClientImpl implements FileClient {
   }
 
   @Override
+  public void appendFile(@NonNull FileId fileId, byte[] content) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+
+    if (content == null || content.length == 0) {
+      throw new IllegalArgumentException("content cannot be empty.");
+    }
+
+    final FileAppendRequest request = FileAppendRequest.of(fileId, content);
+    protocolLayerClient.executeFileAppendRequestTransaction(request);
+  }
+
+  @Override
   public boolean isDeleted(@NonNull final FileId fileId) throws HieroException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     final FileInfoRequest request = FileInfoRequest.of(fileId);

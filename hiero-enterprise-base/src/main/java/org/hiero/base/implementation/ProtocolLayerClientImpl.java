@@ -251,8 +251,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setMaxTransactionFee(request.maxTransactionFee())
             .setTransactionValidDuration(request.transactionValidDuration())
             .setFileId(request.fileId())
-            .setContents(request.contents())
-            .setTransactionMemo(request.fileMemo());
+            .setContents(request.contents());
 
     final TransactionReceipt receipt =
         executeTransactionAndWaitOnReceipt(transaction, TransactionType.FILE_APPEND);

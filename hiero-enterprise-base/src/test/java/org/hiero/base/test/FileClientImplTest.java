@@ -230,6 +230,39 @@ public class FileClientImplTest {
   }
 
   @Test
+  void testAppendFile() throws HieroException {
+    // mocks
+    final FileAppendResult result = Mockito.mock(FileAppendResult.class);
+
+    // given
+    final FileId fileId = FileId.fromString("1.2.3");
+    final byte[] content = "Hello, Hiero!".getBytes();
+
+    // then
+    when(protocolLayerClient.executeFileAppendRequestTransaction(any(FileAppendRequest.class)))
+        .thenReturn(result);
+
+    fileClientImpl.appendFile(fileId, content);
+
+    verify(protocolLayerClient, times(1))
+        .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
+  }
+
+  @Test
+  void testAppendFileThrowsExceptionForEmptyBytes() {
+    final FileId fileId = FileId.fromString("1.2.3");
+    final byte[] content = new byte[] {};
+
+    // Empty byte array
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> fileClientImpl.appendFile(fileId, content));
+
+    // Null byte array
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> fileClientImpl.appendFile(fileId, (byte[])null));
+  }
+
+  @Test
   void testGetFileSize() throws HieroException {
     // mocks
     final int size = 10;

@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.FileClient;
+import org.hiero.base.HieroException;
 import org.hiero.microprofile.ClientProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,5 +40,16 @@ public class FileClientTests {
 
     // then
     Assertions.assertNotNull(fileId);
+  }
+
+  @Test
+  void testAppendFile() throws HieroException {
+    final byte[] contents = "Hello,".getBytes();
+    final FileId fileId = fileClient.createFile(contents);
+
+    fileClient.appendFile(fileId, " Hiero!");
+    byte[] bytes = fileClient.readFile(fileId);
+
+    Assertions.assertEquals("Hello, Hiero!", new String(bytes));
   }
 }

@@ -900,13 +900,9 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertDoesNotThrow(() -> FileAppendRequest.of(fileIdString, contents));
     Assertions.assertDoesNotThrow(() -> FileAppendRequest.of(fileId, contents));
     Assertions.assertDoesNotThrow(
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, contents, fileMemo));
+        () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, contents));
     Assertions.assertDoesNotThrow(
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, contents, null));
+        () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, contents));
     Assertions.assertThrows(
         NullPointerException.class, () -> FileAppendRequest.of((String) null, contents));
     Assertions.assertThrows(
@@ -916,43 +912,37 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(NullPointerException.class, () -> FileAppendRequest.of(fileId, null));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new FileAppendRequest(null, transactionValidDuration, fileId, contents, fileMemo));
+        () -> new FileAppendRequest(null, transactionValidDuration, fileId, contents));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new FileAppendRequest(maxTransactionFee, null, fileId, contents, fileMemo));
+        () -> new FileAppendRequest(maxTransactionFee, null, fileId, contents));
     Assertions.assertThrows(
         NullPointerException.class,
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, null, contents, fileMemo));
+        () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, null, contents));
     Assertions.assertThrows(
         NullPointerException.class,
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, null, fileMemo));
+        () -> new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, null));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new FileAppendRequest(
-                Hbar.fromTinybars(-100), transactionValidDuration, fileId, contents, fileMemo));
+                Hbar.fromTinybars(-100), transactionValidDuration, fileId, contents));
     Assertions.assertThrows(
         IllegalArgumentException.class,
-        () -> new FileAppendRequest(maxTransactionFee, Duration.ZERO, fileId, contents, fileMemo));
+        () -> new FileAppendRequest(maxTransactionFee, Duration.ZERO, fileId, contents));
     Assertions.assertThrows(
         IllegalArgumentException.class,
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, Duration.ofSeconds(-1), fileId, contents, fileMemo));
-    Assertions.assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, largeContents, fileMemo));
+        () -> new FileAppendRequest(maxTransactionFee, Duration.ofSeconds(-1), fileId, contents));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, largeContents, longFileMemo));
+                maxTransactionFee, transactionValidDuration, fileId, largeContents));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new FileAppendRequest(
+                maxTransactionFee, transactionValidDuration, fileId, largeContents));
   }
 
   @Test

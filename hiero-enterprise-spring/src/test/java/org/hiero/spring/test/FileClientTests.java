@@ -368,6 +368,17 @@ public class FileClientTests {
   }
 
   @Test
+  void testAppendFile() throws HieroException {
+    final byte[] contents = "Hello,".getBytes();
+    final FileId fileId = fileClient.createFile(contents);
+
+    fileClient.appendFile(fileId, " Hiero!");
+    byte[] bytes = fileClient.readFile(fileId);
+
+    Assertions.assertEquals("Hello, Hiero!", new String(bytes));
+  }
+
+  @Test
   void testGetFileSize() throws HieroException {
     final byte[] contents = "Hello, Hiero!".getBytes();
     final FileId fileId = fileClient.createFile(contents);
