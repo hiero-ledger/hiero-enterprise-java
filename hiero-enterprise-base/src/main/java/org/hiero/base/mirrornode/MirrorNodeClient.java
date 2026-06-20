@@ -26,6 +26,9 @@ import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
+import org.hiero.base.mirrornode.query.AccountQuery;
+import org.hiero.base.mirrornode.query.NftQuery;
+import org.hiero.base.mirrornode.query.TransactionQuery;
 import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
 
@@ -167,6 +170,16 @@ public interface MirrorNodeClient {
   }
 
   /**
+   * Queries NFTs based on a specific query.
+   *
+   * @param query the NFT query
+   * @return a page of NFT information
+   * @throws HieroException if an error occurs during the query
+   */
+  @NonNull
+  Page<Nft> queryNfts(@NonNull NftQuery query) throws HieroException;
+
+  /**
    * Queries all transactions for a specific account.
    *
    * @param accountId the account ID to query transactions for
@@ -209,6 +222,16 @@ public interface MirrorNodeClient {
       @NonNull AccountId accountId, @NonNull BalanceModification type) throws HieroException;
 
   /**
+   * Queries transactions based on a specific query.
+   *
+   * @param query the transaction query
+   * @return a page of transaction information
+   * @throws HieroException if an error occurs during the query
+   */
+  @NonNull
+  Page<TransactionInfo> queryTransactions(@NonNull TransactionQuery query) throws HieroException;
+
+  /**
    * Queries the transaction information for a specific transaction ID.
    *
    * @param transactionId the transaction ID
@@ -239,6 +262,16 @@ public interface MirrorNodeClient {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return queryAccount(AccountId.fromString(accountId));
   }
+
+  /**
+   * Queries accounts based on a specific query.
+   *
+   * @param query the account query
+   * @return a page of account information
+   * @throws HieroException if an error occurs during the query
+   */
+  @NonNull
+  Page<AccountInfo> queryAccounts(@NonNull AccountQuery query) throws HieroException;
 
   /**
    * Queries the ExchangeRates for the network.

@@ -188,6 +188,21 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   }
 
   @Override
+  public @NonNull List<AccountInfo> toAccountInfos(@NonNull JsonObject node) {
+    if (!node.containsKey("accounts")) {
+      return List.of();
+    }
+
+    final JsonArray accountsNode = node.getJsonArray("accounts");
+
+    return jsonArrayToStream(accountsNode)
+        .map(n -> toAccountInfo(n.asJsonObject()))
+        .filter(n -> n.isPresent())
+        .map(n -> n.get())
+        .toList();
+  }
+
+  @Override
   public @NonNull List<NetworkFee> toNetworkFees(@NonNull JsonObject jsonObject) {
 
     if (!jsonObject.containsKey("nfts")) {

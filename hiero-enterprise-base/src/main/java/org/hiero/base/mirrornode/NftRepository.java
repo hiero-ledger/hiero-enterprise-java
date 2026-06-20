@@ -8,6 +8,7 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Page;
+import org.hiero.base.mirrornode.query.NftQuery;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -207,4 +208,13 @@ public interface NftRepository {
     Objects.requireNonNull(nft, "nft must not be null");
     return getNftMetadata(nft.tokenId());
   }
+
+  /**
+   * Find all NFTs based on a specific query.
+   *
+   * @param query the NFT query
+   * @return page of NFTs
+   * @throws HieroException if the search fails
+   */
+  @NonNull Page<Nft> findAll(@NonNull NftQuery query) throws HieroException;
 }

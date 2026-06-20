@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.Page;
+import org.hiero.base.mirrornode.query.AccountQuery;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -33,4 +35,14 @@ public interface AccountRepository {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return findById(AccountId.fromString(accountId));
   }
+
+  /**
+   * Find all accounts based on a specific query.
+   *
+   * @param query the account query
+   * @return page of accounts
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  Page<AccountInfo> findAll(@NonNull AccountQuery query) throws HieroException;
 }

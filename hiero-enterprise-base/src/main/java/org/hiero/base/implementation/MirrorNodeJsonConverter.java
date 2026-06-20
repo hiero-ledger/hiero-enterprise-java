@@ -30,6 +30,8 @@ public interface MirrorNodeJsonConverter<JSON> {
 
   @NonNull Optional<AccountInfo> toAccountInfo(@NonNull JSON jsonNode);
 
+  @NonNull List<AccountInfo> toAccountInfos(@NonNull JSON json);
+
   @NonNull List<NetworkFee> toNetworkFees(@NonNull JSON json);
 
   @NonNull Optional<TransactionInfo> toTransactionInfo(@NonNull JSON json);

@@ -10,6 +10,7 @@ import org.hiero.base.data.Result;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.TransactionRepository;
+import org.hiero.base.mirrornode.query.TransactionQuery;
 import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
 
@@ -51,6 +52,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(type, "type must not be null");
     return mirrorNodeClient.queryTransactionsByAccountAndModification(accountId, type);
+  }
+
+  @Override
+  public @NonNull Page<TransactionInfo> findAll(@NonNull TransactionQuery query)
+      throws HieroException {
+    Objects.requireNonNull(query, "query must not be null");
+    return mirrorNodeClient.queryTransactions(query);
   }
 
   @NonNull
