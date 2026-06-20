@@ -73,7 +73,12 @@ public class FileClientImpl implements FileClient {
             appendCount);
       }
       final byte[] start = Arrays.copyOf(contents, FileCreateRequest.FILE_CREATE_MAX_SIZE);
-      final FileCreateRequest request = FileCreateRequest.of(start);
+      final FileCreateRequest request;
+      if (expirationTime != null) {
+        request = FileCreateRequest.of(start, expirationTime);
+      } else {
+        request = FileCreateRequest.of(start);
+      }
       final FileCreateResult result = protocolLayerClient.executeFileCreateTransaction(request);
       final FileId fileId = result.fileId();
       byte[] remaining =

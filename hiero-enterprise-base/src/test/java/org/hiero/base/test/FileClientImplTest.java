@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -87,6 +88,37 @@ public class FileClientImplTest {
     verify(protocolLayerClient, times(1))
         .executeFileCreateTransaction(any(FileCreateRequest.class));
     verify(fileCreateResult, times(1)).fileId();
+    verify(protocolLayerClient, times(appendCount))
+        .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
+    Assertions.assertEquals(fileId, result);
+  }
+
+  @Test
+  void testCreateFileWithExpirationForSizeGreaterThanFileCreateMaxSize() throws HieroException {
+    // mock
+    final FileId fileId = FileId.fromString("1.2.3");
+    final FileCreateResult fileCreateResult = Mockito.mock(FileCreateResult.class);
+    final FileAppendResult fileAppendResult = Mockito.mock(FileAppendResult.class);
+
+    // given
+    final byte[] content = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
+    final Instant expirationTime = Instant.now().plusSeconds(120);
+    // -1 because 1 for executeFileCreateTransaction()
+    final int appendCount =
+        Math.floorDiv(content.length, FileCreateRequest.FILE_CREATE_MAX_SIZE) - 1;
+
+    // then
+    when(protocolLayerClient.executeFileCreateTransaction(any(FileCreateRequest.class)))
+        .thenReturn(fileCreateResult);
+    when(fileCreateResult.fileId()).thenReturn(fileId);
+    when(protocolLayerClient.executeFileAppendRequestTransaction(any(FileAppendRequest.class)))
+        .thenReturn(fileAppendResult);
+
+    final FileId result = fileClientImpl.createFile(content, expirationTime);
+
+    verify(protocolLayerClient, times(1))
+        .executeFileCreateTransaction(
+            argThat(request -> expirationTime.equals(request.expirationTime())));
     verify(protocolLayerClient, times(appendCount))
         .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
     Assertions.assertEquals(fileId, result);
