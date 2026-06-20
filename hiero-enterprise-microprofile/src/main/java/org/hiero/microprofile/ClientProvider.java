@@ -1,6 +1,7 @@
 package org.hiero.microprofile;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
@@ -29,6 +30,8 @@ import org.hiero.base.implementation.TokenRepositoryImpl;
 import org.hiero.base.implementation.TopicClientImpl;
 import org.hiero.base.implementation.TopicRepositoryImpl;
 import org.hiero.base.implementation.TransactionRepositoryImpl;
+import org.hiero.base.interceptors.ReceiveRecordInterceptor;
+import org.hiero.base.interceptors.TransactionInterceptor;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.BlockRepository;
 import org.hiero.base.mirrornode.ContractRepository;
@@ -53,6 +56,17 @@ public class ClientProvider {
 
   @Inject @ConfigProperties private HieroNetworkConfiguration networkConfiguration;
 
+  @Inject private Instance<ReceiveRecordInterceptor> interceptors;
+
+  @Inject private Instance<TransactionInterceptor> transactionInterceptors;
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  TransactionInterceptor createRetryInterceptor() {
+    return new org.hiero.base.interceptors.ExponentialBackoffRetryInterceptor();
+  }
+
   @NonNull
   @Produces
   @ApplicationScoped
@@ -71,7 +85,10 @@ public class ClientProvider {
   @Produces
   @ApplicationScoped
   ProtocolLayerClient createProtocolLayerClient(@NonNull final HieroContext hieroContext) {
-    return new ProtocolLayerClientImpl(hieroContext);
+    final ProtocolLayerClientImpl client = new ProtocolLayerClientImpl(hieroContext);
+    interceptors.stream().findFirst().ifPresent(client::setRecordInterceptor);
+    transactionInterceptors.forEach(client::addTransactionInterceptor);
+    return client;
   }
 
   @NonNull

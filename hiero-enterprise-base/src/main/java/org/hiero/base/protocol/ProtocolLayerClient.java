@@ -2,6 +2,7 @@ package org.hiero.base.protocol;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import org.hiero.base.HieroException;
+import org.hiero.base.interceptors.TransactionInterceptor;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
@@ -366,6 +367,14 @@ public interface ProtocolLayerClient {
    * @return a Runnable object that can be used to remove the listener
    */
   @NonNull Runnable addTransactionListener(@NonNull TransactionListener listener);
+
+  /**
+   * Adds a transaction interceptor to the protocol layer client. The interceptor will be called
+   * when a transaction is executed.
+   *
+   * @param interceptor the transaction interceptor to be added
+   */
+  void addTransactionInterceptor(@NonNull TransactionInterceptor interceptor);
 
   /**
    * Returns the account ID of the operator account.
