@@ -102,6 +102,15 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   }
 
   @Override
+  @NonNull
+  public final Optional<TopicMessage> queryTopicMessageByConsensusTimestamp(
+      @NonNull String consensusTimestamp) throws HieroException {
+    Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
+    final JSON json = getRestClient().queryTopicMessageByConsensusTimestamp(consensusTimestamp);
+    return getJsonConverter().toTopicMessage(json);
+  }
+
+  @Override
   public @NonNull Optional<NftMetadata> getNftMetadata(TokenId tokenId) throws HieroException {
     throw new UnsupportedOperationException("Not yet implemented");
   }

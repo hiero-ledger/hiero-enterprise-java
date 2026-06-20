@@ -641,8 +641,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         chunkInfo = new ChunkInfo(transactionId, nonce, number, total, scheduled);
       }
 
-      final Instant consensusTimestamp =
-          Instant.ofEpochSecond(node.get("consensus_timestamp").asLong());
+      final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
       final String message = new String(Base64.getDecoder().decode(node.get("message").asText()));
       final AccountId payerAccountId = AccountId.fromString(node.get("payer_account_id").asText());
       final byte[] runningHash = node.get("running_hash").asText().getBytes();

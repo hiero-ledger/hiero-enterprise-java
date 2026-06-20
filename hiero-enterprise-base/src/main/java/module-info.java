@@ -14,6 +14,7 @@ module org.hiero.base {
       org.hiero.base.test;
   exports org.hiero.base.config.implementation;
   exports org.hiero.base.protocol.data;
+  exports org.hiero.base.util;
   exports org.hiero.base.interceptors to
       org.hiero.base.test;
 
