@@ -1,0 +1,462 @@
+[
+  {
+    "name": "org.hiero.base.data.Account",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.AccountInfo",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Balance",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Block",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.ChunkInfo",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Contract",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.ContractCallResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.CustomFee",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.ExchangeRate",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.ExchangeRates",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.FixedFee",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.FractionalFee",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.HookDetails",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.NetworkFee",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.NetworkStake",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.NetworkSupplies",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Nft",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.NftMetadata",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.NftTransfer",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Page",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.RoyaltyFee",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.SinglePage",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.StakingRewardTransfer",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.TimestampRange",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Token",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.TokenInfo",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.TokenMetadata",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.TokenTransfer",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Topic",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.TopicMessage",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.TransactionInfo",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.data.Transfer",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountBalanceRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountBalanceResponse",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountCreateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountCreateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountDeleteRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountDeleteResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountHookUpdateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountHookUpdateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountUpdateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.AccountUpdateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.ContractCallRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.ContractCallResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.ContractCreateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.ContractCreateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.ContractDeleteRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.ContractDeleteResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileAppendRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileAppendResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileContentsRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileContentsResponse",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileCreateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileCreateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileDeleteRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileDeleteResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileInfoRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileInfoResponse",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileUpdateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.FileUpdateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.HookStoreRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.HookStoreResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenAssociateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenAssociateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenBurnRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenBurnResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenCreateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenCreateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenDissociateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenDissociateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenMintRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenMintResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenTransferRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TokenTransferResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicCreateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicCreateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicDeleteRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicDeleteResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicSubmitMessageRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicSubmitMessageResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicUpdateRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TopicUpdateResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TransactionRecord",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TransactionRequest",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TransactionResult",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.base.protocol.data.TransactionType",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "com.hedera.hashgraph.sdk.AccountId",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "com.hedera.hashgraph.sdk.TokenId",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "com.hedera.hashgraph.sdk.TopicId",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "com.hedera.hashgraph.sdk.ContractId",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "com.hedera.hashgraph.sdk.Key",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "com.hedera.hashgraph.sdk.PublicKey",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "org.hiero.spring.implementation.HieroProperties",
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.spring.implementation.HieroNetworkProperties",
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.hiero.spring.implementation.HieroNode",
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicConstructors": true
+  }
+]
