@@ -165,9 +165,17 @@ public class FileClientImpl implements FileClient {
   @Override
   public void appendFile(@NonNull FileId fileId, byte[] content) throws HieroException {
     Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(content, "content must not be null");
 
-    if (content == null || content.length == 0) {
-      throw new IllegalArgumentException("content cannot be empty.");
+    if (content.length > FileCreateRequest.FILE_MAX_SIZE) {
+      throw new HieroException(
+          "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
+    }
+
+    int initialSize = getSize(fileId);
+    if (initialSize + content.length > FileCreateRequest.FILE_MAX_SIZE) {
+      throw new HieroException(
+          "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
     }
 
     final FileAppendRequest request = FileAppendRequest.of(fileId, content);

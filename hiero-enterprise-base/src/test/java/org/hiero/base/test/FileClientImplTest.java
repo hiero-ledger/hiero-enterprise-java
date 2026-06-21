@@ -6,8 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.hedera.hashgraph.sdk.FileId;
@@ -233,6 +235,7 @@ public class FileClientImplTest {
   void testAppendFile() throws HieroException {
     // mocks
     final FileAppendResult result = Mockito.mock(FileAppendResult.class);
+    final FileInfoResponse fileInfoResponse = Mockito.mock(FileInfoResponse.class);
 
     // given
     final FileId fileId = FileId.fromString("1.2.3");
@@ -241,25 +244,58 @@ public class FileClientImplTest {
     // then
     when(protocolLayerClient.executeFileAppendRequestTransaction(any(FileAppendRequest.class)))
         .thenReturn(result);
+    when(protocolLayerClient.executeFileInfoQuery(any(FileInfoRequest.class)))
+        .thenReturn(fileInfoResponse);
+    when(fileInfoResponse.size()).thenReturn(0);
 
     fileClientImpl.appendFile(fileId, content);
 
     verify(protocolLayerClient, times(1))
         .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
+    verify(protocolLayerClient, times(1)).executeFileInfoQuery(any(FileInfoRequest.class));
   }
 
   @Test
-  void testAppendFileThrowsExceptionForEmptyBytes() {
+  void testAppendFileThrowsExceptionWhenContentExceedsMaxSize() throws HieroException {
+    // given
     final FileId fileId = FileId.fromString("1.2.3");
-    final byte[] content = new byte[] {};
+    final byte[] content = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
 
-    // Empty byte array
-    Assertions.assertThrows(
-        IllegalArgumentException.class, () -> fileClientImpl.appendFile(fileId, content));
+    final HieroException err =
+        Assertions.assertThrows(
+            HieroException.class, () -> fileClientImpl.appendFile(fileId, content));
 
-    // Null byte array
-    Assertions.assertThrows(
-        IllegalArgumentException.class, () -> fileClientImpl.appendFile(fileId, (byte[])null));
+    Assertions.assertEquals(
+        "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes",
+        err.getMessage());
+
+    verifyNoInteractions(protocolLayerClient);
+  }
+
+  @Test
+  void testAppendFileThrowsExceptionWhenCombinedSizeExceedsMaxSize() throws HieroException {
+    // mocks
+    final FileInfoResponse fileInfoResponse = Mockito.mock(FileInfoResponse.class);
+
+    // given
+    final FileId fileId = FileId.fromString("1.2.3");
+    final byte[] content = new byte[10];
+
+    when(protocolLayerClient.executeFileInfoQuery(any(FileInfoRequest.class)))
+        .thenReturn(fileInfoResponse);
+    when(fileInfoResponse.size()).thenReturn(FileCreateRequest.FILE_MAX_SIZE);
+
+    final HieroException err =
+        Assertions.assertThrows(
+            HieroException.class, () -> fileClientImpl.appendFile(fileId, content));
+
+    Assertions.assertEquals(
+        "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes",
+        err.getMessage());
+
+    verify(protocolLayerClient, times(1)).executeFileInfoQuery(any(FileInfoRequest.class));
+    verify(protocolLayerClient, never())
+        .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
   }
 
   @Test
