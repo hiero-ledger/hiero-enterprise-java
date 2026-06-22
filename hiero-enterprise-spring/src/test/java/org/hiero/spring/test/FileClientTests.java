@@ -379,6 +379,14 @@ public class FileClientTests {
   }
 
   @Test
+  void testAppendFileThrowsExceptionWhenContentExceedMaxSize() throws HieroException {
+    final byte[] content = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
+    final FileId fileId = fileClient.createFile(new byte[0]);
+
+    Assertions.assertThrows(HieroException.class, () -> fileClient.appendFile(fileId, content));
+  }
+
+  @Test
   void testGetFileSize() throws HieroException {
     final byte[] contents = "Hello, Hiero!".getBytes();
     final FileId fileId = fileClient.createFile(contents);

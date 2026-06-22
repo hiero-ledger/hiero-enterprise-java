@@ -9,6 +9,7 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.FileClient;
 import org.hiero.base.HieroException;
+import org.hiero.base.protocol.data.FileCreateRequest;
 import org.hiero.microprofile.ClientProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,5 +52,13 @@ public class FileClientTests {
     byte[] bytes = fileClient.readFile(fileId);
 
     Assertions.assertEquals("Hello, Hiero!", new String(bytes));
+  }
+
+  @Test
+  void testAppendFileThrowsExceptionWhenContentExceedMaxSize() throws HieroException {
+    final byte[] content = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
+    final FileId fileId = fileClient.createFile(new byte[0]);
+
+    Assertions.assertThrows(HieroException.class, () -> fileClient.appendFile(fileId, content));
   }
 }
