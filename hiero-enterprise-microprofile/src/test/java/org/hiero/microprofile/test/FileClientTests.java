@@ -48,9 +48,12 @@ public class FileClientTests {
     final byte[] contents = "Hello,".getBytes();
     final FileId fileId = fileClient.createFile(contents);
 
+    Assertions.assertNotNull(fileId);
+
     fileClient.appendFile(fileId, " Hiero!");
     byte[] bytes = fileClient.readFile(fileId);
 
+    Assertions.assertNotNull(bytes);
     Assertions.assertEquals("Hello, Hiero!", new String(bytes));
   }
 
@@ -59,6 +62,21 @@ public class FileClientTests {
     final byte[] content = new byte[FileCreateRequest.FILE_MAX_SIZE + 1];
     final FileId fileId = fileClient.createFile(new byte[0]);
 
+    Assertions.assertNotNull(fileId);
     Assertions.assertThrows(HieroException.class, () -> fileClient.appendFile(fileId, content));
+  }
+
+  @Test
+  void testChunkedAppendFile() throws HieroException {
+    final String content = "A".repeat(FileCreateRequest.FILE_CREATE_MAX_SIZE * 2);
+    final FileId fileId = fileClient.createFile(new byte[0]);
+
+    Assertions.assertNotNull(fileId);
+
+    fileClient.appendFile(fileId, content);
+    byte[] bytes = fileClient.readFile(fileId);
+
+    Assertions.assertNotNull(bytes);
+    Assertions.assertEquals(content, new String(bytes));
   }
 }
