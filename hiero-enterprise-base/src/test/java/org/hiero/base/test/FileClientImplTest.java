@@ -299,6 +299,27 @@ public class FileClientImplTest {
   }
 
   @Test
+  void testAppendFileWithLargeContent() throws HieroException {
+    // mocks
+    final FileInfoResponse fileInfoResponse = Mockito.mock(FileInfoResponse.class);
+
+    // given
+    final FileId fileId = FileId.fromString("1.2.3");
+    final byte[] content = new byte[FileCreateRequest.FILE_CREATE_MAX_SIZE * 2];
+
+    when(protocolLayerClient.executeFileInfoQuery(any(FileInfoRequest.class)))
+        .thenReturn(fileInfoResponse);
+    when(fileInfoResponse.size()).thenReturn(1);
+
+    fileClientImpl.appendFile(fileId, content);
+
+    // call for each 2048 chunk
+    verify(protocolLayerClient, times(2))
+        .executeFileAppendRequestTransaction(any(FileAppendRequest.class));
+    verify(protocolLayerClient, times(1)).executeFileInfoQuery(any(FileInfoRequest.class));
+  }
+
+  @Test
   void testGetFileSize() throws HieroException {
     // mocks
     final int size = 10;

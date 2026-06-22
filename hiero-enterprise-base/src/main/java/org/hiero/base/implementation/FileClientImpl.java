@@ -78,13 +78,7 @@ public class FileClientImpl implements FileClient {
       final FileId fileId = result.fileId();
       byte[] remaining =
           Arrays.copyOfRange(contents, FileCreateRequest.FILE_CREATE_MAX_SIZE, contents.length);
-      while (remaining.length > 0) {
-        final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
-        final byte[] next = Arrays.copyOf(remaining, length);
-        final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
-        protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
-        remaining = Arrays.copyOfRange(remaining, length, remaining.length);
-      }
+      appendRemainingChunks(fileId, remaining);
       return fileId;
     }
   }
@@ -139,13 +133,7 @@ public class FileClientImpl implements FileClient {
       protocolLayerClient.executeFileUpdateRequestTransaction(request);
       byte[] remaining =
           Arrays.copyOfRange(content, FileCreateRequest.FILE_CREATE_MAX_SIZE, content.length);
-      while (remaining.length > 0) {
-        final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
-        byte[] next = Arrays.copyOf(remaining, length);
-        final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
-        protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
-        remaining = Arrays.copyOfRange(remaining, length, remaining.length);
-      }
+      appendRemainingChunks(fileId, remaining);
     }
   }
 
@@ -178,8 +166,25 @@ public class FileClientImpl implements FileClient {
           "File contents must be less than " + FileCreateRequest.FILE_MAX_SIZE + " bytes");
     }
 
-    final FileAppendRequest request = FileAppendRequest.of(fileId, content);
-    protocolLayerClient.executeFileAppendRequestTransaction(request);
+    if (content.length <= FileCreateRequest.FILE_CREATE_MAX_SIZE) {
+      final FileAppendRequest request = FileAppendRequest.of(fileId, content);
+      protocolLayerClient.executeFileAppendRequestTransaction(request);
+    } else {
+      if (log.isDebugEnabled()) {
+        int appendCount = Math.floorDiv(content.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
+        log.debug(
+            "Content of size {} is to big for 1 FileAppend transaction. Will append {} FileAppend transactions",
+            content.length,
+            appendCount);
+      }
+
+      byte[] start = Arrays.copyOf(content, FileCreateRequest.FILE_CREATE_MAX_SIZE);
+      final FileAppendRequest request = FileAppendRequest.of(fileId, start);
+      protocolLayerClient.executeFileAppendRequestTransaction(request);
+      byte[] remaining =
+          Arrays.copyOfRange(content, FileCreateRequest.FILE_CREATE_MAX_SIZE, content.length);
+      appendRemainingChunks(fileId, remaining);
+    }
   }
 
   @Override
@@ -204,5 +209,16 @@ public class FileClientImpl implements FileClient {
     final FileInfoRequest request = FileInfoRequest.of(fileId);
     final FileInfoResponse infoResponse = protocolLayerClient.executeFileInfoQuery(request);
     return infoResponse.expirationTime();
+  }
+
+  private void appendRemainingChunks(@NonNull FileId fileId, byte[] remaining)
+      throws HieroException {
+    while (remaining.length > 0) {
+      final int length = Math.min(remaining.length, FileCreateRequest.FILE_CREATE_MAX_SIZE);
+      final byte[] next = Arrays.copyOf(remaining, length);
+      final FileAppendRequest appendRequest = FileAppendRequest.of(fileId, next);
+      protocolLayerClient.executeFileAppendRequestTransaction(appendRequest);
+      remaining = Arrays.copyOfRange(remaining, length, remaining.length);
+    }
   }
 }
