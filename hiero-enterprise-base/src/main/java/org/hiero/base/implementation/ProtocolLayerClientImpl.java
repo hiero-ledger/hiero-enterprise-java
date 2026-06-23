@@ -434,6 +434,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         transaction.setSubmitKey(request.submitKey());
       }
       sign(transaction, request.adminKey());
+      // A private topic requires the transaction to be signed by both the admin key
+      // and the submit key, as the submit key is being registered on-chain.
+      if (request.submitKey() != null) {
+        sign(transaction, request.submitKey());
+      }
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_CREATE);
       return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
