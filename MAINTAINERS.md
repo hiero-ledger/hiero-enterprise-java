@@ -14,10 +14,11 @@ Maintainers are assigned the following scopes in this repository:
 
 ## Active Maintainers
 
-|         Name          |     GitHub ID      | Scope | LFID | Discord ID | Email | Company Affiliation |
-|-----------------------|--------------------|-------|------|------------|-------|---------------------|
-| Hendrik Ebbers        | hendrikebbers      |       |      |            |       | Hashgraph           |
-
+|         Name          |     GitHub ID       | Scope | LFID | Discord ID | Email | Company Affiliation |
+|-----------------------|---------------------|-------|------|------------|-------|---------------------|
+| Hendrik Ebbers        | hendrikebbers       |       |      |            |       | Hashgraph           |
+| Manish Dait           | manishdait          |       |      |            |       |                     |
+| Noah Tayebwa          | Ndacyayisenga-droid |       |      |            |       |                     |
 
 ## Emeritus Maintainers
 
