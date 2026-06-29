@@ -1,6 +1,6 @@
 {
   "maintainerTeam": "@hiero-ledger/hiero-enterprise-java-maintainers",
-  "goodFirstIssueSupportTeam": "@hiero-ledger/hiero-enterprise-java-good-first-issue-support",
+  "goodFirstIssueSupportTeam": "@hiero-ledger/hiero-sdk-good-first-issue-support",
 
   "labels": {
     "status": {
