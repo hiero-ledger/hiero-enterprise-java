@@ -264,8 +264,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final Instant consensusTimestamp =
           Instant.ofEpochSecond(node.get("consensus_timestamp").asLong());
       final String entityId = node.hasNonNull("entity_id") ? node.get("entity_id").asText() : null;
-      final boolean highVolume = node.get("high_volume").asBoolean();
-      final long highVolumePricingMultiplier = node.get("high_volume_pricing_multiplier").asLong();
+      final boolean highVolume =
+          node.hasNonNull("high_volume") ? node.get("high_volume").asBoolean() : false;
+      final long highVolumePricingMultiplier =
+          node.hasNonNull("high_volume_pricing_multiplier")
+              ? node.get("high_volume_pricing_multiplier").asLong()
+              : 0;
       final String maxFee = node.get("max_fee").asText();
       final byte[] memo = node.get("memo_base64").asText().getBytes();
       final TransactionType name = TransactionType.from(node.get("name").asText());

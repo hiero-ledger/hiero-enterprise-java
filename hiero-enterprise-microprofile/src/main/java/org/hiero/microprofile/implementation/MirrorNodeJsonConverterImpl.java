@@ -278,7 +278,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       final String transactionId = jsonObject.getString("transaction_id");
       final Key batchKey =
-          jsonObject.containsKey("batch_key") && jsonObject.isNull("batch_key")
+          jsonObject.containsKey("batch_key") && !jsonObject.isNull("batch_key")
               ? parseKey(jsonObject.get("batch_key").asJsonObject())
               : null;
       final byte[] bytes = getNullableString(jsonObject, "bytes").orElse("").getBytes();
@@ -287,9 +287,15 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           Instant.ofEpochSecond(
               (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
       final String entityId = getNullableString(jsonObject, "entity_id").orElse(null);
-      final boolean highVolume = jsonObject.getBoolean("high_volume");
+      final boolean highVolume =
+          jsonObject.containsKey("high_volume") && !jsonObject.isNull("high_volume")
+              ? jsonObject.getBoolean("high_volume")
+              : false;
       final long highVolumePricingMultiplier =
-          jsonObject.getJsonNumber("high_volume_pricing_multiplier").longValue();
+          jsonObject.containsKey("high_volume_pricing_multiplier")
+                  && !jsonObject.isNull("high_volume_pricing_multiplier")
+              ? jsonObject.getJsonNumber("high_volume_pricing_multiplier").longValue()
+              : 0;
       final String maxFee = jsonObject.getString("max_fee");
       final byte[] memo = jsonObject.getString("memo_base64").getBytes();
       final TransactionType name = TransactionType.from(jsonObject.getString("name"));
