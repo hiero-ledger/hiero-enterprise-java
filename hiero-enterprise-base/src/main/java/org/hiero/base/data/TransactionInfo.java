@@ -1,5 +1,6 @@
 package org.hiero.base.data;
 
+import com.hedera.hashgraph.sdk.Key;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -9,10 +10,13 @@ import org.jspecify.annotations.Nullable;
 
 public record TransactionInfo(
     @NonNull String transactionId,
+    Key batchKey,
     byte[] bytes,
     long chargedTxFee,
     @NonNull Instant consensusTimestamp,
     @Nullable String entityId,
+    boolean highVolume,
+    long highVolumePricingMultiplier,
     @NonNull String maxFee,
     byte[] memo,
     @NonNull TransactionType name,

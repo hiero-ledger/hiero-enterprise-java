@@ -176,12 +176,63 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
     try {
       final AccountId accountId = AccountId.fromString(node.getString("account"));
-      final String evmAddress = node.getString("evm_address");
+      final String alias =
+          node.containsKey("alias") && !node.isNull("alias") ? node.getString("alias") : null;
+      final Long autoRenewPeriod =
+          node.containsKey("auto_renew_period") && !node.isNull("auto_renew_period")
+              ? node.getJsonNumber("auto_renew_period").longValue()
+              : null;
+      final Instant createdTimestamp = parseInstant(node.getString("created_timestamp"));
+      final boolean declineReward = node.getBoolean("decline_reward");
+      final boolean deleted = node.getBoolean("deleted");
       final long ethereumNonce = node.getJsonNumber("ethereum_nonce").longValue();
+      final String evmAddress = node.getString("evm_address");
+      final Instant expiryTimestamp = parseInstant(node.getString("expiry_timestamp"));
+      final Key key = parseKey(node.get("key").asJsonObject());
+      final int maxAutomaticTokenAssociations = node.getInt("max_automatic_token_associations");
+      final String memo = node.getString("memo");
       final long pendingReward = node.getJsonNumber("pending_reward").longValue();
+      final boolean requiredReceiverSignature = node.getBoolean("receiver_sig_required");
+      final AccountId stakedAccountId =
+          node.containsKey("staked_account_id") && !node.isNull("staked_account_id")
+              ? AccountId.fromString(node.getString("staked_account_id"))
+              : null;
+      final Long stakedNodeId =
+          node.containsKey("staked_node_id") && !node.isNull("staked_node_id")
+              ? node.getJsonNumber("staked_node_id").longValue()
+              : null;
+      final Instant stakePeriodStart =
+          node.containsKey("stake_period_start") && !node.isNull("staked_period_start")
+              ? parseInstant(node.getString("stake_period_start"))
+              : null;
+
+      List<TransactionInfo> transactions = List.of();
+      if (node.containsKey("transactions") && !node.isNull("transactions")) {
+        transactions = toTransactionInfos(node);
+      }
+
       final long balance = node.getJsonObject("balance").getJsonNumber("balance").longValue();
       return Optional.of(
-          new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward));
+          new AccountInfo(
+              accountId,
+              alias,
+              autoRenewPeriod,
+              balance,
+              createdTimestamp,
+              declineReward,
+              deleted,
+              ethereumNonce,
+              evmAddress,
+              expiryTimestamp,
+              key,
+              maxAutomaticTokenAssociations,
+              memo,
+              pendingReward,
+              requiredReceiverSignature,
+              stakedAccountId,
+              stakedNodeId,
+              stakePeriodStart,
+              transactions));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + node, e);
     }
@@ -226,12 +277,19 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final String transactionId = jsonObject.getString("transaction_id");
+      final Key batchKey =
+          jsonObject.containsKey("batch_key") && jsonObject.isNull("batch_key")
+              ? parseKey(jsonObject.get("batch_key").asJsonObject())
+              : null;
       final byte[] bytes = getNullableString(jsonObject, "bytes").orElse("").getBytes();
       final long chargedTxFee = jsonObject.getJsonNumber("charged_tx_fee").longValue();
       final Instant consensusTimestamp =
           Instant.ofEpochSecond(
               (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
       final String entityId = getNullableString(jsonObject, "entity_id").orElse(null);
+      final boolean highVolume = jsonObject.getBoolean("high_volume");
+      final long highVolumePricingMultiplier =
+          jsonObject.getJsonNumber("high_volume_pricing_multiplier").longValue();
       final String maxFee = jsonObject.getString("max_fee");
       final byte[] memo = jsonObject.getString("memo_base64").getBytes();
       final TransactionType name = TransactionType.from(jsonObject.getString("name"));
@@ -271,10 +329,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       return Optional.of(
           new TransactionInfo(
               transactionId,
+              batchKey,
               bytes,
               chargedTxFee,
               consensusTimestamp,
               entityId,
+              highVolume,
+              highVolumePricingMultiplier,
               maxFee,
               memo,
               name,
