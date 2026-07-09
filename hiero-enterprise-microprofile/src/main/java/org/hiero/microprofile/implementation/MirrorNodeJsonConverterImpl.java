@@ -63,7 +63,11 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
     try {
       final TokenId parsedTokenId = TokenId.fromString(jsonObject.getString("token_id"));
-      final AccountId account = AccountId.fromString(jsonObject.getString("account_id"));
+      // account_id is null for burned NFTs — the mirror node intentionally omits the owner.
+      final AccountId account =
+          jsonObject.isNull("account_id")
+              ? null
+              : AccountId.fromString(jsonObject.getString("account_id"));
       final long serial = jsonObject.getJsonNumber("serial_number").longValue();
       final byte[] metadata = jsonObject.getString("metadata").getBytes();
       return Optional.of(new Nft(parsedTokenId, serial, account, metadata));
