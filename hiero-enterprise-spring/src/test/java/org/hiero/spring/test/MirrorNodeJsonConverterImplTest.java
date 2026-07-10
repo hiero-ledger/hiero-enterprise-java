@@ -37,7 +37,7 @@ public class MirrorNodeJsonConverterImplTest {
     objectMapper = new ObjectMapper();
   }
 
-  // ─── toNft — single NFT ───────────────────────────────────────────────────
+  // toNft tests
 
   @Test
   void toNft_withValidAccountId_returnsNftWithOwner() throws Exception {
@@ -96,7 +96,7 @@ public class MirrorNodeJsonConverterImplTest {
     Assertions.assertThrows(NullPointerException.class, () -> converter.toNft(null));
   }
 
-  // ─── toNfts — NFT list ────────────────────────────────────────────────────
+  // toNfts tests
 
   @Test
   void toNfts_withMixedBurnedAndLiveNfts_returnsBothCorrectly() throws Exception {
