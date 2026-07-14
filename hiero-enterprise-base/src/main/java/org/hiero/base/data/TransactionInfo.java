@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 
 public record TransactionInfo(
     @NonNull String transactionId,
-    Key batchKey,
+    @Nullable Key batchKey,
     byte[] bytes,
     long chargedTxFee,
     @NonNull Instant consensusTimestamp,

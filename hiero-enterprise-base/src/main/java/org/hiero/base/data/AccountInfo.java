@@ -6,30 +6,31 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public record AccountInfo(
     @NonNull AccountId accountId,
-    String alias,
-    Long autoRenewPeriod,
+    @Nullable String alias,
+    @Nullable Long autoRenewPeriod,
     long balance,
     Instant createdTimestamp,
     boolean declineReward,
     boolean deleted,
     long ethereumNonce,
-    @NonNull String evmAddress,
+    String evmAddress,
     Instant expiryTimestamp,
     Key key,
     int maxAutomaticTokenAssociations,
-    String memo,
+    @NonNull String memo,
     long pendingReward,
     boolean requireReceiverSignature,
-    AccountId stakedAccountId,
-    Long stakedNodeId,
-    Instant stakePeriodStart,
+    @Nullable AccountId stakedAccountId,
+    @Nullable Long stakedNodeId,
+    @Nullable Instant stakePeriodStart,
     @NonNull List<TransactionInfo> transactions) {
   public AccountInfo {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    Objects.requireNonNull(evmAddress, "evmAddress must not be null");
+    Objects.requireNonNull(memo, "memo must not be null");
     Objects.requireNonNull(transactions, "transactions must not be null");
   }
 }
