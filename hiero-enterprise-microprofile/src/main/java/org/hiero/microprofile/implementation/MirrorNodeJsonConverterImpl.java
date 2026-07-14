@@ -878,16 +878,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               : jsonObject.getJsonNumber("auto_renew_period").intValue();
       final Instant createdTimestamp =
           jsonObject.get("created_timestamp") == null
-              ? Instant.ofEpochSecond(0)
-              : Instant.ofEpochSecond(
-                  Long.parseLong(
-                      jsonObject.get("created_timestamp").toString().replaceAll("[^0-9].*$", "")));
+              ? null
+              : parseInstant(jsonObject.getString("created_timestamp"));
       final boolean deleted = jsonObject.get("deleted") != null && jsonObject.getBoolean("deleted");
       final Instant expirationTimestamp =
           jsonObject.get("expiration_timestamp") == null
               ? null
-              : Instant.ofEpochSecond(
-                  Long.parseLong(jsonObject.getString("expiration_timestamp").split("\\.")[0]));
+              : parseInstant(jsonObject.getString("expiration_timestamp"));
       final String fileId = jsonObject.getString("file_id", null);
       final String evmAddress = jsonObject.getString("evm_address", null);
       final String memo = jsonObject.getString("memo", null);
@@ -902,11 +899,11 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           jsonObject.get("permanent_removal") != null && jsonObject.getBoolean("permanent_removal");
       final String proxyAccountId = jsonObject.getString("proxy_account_id", null);
       final Instant fromTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").getJsonNumber("from").longValue());
+          parseInstant(jsonObject.getJsonObject("timestamp").getString("from"));
       final Instant toTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").getJsonNumber("to").longValue());
+          jsonObject.getJsonObject("timestamp").isNull("to")
+              ? null
+              : parseInstant(jsonObject.getJsonObject("timestamp").getString("to"));
       final String bytecode = jsonObject.getString("bytecode", null);
       final String runtimeBytecode = jsonObject.getString("runtime_bytecode", null);
 
@@ -991,19 +988,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           jsonObject.isNull("logs_bloom") ? null : jsonObject.getString("logs_bloom");
 
       final Instant fromTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").get("from").getValueType()
-                      == JsonValue.ValueType.NUMBER
-                  ? jsonObject.getJsonObject("timestamp").getJsonNumber("from").longValue()
-                  : Long.parseLong(
-                      jsonObject.getJsonObject("timestamp").getString("from").split("\\.")[0]));
+          parseInstant(jsonObject.getJsonObject("timestamp").getString("from"));
       final Instant toTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").get("to").getValueType()
-                      == JsonValue.ValueType.NUMBER
-                  ? jsonObject.getJsonObject("timestamp").getJsonNumber("to").longValue()
-                  : Long.parseLong(
-                      jsonObject.getJsonObject("timestamp").getString("to").split("\\.")[0]));
+          parseInstant(jsonObject.getJsonObject("timestamp").getString("to"));
 
       return Optional.of(
           new Block(

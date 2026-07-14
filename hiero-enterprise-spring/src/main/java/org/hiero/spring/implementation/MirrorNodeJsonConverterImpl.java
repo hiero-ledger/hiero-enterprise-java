@@ -798,13 +798,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final ContractId contractId = ContractId.fromString(node.get("contract_id").asText());
-      final Key adminKey;
-
-      if (!node.has("admin_key") || node.get("admin_key").isNull()) {
-        adminKey = null;
-      } else {
-        adminKey = parseKey(node.get("admin_key"));
-      }
+      final Key adminKey = node.hasNonNull("admin_key") ? parseKey(node.get("admin_key")) : null;
 
       final AccountId autoRenewAccount =
           node.get("auto_renew_account").isNull()
@@ -812,17 +806,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               : AccountId.fromString(node.get("auto_renew_account").asText());
       final int autoRenewPeriod =
           node.get("auto_renew_period").isNull() ? 0 : node.get("auto_renew_period").asInt();
-      final Instant createdTimestamp =
-          Instant.ofEpochSecond(
-              node.get("created_timestamp").isNumber()
-                  ? node.get("created_timestamp").asLong()
-                  : Long.parseLong(node.get("created_timestamp").asText().split("\\.")[0]));
+      final Instant createdTimestamp = parseInstant(node.get("created_timestamp").asText());
       final boolean deleted = !node.get("deleted").isNull() && node.get("deleted").asBoolean();
       final Instant expirationTimestamp =
           node.get("expiration_timestamp").isNull()
               ? null
-              : Instant.ofEpochSecond(
-                  Long.parseLong(node.get("expiration_timestamp").asText().split("\\.")[0]));
+              : parseInstant(node.get("expiration_timestamp").asText());
       final String fileId = node.get("file_id").isNull() ? null : node.get("file_id").asText();
       final String evmAddress =
           node.get("evm_address").isNull() ? null : node.get("evm_address").asText();
@@ -838,13 +827,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           !node.get("permanent_removal").isNull() && node.get("permanent_removal").asBoolean();
       final String proxyAccountId =
           node.get("proxy_account_id").isNull() ? null : node.get("proxy_account_id").asText();
-      final Instant fromTimestamp =
-          Instant.ofEpochSecond(node.get("timestamp").get("from").asLong());
-      final Instant toTimestamp = Instant.ofEpochSecond(node.get("timestamp").get("to").asLong());
-      final String bytecode =
-          (!node.has("bytecode") || node.get("bytecode").isNull())
-              ? null
-              : node.get("bytecode").asText();
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
+      final Instant toTimestamp =
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
+              : null;
+      final String bytecode = node.hasNonNull("bytecode") ? node.get("bytecode").asText() : null;
       final String runtimeBytecode =
           (!node.has("runtime_bytecode") || node.get("runtime_bytecode").isNull())
               ? null
@@ -927,20 +915,10 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final long size = node.get("size").asLong();
       final long gasUsed = node.get("gas_used").asLong();
       final String logsBloom =
-          node.has("logs_bloom") && !node.get("logs_bloom").isNull()
-              ? node.get("logs_bloom").asText()
-              : null;
+          node.hasNonNull("logs_bloom") ? node.get("logs_bloom").asText() : null;
 
-      final Instant fromTimestamp =
-          Instant.ofEpochSecond(
-              node.get("timestamp").get("from").isNumber()
-                  ? node.get("timestamp").get("from").asLong()
-                  : Long.parseLong(node.get("timestamp").get("from").asText().split("\\.")[0]));
-      final Instant toTimestamp =
-          Instant.ofEpochSecond(
-              node.get("timestamp").get("to").isNumber()
-                  ? node.get("timestamp").get("to").asLong()
-                  : Long.parseLong(node.get("timestamp").get("to").asText().split("\\.")[0]));
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
+      final Instant toTimestamp = parseInstant(node.get("timestamp").get("to").asText());
 
       return Optional.of(
           new Block(

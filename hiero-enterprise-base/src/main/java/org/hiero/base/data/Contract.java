@@ -26,13 +26,12 @@ public record Contract(
     boolean permanentRemoval,
     @Nullable String proxyAccountId,
     @NonNull Instant fromTimestamp,
-    @NonNull Instant toTimestamp,
+    @Nullable Instant toTimestamp,
     @Nullable String bytecode,
     @Nullable String runtimeBytecode) {
   public Contract {
     Objects.requireNonNull(contractId, "contractId must not be null");
     Objects.requireNonNull(createdTimestamp, "createdTimestamp must not be null");
     Objects.requireNonNull(fromTimestamp, "fromTimestamp must not be null");
-    Objects.requireNonNull(toTimestamp, "toTimestamp must not be null");
   }
 }
