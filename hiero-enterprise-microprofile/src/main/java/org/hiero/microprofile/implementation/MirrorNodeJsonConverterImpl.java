@@ -202,7 +202,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               ? node.getJsonNumber("staked_node_id").longValue()
               : null;
       final Instant stakePeriodStart =
-          node.containsKey("stake_period_start") && !node.isNull("staked_period_start")
+          node.containsKey("stake_period_start") && !node.isNull("stake_period_start")
               ? parseInstant(node.getString("stake_period_start"))
               : null;
 
