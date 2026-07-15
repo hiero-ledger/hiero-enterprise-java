@@ -366,13 +366,16 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   @Override
   public List<Nft> toNfts(@NonNull JsonObject jsonObject) {
-    if (!jsonObject.containsKey("transactions")) {
+    if (!jsonObject.containsKey("nfts")) {
       return List.of();
     }
 
     final JsonArray nftsArray = jsonObject.getJsonArray("nfts");
+    if (nftsArray == null) {
+      throw new IllegalArgumentException("NFTs node is not an array: " + nftsArray);
+    }
     if (nftsArray.isEmpty()) {
-      throw new IllegalArgumentException("NFTs jsonObject is not an array: " + nftsArray);
+      return List.of();
     }
     Spliterator<JsonValue> spliterator =
         Spliterators.spliteratorUnknownSize(nftsArray.iterator(), Spliterator.ORDERED);
