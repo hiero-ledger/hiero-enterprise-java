@@ -171,10 +171,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           Instant.ofEpochSecond(
               jsonObject.getJsonObject("next_rate").getJsonNumber("expiration_time").longValue());
 
+      final Instant timestamp = parseInstant(jsonObject.getString("timestamp"));
+
       return Optional.of(
           new ExchangeRates(
               new ExchangeRate(currentCentEquivalent, currentHbarEquivalent, currentExpirationTime),
-              new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime)));
+              new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime),
+              timestamp));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
