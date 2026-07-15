@@ -80,7 +80,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       final String releasedSupply = jsonObject.getString("released_supply");
       final String totalSupply = jsonObject.getString("total_supply");
-      return Optional.of(new NetworkSupplies(releasedSupply, totalSupply));
+      final Instant timestamp = parseInstant(jsonObject.getString("timestamp"));
+      return Optional.of(new NetworkSupplies(releasedSupply, totalSupply, timestamp));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }

@@ -80,7 +80,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       final String releasedSupply = node.get("released_supply").asText();
       final String totalSupply = node.get("total_supply").asText();
-      return Optional.of(new NetworkSupplies(releasedSupply, totalSupply));
+      final Instant timestamp = parseInstant(node.get("timestamp").asText());
+      return Optional.of(new NetworkSupplies(releasedSupply, totalSupply, timestamp));
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
