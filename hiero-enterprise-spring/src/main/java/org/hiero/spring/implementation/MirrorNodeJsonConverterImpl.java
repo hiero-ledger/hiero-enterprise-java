@@ -919,18 +919,22 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final long count = node.get("count").asLong();
-      final String hapiVersion = node.get("hapi_version").asText();
+      final String hapiVersion =
+          node.hasNonNull("hapi_version") ? node.get("hapi_version").asText() : null;
       final String hash = node.get("hash").asText();
       final String name = node.get("name").asText();
       final long number = node.get("number").asLong();
       final String previousHash = node.get("previous_hash").asText();
-      final long size = node.get("size").asLong();
-      final long gasUsed = node.get("gas_used").asLong();
+      final Long size = node.hasNonNull("size") ? node.get("size").asLong() : null;
+      final Long gasUsed = node.hasNonNull("gas_used") ? node.get("gas_used").asLong() : null;
       final String logsBloom =
           node.hasNonNull("logs_bloom") ? node.get("logs_bloom").asText() : null;
 
       final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
-      final Instant toTimestamp = parseInstant(node.get("timestamp").get("to").asText());
+      final Instant toTimestamp =
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
+              : null;
 
       return Optional.of(
           new Block(
