@@ -108,6 +108,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final long unreservedStakingRewardBalance =
           node.get("unreserved_staking_reward_balance").asLong();
 
+      JsonNode stakingPeriod = node.get("staking_period");
+
+      final Instant stakingPeriodFrom = parseInstant(stakingPeriod.get("from").asText());
+      final Instant stakingPeriodTo =
+          stakingPeriod.hasNonNull("to") ? parseInstant(stakingPeriod.get("to").asText()) : null;
+
       return Optional.of(
           new NetworkStake(
               maxStakeReward,
@@ -122,7 +128,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               stakingRewardFeeFraction,
               stakingRewardRate,
               stakingStartThreshold,
-              unreservedStakingRewardBalance));
+              unreservedStakingRewardBalance,
+              stakingPeriodFrom,
+              stakingPeriodTo));
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
