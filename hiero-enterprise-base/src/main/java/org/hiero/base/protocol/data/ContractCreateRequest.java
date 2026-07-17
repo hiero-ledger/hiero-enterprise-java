@@ -17,6 +17,8 @@ public record ContractCreateRequest(
     @NonNull List<ContractParam<?>> constructorParams)
     implements TransactionRequest {
 
+  public static final int MAX_GAS_LIMIT = 15_000_000;
+
   public ContractCreateRequest {
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
@@ -29,8 +31,9 @@ public record ContractCreateRequest(
     if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
       throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
-    if (gas < 0) {
-      throw new IllegalArgumentException("gas must be positive");
+    if (gas < 0 || gas > MAX_GAS_LIMIT) {
+      throw new IllegalArgumentException(
+          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
     }
   }
 
