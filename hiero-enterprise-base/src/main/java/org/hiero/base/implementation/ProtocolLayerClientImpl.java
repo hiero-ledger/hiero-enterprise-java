@@ -282,7 +282,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setMaxTransactionFee(request.maxTransactionFee())
             .setTransactionValidDuration(request.transactionValidDuration())
             .setBytecodeFileId(request.fileId())
-            .setGas(DEFAULT_GAS)
+            .setGas(request.gas())
             .setConstructorParameters(constructorParams);
     final TransactionReceipt receipt =
         executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_CREATE);
