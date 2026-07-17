@@ -141,7 +141,9 @@ public class ProtocolLayerClientTests {
     final FileCreateResult result =
         protocolLayerClient.executeFileCreateTransaction(fileCreateRequest);
     final FileId fileId = result.fileId();
-    final ContractCreateRequest request = ContractCreateRequest.of(fileId);
+    final Hbar maxTransactionFee = Hbar.from(5);
+    final int gas = 1_000_000;
+    final ContractCreateRequest request = ContractCreateRequest.of(fileId, maxTransactionFee, gas);
 
     // when
     final ContractCreateResult contractCreateResult =

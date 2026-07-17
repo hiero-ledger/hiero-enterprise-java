@@ -13,6 +13,7 @@ public record ContractCreateRequest(
     @NonNull Hbar maxTransactionFee,
     @NonNull Duration transactionValidDuration,
     @NonNull FileId fileId,
+    int gas,
     @NonNull List<ContractParam<?>> constructorParams)
     implements TransactionRequest {
 
@@ -21,45 +22,64 @@ public record ContractCreateRequest(
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
     Objects.requireNonNull(fileId, "fileId is required");
     Objects.requireNonNull(constructorParams, "constructorParams is required");
+
     if (maxTransactionFee.toTinybars() < 0) {
       throw new IllegalArgumentException("maxTransactionFee must be non-negative");
     }
     if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
       throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
-  }
-
-  @NonNull
-  public static ContractCreateRequest of(
-      @NonNull String fileId, @Nullable ContractParam<?>... constructorParams) {
-    Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), constructorParams);
-  }
-
-  @NonNull
-  public static ContractCreateRequest of(
-      @NonNull FileId fileId, @Nullable ContractParam<?>... constructorParams) {
-    if (constructorParams == null) {
-      return of(fileId, List.of());
-    } else {
-      return of(fileId, List.of(constructorParams));
+    if (gas < 0) {
+      throw new IllegalArgumentException("gas must be positive");
     }
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull String fileId, @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull String fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable ContractParam<?>... constructorParams) {
     Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), constructorParams);
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    return of(FileId.fromString(fileId), maxTransactionFee, gas, constructorParams);
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull FileId fileId, @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull FileId fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable ContractParam<?>... constructorParams) {
+    if (constructorParams == null) {
+      return of(fileId, maxTransactionFee, gas, List.of());
+    } else {
+      return of(fileId, maxTransactionFee, gas, List.of(constructorParams));
+    }
+  }
+
+  @NonNull
+  public static ContractCreateRequest of(
+      @NonNull String fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @NonNull List<ContractParam<?>> constructorParams) {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    return of(FileId.fromString(fileId), maxTransactionFee, gas, constructorParams);
+  }
+
+  @NonNull
+  public static ContractCreateRequest of(
+      @NonNull FileId fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @NonNull List<ContractParam<?>> constructorParams) {
     return new ContractCreateRequest(
-        DEFAULT_MAX_TRANSACTION_FEE,
+        maxTransactionFee,
         DEFAULT_TRANSACTION_VALID_DURATION,
         fileId,
+        gas,
         List.copyOf(constructorParams));
   }
 }
