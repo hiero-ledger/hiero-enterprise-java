@@ -1,6 +1,6 @@
 package org.hiero.base.implementation;
 
-import static org.hiero.base.protocol.data.ContractCreateRequest.MAX_GAS_LIMIT;
+import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
 
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
@@ -117,10 +117,23 @@ public class SmartContractClientImpl implements SmartContractClient {
   public ContractCallResult callContractFunction(
       @NonNull final ContractId contractId,
       @NonNull final String functionName,
+      @NonNull final Hbar maxTransactionFee,
+      final int gas,
       @Nullable ContractParam<?>... params)
       throws HieroException {
+
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    Objects.requireNonNull(functionName, "functionName must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
+    if (gas < 0 || gas > MAX_GAS_LIMIT) {
+      throw new IllegalArgumentException(
+          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
+    }
+
     try {
-      final ContractCallRequest request = ContractCallRequest.of(contractId, functionName, params);
+      final ContractCallRequest request =
+          ContractCallRequest.of(contractId, functionName, maxTransactionFee, gas, params);
       final ContractFunctionResult result =
           protocolLayerClient.executeContractCallTransaction(request).contractFunctionResult();
       return new ContractCallResultImpl(result);
