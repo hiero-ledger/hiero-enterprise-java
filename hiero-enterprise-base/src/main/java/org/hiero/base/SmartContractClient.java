@@ -1,5 +1,7 @@
 package org.hiero.base;
 
+import static org.hiero.base.implementation.ProtocolLayerClientImpl.DEFAULT_GAS;
+
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -18,7 +20,6 @@ import org.jspecify.annotations.Nullable;
  */
 public interface SmartContractClient {
   Hbar DEFAULT_MAX_TRANSACTION_FEE = Hbar.from(16);
-  int DEFAULT_GAS = 5_000_000;
 
   /**
    * Create a new smart contract based on the file the given file ID. The file must contain the
@@ -33,7 +34,7 @@ public interface SmartContractClient {
   default ContractId createContract(
       @NonNull String fileId, @Nullable ContractParam<?>... constructorParams)
       throws HieroException {
-    Objects.requireNonNull(fileId, "fileId");
+    Objects.requireNonNull(fileId, "fileId must not be null");
     return createContract(
         FileId.fromString(fileId), DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_GAS, constructorParams);
   }
@@ -50,6 +51,7 @@ public interface SmartContractClient {
   default @NonNull ContractId createContract(
       @NonNull FileId fileId, @Nullable ContractParam<?>... constructorParams)
       throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
     return createContract(fileId, DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_GAS, constructorParams);
   }
 
@@ -65,6 +67,7 @@ public interface SmartContractClient {
   default @NonNull ContractId createContract(
       @NonNull byte[] contents, @Nullable ContractParam<?>... constructorParams)
       throws HieroException {
+    Objects.requireNonNull(contents, "contents must not be null");
     return createContract(contents, DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_GAS, constructorParams);
   }
 
@@ -80,15 +83,17 @@ public interface SmartContractClient {
   default @NonNull ContractId createContract(
       @NonNull Path pathToBin, @Nullable ContractParam<?>... constructorParams)
       throws HieroException {
+    Objects.requireNonNull(pathToBin, "pathToBin must not be null");
     return createContract(pathToBin, DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_GAS, constructorParams);
   }
 
   /**
    * Create a new smart contract based on the file the given file ID, using a custom max transaction
-   * fee. The file must contain the bytecode for the contract.
+   * fee and gas. The file must contain the bytecode for the contract.
    *
    * @param fileId the ID of the file containing the contract bytecode
    * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
    * @param constructorParams the parameters to pass to the contract constructor
    * @return the ID of the new contract
    * @throws HieroException if the contract could not be created
@@ -97,18 +102,21 @@ public interface SmartContractClient {
       @NonNull String fileId,
       @NonNull Hbar maxTransactionFee,
       int gas,
-      @NonNull ContractParam<?>... constructorParams)
+      @Nullable ContractParam<?>... constructorParams)
       throws HieroException {
     Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
     return createContract(FileId.fromString(fileId), maxTransactionFee, gas, constructorParams);
   }
 
   /**
    * Create a new smart contract based on the file with the given file ID, using a custom max
-   * transaction fee. The file must contain the bytecode for the contract.
+   * transaction fee and gas. The file must contain the bytecode for the contract.
    *
    * @param fileId the ID of the file containing the contract bytecode
    * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
    * @param constructorParams the parameters to pass to the contract constructor
    * @return the ID of the new contract
    * @throws HieroException if the contract could not be created
@@ -121,11 +129,12 @@ public interface SmartContractClient {
       throws HieroException;
 
   /**
-   * Create a new smart contract with the given contents, using a custom maximum transaction fee.
-   * The contents must be the bytecode for the contract.
+   * Create a new smart contract with the given contents, using a custom maximum transaction fee and
+   * gas. The contents must be the bytecode for the contract.
    *
    * @param contents the contents of the contract
    * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
    * @param constructorParams the parameters to pass to the contract constructor
    * @return the ID of the new contract
    * @throws HieroException if the contract could not be created
@@ -138,11 +147,12 @@ public interface SmartContractClient {
       throws HieroException;
 
   /**
-   * Create a new smart contract based on a local file, using a custom maximum transaction fee. The
-   * contents of the file must be the bytecode for the contract.
+   * Create a new smart contract based on a local file, using a custom maximum transaction fee and
+   * gas. The contents of the file must be the bytecode for the contract.
    *
    * @param pathToBin the path to the file containing the contract bytecode
    * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
    * @param constructorParams the parameters to pass to the contract constructor
    * @return the ID of the new contract
    * @throws HieroException if the contract could not be created

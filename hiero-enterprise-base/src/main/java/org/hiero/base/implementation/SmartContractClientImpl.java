@@ -1,5 +1,7 @@
 package org.hiero.base.implementation;
 
+import static org.hiero.base.protocol.data.ContractCreateRequest.MAX_GAS_LIMIT;
+
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
@@ -45,6 +47,14 @@ public class SmartContractClientImpl implements SmartContractClient {
       final int gas,
       @Nullable final ContractParam<?>... constructorParams)
       throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
+    if (gas < 0 || gas > MAX_GAS_LIMIT) {
+      throw new IllegalArgumentException(
+          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
+    }
+
     try {
       final ContractCreateRequest request;
       if (constructorParams == null) {
@@ -70,9 +80,11 @@ public class SmartContractClientImpl implements SmartContractClient {
       final int gas,
       @Nullable final ContractParam<?>... constructorParams)
       throws HieroException {
+    Objects.requireNonNull(contents, "contents must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
     try {
       final FileId fileId = fileClient.createFile(contents);
-      System.out.println("created file");
       final ContractId contract = createContract(fileId, maxTransactionFee, gas, constructorParams);
       fileClient.deleteFile(fileId);
       return contract;
@@ -89,6 +101,9 @@ public class SmartContractClientImpl implements SmartContractClient {
       final int gas,
       @Nullable final ContractParam<?>... constructorParams)
       throws HieroException {
+    Objects.requireNonNull(pathToBin, "pathToBin must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
     try {
       final byte[] bytes = Files.readAllBytes(pathToBin);
       return createContract(bytes, maxTransactionFee, gas, constructorParams);
