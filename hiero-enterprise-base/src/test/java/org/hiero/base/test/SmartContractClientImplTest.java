@@ -3,6 +3,7 @@ package org.hiero.base.test;
 import static org.hiero.base.implementation.ProtocolLayerClientImpl.DEFAULT_GAS;
 import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
 import static org.hiero.base.protocol.data.ContractCreateRequest.DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE;
+import static org.hiero.base.protocol.data.TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE;
 import static org.hiero.base.protocol.data.TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -21,6 +23,8 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.ContractParam;
 import org.hiero.base.implementation.SmartContractClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.ContractCallRequest;
+import org.hiero.base.protocol.data.ContractCallResult;
 import org.hiero.base.protocol.data.ContractCreateRequest;
 import org.hiero.base.protocol.data.ContractCreateResult;
 import org.junit.jupiter.api.Assertions;
@@ -35,6 +39,8 @@ public class SmartContractClientImplTest {
 
   private final ArgumentCaptor<ContractCreateRequest> contractCreateRequestCaptor =
       ArgumentCaptor.forClass(ContractCreateRequest.class);
+  private final ArgumentCaptor<ContractCallRequest> contractCallRequestCaptor =
+      ArgumentCaptor.forClass(ContractCallRequest.class);
 
   private SmartContractClientImpl smartContractClient;
 
@@ -377,7 +383,7 @@ public class SmartContractClientImplTest {
   }
 
   @Test
-  void shouldThrowNullPointerExceptionForNullArguments() {
+  void shouldThrowNullPointerExceptionForNullArgumentsOnCreateContract() {
     Assertions.assertThrows(
         NullPointerException.class, () -> smartContractClient.createContract((FileId) null));
     Assertions.assertThrows(
@@ -400,7 +406,7 @@ public class SmartContractClientImplTest {
   }
 
   @Test
-  void shouldThrowExceptionIfGasIsLessThanZero() {
+  void shouldThrowExceptionIfGasIsLessThanZeroOnCreateContract() {
     final FileId fileId = FileId.fromString("0.0.101");
     final Hbar maxTransactionFee = Hbar.from(10);
 
@@ -410,7 +416,7 @@ public class SmartContractClientImplTest {
   }
 
   @Test
-  void shouldThrowExceptionIfGasGreaterThanMaxGasLimit() {
+  void shouldThrowExceptionIfGasGreaterThanMaxGasLimitOnCreateContract() {
     final FileId fileId = FileId.fromString("0.0.101");
     final Hbar maxTransactionFee = Hbar.from(10);
     final int gas = MAX_GAS_LIMIT + 1;
@@ -418,5 +424,164 @@ public class SmartContractClientImplTest {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> smartContractClient.createContract(fileId, maxTransactionFee, gas));
+  }
+
+  @Test
+  void shouldCallContractFunction() throws Exception {
+    final ContractFunctionResult mockCallResult = mock(ContractFunctionResult.class);
+    final ContractCallResult response = mock(ContractCallResult.class);
+
+    // given
+    final ContractId contractId = ContractId.fromString("0.0.101");
+    final String functionName = "doSomething()";
+
+    // then
+    when(mockProtocolLayerClient.executeContractCallTransaction(any(ContractCallRequest.class)))
+        .thenReturn(response);
+    when(response.contractFunctionResult()).thenReturn(mockCallResult);
+
+    final org.hiero.base.data.ContractCallResult result =
+        smartContractClient.callContractFunction(contractId, functionName);
+
+    // verify
+    verify(mockProtocolLayerClient, times(1))
+        .executeContractCallTransaction(contractCallRequestCaptor.capture());
+    verify(response, times(1)).contractFunctionResult();
+
+    Assertions.assertNotNull(result);
+
+    final ContractCallRequest request = contractCallRequestCaptor.getValue();
+    Assertions.assertEquals(contractId, request.contractId());
+    Assertions.assertEquals(functionName, request.functionName());
+    Assertions.assertTrue(request.functionParams().isEmpty());
+    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_GAS, request.gas());
+    Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
+  }
+
+  @Test
+  void shouldCallContractFunctionWithParams() throws Exception {
+    final ContractFunctionResult mockCallResult = mock(ContractFunctionResult.class);
+    final ContractCallResult response = mock(ContractCallResult.class);
+
+    // given
+    final ContractId contractId = ContractId.fromString("0.0.101");
+    final String functionName = "doSomething()";
+    final ContractParam<String> param1 = ContractParam.string("Hello");
+    final ContractParam<Long> param2 = ContractParam.int32(10);
+
+    // then
+    when(mockProtocolLayerClient.executeContractCallTransaction(any(ContractCallRequest.class)))
+        .thenReturn(response);
+    when(response.contractFunctionResult()).thenReturn(mockCallResult);
+
+    final org.hiero.base.data.ContractCallResult result =
+        smartContractClient.callContractFunction(contractId, functionName, param1, param2);
+
+    // verify
+    verify(mockProtocolLayerClient, times(1))
+        .executeContractCallTransaction(contractCallRequestCaptor.capture());
+    verify(response, times(1)).contractFunctionResult();
+
+    Assertions.assertNotNull(result);
+
+    final ContractCallRequest request = contractCallRequestCaptor.getValue();
+    Assertions.assertEquals(contractId, request.contractId());
+    Assertions.assertEquals(functionName, request.functionName());
+    Assertions.assertEquals(2, request.functionParams().size());
+    Assertions.assertEquals(List.of(param1, param2), request.functionParams());
+    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_GAS, request.gas());
+    Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
+  }
+
+  @Test
+  void shouldCallContractFunctionUsingCustomMaxFeeAndGas() throws Exception {
+    final ContractFunctionResult mockCallResult = mock(ContractFunctionResult.class);
+    final ContractCallResult response = mock(ContractCallResult.class);
+
+    // given
+    final ContractId contractId = ContractId.fromString("0.0.101");
+    final String functionName = "doSomething()";
+    final ContractParam<String> param1 = ContractParam.string("Hello");
+    final ContractParam<Long> param2 = ContractParam.int32(10);
+    final Hbar maxTransactionFee = Hbar.from(20);
+    final int gas = 1_000_000;
+
+    // then
+    when(mockProtocolLayerClient.executeContractCallTransaction(any(ContractCallRequest.class)))
+        .thenReturn(response);
+    when(response.contractFunctionResult()).thenReturn(mockCallResult);
+
+    final org.hiero.base.data.ContractCallResult result =
+        smartContractClient.callContractFunction(
+            contractId, functionName, maxTransactionFee, gas, param1, param2);
+
+    // verify
+    verify(mockProtocolLayerClient, times(1))
+        .executeContractCallTransaction(contractCallRequestCaptor.capture());
+    verify(response, times(1)).contractFunctionResult();
+
+    Assertions.assertNotNull(result);
+
+    final ContractCallRequest request = contractCallRequestCaptor.getValue();
+    Assertions.assertEquals(contractId, request.contractId());
+    Assertions.assertEquals(functionName, request.functionName());
+    Assertions.assertEquals(2, request.functionParams().size());
+    Assertions.assertEquals(List.of(param1, param2), request.functionParams());
+    Assertions.assertEquals(maxTransactionFee, request.maxTransactionFee());
+    Assertions.assertEquals(gas, request.gas());
+    Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
+  }
+
+  @Test
+  void shouldThrowNullPointerExceptionForNullArgumentsOnFunctionCall() {
+    final ContractId contractId = ContractId.fromString("0.0.101");
+    final String functionName = "doSomething";
+
+    // contractId
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> smartContractClient.callContractFunction((ContractId) null, functionName));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> smartContractClient.callContractFunction((String) null, functionName));
+
+    // functionName
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> smartContractClient.callContractFunction(contractId, null));
+
+    // maxTransactionFee
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> smartContractClient.callContractFunction(contractId, functionName, null, 1));
+  }
+
+  @Test
+  void shouldThrowExceptionIfGasIsLessThanZeroOnFunctionCall() {
+    final ContractId contractId = ContractId.fromString("0.0.101");
+    final String functionName = "doSomething";
+    final Hbar maxTransactionFee = Hbar.from(10);
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            smartContractClient.callContractFunction(
+                contractId, functionName, maxTransactionFee, -1));
+  }
+
+  @Test
+  void shouldThrowExceptionIfGasGreaterThanMaxGasLimitOnFunctionCall() {
+    final ContractId contractId = ContractId.fromString("0.0.101");
+    final String functionName = "doSomething";
+    final Hbar maxTransactionFee = Hbar.from(10);
+    final int gas = MAX_GAS_LIMIT + 1;
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            smartContractClient.callContractFunction(
+                contractId, functionName, maxTransactionFee, gas));
   }
 }
