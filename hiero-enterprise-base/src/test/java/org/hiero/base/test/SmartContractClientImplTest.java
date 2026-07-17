@@ -1,8 +1,8 @@
 package org.hiero.base.test;
 
-import static org.hiero.base.SmartContractClient.DEFAULT_MAX_TRANSACTION_FEE;
 import static org.hiero.base.implementation.ProtocolLayerClientImpl.DEFAULT_GAS;
-import static org.hiero.base.protocol.data.ContractCreateRequest.MAX_GAS_LIMIT;
+import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
+import static org.hiero.base.protocol.data.ContractCreateRequest.DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE;
 import static org.hiero.base.protocol.data.TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -72,7 +72,7 @@ public class SmartContractClientImplTest {
     final ContractCreateRequest request = contractCreateRequestCaptor.getValue();
     Assertions.assertEquals(fileId, request.fileId());
     Assertions.assertTrue(request.constructorParams().isEmpty());
-    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, request.maxTransactionFee());
     Assertions.assertEquals(DEFAULT_GAS, request.gas());
     Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
   }
@@ -105,7 +105,7 @@ public class SmartContractClientImplTest {
     Assertions.assertEquals(fileId, request.fileId());
     Assertions.assertEquals(2, request.constructorParams().size());
     Assertions.assertEquals(List.of(param1, param2), request.constructorParams());
-    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, request.maxTransactionFee());
     Assertions.assertEquals(DEFAULT_GAS, request.gas());
     Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
   }
@@ -175,7 +175,7 @@ public class SmartContractClientImplTest {
     final ContractCreateRequest request = contractCreateRequestCaptor.getValue();
     Assertions.assertEquals(mockFileId, request.fileId());
     Assertions.assertTrue(request.constructorParams().isEmpty());
-    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, request.maxTransactionFee());
     Assertions.assertEquals(DEFAULT_GAS, request.gas());
     Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
   }
@@ -212,7 +212,7 @@ public class SmartContractClientImplTest {
     Assertions.assertEquals(mockFileId, request.fileId());
     Assertions.assertEquals(2, request.constructorParams().size());
     Assertions.assertEquals(List.of(param1, param2), request.constructorParams());
-    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, request.maxTransactionFee());
     Assertions.assertEquals(DEFAULT_GAS, request.gas());
     Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
   }
@@ -288,7 +288,7 @@ public class SmartContractClientImplTest {
     final ContractCreateRequest request = contractCreateRequestCaptor.getValue();
     Assertions.assertEquals(mockFileId, request.fileId());
     Assertions.assertTrue(request.constructorParams().isEmpty());
-    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, request.maxTransactionFee());
     Assertions.assertEquals(DEFAULT_GAS, request.gas());
     Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
   }
@@ -328,7 +328,7 @@ public class SmartContractClientImplTest {
     Assertions.assertEquals(mockFileId, request.fileId());
     Assertions.assertEquals(2, request.constructorParams().size());
     Assertions.assertEquals(List.of(param1, param2), request.constructorParams());
-    Assertions.assertEquals(DEFAULT_MAX_TRANSACTION_FEE, request.maxTransactionFee());
+    Assertions.assertEquals(DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, request.maxTransactionFee());
     Assertions.assertEquals(DEFAULT_GAS, request.gas());
     Assertions.assertEquals(DEFAULT_TRANSACTION_VALID_DURATION, request.transactionValidDuration());
   }

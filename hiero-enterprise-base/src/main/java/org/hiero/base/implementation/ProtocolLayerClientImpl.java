@@ -120,6 +120,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   private static final Logger log = LoggerFactory.getLogger(ProtocolLayerClientImpl.class);
 
   public static final int DEFAULT_GAS = 5_000_000;
+  public static final int MAX_GAS_LIMIT = 15_000_000;
 
   private final List<TransactionListener> listeners;
 
@@ -321,7 +322,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setTransactionValidDuration(request.transactionValidDuration())
             .setContractId(request.contractId())
             .setFunction(request.functionName(), functionParams)
-            .setGas(DEFAULT_GAS);
+            .setGas(request.gas());
     final TransactionRecord record =
         executeTransactionAndWaitOnRecord(transaction, TransactionType.CONTRACT_CALL);
     return new ContractCallResult(

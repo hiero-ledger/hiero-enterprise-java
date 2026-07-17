@@ -1,5 +1,7 @@
 package org.hiero.base.protocol.data;
 
+import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
+
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import java.time.Duration;
@@ -17,7 +19,7 @@ public record ContractCreateRequest(
     @NonNull List<ContractParam<?>> constructorParams)
     implements TransactionRequest {
 
-  public static final int MAX_GAS_LIMIT = 15_000_000;
+  public static final Hbar DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE = Hbar.from(16);
 
   public ContractCreateRequest {
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
