@@ -31,7 +31,7 @@ public class SmartContractDatatypesTests {
     if (contractId == null) {
       try {
         final Path path =
-            Path.of(ContractServiceTest.class.getResource("/datatypes.bin").getPath());
+            Path.of(SmartContractDatatypesTests.class.getResource("/datatypes.bin").getPath());
         contractId = smartContractClient.createContract(path);
       } catch (Exception e) {
         throw new RuntimeException("Can not create contract", e);
