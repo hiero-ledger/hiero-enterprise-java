@@ -8,8 +8,8 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Node;
-import org.jspecify.annotations.NonNull;
 import org.hiero.base.data.Page;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface for interacting with a Hiero network. This interface provides methods to get

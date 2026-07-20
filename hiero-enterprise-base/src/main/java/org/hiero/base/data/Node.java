@@ -35,7 +35,5 @@ public record Node(
 
   /** Represents a node service endpoint. */
   public record ServiceEndpoint(
-      @Nullable String ipAddress,
-      int port,
-      @Nullable String domainName) {}
+      @Nullable String ipAddress, int port, @Nullable String domainName) {}
 }

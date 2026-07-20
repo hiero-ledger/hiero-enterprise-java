@@ -1018,72 +1018,71 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     return Instant.ofEpochSecond(seconds, nanos);
   }
 
-@Override
-public @NonNull List<Node> toNodes(@NonNull JsonObject jsonObject) {
-  Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+  @Override
+  public @NonNull List<Node> toNodes(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
 
-  if (!jsonObject.containsKey("nodes")) {
-    return List.of();
+    if (!jsonObject.containsKey("nodes")) {
+      return List.of();
+    }
+
+    final JsonArray nodes = jsonObject.getJsonArray("nodes");
+    if (nodes == null) {
+      throw new IllegalArgumentException("Nodes array is not an array: " + nodes);
+    }
+
+    return jsonArrayToStream(nodes)
+        .map(n -> toNode(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
   }
 
-  final JsonArray nodes = jsonObject.getJsonArray("nodes");
-  if (nodes == null) {
-    throw new IllegalArgumentException("Nodes array is not an array: " + nodes);
+  private @NonNull Optional<Node> toNode(@NonNull JsonObject jsonObject) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
+
+    try {
+      final long nodeId = jsonObject.getJsonNumber("node_id").longValue();
+
+      final AccountId nodeAccountId = AccountId.fromString(jsonObject.getString("node_account_id"));
+
+      final List<Node.ServiceEndpoint> serviceEndpoints =
+          jsonArrayToStream(jsonObject.getJsonArray("service_endpoints"))
+              .map(
+                  endpoint ->
+                      new Node.ServiceEndpoint(
+                          endpoint.asJsonObject().getString("ip_address", null),
+                          endpoint.asJsonObject().getInt("port"),
+                          endpoint.asJsonObject().getString("domain_name", null)))
+              .toList();
+
+      return Optional.of(
+          new Node(
+              nodeId,
+              nodeAccountId,
+              getNullableString(jsonObject, "description").orElse(null),
+              getNullableString(jsonObject, "memo").orElse(null),
+              jsonObject.containsKey("public_key")
+                  ? parseKey(jsonObject.getJsonObject("public_key"))
+                  : null,
+              getNullableString(jsonObject, "node_cert_hash").orElse(null),
+              jsonObject.getJsonNumber("stake").longValue(),
+              jsonObject.getJsonNumber("min_stake").longValue(),
+              jsonObject.getJsonNumber("max_stake").longValue(),
+              jsonObject.getJsonNumber("stake_rewarded").longValue(),
+              jsonObject.getJsonNumber("stake_not_rewarded").longValue(),
+              jsonObject.getJsonNumber("reward_rate_start").longValue(),
+              jsonObject.getBoolean("decline_reward"),
+              getNullableString(jsonObject, "file_id").orElse(null),
+              jsonObject.getJsonNumber("staking_period").longValue(),
+              new TimestampRange(
+                  parseInstant(jsonObject.getString("timestamp_from", "")),
+                  parseInstant(jsonObject.getString("timestamp_to", ""))),
+              serviceEndpoints));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
   }
-
-  return jsonArrayToStream(nodes)
-      .map(n -> toNode(n.asJsonObject()))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .toList();
-}
-
-private @NonNull Optional<Node> toNode(@NonNull JsonObject jsonObject) {
-  if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
-    return Optional.empty();
-  }
-
-  try {
-    final long nodeId = jsonObject.getJsonNumber("node_id").longValue();
-
-    final AccountId nodeAccountId =
-        AccountId.fromString(jsonObject.getString("node_account_id"));
-
-    final List<Node.ServiceEndpoint> serviceEndpoints =
-        jsonArrayToStream(jsonObject.getJsonArray("service_endpoints"))
-            .map(
-                endpoint ->
-                    new Node.ServiceEndpoint(
-                        endpoint.asJsonObject().getString("ip_address", null),
-                        endpoint.asJsonObject().getInt("port"),
-                        endpoint.asJsonObject().getString("domain_name", null)))
-            .toList();
-
-    return Optional.of(
-        new Node(
-            nodeId,
-            nodeAccountId,
-            getNullableString(jsonObject, "description").orElse(null),
-            getNullableString(jsonObject, "memo").orElse(null),
-            jsonObject.containsKey("public_key")
-                ? parseKey(jsonObject.getJsonObject("public_key"))
-                : null,
-            getNullableString(jsonObject, "node_cert_hash").orElse(null),
-            jsonObject.getJsonNumber("stake").longValue(),
-            jsonObject.getJsonNumber("min_stake").longValue(),
-            jsonObject.getJsonNumber("max_stake").longValue(),
-            jsonObject.getJsonNumber("stake_rewarded").longValue(),
-            jsonObject.getJsonNumber("stake_not_rewarded").longValue(),
-            jsonObject.getJsonNumber("reward_rate_start").longValue(),
-            jsonObject.getBoolean("decline_reward"),
-            getNullableString(jsonObject, "file_id").orElse(null),
-            jsonObject.getJsonNumber("staking_period").longValue(),
-            new TimestampRange(
-                parseInstant(jsonObject.getString("timestamp_from", "")),
-                parseInstant(jsonObject.getString("timestamp_to", ""))),
-            serviceEndpoints));
-  } catch (final Exception e) {
-    throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
-  }
-}
 }

@@ -202,5 +202,4 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
   }
-  
 }
