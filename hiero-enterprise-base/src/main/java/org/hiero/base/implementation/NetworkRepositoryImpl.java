@@ -11,6 +11,8 @@ import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.jspecify.annotations.NonNull;
+import org.hiero.base.data.Node;
+import org.hiero.base.data.Page;
 
 public class NetworkRepositoryImpl implements NetworkRepository {
   private final MirrorNodeClient mirrorNodeClient;
@@ -38,5 +40,10 @@ public class NetworkRepositoryImpl implements NetworkRepository {
   @Override
   public Optional<NetworkSupplies> supplies() throws HieroException {
     return mirrorNodeClient.queryNetworkSupplies();
+  }
+
+  @Override
+  public Page<Node> nodes() throws HieroException {
+    return mirrorNodeClient.queryNetworkNodes();
   }
 }

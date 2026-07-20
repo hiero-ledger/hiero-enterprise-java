@@ -7,7 +7,9 @@ import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
+import org.hiero.base.data.Node;
 import org.jspecify.annotations.NonNull;
+import org.hiero.base.data.Page;
 
 /**
  * Interface for interacting with a Hiero network. This interface provides methods to get
@@ -45,4 +47,12 @@ public interface NetworkRepository {
    * @throws HieroException if the search fails
    */
   @NonNull Optional<NetworkSupplies> supplies() throws HieroException;
+
+  /**
+   * Return the Nodes for network.
+   *
+   * @return {@link Page} containing Nodes
+   * @throws HieroException if the search fails
+   */
+  @NonNull Page<Node> nodes() throws HieroException;
 }
