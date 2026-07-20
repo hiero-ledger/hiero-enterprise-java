@@ -10,7 +10,6 @@ import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
-import jakarta.json.JsonObject;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Base64;
@@ -968,70 +967,90 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   }
 
   @Override
-  public @NonNull List<Node> toNodes(@NonNull JsonObject jsonObject) {
-    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+  public @NonNull List<Node> toNodes(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "node must not be null");
 
-    if (!jsonObject.containsKey("nodes")) {
+    if (!node.has("nodes")) {
       return List.of();
     }
 
-    final JsonArray nodes = jsonObject.getJsonArray("nodes");
-    if (nodes == null) {
-      throw new IllegalArgumentException("Nodes array is not an array: " + nodes);
+    final JsonNode nodes = node.get("nodes");
+    if (!nodes.isArray()) {
+      throw new IllegalArgumentException("Nodes property is not an array: " + nodes);
     }
 
     return jsonArrayToStream(nodes)
-        .map(n -> toNode(n.asJsonObject()))
+        .map(n -> toNode(n))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
   }
 
-  private @NonNull Optional<Node> toNode(@NonNull JsonObject jsonObject) {
-    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+  private @NonNull Optional<Node> toNode(@NonNull JsonNode node) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
       return Optional.empty();
     }
 
     try {
-      final long nodeId = jsonObject.getJsonNumber("node_id").longValue();
-
-      final AccountId nodeAccountId = AccountId.fromString(jsonObject.getString("node_account_id"));
+      final long nodeId = node.get("node_id").asLong();
+      final AccountId nodeAccountId = AccountId.fromString(node.get("node_account_id").asText());
 
       final List<Node.ServiceEndpoint> serviceEndpoints =
-          jsonArrayToStream(jsonObject.getJsonArray("service_endpoints"))
-              .map(
-                  endpoint ->
-                      new Node.ServiceEndpoint(
-                          endpoint.asJsonObject().getString("ip_address", null),
-                          endpoint.asJsonObject().getInt("port"),
-                          endpoint.asJsonObject().getString("domain_name", null)))
-              .toList();
+          node.has("service_endpoints")
+              ? jsonArrayToStream(node.get("service_endpoints"))
+                  .map(
+                      endpoint ->
+                          new Node.ServiceEndpoint(
+                              endpoint.has("ip_address_v4")
+                                      && !endpoint.get("ip_address_v4").isNull()
+                                  ? endpoint.get("ip_address_v4").asText()
+                                  : null,
+                              endpoint.get("port").asInt(),
+                              endpoint.has("domain_name") && !endpoint.get("domain_name").isNull()
+                                  ? endpoint.get("domain_name").asText()
+                                  : null))
+                  .toList()
+              : List.of();
+
+      final JsonNode timestampNode = node.get("timestamp");
+      final Instant fromTimestamp =
+          timestampNode != null && timestampNode.has("from") && !timestampNode.get("from").isNull()
+              ? parseInstant(timestampNode.get("from").asText())
+              : null;
+      final Instant toTimestamp =
+          timestampNode != null && timestampNode.has("to") && !timestampNode.get("to").isNull()
+              ? parseInstant(timestampNode.get("to").asText())
+              : null;
 
       return Optional.of(
           new Node(
               nodeId,
               nodeAccountId,
-              getNullableString(jsonObject, "description").orElse(null),
-              getNullableString(jsonObject, "memo").orElse(null),
-              jsonObject.containsKey("public_key")
-                  ? parseKey(jsonObject.getJsonObject("public_key"))
+              node.has("description") && !node.get("description").isNull()
+                  ? node.get("description").asText()
                   : null,
-              getNullableString(jsonObject, "node_cert_hash").orElse(null),
-              jsonObject.getJsonNumber("stake").longValue(),
-              jsonObject.getJsonNumber("min_stake").longValue(),
-              jsonObject.getJsonNumber("max_stake").longValue(),
-              jsonObject.getJsonNumber("stake_rewarded").longValue(),
-              jsonObject.getJsonNumber("stake_not_rewarded").longValue(),
-              jsonObject.getJsonNumber("reward_rate_start").longValue(),
-              jsonObject.getBoolean("decline_reward"),
-              getNullableString(jsonObject, "file_id").orElse(null),
-              jsonObject.getJsonNumber("staking_period").longValue(),
-              new TimestampRange(
-                  parseInstant(jsonObject.getString("timestamp_from", "")),
-                  parseInstant(jsonObject.getString("timestamp_to", ""))),
+              node.has("memo") && !node.get("memo").isNull() ? node.get("memo").asText() : null,
+              node.has("public_key") && !node.get("public_key").isNull()
+                  ? parseKey(node.get("public_key"))
+                  : null,
+              node.has("node_cert_hash") && !node.get("node_cert_hash").isNull()
+                  ? node.get("node_cert_hash").asText()
+                  : null,
+              node.has("stake") ? node.get("stake").asLong() : 0L,
+              node.has("min_stake") ? node.get("min_stake").asLong() : 0L,
+              node.has("max_stake") ? node.get("max_stake").asLong() : 0L,
+              node.has("stake_rewarded") ? node.get("stake_rewarded").asLong() : 0L,
+              node.has("stake_not_rewarded") ? node.get("stake_not_rewarded").asLong() : 0L,
+              node.has("reward_rate_start") ? node.get("reward_rate_start").asLong() : 0L,
+              node.has("decline_reward") && node.get("decline_reward").asBoolean(),
+              node.has("file_id") && !node.get("file_id").isNull()
+                  ? node.get("file_id").asText()
+                  : null,
+              node.has("staking_period") ? node.get("staking_period").asLong() : 0L,
+              new TimestampRange(fromTimestamp, toTimestamp),
               serviceEndpoints));
     } catch (final Exception e) {
-      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+      throw new JsonParseException(node, e);
     }
   }
 }
