@@ -43,7 +43,12 @@ public class NetworkRepositoryImpl implements NetworkRepository {
   }
 
   @Override
-  public Page<Node> nodes() throws HieroException {
+  public Page<Node> findNodes() throws HieroException {
     return mirrorNodeClient.queryNetworkNodes();
+  }
+
+  @Override
+  public @NonNull Optional<Node> findNodeById(@NonNull AccountId nodeId) throws HieroException {
+    return mirrorNodeClient.queryNetworkNodeById(nodeId);
   }
 }

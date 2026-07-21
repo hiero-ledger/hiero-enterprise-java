@@ -49,10 +49,19 @@ public interface NetworkRepository {
   @NonNull Optional<NetworkSupplies> supplies() throws HieroException;
 
   /**
-   * Return the Nodes for network.
+   * Returns the network address book nodes.
    *
-   * @return {@link Page} containing Nodes
+   * @return a {@link Page} containing the network nodes
    * @throws HieroException if the search fails
    */
-  @NonNull Page<Node> nodes() throws HieroException;
+  @NonNull Page<Node> findNodes() throws HieroException;
+
+  /**
+   * Returns the network node for the given node ID.
+   *
+   * @param nodeId the node account ID
+   * @return the matching {@link Node}, if present
+   * @throws HieroException if the search fails
+   */
+  @NonNull Optional<Node> findNodeById(@NonNull AccountId nodeId) throws HieroException;
 }
