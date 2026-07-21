@@ -205,7 +205,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   }
 
   @Override
-  public @NonNull Optional<Node> queryNetworkNodeById(@NonNull AccountId nodeId) throws HieroException {
+  public @NonNull Optional<Node> queryNetworkNodeById(@NonNull AccountId nodeId)
+      throws HieroException {
 
     final String path = "/api/v1/network/nodes?node.id=" + nodeId;
 
@@ -213,6 +214,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
         node -> jsonConverter.toNodes(node);
 
     return new RestBasedPage<>(
-        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction).getData().stream().findFirst();
+            objectMapper, restClient.mutate().clone(), path, dataExtractionFunction)
+        .getData().stream().findFirst();
   }
 }
