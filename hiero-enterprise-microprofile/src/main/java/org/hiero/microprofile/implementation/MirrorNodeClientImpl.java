@@ -181,7 +181,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final Function<JsonObject, List<Node>> dataExtractionFunction =
         node -> jsonConverter.toNodes(node);
 
-    return new RestBasedPage<>(restTarget, dataExtractionFunction, path)
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path)
         .getData().stream().findFirst();
   }
 }
