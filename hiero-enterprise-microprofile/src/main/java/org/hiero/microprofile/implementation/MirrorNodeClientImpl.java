@@ -176,7 +176,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Optional<Node> queryNetworkNodeById(@NonNull AccountId nodeId)
       throws HieroException {
 
-    final String path = "/api/v1/network/nodes?node.id=" + nodeId;
+    final String path = "/api/v1/network/nodes?node.id=eq:" + nodeId;
 
     final Function<JsonObject, List<Node>> dataExtractionFunction =
         node -> jsonConverter.toNodes(node);

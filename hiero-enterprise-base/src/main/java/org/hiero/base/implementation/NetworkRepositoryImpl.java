@@ -1,6 +1,5 @@
 package org.hiero.base.implementation;
 
-import com.hedera.hashgraph.sdk.AccountId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +48,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
   }
 
   @Override
-  public @NonNull Optional<Node> findNodeById(@NonNull AccountId nodeId) throws HieroException {
+  public @NonNull Optional<Node> findNodeById(long nodeId) throws HieroException {
     return mirrorNodeClient.queryNetworkNodeById(nodeId);
   }
 }

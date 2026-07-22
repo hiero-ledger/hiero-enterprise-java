@@ -1,6 +1,5 @@
 package org.hiero.base.mirrornode;
 
-import com.hedera.hashgraph.sdk.AccountId;
 import java.util.List;
 import java.util.Optional;
 import org.hiero.base.HieroException;
@@ -64,5 +63,5 @@ public interface NetworkRepository {
    * @return the matching {@link Node}, if present
    * @throws HieroException if the search fails
    */
-  @NonNull Optional<Node> findNodeById(@NonNull AccountId nodeId) throws HieroException;
+  @NonNull Optional<Node> findNodeById(long nodeId) throws HieroException;
 }

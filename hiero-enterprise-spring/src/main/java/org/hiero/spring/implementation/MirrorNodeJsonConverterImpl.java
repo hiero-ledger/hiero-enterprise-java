@@ -993,7 +993,10 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final long nodeId = node.get("node_id").asLong();
-      final AccountId nodeAccountId = AccountId.fromString(node.get("node_account_id").asText());
+      final AccountId nodeAccountId =
+          node.hasNonNull("node_account_id")
+              ? AccountId.fromString(node.get("node_account_id").asText())
+              : null;
 
       final List<Node.ServiceEndpoint> serviceEndpoints =
           node.has("service_endpoints")
@@ -1001,12 +1004,11 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
                   .map(
                       endpoint ->
                           new Node.ServiceEndpoint(
-                              endpoint.has("ip_address_v4")
-                                      && !endpoint.get("ip_address_v4").isNull()
+                              endpoint.hasNonNull("ip_address_v4")
                                   ? endpoint.get("ip_address_v4").asText()
                                   : null,
                               endpoint.get("port").asInt(),
-                              endpoint.has("domain_name") && !endpoint.get("domain_name").isNull()
+                              endpoint.hasNonNull("domain_name")
                                   ? endpoint.get("domain_name").asText()
                                   : null))
                   .toList()
@@ -1014,11 +1016,11 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
       final JsonNode timestampNode = node.get("timestamp");
       final Instant fromTimestamp =
-          timestampNode != null && timestampNode.has("from") && !timestampNode.get("from").isNull()
+          timestampNode != null && timestampNode.hasNonNull("from")
               ? parseInstant(timestampNode.get("from").asText())
               : null;
       final Instant toTimestamp =
-          timestampNode != null && timestampNode.has("to") && !timestampNode.get("to").isNull()
+          timestampNode != null && timestampNode.hasNonNull("to")
               ? parseInstant(timestampNode.get("to").asText())
               : null;
 
@@ -1026,26 +1028,21 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           new Node(
               nodeId,
               nodeAccountId,
-              node.has("description") && !node.get("description").isNull()
-                  ? node.get("description").asText()
+              node.hasNonNull("description") ? node.get("description").asText() : null,
+              node.hasNonNull("memo") ? node.get("memo").asText() : null,
+              node.hasNonNull("public_key") ? parseKey(node.get("public_key")) : null,
+              node.hasNonNull("admin_key") ? parseKey(node.get("admin_key")) : null,
+              node.hasNonNull("node_cert_hash") ? node.get("node_cert_hash").asText() : null,
+              node.hasNonNull("stake") ? node.get("stake").asLong() : null,
+              node.hasNonNull("min_stake") ? node.get("min_stake").asLong() : null,
+              node.hasNonNull("max_stake") ? node.get("max_stake").asLong() : null,
+              node.hasNonNull("stake_rewarded") ? node.get("stake_rewarded").asLong() : null,
+              node.hasNonNull("stake_not_rewarded")
+                  ? node.get("stake_not_rewarded").asLong()
                   : null,
-              node.has("memo") && !node.get("memo").isNull() ? node.get("memo").asText() : null,
-              node.has("public_key") && !node.get("public_key").isNull()
-                  ? parseKey(node.get("public_key"))
-                  : null,
-              node.has("node_cert_hash") && !node.get("node_cert_hash").isNull()
-                  ? node.get("node_cert_hash").asText()
-                  : null,
-              node.has("stake") ? node.get("stake").asLong() : 0L,
-              node.has("min_stake") ? node.get("min_stake").asLong() : 0L,
-              node.has("max_stake") ? node.get("max_stake").asLong() : 0L,
-              node.has("stake_rewarded") ? node.get("stake_rewarded").asLong() : 0L,
-              node.has("stake_not_rewarded") ? node.get("stake_not_rewarded").asLong() : 0L,
-              node.has("reward_rate_start") ? node.get("reward_rate_start").asLong() : 0L,
+              node.hasNonNull("reward_rate_start") ? node.get("reward_rate_start").asLong() : null,
               node.has("decline_reward") && node.get("decline_reward").asBoolean(),
-              node.has("file_id") && !node.get("file_id").isNull()
-                  ? node.get("file_id").asText()
-                  : null,
+              node.hasNonNull("file_id") ? node.get("file_id").asText() : null,
               node.has("staking_period") ? node.get("staking_period").asLong() : 0L,
               new TimestampRange(fromTimestamp, toTimestamp),
               serviceEndpoints));
