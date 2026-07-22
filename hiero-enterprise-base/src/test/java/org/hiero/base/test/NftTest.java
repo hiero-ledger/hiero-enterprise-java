@@ -42,14 +42,12 @@ public class NftTest {
 
   @Test
   void testNftThrowsForNullTokenId() {
-    Assertions.assertThrows(
-        NullPointerException.class, () -> new Nft(null, 1L, null, METADATA));
+    Assertions.assertThrows(NullPointerException.class, () -> new Nft(null, 1L, null, METADATA));
   }
 
   @Test
   void testNftThrowsForNullMetadata() {
-    Assertions.assertThrows(
-        NullPointerException.class, () -> new Nft(TOKEN_ID, 1L, null, null));
+    Assertions.assertThrows(NullPointerException.class, () -> new Nft(TOKEN_ID, 1L, null, null));
   }
 
   @Test
