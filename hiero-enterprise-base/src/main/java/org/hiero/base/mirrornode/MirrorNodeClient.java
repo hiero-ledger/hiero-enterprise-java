@@ -515,5 +515,5 @@ public interface MirrorNodeClient {
    * @return the node information
    * @throws HieroException if an error occurs
    */
-  @NonNull Optional<Node> queryNetworkNodeById(@NonNull AccountId nodeId) throws HieroException;
+  @NonNull Optional<Node> queryNetworkNodeById(long nodeId) throws HieroException;
 }
