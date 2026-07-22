@@ -1068,6 +1068,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               jsonObject.containsKey("public_key")
                   ? parseKey(jsonObject.getJsonObject("public_key"))
                   : null,
+              jsonObject.containsKey("admin_key")
+                  ? parseKey(jsonObject.getJsonObject("admin_key"))
+                  : null,
               getNullableString(jsonObject, "node_cert_hash").orElse(null),
               jsonObject.getJsonNumber("stake").longValue(),
               jsonObject.getJsonNumber("min_stake").longValue(),
