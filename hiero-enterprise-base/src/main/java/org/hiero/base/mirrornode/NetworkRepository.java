@@ -7,6 +7,8 @@ import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
+import org.hiero.base.data.Node;
+import org.hiero.base.data.Page;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -45,4 +47,21 @@ public interface NetworkRepository {
    * @throws HieroException if the search fails
    */
   @NonNull Optional<NetworkSupplies> supplies() throws HieroException;
+
+  /**
+   * Returns the network address book nodes.
+   *
+   * @return a {@link Page} containing the network nodes
+   * @throws HieroException if the search fails
+   */
+  @NonNull Page<Node> findNodes() throws HieroException;
+
+  /**
+   * Returns the network node for the given node ID.
+   *
+   * @param nodeId the node account ID
+   * @return the matching {@link Node}, if present
+   * @throws HieroException if the search fails
+   */
+  @NonNull Optional<Node> findNodeById(long nodeId) throws HieroException;
 }

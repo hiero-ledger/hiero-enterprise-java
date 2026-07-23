@@ -19,6 +19,7 @@ import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
 import org.hiero.base.data.Token;
@@ -498,4 +499,21 @@ public interface MirrorNodeClient {
    * @throws HieroException if an error occurs
    */
   @NonNull Optional<Block> queryBlockByHash(@NonNull String hash) throws HieroException;
+
+  /**
+   * Queries all network nodes.
+   *
+   * @return the nodes
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<Node> queryNetworkNodes() throws HieroException;
+
+  /**
+   * Queries a network node by its ID.
+   *
+   * @param nodeId the node ID
+   * @return the node information
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Optional<Node> queryNetworkNodeById(long nodeId) throws HieroException;
 }

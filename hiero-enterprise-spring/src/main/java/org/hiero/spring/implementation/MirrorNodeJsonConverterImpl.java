@@ -36,6 +36,7 @@ import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransfer;
+import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.SinglePage;
@@ -963,5 +964,90 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
 
     return Instant.ofEpochSecond(seconds, nanos);
+  }
+
+  @Override
+  public @NonNull List<Node> toNodes(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "node must not be null");
+
+    if (!node.has("nodes")) {
+      return List.of();
+    }
+
+    final JsonNode nodes = node.get("nodes");
+    if (!nodes.isArray()) {
+      throw new IllegalArgumentException("Nodes property is not an array: " + nodes);
+    }
+
+    return jsonArrayToStream(nodes)
+        .map(n -> toNode(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private @NonNull Optional<Node> toNode(@NonNull JsonNode node) {
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
+      return Optional.empty();
+    }
+
+    try {
+      final long nodeId = node.get("node_id").asLong();
+      final AccountId nodeAccountId =
+          node.hasNonNull("node_account_id")
+              ? AccountId.fromString(node.get("node_account_id").asText())
+              : null;
+
+      final List<Node.ServiceEndpoint> serviceEndpoints =
+          node.has("service_endpoints")
+              ? jsonArrayToStream(node.get("service_endpoints"))
+                  .map(
+                      endpoint ->
+                          new Node.ServiceEndpoint(
+                              endpoint.hasNonNull("ip_address_v4")
+                                  ? endpoint.get("ip_address_v4").asText()
+                                  : null,
+                              endpoint.get("port").asInt(),
+                              endpoint.hasNonNull("domain_name")
+                                  ? endpoint.get("domain_name").asText()
+                                  : null))
+                  .toList()
+              : List.of();
+
+      final JsonNode timestampNode = node.get("timestamp");
+      final Instant fromTimestamp =
+          timestampNode != null && timestampNode.hasNonNull("from")
+              ? parseInstant(timestampNode.get("from").asText())
+              : null;
+      final Instant toTimestamp =
+          timestampNode != null && timestampNode.hasNonNull("to")
+              ? parseInstant(timestampNode.get("to").asText())
+              : null;
+
+      return Optional.of(
+          new Node(
+              nodeId,
+              nodeAccountId,
+              node.hasNonNull("description") ? node.get("description").asText() : null,
+              node.hasNonNull("memo") ? node.get("memo").asText() : null,
+              node.hasNonNull("public_key") ? parseKey(node.get("public_key")) : null,
+              node.hasNonNull("admin_key") ? parseKey(node.get("admin_key")) : null,
+              node.hasNonNull("node_cert_hash") ? node.get("node_cert_hash").asText() : null,
+              node.hasNonNull("stake") ? node.get("stake").asLong() : null,
+              node.hasNonNull("min_stake") ? node.get("min_stake").asLong() : null,
+              node.hasNonNull("max_stake") ? node.get("max_stake").asLong() : null,
+              node.hasNonNull("stake_rewarded") ? node.get("stake_rewarded").asLong() : null,
+              node.hasNonNull("stake_not_rewarded")
+                  ? node.get("stake_not_rewarded").asLong()
+                  : null,
+              node.hasNonNull("reward_rate_start") ? node.get("reward_rate_start").asLong() : null,
+              node.has("decline_reward") && node.get("decline_reward").asBoolean(),
+              node.hasNonNull("file_id") ? node.get("file_id").asText() : null,
+              node.has("staking_period") ? node.get("staking_period").asLong() : 0L,
+              new TimestampRange(fromTimestamp, toTimestamp),
+              serviceEndpoints));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
   }
 }

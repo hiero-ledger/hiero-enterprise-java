@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.TopicId;
 import jakarta.json.JsonObject;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
@@ -13,6 +14,7 @@ import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
 import org.hiero.base.data.Token;
@@ -160,5 +162,25 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final Function<JsonObject, List<Block>> dataExtractionFunction =
         node -> jsonConverter.toBlocks(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<Node> queryNetworkNodes() throws HieroException {
+    final String path = "/api/v1/network/nodes";
+    final Function<JsonObject, List<Node>> dataExtractionFunction =
+        node -> jsonConverter.toNodes(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Optional<Node> queryNetworkNodeById(long nodeId) throws HieroException {
+
+    final String path = "/api/v1/network/nodes?node.id=eq:" + nodeId;
+
+    final Function<JsonObject, List<Node>> dataExtractionFunction =
+        node -> jsonConverter.toNodes(node);
+
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path)
+        .getData().stream().findFirst();
   }
 }
