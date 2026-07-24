@@ -80,7 +80,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       final String releasedSupply = jsonObject.getString("released_supply");
       final String totalSupply = jsonObject.getString("total_supply");
-      return Optional.of(new NetworkSupplies(releasedSupply, totalSupply));
+      final Instant timestamp = parseInstant(jsonObject.getString("timestamp"));
+      return Optional.of(new NetworkSupplies(releasedSupply, totalSupply, timestamp));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
@@ -115,6 +116,14 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final long unreservedStakingRewardBalance =
           jsonObject.getJsonNumber("unreserved_staking_reward_balance").longValue();
 
+      JsonObject stakingPeriod = jsonObject.getJsonObject("staking_period");
+
+      final Instant stakingPeriodFrom = parseInstant(stakingPeriod.getString("from"));
+      final Instant stakingPeriodTo =
+          stakingPeriod.containsKey("to") && !stakingPeriod.isNull("to")
+              ? parseInstant(stakingPeriod.getString("to"))
+              : null;
+
       return Optional.of(
           new NetworkStake(
               maxStakeReward,
@@ -129,7 +138,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               stakingRewardFeeFraction,
               stakingRewardRate,
               stakingStartThreshold,
-              unreservedStakingRewardBalance));
+              unreservedStakingRewardBalance,
+              stakingPeriodFrom,
+              stakingPeriodTo));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
@@ -160,10 +171,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           Instant.ofEpochSecond(
               jsonObject.getJsonObject("next_rate").getJsonNumber("expiration_time").longValue());
 
+      final Instant timestamp = parseInstant(jsonObject.getString("timestamp"));
+
       return Optional.of(
           new ExchangeRates(
               new ExchangeRate(currentCentEquivalent, currentHbarEquivalent, currentExpirationTime),
-              new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime)));
+              new ExchangeRate(nextCentEquivalent, nextHbarEquivalent, nextExpirationTime),
+              timestamp));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
@@ -176,12 +190,63 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
     try {
       final AccountId accountId = AccountId.fromString(node.getString("account"));
-      final String evmAddress = node.getString("evm_address");
+      final String alias =
+          node.containsKey("alias") && !node.isNull("alias") ? node.getString("alias") : null;
+      final Long autoRenewPeriod =
+          node.containsKey("auto_renew_period") && !node.isNull("auto_renew_period")
+              ? node.getJsonNumber("auto_renew_period").longValue()
+              : null;
+      final Instant createdTimestamp = parseInstant(node.getString("created_timestamp"));
+      final boolean declineReward = node.getBoolean("decline_reward");
+      final boolean deleted = node.getBoolean("deleted");
       final long ethereumNonce = node.getJsonNumber("ethereum_nonce").longValue();
+      final String evmAddress = node.getString("evm_address");
+      final Instant expiryTimestamp = parseInstant(node.getString("expiry_timestamp"));
+      final Key key = parseKey(node.get("key").asJsonObject());
+      final int maxAutomaticTokenAssociations = node.getInt("max_automatic_token_associations");
+      final String memo = node.getString("memo");
       final long pendingReward = node.getJsonNumber("pending_reward").longValue();
+      final boolean requiredReceiverSignature = node.getBoolean("receiver_sig_required");
+      final AccountId stakedAccountId =
+          node.containsKey("staked_account_id") && !node.isNull("staked_account_id")
+              ? AccountId.fromString(node.getString("staked_account_id"))
+              : null;
+      final Long stakedNodeId =
+          node.containsKey("staked_node_id") && !node.isNull("staked_node_id")
+              ? node.getJsonNumber("staked_node_id").longValue()
+              : null;
+      final Instant stakePeriodStart =
+          node.containsKey("stake_period_start") && !node.isNull("stake_period_start")
+              ? parseInstant(node.getString("stake_period_start"))
+              : null;
+
+      List<TransactionInfo> transactions = List.of();
+      if (node.containsKey("transactions") && !node.isNull("transactions")) {
+        transactions = toTransactionInfos(node);
+      }
+
       final long balance = node.getJsonObject("balance").getJsonNumber("balance").longValue();
       return Optional.of(
-          new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward));
+          new AccountInfo(
+              accountId,
+              alias,
+              autoRenewPeriod,
+              balance,
+              createdTimestamp,
+              declineReward,
+              deleted,
+              ethereumNonce,
+              evmAddress,
+              expiryTimestamp,
+              key,
+              maxAutomaticTokenAssociations,
+              memo,
+              pendingReward,
+              requiredReceiverSignature,
+              stakedAccountId,
+              stakedNodeId,
+              stakePeriodStart,
+              transactions));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + node, e);
     }
@@ -226,12 +291,25 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final String transactionId = jsonObject.getString("transaction_id");
+      final Key batchKey =
+          jsonObject.containsKey("batch_key") && !jsonObject.isNull("batch_key")
+              ? parseKey(jsonObject.get("batch_key").asJsonObject())
+              : null;
       final byte[] bytes = getNullableString(jsonObject, "bytes").orElse("").getBytes();
       final long chargedTxFee = jsonObject.getJsonNumber("charged_tx_fee").longValue();
       final Instant consensusTimestamp =
           Instant.ofEpochSecond(
               (long) Double.parseDouble(jsonObject.getString("consensus_timestamp")));
       final String entityId = getNullableString(jsonObject, "entity_id").orElse(null);
+      final boolean highVolume =
+          jsonObject.containsKey("high_volume") && !jsonObject.isNull("high_volume")
+              ? jsonObject.getBoolean("high_volume")
+              : false;
+      final long highVolumePricingMultiplier =
+          jsonObject.containsKey("high_volume_pricing_multiplier")
+                  && !jsonObject.isNull("high_volume_pricing_multiplier")
+              ? jsonObject.getJsonNumber("high_volume_pricing_multiplier").longValue()
+              : 0;
       final String maxFee = jsonObject.getString("max_fee");
       final byte[] memo = jsonObject.getString("memo_base64").getBytes();
       final TransactionType name = TransactionType.from(jsonObject.getString("name"));
@@ -271,10 +349,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       return Optional.of(
           new TransactionInfo(
               transactionId,
+              batchKey,
               bytes,
               chargedTxFee,
               consensusTimestamp,
               entityId,
+              highVolume,
+              highVolumePricingMultiplier,
               maxFee,
               memo,
               name,
@@ -811,16 +892,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               : jsonObject.getJsonNumber("auto_renew_period").intValue();
       final Instant createdTimestamp =
           jsonObject.get("created_timestamp") == null
-              ? Instant.ofEpochSecond(0)
-              : Instant.ofEpochSecond(
-                  Long.parseLong(
-                      jsonObject.get("created_timestamp").toString().replaceAll("[^0-9].*$", "")));
+              ? null
+              : parseInstant(jsonObject.getString("created_timestamp"));
       final boolean deleted = jsonObject.get("deleted") != null && jsonObject.getBoolean("deleted");
       final Instant expirationTimestamp =
           jsonObject.get("expiration_timestamp") == null
               ? null
-              : Instant.ofEpochSecond(
-                  Long.parseLong(jsonObject.getString("expiration_timestamp").split("\\.")[0]));
+              : parseInstant(jsonObject.getString("expiration_timestamp"));
       final String fileId = jsonObject.getString("file_id", null);
       final String evmAddress = jsonObject.getString("evm_address", null);
       final String memo = jsonObject.getString("memo", null);
@@ -835,11 +913,11 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           jsonObject.get("permanent_removal") != null && jsonObject.getBoolean("permanent_removal");
       final String proxyAccountId = jsonObject.getString("proxy_account_id", null);
       final Instant fromTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").getJsonNumber("from").longValue());
+          parseInstant(jsonObject.getJsonObject("timestamp").getString("from"));
       final Instant toTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").getJsonNumber("to").longValue());
+          jsonObject.getJsonObject("timestamp").isNull("to")
+              ? null
+              : parseInstant(jsonObject.getJsonObject("timestamp").getString("to"));
       final String bytecode = jsonObject.getString("bytecode", null);
       final String runtimeBytecode = jsonObject.getString("runtime_bytecode", null);
 
@@ -912,31 +990,30 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
     try {
       final long count = jsonObject.getJsonNumber("count").longValue();
-      final String hapiVersion = jsonObject.getString("hapi_version");
+      final String hapiVersion = jsonObject.getString("hapi_version", null);
       final String hash = jsonObject.getString("hash");
       final String name = jsonObject.getString("name");
       final long number = jsonObject.getJsonNumber("number").longValue();
       final String previousHash =
           jsonObject.isNull("previous_hash") ? null : jsonObject.getString("previous_hash");
-      final long size = jsonObject.getJsonNumber("size").longValue();
-      final long gasUsed = jsonObject.getJsonNumber("gas_used").longValue();
+      final Long size =
+          jsonObject.containsKey("size") && !jsonObject.isNull("size")
+              ? jsonObject.getJsonNumber("size").longValue()
+              : null;
+      final Long gasUsed =
+          jsonObject.containsKey("gas_used") && !jsonObject.isNull("gas_used")
+              ? jsonObject.getJsonNumber("gas_used").longValue()
+              : null;
       final String logsBloom =
           jsonObject.isNull("logs_bloom") ? null : jsonObject.getString("logs_bloom");
 
       final Instant fromTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").get("from").getValueType()
-                      == JsonValue.ValueType.NUMBER
-                  ? jsonObject.getJsonObject("timestamp").getJsonNumber("from").longValue()
-                  : Long.parseLong(
-                      jsonObject.getJsonObject("timestamp").getString("from").split("\\.")[0]));
+          parseInstant(jsonObject.getJsonObject("timestamp").getString("from"));
       final Instant toTimestamp =
-          Instant.ofEpochSecond(
-              jsonObject.getJsonObject("timestamp").get("to").getValueType()
-                      == JsonValue.ValueType.NUMBER
-                  ? jsonObject.getJsonObject("timestamp").getJsonNumber("to").longValue()
-                  : Long.parseLong(
-                      jsonObject.getJsonObject("timestamp").getString("to").split("\\.")[0]));
+          jsonObject.getJsonObject("timestamp").containsKey("to")
+                  && !jsonObject.getJsonObject("timestamp").isNull("to")
+              ? parseInstant(jsonObject.getJsonObject("timestamp").getString("to"))
+              : null;
 
       return Optional.of(
           new Block(
