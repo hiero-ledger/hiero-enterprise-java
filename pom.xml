@@ -41,6 +41,9 @@
     <grpc.version>1.58.0</grpc.version>
     <spring.version>6.1.8</spring.version>
     <spring.boot.version>4.1.0</spring.boot.version>
+    <!-- Helidon 4.x requires Jersey 3.1 / JAX-RS 3.1; Spring Boot 4 manages Jersey 4.0 -->
+    <jersey.version>3.1.10</jersey.version>
+    <jakarta-ws-rs.version>3.1.0</jakarta-ws-rs.version>
     <jspecify.version>1.0.0</jspecify.version>
     <dotenv.version>3.2.0</dotenv.version>
     <junit.version>6.0.3</junit.version>
@@ -79,6 +82,20 @@
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcpkix-jdk18on</artifactId>
         <version>${bouncycastle.version}</version>
+      </dependency>
+      <!-- Must precede spring-boot-dependencies: first BOM import wins, and property
+           overrides do not apply when Boot is consumed as an imported BOM. -->
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${jersey.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>${jakarta-ws-rs.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
