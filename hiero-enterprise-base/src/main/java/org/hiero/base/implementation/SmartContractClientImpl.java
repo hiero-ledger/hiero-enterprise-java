@@ -83,13 +83,13 @@ public class SmartContractClientImpl implements SmartContractClient {
     Objects.requireNonNull(contents, "contents must not be null");
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
 
+    final FileId fileId = fileClient.createFile(contents);
     try {
-      final FileId fileId = fileClient.createFile(contents);
-      final ContractId contract = createContract(fileId, maxTransactionFee, gas, constructorParams);
-      fileClient.deleteFile(fileId);
-      return contract;
+      return createContract(fileId, maxTransactionFee, gas, constructorParams);
     } catch (Exception e) {
       throw new HieroException("Failed to create contract out of byte array", e);
+    } finally {
+      fileClient.deleteFile(fileId);
     }
   }
 
