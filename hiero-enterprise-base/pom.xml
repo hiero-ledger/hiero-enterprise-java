@@ -59,6 +59,12 @@
       <groupId>io.grpc</groupId>
       <artifactId>grpc-okhttp</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.squareup.okio</groupId>
+          <artifactId>okio</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
@@ -68,6 +74,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okio</groupId>
+      <artifactId>okio-jvm</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

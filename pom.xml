@@ -57,6 +57,7 @@
     <google.auto.version>1.1.1</google.auto.version>
     <bouncycastle.version>1.84</bouncycastle.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
+    <okio.version>3.17.0</okio.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
@@ -237,6 +238,11 @@
         <groupId>com.google.auto.service</groupId>
         <artifactId>auto-service-annotations</artifactId>
         <version>${google.auto.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okio</groupId>
+        <artifactId>okio-jvm</artifactId>
+        <version>${okio.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
