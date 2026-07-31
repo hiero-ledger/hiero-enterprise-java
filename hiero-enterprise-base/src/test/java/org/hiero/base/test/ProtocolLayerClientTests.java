@@ -36,6 +36,7 @@ public class ProtocolLayerClientTests {
     // then
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeAccountBalanceQuery(null));
+    Assertions.assertThrows(NullPointerException.class, () -> client.executeAccountInfoQuery(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeFileContentsQuery(null));
     Assertions.assertThrows(

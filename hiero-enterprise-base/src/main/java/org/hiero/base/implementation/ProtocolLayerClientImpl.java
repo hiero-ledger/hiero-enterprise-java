@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.AccountInfo;
+import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
@@ -60,6 +62,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -148,6 +152,34 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setMaxQueryPayment(request.maxQueryPayment());
     final AccountBalance balance = executeQueryAndWait(query);
     return new AccountBalanceResponse(balance.hbars);
+  }
+
+  @Override
+  public AccountInfoResponse executeAccountInfoQuery(@NonNull final AccountInfoRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    final AccountInfoQuery query =
+        new AccountInfoQuery()
+            .setAccountId(request.accountId())
+            .setQueryPayment(request.queryPayment())
+            .setMaxQueryPayment(request.maxQueryPayment());
+    final AccountInfo accountInfo = executeQueryAndWait(query);
+    return new AccountInfoResponse(
+        accountInfo.accountId,
+        accountInfo.contractAccountId == null ? "" : accountInfo.contractAccountId,
+        accountInfo.isDeleted,
+        accountInfo.key,
+        accountInfo.balance,
+        accountInfo.isReceiverSignatureRequired,
+        accountInfo.expirationTime,
+        accountInfo.autoRenewPeriod,
+        accountInfo.accountMemo == null ? "" : accountInfo.accountMemo,
+        accountInfo.ownedNfts,
+        accountInfo.maxAutomaticTokenAssociations,
+        accountInfo.aliasKey,
+        accountInfo.ledgerId,
+        accountInfo.ethereumNonce,
+        accountInfo.stakingInfo);
   }
 
   @Override

@@ -31,6 +31,8 @@ import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -114,6 +116,111 @@ public class ProtocolLayerDataCreationTests {
         IllegalArgumentException.class, () -> AccountBalanceResponse.of(Hbar.fromTinybars(-1000)));
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> new AccountBalanceResponse(Hbar.fromTinybars(-1000)));
+  }
+
+  @Test
+  void testAccountInfoRequestCreation() {
+    // given
+    final String accountIdString = "0.0.12345";
+    final AccountId accountId = AccountId.fromString(accountIdString);
+
+    // then
+    Assertions.assertDoesNotThrow(() -> AccountInfoRequest.of(accountIdString));
+    Assertions.assertDoesNotThrow(() -> AccountInfoRequest.of(accountId));
+    Assertions.assertDoesNotThrow(() -> new AccountInfoRequest(accountId, null, null));
+    Assertions.assertDoesNotThrow(
+        () -> new AccountInfoRequest(accountId, Hbar.from(1), Hbar.from(2)));
+    Assertions.assertThrows(NullPointerException.class, () -> AccountInfoRequest.of((String) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> AccountInfoRequest.of((AccountId) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new AccountInfoRequest(null, null, null));
+  }
+
+  @Test
+  void testAccountInfoResponseCreation() {
+    // given
+    final AccountId accountId = AccountId.fromString("0.0.12345");
+    final PrivateKey privateKey = PrivateKey.generateED25519();
+    final Instant expirationTime = Instant.now().plus(Duration.ofDays(90));
+    final Duration autoRenewPeriod = Duration.ofDays(90);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new AccountInfoResponse(
+                accountId,
+                "0000000000000000000000000000000000003039",
+                false,
+                privateKey.getPublicKey(),
+                Hbar.from(10),
+                false,
+                expirationTime,
+                autoRenewPeriod,
+                "memo",
+                0L,
+                0,
+                null,
+                null,
+                0L,
+                null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new AccountInfoResponse(
+                null,
+                "0000000000000000000000000000000000003039",
+                false,
+                privateKey.getPublicKey(),
+                Hbar.from(10),
+                false,
+                expirationTime,
+                autoRenewPeriod,
+                "memo",
+                0L,
+                0,
+                null,
+                null,
+                0L,
+                null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountInfoResponse(
+                accountId,
+                "0000000000000000000000000000000000003039",
+                false,
+                privateKey.getPublicKey(),
+                Hbar.fromTinybars(-1),
+                false,
+                expirationTime,
+                autoRenewPeriod,
+                "memo",
+                0L,
+                0,
+                null,
+                null,
+                0L,
+                null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountInfoResponse(
+                accountId,
+                "0000000000000000000000000000000000003039",
+                false,
+                privateKey.getPublicKey(),
+                Hbar.from(10),
+                false,
+                expirationTime,
+                autoRenewPeriod,
+                "memo",
+                -1L,
+                0,
+                null,
+                null,
+                0L,
+                null));
   }
 
   @Test

@@ -19,6 +19,8 @@ import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
@@ -61,6 +63,76 @@ public class AccountClientImplTest {
     Hbar balance = accountClientImpl.getAccountBalance(accountId);
 
     assertEquals(expectedBalance, balance);
+  }
+
+  @Test
+  public void testGetAccountInfoSuccessful() throws HieroException {
+    AccountId accountId = AccountId.fromString("0.0.12345");
+    AccountInfoResponse mockResponse = mock(AccountInfoResponse.class);
+    when(mockResponse.accountId()).thenReturn(accountId);
+    when(mockResponse.balance()).thenReturn(Hbar.from(10));
+    when(mockResponse.accountMemo()).thenReturn("memo");
+    when(mockResponse.deleted()).thenReturn(false);
+
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenReturn(mockResponse);
+
+    AccountInfoResponse info = accountClientImpl.getAccountInfo(accountId);
+
+    assertEquals(accountId, info.accountId());
+    assertEquals(Hbar.from(10), info.balance());
+    assertEquals("memo", info.accountMemo());
+    assertFalse(info.deleted());
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountInfoQuery(any(AccountInfoRequest.class));
+  }
+
+  @Test
+  public void testGetAccountInfoByStringSuccessful() throws HieroException {
+    AccountInfoResponse mockResponse = mock(AccountInfoResponse.class);
+    when(mockResponse.accountId()).thenReturn(AccountId.fromString("0.0.12345"));
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenReturn(mockResponse);
+
+    AccountInfoResponse info = accountClientImpl.getAccountInfo("0.0.12345");
+
+    assertEquals(AccountId.fromString("0.0.12345"), info.accountId());
+    ArgumentCaptor<AccountInfoRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountInfoRequest.class);
+    verify(mockProtocolLayerClient).executeAccountInfoQuery(requestCaptor.capture());
+    assertEquals(AccountId.fromString("0.0.12345"), requestCaptor.getValue().accountId());
+  }
+
+  @Test
+  public void testGetOperatorAccountInfoSuccessful() throws HieroException {
+    AccountInfoResponse mockResponse = mock(AccountInfoResponse.class);
+    when(mockResponse.accountId()).thenReturn(operatorAccount.accountId());
+    when(mockProtocolLayerClient.getOperatorAccountId()).thenReturn(operatorAccount.accountId());
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenReturn(mockResponse);
+
+    AccountInfoResponse info = accountClientImpl.getOperatorAccountInfo();
+
+    assertEquals(operatorAccount.accountId(), info.accountId());
+    ArgumentCaptor<AccountInfoRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountInfoRequest.class);
+    verify(mockProtocolLayerClient).executeAccountInfoQuery(requestCaptor.capture());
+    assertEquals(operatorAccount.accountId(), requestCaptor.getValue().accountId());
+  }
+
+  @Test
+  public void testGetAccountInfoNullThrowsException() {
+    assertThrows(
+        NullPointerException.class, () -> accountClientImpl.getAccountInfo((AccountId) null));
+  }
+
+  @Test
+  public void testGetAccountInfoInvalidAccountThrowsException() throws HieroException {
+    AccountId invalidAccountId = AccountId.fromString("0.0.9999999");
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenThrow(new HieroException("Invalid account"));
+
+    assertThrows(HieroException.class, () -> accountClientImpl.getAccountInfo(invalidAccountId));
   }
 
   @Test

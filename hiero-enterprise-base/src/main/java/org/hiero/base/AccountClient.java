@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.HookDetails;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -132,12 +133,44 @@ public interface AccountClient {
   }
 
   /**
+   * Returns information about the given account from a consensus node. This does not include the
+   * list of records associated with the account.
+   *
+   * @param accountId the ID of the account
+   * @return the account information
+   * @throws HieroException if the account information could not be retrieved
+   */
+  @NonNull AccountInfoResponse getAccountInfo(@NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Returns information about the given account from a consensus node. This does not include the
+   * list of records associated with the account.
+   *
+   * @param accountId the ID of the account
+   * @return the account information
+   * @throws HieroException if the account information could not be retrieved
+   */
+  @NonNull
+  default AccountInfoResponse getAccountInfo(@NonNull String accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return getAccountInfo(AccountId.fromString(accountId));
+  }
+
+  /**
    * Returns the balance of the operator account.
    *
    * @return the balance of the operator account
    * @throws HieroException if the balance could not be retrieved
    */
   @NonNull Hbar getOperatorAccountBalance() throws HieroException;
+
+  /**
+   * Returns information about the operator account from a consensus node.
+   *
+   * @return the operator account information
+   * @throws HieroException if the account information could not be retrieved
+   */
+  @NonNull AccountInfoResponse getOperatorAccountInfo() throws HieroException;
 
   /**
    * Transfers HBAR from the operator account to another account.

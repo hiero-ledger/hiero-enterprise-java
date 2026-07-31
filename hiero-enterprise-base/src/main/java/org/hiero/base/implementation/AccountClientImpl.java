@@ -14,6 +14,8 @@ import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.AccountDeleteRequest;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
 import org.hiero.base.protocol.data.HbarTransferRequest;
@@ -105,9 +107,22 @@ public class AccountClientImpl implements AccountClient {
     return response.hbars();
   }
 
+  @NonNull
+  @Override
+  public AccountInfoResponse getAccountInfo(@NonNull AccountId accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final AccountInfoRequest request = AccountInfoRequest.of(accountId);
+    return client.executeAccountInfoQuery(request);
+  }
+
   @Override
   public @NonNull Hbar getOperatorAccountBalance() throws HieroException {
     return getAccountBalance(client.getOperatorAccountId());
+  }
+
+  @Override
+  public @NonNull AccountInfoResponse getOperatorAccountInfo() throws HieroException {
+    return getAccountInfo(client.getOperatorAccountId());
   }
 
   @Override

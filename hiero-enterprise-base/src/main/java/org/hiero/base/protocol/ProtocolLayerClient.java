@@ -10,6 +10,8 @@ import org.hiero.base.protocol.data.AccountDeleteRequest;
 import org.hiero.base.protocol.data.AccountDeleteResult;
 import org.hiero.base.protocol.data.AccountHookUpdateRequest;
 import org.hiero.base.protocol.data.AccountHookUpdateResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
 import org.hiero.base.protocol.data.ContractCallRequest;
@@ -73,6 +75,16 @@ public interface ProtocolLayerClient {
    * @throws HieroException if the query could not be executed
    */
   @NonNull AccountBalanceResponse executeAccountBalanceQuery(@NonNull AccountBalanceRequest request)
+      throws HieroException;
+
+  /**
+   * Execute an account info query.
+   *
+   * @param request the request
+   * @return the response containing information about the account
+   * @throws HieroException if the query could not be executed
+   */
+  @NonNull AccountInfoResponse executeAccountInfoQuery(@NonNull AccountInfoRequest request)
       throws HieroException;
 
   /**

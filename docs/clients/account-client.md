@@ -1,6 +1,6 @@
 # Account Client
 
-`AccountClient` provides APIs for managing Hiero accounts, including account creation, deletion, updates, and balance queries.
+`AccountClient` provides APIs for managing Hiero accounts, including account creation, deletion, updates, balance queries, and account info queries.
 
 !!! note
 
@@ -23,7 +23,10 @@
 | `updateAccount(Account account, PrivateKey updatedPrivateKey, String memo)` | Updates both account key and memo. |
 | `getAccountBalance(AccountId accountId)` | Retrieves the HBAR balance of the specified account. |
 | `getAccountBalance(String accountId)` | Retrieves account balance using an account ID string. |
+| `getAccountInfo(AccountId accountId)` | Retrieves account information from a consensus node. |
+| `getAccountInfo(String accountId)` | Retrieves account information using an account ID string. |
 | `getOperatorAccountBalance()` | Retrieves the balance of the configured operator account. |
+| `getOperatorAccountInfo()` | Retrieves account information for the configured operator account. |
 | `transferHbar(AccountId toAccountId, Hbar amount)` | Transfers HBAR from the operator account to another account. |
 | `transferHbar(String toAccountId, Hbar amount)` | Transfers HBAR from the operator account using an account ID string. |
 | `transferHbar(AccountId toAccountId, long amountInHbar)` | Transfers HBAR from the operator account using an amount specified in HBAR. |
@@ -128,6 +131,33 @@ Hbar balance =
 ```java title="getOperatorAccountBalance()"
 Hbar balance =
     accountClient.getOperatorAccountBalance();
+```
+
+---
+
+## Get Account Info
+
+Retrieves the current state of an account from a consensus node. This query does not include the list of records associated with the account.
+
+!!! note
+
+    For historical account data or high-volume reads, prefer [`AccountRepository`](../repositories/account-repository.md) (mirror node). Use `getAccountInfo` when you need current consensus-node state such as keys, memo, expiration, and deletion status.
+
+```java title="getAccountInfo(AccountId accountId)"
+AccountId accountId = AccountId.fromString("0.0.1234");
+
+AccountInfoResponse accountInfo =
+    accountClient.getAccountInfo(accountId);
+
+AccountId id = accountInfo.accountId();
+Hbar balance = accountInfo.balance();
+String memo = accountInfo.accountMemo();
+boolean deleted = accountInfo.deleted();
+```
+
+```java title="getOperatorAccountInfo()"
+AccountInfoResponse accountInfo =
+    accountClient.getOperatorAccountInfo();
 ```
 
 ### Transfer Hbar
