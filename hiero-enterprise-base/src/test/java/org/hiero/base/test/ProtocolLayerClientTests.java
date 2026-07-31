@@ -87,5 +87,4 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeHookStoreTransaction(null));
   }
-  
 }
