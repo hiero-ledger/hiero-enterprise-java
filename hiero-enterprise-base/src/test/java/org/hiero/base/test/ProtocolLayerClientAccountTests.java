@@ -103,14 +103,12 @@ public class ProtocolLayerClientAccountTests {
     final Account account = accountCreateResult.newAccount();
     protocolLayerClient.executeAccountDeleteTransaction(AccountDeleteRequest.of(account));
 
-    // when
-    final AccountInfoResponse accountInfoResponse =
-        protocolLayerClient.executeAccountInfoQuery(AccountInfoRequest.of(account.accountId()));
-
-    // then
-    Assertions.assertNotNull(accountInfoResponse);
-    Assertions.assertEquals(account.accountId(), accountInfoResponse.accountId());
-    Assertions.assertTrue(accountInfoResponse.deleted());
+    // when / then — consensus nodes reject AccountInfoQuery for deleted accounts
+    Assertions.assertThrows(
+        HieroException.class,
+        () ->
+            protocolLayerClient.executeAccountInfoQuery(
+                AccountInfoRequest.of(account.accountId())));
   }
 
   @Test
