@@ -221,6 +221,44 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 0L,
                 null));
+    // -1 means unlimited automatic token associations
+    Assertions.assertDoesNotThrow(
+        () ->
+            new AccountInfoResponse(
+                accountId,
+                "0000000000000000000000000000000000003039",
+                false,
+                privateKey.getPublicKey(),
+                Hbar.from(10),
+                false,
+                expirationTime,
+                autoRenewPeriod,
+                "memo",
+                0L,
+                -1,
+                null,
+                null,
+                0L,
+                null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new AccountInfoResponse(
+                accountId,
+                "0000000000000000000000000000000000003039",
+                false,
+                privateKey.getPublicKey(),
+                Hbar.from(10),
+                false,
+                expirationTime,
+                autoRenewPeriod,
+                "memo",
+                0L,
+                -2,
+                null,
+                null,
+                0L,
+                null));
   }
 
   @Test

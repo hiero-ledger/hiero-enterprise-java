@@ -25,7 +25,8 @@ import org.jspecify.annotations.Nullable;
  * @param autoRenewPeriod the auto-renew period
  * @param accountMemo the account memo
  * @param ownedNfts the number of NFTs owned by the account
- * @param maxAutomaticTokenAssociations the max automatic token associations
+ * @param maxAutomaticTokenAssociations the max automatic token associations; {@code -1} means
+ *     unlimited
  * @param aliasKey the public key alias for the account, if any
  * @param ledgerId the ledger ID the response was returned from
  * @param ethereumNonce the ethereum transaction nonce
@@ -62,8 +63,10 @@ public record AccountInfoResponse(
     if (ownedNfts < 0) {
       throw new IllegalArgumentException("ownedNfts must not be negative");
     }
-    if (maxAutomaticTokenAssociations < 0) {
-      throw new IllegalArgumentException("maxAutomaticTokenAssociations must not be negative");
+    // -1 means unlimited automatic token associations (HIP-904)
+    if (maxAutomaticTokenAssociations < -1) {
+      throw new IllegalArgumentException(
+          "maxAutomaticTokenAssociations must be -1 (unlimited) or non-negative");
     }
   }
 }
