@@ -221,7 +221,6 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 0L,
                 null));
-    // -1 means unlimited automatic token associations
     Assertions.assertDoesNotThrow(
         () ->
             new AccountInfoResponse(
