@@ -1,11 +1,7 @@
 package org.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import java.util.Objects;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-public record Balance(@NonNull AccountId accountId, long balance, long decimals) {
-  public Balance {
-    Objects.requireNonNull(accountId, "accountId must not be null");
-  }
-}
+/* Represent Balance Response for List token balances Hiero mirror-node */
+public record Balance(@Nullable AccountId accountId, long balance, long decimals) {}

@@ -10,11 +10,11 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public record TokenInfo(
-    @NonNull TokenId tokenId,
+    @Nullable TokenId tokenId,
     @NonNull TokenType type,
     @NonNull String name,
     @NonNull String symbol,
-    @Nullable String memo,
+    @NonNull String memo,
     long decimals,
     byte[] metadata,
     @NonNull Instant createdTimestamp,
@@ -24,14 +24,14 @@ public record TokenInfo(
     @NonNull String initialSupply,
     @NonNull String totalSupply,
     @NonNull String maxSupply,
-    @NonNull AccountId treasuryAccountId,
+    @Nullable AccountId treasuryAccountId,
     boolean deleted,
     @NonNull CustomFee customFees) {
   public TokenInfo {
-    Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(type, "type must not be null");
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
+    Objects.requireNonNull(memo, "memo must not be null");
     Objects.requireNonNull(metadata, "metadata must not be null");
     Objects.requireNonNull(createdTimestamp, "createdTimestamp must not be null");
     Objects.requireNonNull(modifiedTimestamp, "modifiedTimestamp must not be null");
@@ -39,7 +39,6 @@ public record TokenInfo(
     Objects.requireNonNull(initialSupply, "initialSupply must not be null");
     Objects.requireNonNull(totalSupply, "totalSupply must not be null");
     Objects.requireNonNull(maxSupply, "maxSupply must not be null");
-    Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
     Objects.requireNonNull(customFees, "customFees must not be null");
   }
 }

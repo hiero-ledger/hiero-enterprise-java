@@ -11,15 +11,13 @@ public record TopicMessage(
     @Nullable ChunkInfo chunkInfo,
     @NonNull Instant consensusTimestamp,
     @NonNull String message,
-    @NonNull AccountId payerAccountId,
+    @Nullable AccountId payerAccountId,
     byte[] runningHash,
     int runningHashVersion,
     long sequenceNumber,
-    @NonNull TopicId topicId) {
+    @Nullable TopicId topicId) {
   public TopicMessage {
     Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
     Objects.requireNonNull(message, "message must not be null");
-    Objects.requireNonNull(payerAccountId, "payerAccountId must not be null");
-    Objects.requireNonNull(topicId, "topicId must not be null");
   }
 }

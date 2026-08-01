@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
+/* Represent CustomFee for TokenInfo response for Hiero mirror-node */
 public record CustomFee(
     @NonNull List<FixedFee> fixedFees,
     @NonNull List<FractionalFee> fractionalFees,
