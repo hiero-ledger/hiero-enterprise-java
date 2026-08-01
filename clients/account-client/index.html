@@ -856,7 +856,18 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Get Account Balance">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-account-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Get Account Info
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Get Account Info">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1577,7 +1588,18 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Get Account Balance">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-account-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Get Account Info
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Get Account Info">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1744,7 +1766,7 @@
 
 
 <h1 id="account-client">Account Client<a class="headerlink" href="#account-client" title="Permanent link">&para;</a></h1>
-<p><code>AccountClient</code> provides APIs for managing Hiero accounts, including account creation, deletion, updates, and balance queries.</p>
+<p><code>AccountClient</code> provides APIs for managing Hiero accounts, including account creation, deletion, updates, balance queries, and account info queries.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Account operations that submit transactions to the Hiero network require HBAR to pay transaction fees.
@@ -1801,8 +1823,20 @@ The configured operator account is used as the transaction payer and must have s
 <td style="text-align: left;">Retrieves account balance using an account ID string.</td>
 </tr>
 <tr>
+<td style="text-align: left;"><code>getAccountInfo(AccountId accountId)</code></td>
+<td style="text-align: left;">Retrieves account information from a consensus node.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>getAccountInfo(String accountId)</code></td>
+<td style="text-align: left;">Retrieves account information using an account ID string.</td>
+</tr>
+<tr>
 <td style="text-align: left;"><code>getOperatorAccountBalance()</code></td>
 <td style="text-align: left;">Retrieves the balance of the configured operator account.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>getOperatorAccountInfo()</code></td>
+<td style="text-align: left;">Retrieves account information for the configured operator account.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>transferHbar(AccountId toAccountId, Hbar amount)</code></td>
@@ -1898,43 +1932,63 @@ The configured operator account is used as the transaction payer and must have s
 <div class="language-java highlight"><span class="filename">getOperatorAccountBalance()</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Hbar</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">accountClient</span><span class="p">.</span><span class="na">getOperatorAccountBalance</span><span class="p">();</span>
 </span></code></pre></div>
+<hr />
+<h2 id="get-account-info">Get Account Info<a class="headerlink" href="#get-account-info" title="Permanent link">&para;</a></h2>
+<p>Retrieves the current state of an account from a consensus node. This query does not include the list of records associated with the account.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For historical account data or high-volume reads, prefer <a href="../../repositories/account-repository/"><code>AccountRepository</code></a> (mirror node). Use <code>getAccountInfo</code> when you need current consensus-node state such as keys, memo, expiration, and deletion status.</p>
+</div>
+<div class="language-java highlight"><span class="filename">getAccountInfo(AccountId accountId)</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">accountId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">AccountInfoResponse</span><span class="w"> </span><span class="n">accountInfo</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">accountClient</span><span class="p">.</span><span class="na">getAccountInfo</span><span class="p">(</span><span class="n">accountId</span><span class="p">);</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accountInfo</span><span class="p">.</span><span class="na">accountId</span><span class="p">();</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">Hbar</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accountInfo</span><span class="p">.</span><span class="na">balance</span><span class="p">();</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">String</span><span class="w"> </span><span class="n">memo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accountInfo</span><span class="p">.</span><span class="na">accountMemo</span><span class="p">();</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accountInfo</span><span class="p">.</span><span class="na">deleted</span><span class="p">();</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">getOperatorAccountInfo()</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">AccountInfoResponse</span><span class="w"> </span><span class="n">accountInfo</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">accountClient</span><span class="p">.</span><span class="na">getOperatorAccountInfo</span><span class="p">();</span>
+</span></code></pre></div>
 <h3 id="transfer-hbar">Transfer Hbar<a class="headerlink" href="#transfer-hbar" title="Permanent link">&para;</a></h3>
 <p>Transfer Hbar between account.</p>
-<div class="language-java highlight"><span class="filename">transferHbar(AccountId toAccountId, Hbar amount)</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiverAccountId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.4321&quot;</span><span class="p">);</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">accountClient</span><span class="p">.</span><span class="na">transferHbar</span><span class="p">(</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">receiverAccountId</span><span class="p">,</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">);</span>
-</span></code></pre></div>
-<div class="language-java highlight"><span class="filename">transferHbar(AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId, Hbar amount)</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">senderAccountId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">senderPrivateKey</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiverAccountId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.4321&quot;</span><span class="p">);</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="n">accountClient</span><span class="p">.</span><span class="na">transferHbar</span><span class="p">(</span>
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="n">senderAccountId</span><span class="p">,</span>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">    </span><span class="n">senderPrivateKey</span><span class="p">,</span>
-</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">    </span><span class="n">receiverAccountId</span><span class="p">,</span>
-</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">    </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
-</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="p">);</span>
-</span></code></pre></div>
-<div class="language-java highlight"><span class="filename">transferHbar(Account fromAccount, AccountId toAccountId, Hbar amount)</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Account</span><span class="w"> </span><span class="n">senderAccount</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">accountClient</span><span class="p">.</span><span class="na">createAccount</span><span class="p">();</span>
+<div class="language-java highlight"><span class="filename">transferHbar(AccountId toAccountId, Hbar amount)</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiverAccountId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.4321&quot;</span><span class="p">);</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiverAccountId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.4321&quot;</span><span class="p">);</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">accountClient</span><span class="p">.</span><span class="na">transferHbar</span><span class="p">(</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="n">senderAccount</span><span class="p">,</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="n">receiverAccountId</span><span class="p">,</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="p">);</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">accountClient</span><span class="p">.</span><span class="na">transferHbar</span><span class="p">(</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">receiverAccountId</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">transferHbar(AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId, Hbar amount)</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">senderAccountId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">senderPrivateKey</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiverAccountId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.4321&quot;</span><span class="p">);</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="n">accountClient</span><span class="p">.</span><span class="na">transferHbar</span><span class="p">(</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">    </span><span class="n">senderAccountId</span><span class="p">,</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">    </span><span class="n">senderPrivateKey</span><span class="p">,</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">    </span><span class="n">receiverAccountId</span><span class="p">,</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">transferHbar(Account fromAccount, AccountId toAccountId, Hbar amount)</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Account</span><span class="w"> </span><span class="n">senderAccount</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="n">accountClient</span><span class="p">.</span><span class="na">createAccount</span><span class="p">();</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiverAccountId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.4321&quot;</span><span class="p">);</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="n">accountClient</span><span class="p">.</span><span class="na">transferHbar</span><span class="p">(</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="n">senderAccount</span><span class="p">,</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">    </span><span class="n">receiverAccountId</span><span class="p">,</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
