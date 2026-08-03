@@ -391,7 +391,9 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
       final Instant expiryTimestamp =
           node.hasNonNull("expiry_timestamp")
-              ? parseInstant(node.get("expiry_timestamp").asText())
+              ? Instant.ofEpochSecond(
+                  Math.floorDiv(node.get("expiry_timestamp").asLong(), 1_000_000_000L),
+                  Math.floorMod(node.get("expiry_timestamp").asLong(), 1_000_000_000L))
               : null;
 
       final CustomFee customFees = getCustomFee(node.get("custom_fees"));
