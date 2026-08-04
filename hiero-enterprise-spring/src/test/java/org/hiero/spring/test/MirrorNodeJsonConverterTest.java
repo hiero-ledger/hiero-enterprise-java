@@ -2,9 +2,11 @@ package org.hiero.spring.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
@@ -24,6 +26,8 @@ import org.hiero.spring.implementation.MirrorNodeJsonConverterImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class MirrorNodeJsonConverterTest {
   private MirrorNodeJsonConverterImpl jsonConverter;
@@ -43,6 +47,12 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyAccountInfoOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toAccountInfo(node).isEmpty());
+  }
+
   // Blocks
   @Test
   void shouldParseValidBlocks() {
@@ -58,6 +68,12 @@ public class MirrorNodeJsonConverterTest {
     final Optional<Block> result = Assertions.assertDoesNotThrow(() -> jsonConverter.toBlock(node));
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyBlockOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toBlock(node).isEmpty());
   }
 
   // Contracts
@@ -89,6 +105,12 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyContractOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toContract(node).isEmpty());
+  }
+
   // Tokens
   @Test
   void shouldParseValidTokenList() {
@@ -105,6 +127,12 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toTokenInfo(node));
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyTokenInfoOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toTokenInfo(node).isEmpty());
   }
 
   // Nft
@@ -124,6 +152,12 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyNftOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toNft(node).isEmpty());
+  }
+
   // Topics
   @Test
   void shouldParseValidTopic() {
@@ -131,6 +165,12 @@ public class MirrorNodeJsonConverterTest {
     final Optional<Topic> result = Assertions.assertDoesNotThrow(() -> jsonConverter.toTopic(node));
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyTopicOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toTopic(node).isEmpty());
   }
 
   @Test
@@ -149,6 +189,12 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toTopicMessage(node));
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyTopicMessageOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toTopicMessage(node).isEmpty());
   }
 
   // Transactions
@@ -170,6 +216,12 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyTransactionInfoOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toTransactionInfo(node).isEmpty());
+  }
+
   // Network
   @Test
   void shouldParseValidNetworkSupplies() {
@@ -178,6 +230,12 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toNetworkSupplies(node));
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyNetworkSuppliesOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toNetworkSupplies(node).isEmpty());
   }
 
   @Test
@@ -189,6 +247,12 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyNetworkStakesOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toNetworkStake(node).isEmpty());
+  }
+
   @Test
   void shouldParseValidExchangeRate() {
     final JsonNode node = loadJson("exchange-rate.json");
@@ -196,6 +260,12 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toExchangeRates(node));
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyExchangeRatesOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toExchangeRates(node).isEmpty());
   }
 
   @Test
@@ -218,5 +288,10 @@ public class MirrorNodeJsonConverterTest {
     } catch (Exception e) {
       throw new RuntimeException("Failed to read json fixture: " + path, e);
     }
+  }
+
+  private static Stream<JsonNode> emptyNodes() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    return Stream.of(mapper.readTree("{}"), NullNode.getInstance());
   }
 }
