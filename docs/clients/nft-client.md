@@ -317,3 +317,4 @@ nftClient.deleteNftType(tokenId, adminKey);
 !!! info
 
     Provide `adminKey` when the NFT type was created with a custom treasury whose key differs from the configured operator account key.
+
