@@ -573,4 +573,43 @@ public interface NftClient {
     transferNfts(
         tokenId, serialNumbers, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
   }
+
+  /**
+   * Deletes an NFT type (token class). All NFTs of that type must have been burned first. The
+   * operator account key is used as the admin key. The NFT type must have been created with that
+   * key as admin (the default for {@link #createNftType} when the operator is the treasury).
+   *
+   * @param tokenId the ID of the NFT type to delete
+   * @throws HieroException if the NFT type could not be deleted
+   */
+  void deleteNftType(@NonNull TokenId tokenId) throws HieroException;
+
+  /**
+   * Deletes an NFT type (token class). All NFTs of that type must have been burned first. Must be
+   * signed by the admin key that was set when the NFT type was created.
+   *
+   * @param tokenId the ID of the NFT type to delete
+   * @param adminKey the admin private key of the NFT type
+   * @throws HieroException if the NFT type could not be deleted
+   */
+  void deleteNftType(@NonNull TokenId tokenId, @NonNull PrivateKey adminKey) throws HieroException;
+
+  /**
+   * Deletes an NFT type (token class). All NFTs of that type must have been burned first.
+   *
+   * @param tokenId the ID of the NFT type to delete
+   * @param adminKey the admin private key of the NFT type
+   * @throws HieroException if the NFT type could not be deleted
+   */
+  default void deleteNftType(@NonNull String tokenId, @NonNull String adminKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    deleteNftType(TokenId.fromString(tokenId), PrivateKey.fromString(adminKey));
+  }
+
+  default void deleteNftType(@NonNull String tokenId) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    deleteNftType(TokenId.fromString(tokenId));
+  }
 }

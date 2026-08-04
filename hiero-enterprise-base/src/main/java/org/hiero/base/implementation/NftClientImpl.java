@@ -16,6 +16,7 @@ import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
@@ -195,5 +196,19 @@ public class NftClientImpl implements NftClient {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, serialNumber, fromAccountId, toAccountId, fromAccountKey);
     client.executeTransferTransaction(request);
+  }
+
+  @Override
+  public void deleteNftType(@NonNull final TokenId tokenId) throws HieroException {
+    deleteNftType(tokenId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void deleteNftType(@NonNull final TokenId tokenId, @NonNull final PrivateKey adminKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    final TokenDeleteRequest request = TokenDeleteRequest.of(tokenId, adminKey);
+    client.executeTokenDeleteTransaction(request);
   }
 }

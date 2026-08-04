@@ -31,6 +31,7 @@ import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenBurnTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -98,6 +99,8 @@ import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
@@ -584,12 +587,34 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTreasuryAccountId(request.treasuryAccountId())
               .setTokenType(request.tokenType())
               .setSupplyKey(request.supplyKey());
-      sign(transaction, request.treasuryKey(), request.supplyKey());
+      if (request.adminKey() != null) {
+        transaction.setAdminKey(request.adminKey().getPublicKey());
+      }
+      sign(transaction, request.treasuryKey(), request.supplyKey(), request.adminKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
       return new TokenCreateResult(receipt.transactionId, receipt.status, receipt.tokenId);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute create token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenDeleteResult executeTokenDeleteTransaction(@NonNull final TokenDeleteRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenDeleteTransaction transaction =
+          new TokenDeleteTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId());
+      sign(transaction, request.adminKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_DELETE);
+      return new TokenDeleteResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute delete token transaction", e);
     }
   }
 
@@ -801,7 +826,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     if (keys != null) {
       transaction.freezeWith(hieroContext.getClient());
       for (PrivateKey key : keys) {
-        transaction.sign(key);
+        if (key != null) {
+          transaction.sign(key);
+        }
       }
     }
     return transaction;

@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, and transferring NFTs between accounts.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, and deleting NFT types.
 
 !!! note
 
@@ -48,6 +48,10 @@
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Transfers multiple NFTs using an account object as sender. |
+| `deleteNftType(TokenId tokenId)` | Deletes an NFT type using the operator account as admin key. |
+| `deleteNftType(TokenId tokenId, PrivateKey adminKey)` | Deletes an NFT type using a custom admin key. |
+| `deleteNftType(String tokenId)` | Deletes an NFT type using a token ID string and the operator admin key. |
+| `deleteNftType(String tokenId, String adminKey)` | Deletes an NFT type using string token ID and admin key. |
 
 ---
 
@@ -291,3 +295,25 @@ nftClient.transferNfts(
     receiver
 );
 ```
+
+---
+
+## Delete NFT Type
+
+Deletes an NFT type (token class). You cannot delete a specific NFT serial; burn all serials first, then delete the type. Requires the admin key set at creation (by default the treasury key).
+
+```java title="deleteNftType(TokenId tokenId)"
+TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT");
+
+nftClient.deleteNftType(tokenId);
+```
+
+```java title="deleteNftType(TokenId tokenId, PrivateKey adminKey)"
+PrivateKey adminKey = PrivateKey.generateED25519();
+
+nftClient.deleteNftType(tokenId, adminKey);
+```
+
+!!! info
+
+    Provide `adminKey` when the NFT type was created with a custom treasury whose key differs from the configured operator account key.

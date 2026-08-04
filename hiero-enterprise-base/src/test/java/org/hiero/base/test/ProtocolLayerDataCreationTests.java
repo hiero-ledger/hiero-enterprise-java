@@ -67,6 +67,8 @@ import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
@@ -1700,7 +1702,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryAccountId,
                 treasuryKey,
                 tokenType,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
     Assertions.assertThrows(
@@ -1714,7 +1717,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryAccountId,
                 treasuryKey,
                 tokenType,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1726,7 +1730,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryAccountId,
                 treasuryKey,
                 tokenType,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1738,7 +1743,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryAccountId,
                 treasuryKey,
                 tokenType,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1750,7 +1756,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryAccountId,
                 treasuryKey,
                 tokenType,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1762,7 +1769,8 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 treasuryKey,
                 tokenType,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1774,7 +1782,49 @@ public class ProtocolLayerDataCreationTests {
                 treasuryAccountId,
                 treasuryKey,
                 null,
-                supplyKey));
+                supplyKey,
+                treasuryKey));
+  }
+
+  @Test
+  void testTokenDeleteRequestCreation() {
+    // Given
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final PrivateKey supplyKey = PrivateKey.generateECDSA();
+
+    // Then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenDeleteRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, supplyKey));
+    Assertions.assertDoesNotThrow(() -> TokenDeleteRequest.of(tokenId, supplyKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenDeleteRequest(null, transactionValidDuration, tokenId, supplyKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenDeleteRequest(maxTransactionFee, null, tokenId, supplyKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenDeleteRequest(maxTransactionFee, transactionValidDuration, null, supplyKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenDeleteRequest(maxTransactionFee, transactionValidDuration, tokenId, null));
+  }
+
+  @Test
+  void testTokenDeleteResultCreation() {
+    // Given
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    // Then
+    Assertions.assertDoesNotThrow(() -> new TokenDeleteResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new TokenDeleteResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenDeleteResult(transactionId, null));
   }
 
   @Test
