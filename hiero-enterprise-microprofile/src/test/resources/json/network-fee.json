@@ -1,0 +1,17 @@
+{
+  "fees": [
+    {
+      "gas": 120,
+      "transaction_type": "ContractCall"
+    },
+    {
+      "gas": 120,
+      "transaction_type": "ContractCreate"
+    },
+    {
+      "gas": 120,
+      "transaction_type": "EthereumTransaction"
+    }
+  ],
+  "timestamp": "1784739600.440755004"
+}

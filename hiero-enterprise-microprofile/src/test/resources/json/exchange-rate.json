@@ -1,0 +1,13 @@
+{
+  "current_rate": {
+    "cent_equivalent": 212848,
+    "expiration_time": 1785852000,
+    "hbar_equivalent": 30000
+  },
+  "next_rate": {
+    "cent_equivalent": 211949,
+    "expiration_time": 1785855600,
+    "hbar_equivalent": 30000
+  },
+  "timestamp": "1785848458.473589363"
+}

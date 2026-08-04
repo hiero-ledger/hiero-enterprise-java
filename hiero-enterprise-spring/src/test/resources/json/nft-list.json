@@ -1,0 +1,282 @@
+{
+  "nfts": [
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1783782830.140518805",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "SA==",
+      "modified_timestamp": "1783784267.124512000",
+      "serial_number": 1,
+      "spender": null,
+      "token_id": "0.0.9511435"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1783782961.998319786",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "SA==",
+      "modified_timestamp": "1783784267.124512000",
+      "serial_number": 1,
+      "spender": null,
+      "token_id": "0.0.9511427"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1783526536.585324710",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "SGVsbG8gSGllcm8tMg==",
+      "modified_timestamp": "1783526536.585324710",
+      "serial_number": 2,
+      "spender": null,
+      "token_id": "0.0.9486276"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1783526370.769537000",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "SGVsbG8gSGllcm8tMg==",
+      "modified_timestamp": "1783526370.769537000",
+      "serial_number": 2,
+      "spender": null,
+      "token_id": "0.0.9486250"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1783526368.837041000",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "SGVsbG8gSGllcm8tMQ==",
+      "modified_timestamp": "1783526368.837041000",
+      "serial_number": 1,
+      "spender": null,
+      "token_id": "0.0.9486250"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjk=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 270,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjg=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 269,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjc=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 268,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjY=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 267,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjU=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 266,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjQ=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 265,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjM=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 264,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjI=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 263,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjE=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 262,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443887.265130421",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNjA=",
+      "modified_timestamp": "1777443887.265130421",
+      "serial_number": 261,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTk=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 260,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTg=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 259,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTc=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 258,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTY=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 257,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTU=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 256,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTQ=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 255,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTM=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 254,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTI=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 253,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTE=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 252,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    },
+    {
+      "account_id": "0.0.6105114",
+      "created_timestamp": "1777443885.236262485",
+      "delegating_spender": null,
+      "deleted": false,
+      "metadata": "bWV0YWRhdGEyNTA=",
+      "modified_timestamp": "1777443885.236262485",
+      "serial_number": 251,
+      "spender": null,
+      "token_id": "0.0.8814792"
+    }
+  ],
+  "links": {
+    "next": "/api/v1/accounts/0.0.6105114/nfts?token.id=lte:0.0.8814792&serialnumber=lt:251"
+  }
+}

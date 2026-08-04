@@ -1,0 +1,50 @@
+{
+  "admin_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  },
+  "auto_renew_account": "0.0.1245",
+  "auto_renew_period": 6999999,
+  "created_timestamp": "1706816186.275486248",
+  "custom_fees": {
+    "created_timestamp": "1706816186.275486248",
+    "fixed_fees": [],
+    "fractional_fees": []
+  },
+  "decimals": "10",
+  "deleted": true,
+  "expiry_timestamp": 1713816185275486248,
+  "fee_schedule_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  },
+  "freeze_default": false,
+  "freeze_key": null,
+  "initial_supply": "1000000",
+  "kyc_key": null,
+  "max_supply": "0",
+  "memo": "Mirror Node acceptance test: 2024-02-01T19:36:25.988650944Z Create token",
+  "metadata": "",
+  "metadata_key": null,
+  "modified_timestamp": "1706816444.138081003",
+  "name": "fungible_name",
+  "pause_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  },
+  "pause_status": "UNPAUSED",
+  "supply_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  },
+  "supply_type": "INFINITE",
+  "symbol": "fungible",
+  "token_id": "0.0.1267",
+  "total_supply": "0",
+  "treasury_account_id": "0.0.1245",
+  "type": "FUNGIBLE_COMMON",
+  "wipe_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  }
+}

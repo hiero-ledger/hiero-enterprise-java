@@ -1,0 +1,26 @@
+{
+  "admin_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  },
+  "auto_renew_account": null,
+  "auto_renew_period": 7776000,
+  "created_timestamp": "1706816673.106110015",
+  "custom_fees": {
+    "created_timestamp": "1706816673.106110015",
+    "fixed_fees": []
+  },
+  "deleted": false,
+  "fee_exempt_key_list": [],
+  "fee_schedule_key": null,
+  "memo": "1706816668096 Mirror node created test topic",
+  "submit_key": {
+    "_type": "ED25519",
+    "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+  },
+  "timestamp": {
+    "from": "1706816673.106110015",
+    "to": null
+  },
+  "topic_id": "0.0.1926"
+}

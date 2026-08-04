@@ -1,0 +1,304 @@
+{
+  "tokens": [
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_name",
+      "symbol": "fungible",
+      "token_id": "0.0.1267",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_kyc_unfrozen_for_eth_call_name",
+      "symbol": "fungible_kyc_unfrozen_for_eth_call",
+      "token_id": "0.0.1268",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_name",
+      "symbol": "non_fungible",
+      "token_id": "0.0.1269",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_name",
+      "symbol": "fungible",
+      "token_id": "0.0.1270",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_name",
+      "symbol": "non_fungible",
+      "token_id": "0.0.1271",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "allowance_fungible_name",
+      "symbol": "allowance_fungible",
+      "token_id": "0.0.1274",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_deletable_name",
+      "symbol": "fungible_deletable",
+      "token_id": "0.0.1275",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_erc_name",
+      "symbol": "non_fungible_erc",
+      "token_id": "0.0.1276",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_custom_fees_name",
+      "symbol": "fungible_custom_fees",
+      "token_id": "0.0.1278",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_deletable_name",
+      "symbol": "non_fungible_deletable",
+      "token_id": "0.0.1305",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_historical_name",
+      "symbol": "non_fungible_historical",
+      "token_id": "0.0.1381",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_historical_name",
+      "symbol": "fungible_historical",
+      "token_id": "0.0.1391",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "SWOP_name",
+      "symbol": "SWOP",
+      "token_id": "0.0.1558",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_kyc_not_applicable_unfrozen_name",
+      "symbol": "fungible_kyc_not_applicable_unfrozen",
+      "token_id": "0.0.1706",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_name",
+      "symbol": "fungible",
+      "token_id": "0.0.1972",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_kyc_unfrozen_for_eth_call_name",
+      "symbol": "fungible_kyc_unfrozen_for_eth_call",
+      "token_id": "0.0.1973",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_name",
+      "symbol": "non_fungible",
+      "token_id": "0.0.1974",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_name",
+      "symbol": "fungible",
+      "token_id": "0.0.1975",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "allowance_fungible_name",
+      "symbol": "allowance_fungible",
+      "token_id": "0.0.1976",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_name",
+      "symbol": "non_fungible",
+      "token_id": "0.0.1978",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_deletable_name",
+      "symbol": "fungible_deletable",
+      "token_id": "0.0.1980",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_erc_name",
+      "symbol": "non_fungible_erc",
+      "token_id": "0.0.1981",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "fungible_custom_fees_name",
+      "symbol": "fungible_custom_fees",
+      "token_id": "0.0.1983",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 10
+    },
+    {
+      "admin_key": null,
+      "metadata": "",
+      "name": "Myro's Domain",
+      "symbol": "MYRO",
+      "token_id": "0.0.1988",
+      "type": "FUNGIBLE_COMMON",
+      "decimals": 8
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "6bbcd00cb9e4670666987a669eabf478fca032a0fb2a559009e6077d13cd6693"
+      },
+      "metadata": "",
+      "name": "non_fungible_deletable_name",
+      "symbol": "non_fungible_deletable",
+      "token_id": "0.0.1999",
+      "type": "NON_FUNGIBLE_UNIQUE",
+      "decimals": 0
+    }
+  ],
+  "links": {
+    "next": "/api/v1/tokens?token.id=gt:0.0.1999"
+  }
+}

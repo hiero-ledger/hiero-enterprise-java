@@ -1,0 +1,19 @@
+{
+  "max_stake_rewarded": 650000000000000000,
+  "max_staking_reward_rate_per_hbar": 5287,
+  "max_total_reward": 44512288670430,
+  "node_reward_fee_fraction": 0.1,
+  "reserved_staking_rewards": 2781375493493491,
+  "reward_balance_threshold": 8500000000000000,
+  "stake_total": 1465970599400000000,
+  "staking_period": {
+    "from": "1785801600.000000000",
+    "to": "1785888000.000000000"
+  },
+  "staking_period_duration": 1440,
+  "staking_periods_stored": 365,
+  "staking_reward_fee_fraction": 0.1,
+  "staking_reward_rate": 44512288670430,
+  "staking_start_threshold": 25000000000000000,
+  "unreserved_staking_reward_balance": 14652305964403937
+}
