@@ -367,7 +367,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     final JsonObject jsonObject = node.asJsonObject();
     final boolean isApproval = jsonObject.getBoolean("is_approval");
     final AccountId receiverAccountId =
-        hasNonNull(jsonObject, "reveiver_account_id")
+        hasNonNull(jsonObject, "receiver_account_id")
             ? AccountId.fromString(jsonObject.getString("receiver_account_id"))
             : null;
     final AccountId senderAccountId =
@@ -449,7 +449,10 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           hasNonNull(jsonObject, "auto_renew_period")
               ? jsonObject.getJsonNumber("auto_renew_period").longValue()
               : null;
-      final Instant createdTimestamp = parseInstant(jsonObject.getString("created_timestamp"));
+      final Instant createdTimestamp =
+          hasNonNull(jsonObject, "created_timestamp")
+              ? parseInstant(jsonObject.getString("created_timestamp"))
+              : null;
       final boolean deleted = jsonObject.getBoolean("deleted");
       final Key feeScheduleKey =
           hasNonNull(jsonObject, "fee_schedule_key")
@@ -562,7 +565,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final String message =
           new String(Base64.getDecoder().decode(jsonObject.getString("message")));
       final AccountId payerAccountId =
-          hasNonNull(jsonObject, "payer_account_info")
+          hasNonNull(jsonObject, "payer_account_id")
               ? AccountId.fromString(jsonObject.getString("payer_account_id"))
               : null;
       final byte[] runningHash = jsonObject.getString("running_hash").getBytes();
