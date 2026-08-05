@@ -160,7 +160,7 @@ AccountInfoResponse accountInfo =
     accountClient.getOperatorAccountInfo();
 ```
 
-### Transfer Hbar
+## Transfer Hbar
 
 Transfer Hbar between account.
 
