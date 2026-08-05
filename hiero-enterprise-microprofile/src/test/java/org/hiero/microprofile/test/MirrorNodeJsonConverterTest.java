@@ -4,6 +4,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 import org.hiero.base.data.AccountInfo;
@@ -61,6 +62,23 @@ public class MirrorNodeJsonConverterTest {
   }
 
   @Test
+  void shouldReturnEmptyBlockList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toBlocks(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenBlocksIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"blocks\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toBlocks(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"blocks\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toBlocks(jsonObject2));
+  }
+
+  @Test
   void shouldParseValidBlock() {
     final JsonObject jsonObject = loadJson("block.json");
     final Optional<Block> result =
@@ -83,6 +101,23 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toContracts(jsonObject));
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyContractList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toContracts(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenContractsIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"contracts\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toContracts(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"contracts\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toContracts(jsonObject2));
   }
 
   @Test
@@ -121,6 +156,23 @@ public class MirrorNodeJsonConverterTest {
   }
 
   @Test
+  void shouldReturnEmptyTokenList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toTokens(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenTokensIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"tokens\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTokens(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"tokens\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTokens(jsonObject2));
+  }
+
+  @Test
   void shouldParseValidTokenInfo() {
     final JsonObject jsonObject = loadJson("token-info.json");
     final Optional<TokenInfo> result =
@@ -142,6 +194,23 @@ public class MirrorNodeJsonConverterTest {
     final List<Nft> result = Assertions.assertDoesNotThrow(() -> jsonConverter.toNfts(jsonObject));
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyNftList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toNfts(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenNftsIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"nfts\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNfts(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"nfts\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNfts(jsonObject2));
   }
 
   @Test
@@ -182,6 +251,23 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toTopicMessages(jsonObject));
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyTopicMessageList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toTopicMessages(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenMessagesIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"messages\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTopicMessages(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"messages\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTopicMessages(jsonObject2));
   }
 
   @Test
@@ -279,8 +365,25 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertFalse(result.isEmpty());
   }
 
-  // Helper
-  static JsonObject loadJson(String filename) {
+  @Test
+  void shouldReturnEmptyFeeList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toNetworkFees(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenFeesIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"fees\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"fees\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(jsonObject2));
+  }
+
+  // Helpers
+  private JsonObject loadJson(String filename) {
     String path = "/json/" + filename;
     try (InputStream stream = MirrorNodeJsonConverter.class.getResourceAsStream(path)) {
       if (stream == null) {
@@ -291,6 +394,14 @@ public class MirrorNodeJsonConverterTest {
       }
     } catch (Exception e) {
       throw new RuntimeException("Failed to read json fixture: " + path, e);
+    }
+  }
+
+  private JsonObject parseJson(String json) {
+    try (StringReader stringReader = new StringReader(json);
+        JsonReader jsonReader = Json.createReader(stringReader)) {
+
+      return jsonReader.readObject();
     }
   }
 }

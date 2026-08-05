@@ -30,6 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class MirrorNodeJsonConverterTest {
+  private final ObjectMapper mapper = new ObjectMapper();
   private MirrorNodeJsonConverterImpl jsonConverter;
 
   @BeforeEach
@@ -63,6 +64,23 @@ public class MirrorNodeJsonConverterTest {
   }
 
   @Test
+  void shouldReturnEmptyBlockList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toBlocks(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenBlocksIsNotArray() throws Exception {
+    // null value
+    JsonNode node1 = mapper.readTree("{\"blocks\": null}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toBlocks(node1));
+
+    // not array
+    JsonNode node2 = mapper.readTree("{\"blocks\": {}}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toBlocks(node2));
+  }
+
+  @Test
   void shouldParseValidBlock() {
     final JsonNode node = loadJson("block.json");
     final Optional<Block> result = Assertions.assertDoesNotThrow(() -> jsonConverter.toBlock(node));
@@ -84,6 +102,21 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toContracts(node));
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyContractList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toContracts(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenContractsIsNotArray() throws Exception {
+    JsonNode node1 = mapper.readTree("{\"contracts\": null}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toContracts(node1));
+
+    JsonNode node2 = mapper.readTree("{\"contracts\": {}}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toContracts(node2));
   }
 
   @Test
@@ -121,6 +154,21 @@ public class MirrorNodeJsonConverterTest {
   }
 
   @Test
+  void shouldReturnEmptyTokenList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toTokens(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenTokensIsNotArray() throws Exception {
+    JsonNode node1 = mapper.readTree("{\"tokens\": null}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toTokens(node1));
+
+    JsonNode node2 = mapper.readTree("{\"tokens\": {}}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toTokens(node2));
+  }
+
+  @Test
   void shouldParseValidTokenInfo() {
     final JsonNode node = loadJson("token-info.json");
     final Optional<TokenInfo> result =
@@ -142,6 +190,21 @@ public class MirrorNodeJsonConverterTest {
     final List<Nft> result = Assertions.assertDoesNotThrow(() -> jsonConverter.toNfts(node));
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyNftList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toNfts(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenNftsIsNotArray() throws Exception {
+    JsonNode node1 = mapper.readTree("{\"nfts\": null}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toNfts(node1));
+
+    JsonNode node2 = mapper.readTree("{\"nfts\": {}}");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> jsonConverter.toNfts(node2));
   }
 
   @Test
@@ -180,6 +243,23 @@ public class MirrorNodeJsonConverterTest {
         Assertions.assertDoesNotThrow(() -> jsonConverter.toTopicMessages(node));
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyTopicMessageList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toTopicMessages(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenMessagesIsNotArray() throws Exception {
+    JsonNode node1 = mapper.readTree("{\"messages\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTopicMessages(node1));
+
+    JsonNode node2 = mapper.readTree("{\"messages\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTopicMessages(node2));
   }
 
   @Test
@@ -277,14 +357,31 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertFalse(result.isEmpty());
   }
 
+  @Test
+  void shouldReturnEmptyFeeList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toNetworkFees(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenFeesIsNotArray() throws Exception {
+    JsonNode node1 = mapper.readTree("{\"fees\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(node1));
+
+    JsonNode node2 = mapper.readTree("{\"fees\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(node2));
+  }
+
   // Helper
-  static JsonNode loadJson(String filename) {
+  private JsonNode loadJson(String filename) {
     String path = "/json/" + filename;
     try (InputStream stream = MirrorNodeJsonConverter.class.getResourceAsStream(path)) {
       if (stream == null) {
         throw new IllegalArgumentException("Json fixture not found on classpath: " + path);
       }
-      return new ObjectMapper().readTree(stream);
+      return mapper.readTree(stream);
     } catch (Exception e) {
       throw new RuntimeException("Failed to read json fixture: " + path, e);
     }

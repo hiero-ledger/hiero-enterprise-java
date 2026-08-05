@@ -183,15 +183,14 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   @Override
   public List<NetworkFee> toNetworkFees(final JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
-    if (node.isNull() || node.isEmpty()) {
-      return List.of();
-    }
-
     if (!node.has("fees")) {
       return List.of();
     }
 
     final JsonNode feesNode = node.get("fees");
+    if (!feesNode.isArray()) {
+      throw new IllegalArgumentException("Fees node is not an array: " + feesNode);
+    }
     return jsonArrayToStream(feesNode)
         .map(
             n -> {
