@@ -64,6 +64,7 @@ jobs:
         uses: hiero-ledger/hiero-solo-action@531a2b283ca4912df537d64bf89da0f6be4c2574 # v0.22.0
         with:
           installMirrorNode: true
+          soloVersion: 0.82.1
           hieroVersion: v0.66.0
           mirrorNodeVersion: v0.138.0
           mirrorNodePortGrpc: 5600
