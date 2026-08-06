@@ -23,8 +23,13 @@ public final class HederaMainnetSettings implements NetworkSettings {
   }
 
   @Override
-  public @NonNull Set<String> getMirrorNodeAddresses() {
-    return Set.of("https://mainnet.mirrornode.hedera.com:443");
+  public @NonNull Set<String> getMirrorNodeGrpcAddresses() {
+    return Set.of("mainnet.mirrornode.hedera.com:443");
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.of("https://mainnet.mirrornode.hedera.com");
   }
 
   @Override

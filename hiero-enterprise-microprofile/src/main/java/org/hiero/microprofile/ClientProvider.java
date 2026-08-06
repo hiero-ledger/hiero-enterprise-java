@@ -146,8 +146,8 @@ public class ClientProvider {
   @ApplicationScoped
   MirrorNodeClient createMirrorNodeClient(@NonNull final HieroConfig hieroConfig) {
     final String target =
-        hieroConfig.getMirrorNodeAddresses().stream()
-            .findFirst()
+        hieroConfig
+            .getMirrorNodeRestUrl()
             .orElseThrow(() -> new IllegalStateException("No mirror node addresses configured"));
     final MirrorNodeRestClientImpl restClient = new MirrorNodeRestClientImpl(target);
     final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();

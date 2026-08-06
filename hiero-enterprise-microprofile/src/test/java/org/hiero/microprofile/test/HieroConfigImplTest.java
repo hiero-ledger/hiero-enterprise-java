@@ -36,8 +36,8 @@ class HieroConfigImplTest {
           }
 
           @Override
-          public Optional<String> getMirrornode() {
-            return Optional.empty();
+          public MirrorNode getMirrornode() {
+            return new MirrorNode();
           }
 
           @Override
@@ -80,8 +80,8 @@ class HieroConfigImplTest {
           }
 
           @Override
-          public Optional<String> getMirrornode() {
-            return Optional.empty();
+          public MirrorNode getMirrornode() {
+            return new MirrorNode();
           }
 
           @Override

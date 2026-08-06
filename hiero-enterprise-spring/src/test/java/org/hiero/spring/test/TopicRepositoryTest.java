@@ -39,7 +39,7 @@ public class TopicRepositoryTest {
   void testFindTopicById() throws Exception {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
-    System.out.println(topicId);
+
     final Optional<Topic> result = topicRepository.findTopicById(topicId);
 
     Assertions.assertNotNull(result);
