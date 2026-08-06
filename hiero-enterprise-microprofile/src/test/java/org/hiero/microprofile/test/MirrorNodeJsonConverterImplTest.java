@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link MirrorNodeJsonConverterImpl} NFT parsing.
  *
- * <p>These tests do not require a Hedera network connection — they test JSON parsing
- * logic directly using constructed {@link jakarta.json.JsonObject} objects.
+ * <p>These tests do not require a Hedera network connection — they test JSON parsing logic directly
+ * using constructed {@link jakarta.json.JsonObject} objects.
  */
 public class MirrorNodeJsonConverterImplTest {
 
@@ -28,8 +28,7 @@ public class MirrorNodeJsonConverterImplTest {
   private static final String ACCOUNT_ID = "0.0.12345";
   private static final long SERIAL = 1L;
   private static final byte[] METADATA = "https://example.com/nft/1".getBytes();
-  private static final String METADATA_BASE64 =
-      Base64.getEncoder().encodeToString(METADATA);
+  private static final String METADATA_BASE64 = Base64.getEncoder().encodeToString(METADATA);
   // The microprofile converter stores metadata as the raw Base64 string bytes (not decoded),
   // consistent with how it handles metadata throughout the module.
   private static final byte[] EXPECTED_METADATA_BYTES = METADATA_BASE64.getBytes();
@@ -44,12 +43,13 @@ public class MirrorNodeJsonConverterImplTest {
   @Test
   void toNft_withValidAccountId_returnsNftWithOwner() {
     // given — a live NFT with a non-null account_id
-    final JsonObject node = Json.createObjectBuilder()
-        .add("token_id", TOKEN_ID)
-        .add("account_id", ACCOUNT_ID)
-        .add("serial_number", SERIAL)
-        .add("metadata", METADATA_BASE64)
-        .build();
+    final JsonObject node =
+        Json.createObjectBuilder()
+            .add("token_id", TOKEN_ID)
+            .add("account_id", ACCOUNT_ID)
+            .add("serial_number", SERIAL)
+            .add("metadata", METADATA_BASE64)
+            .build();
 
     // when
     final Optional<Nft> result = converter.toNft(node);
@@ -66,12 +66,13 @@ public class MirrorNodeJsonConverterImplTest {
   @Test
   void toNft_withNullAccountId_returnsNftWithNullOwner() {
     // given — a burned NFT: the mirror node returns account_id: null
-    final JsonObject node = Json.createObjectBuilder()
-        .add("token_id", TOKEN_ID)
-        .addNull("account_id")          // <-- burned NFT
-        .add("serial_number", SERIAL)
-        .add("metadata", METADATA_BASE64)
-        .build();
+    final JsonObject node =
+        Json.createObjectBuilder()
+            .add("token_id", TOKEN_ID)
+            .addNull("account_id") // <-- burned NFT
+            .add("serial_number", SERIAL)
+            .add("metadata", METADATA_BASE64)
+            .build();
 
     // when
     final Optional<Nft> result = converter.toNft(node);
@@ -107,28 +108,25 @@ public class MirrorNodeJsonConverterImplTest {
   @Test
   void toNfts_withMixedBurnedAndLiveNfts_returnsBothCorrectly() {
     // given — a list that contains one live NFT and one burned NFT
-    final JsonObject liveNft = Json.createObjectBuilder()
-        .add("token_id", TOKEN_ID)
-        .add("account_id", ACCOUNT_ID)
-        .add("serial_number", 1L)
-        .add("metadata", METADATA_BASE64)
-        .build();
+    final JsonObject liveNft =
+        Json.createObjectBuilder()
+            .add("token_id", TOKEN_ID)
+            .add("account_id", ACCOUNT_ID)
+            .add("serial_number", 1L)
+            .add("metadata", METADATA_BASE64)
+            .build();
 
-    final JsonObject burnedNft = Json.createObjectBuilder()
-        .add("token_id", TOKEN_ID)
-        .addNull("account_id")          // <-- burned NFT
-        .add("serial_number", 2L)
-        .add("metadata", METADATA_BASE64)
-        .build();
+    final JsonObject burnedNft =
+        Json.createObjectBuilder()
+            .add("token_id", TOKEN_ID)
+            .addNull("account_id") // <-- burned NFT
+            .add("serial_number", 2L)
+            .add("metadata", METADATA_BASE64)
+            .build();
 
-    final JsonArray nftsArray = Json.createArrayBuilder()
-        .add(liveNft)
-        .add(burnedNft)
-        .build();
+    final JsonArray nftsArray = Json.createArrayBuilder().add(liveNft).add(burnedNft).build();
 
-    final JsonObject root = Json.createObjectBuilder()
-        .add("nfts", nftsArray)
-        .build();
+    final JsonObject root = Json.createObjectBuilder().add("nfts", nftsArray).build();
 
     // when
     final List<Nft> result = converter.toNfts(root);
@@ -148,9 +146,8 @@ public class MirrorNodeJsonConverterImplTest {
   @Test
   void toNfts_withEmptyNftsArray_returnsEmptyList() {
     // given
-    final JsonObject root = Json.createObjectBuilder()
-        .add("nfts", Json.createArrayBuilder().build())
-        .build();
+    final JsonObject root =
+        Json.createObjectBuilder().add("nfts", Json.createArrayBuilder().build()).build();
 
     // when
     final List<Nft> result = converter.toNfts(root);

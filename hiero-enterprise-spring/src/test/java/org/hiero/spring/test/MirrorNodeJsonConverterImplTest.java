@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link MirrorNodeJsonConverterImpl} NFT parsing.
  *
- * <p>These tests do not require a Hedera network connection — they test JSON parsing
- * logic directly using constructed {@link com.fasterxml.jackson.databind.JsonNode} objects.
+ * <p>These tests do not require a Hedera network connection — they test JSON parsing logic directly
+ * using constructed {@link com.fasterxml.jackson.databind.JsonNode} objects.
  */
 public class MirrorNodeJsonConverterImplTest {
 
@@ -28,8 +28,7 @@ public class MirrorNodeJsonConverterImplTest {
   private static final String ACCOUNT_ID = "0.0.12345";
   private static final long SERIAL = 1L;
   private static final byte[] METADATA = "https://example.com/nft/1".getBytes();
-  private static final String METADATA_BASE64 =
-      Base64.getEncoder().encodeToString(METADATA);
+  private static final String METADATA_BASE64 = Base64.getEncoder().encodeToString(METADATA);
 
   @BeforeEach
   void setUp() {
@@ -65,7 +64,7 @@ public class MirrorNodeJsonConverterImplTest {
     // given — a burned NFT: the mirror node returns account_id: null
     final ObjectNode node = objectMapper.createObjectNode();
     node.put("token_id", TOKEN_ID);
-    node.putNull("account_id");         // <-- burned NFT
+    node.putNull("account_id"); // <-- burned NFT
     node.put("serial_number", SERIAL);
     node.put("metadata", METADATA_BASE64);
 
@@ -111,7 +110,7 @@ public class MirrorNodeJsonConverterImplTest {
 
     final ObjectNode burnedNft = objectMapper.createObjectNode();
     burnedNft.put("token_id", TOKEN_ID);
-    burnedNft.putNull("account_id");    // <-- burned NFT
+    burnedNft.putNull("account_id"); // <-- burned NFT
     burnedNft.put("serial_number", 2L);
     burnedNft.put("metadata", METADATA_BASE64);
 
