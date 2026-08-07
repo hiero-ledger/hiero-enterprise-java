@@ -2,6 +2,7 @@ package org.hiero.base.test;
 
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.Status;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -108,5 +109,6 @@ public class ProtocolLayerClientTokenTests {
     // then
     Assertions.assertNotNull(tokenUpdateResult);
     Assertions.assertNotNull(tokenUpdateResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, tokenUpdateResult.status());
   }
 }
