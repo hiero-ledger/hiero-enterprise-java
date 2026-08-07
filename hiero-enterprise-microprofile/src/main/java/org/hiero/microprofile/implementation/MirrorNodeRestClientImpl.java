@@ -48,7 +48,8 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonObject
   }
 
   private String resolveTarget(String path) {
-    if (networkTarget != null && path.startsWith(NETWORK_API_PREFIX)) {
+    if (networkTarget != null
+        && (path.equals(NETWORK_API_PREFIX) || path.startsWith(NETWORK_API_PREFIX + "/"))) {
       return networkTarget;
     }
     return target;
