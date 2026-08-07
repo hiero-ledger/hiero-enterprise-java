@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, updating NFT types, and deleting NFT types.
 
 !!! note
 
@@ -48,6 +48,10 @@
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Transfers multiple NFTs using an account object as sender. |
+| `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
+| `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
+| `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
+| `updateNftType(String tokenId, String name, String symbol, String adminKey)` | Updates an NFT type using string token ID and admin key. |
 | `deleteNftType(TokenId tokenId)` | Deletes an NFT type using the operator account as admin key. |
 | `deleteNftType(TokenId tokenId, PrivateKey adminKey)` | Deletes an NFT type using a custom admin key. |
 | `deleteNftType(String tokenId)` | Deletes an NFT type using a token ID string and the operator admin key. |
@@ -295,6 +299,28 @@ nftClient.transferNfts(
     receiver
 );
 ```
+
+---
+
+## Update NFT Type
+
+Updates properties of an NFT type (token class), such as name and symbol. Requires the admin key set at creation (by default the treasury key). Fields that are not changed are left as-is on the network.
+
+```java title="updateNftType(TokenId tokenId, String name, String symbol)"
+TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT");
+
+nftClient.updateNftType(tokenId, "Updated Demo NFT", "UDNFT");
+```
+
+```java title="updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)"
+PrivateKey adminKey = PrivateKey.generateED25519();
+
+nftClient.updateNftType(tokenId, "Updated Demo NFT", "UDNFT", adminKey);
+```
+
+!!! info
+
+    Provide `adminKey` when the NFT type was created with a custom treasury whose key differs from the configured operator account key.
 
 ---
 

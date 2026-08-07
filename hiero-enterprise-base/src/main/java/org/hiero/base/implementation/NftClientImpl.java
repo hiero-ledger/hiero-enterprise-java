@@ -21,6 +21,7 @@ import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.jspecify.annotations.NonNull;
 
 public class NftClientImpl implements NftClient {
@@ -196,6 +197,27 @@ public class NftClientImpl implements NftClient {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, serialNumber, fromAccountId, toAccountId, fromAccountKey);
     client.executeTransferTransaction(request);
+  }
+
+  @Override
+  public void updateNftType(@NonNull TokenId tokenId, @NonNull String name, @NonNull String symbol)
+      throws HieroException {
+    updateNftType(tokenId, name, symbol, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void updateNftType(
+      @NonNull TokenId tokenId,
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull PrivateKey adminKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(name, "name must not be null");
+    Objects.requireNonNull(symbol, "symbol must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    final TokenUpdateRequest request = TokenUpdateRequest.of(tokenId, adminKey, name, symbol);
+    client.executeTokenUpdateTransaction(request);
   }
 
   @Override

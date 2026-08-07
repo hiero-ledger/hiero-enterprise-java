@@ -30,6 +30,8 @@ import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenUpdateResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -875,6 +877,91 @@ public class NftClientImplTest {
         () -> nftClientImpl.mintNfts(tokenId, (PrivateKey) null, metadata));
     Assertions.assertThrows(
         NullPointerException.class, () -> nftClientImpl.mintNfts(tokenId, supplyKey, null));
+  }
+
+  @Test
+  void testUpdateNftTypeWithOperatorAdminKey() throws HieroException {
+    final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final String name = "Updated NFT";
+    final String symbol = "UNFT";
+    final TokenUpdateResult tokenUpdateResult = Mockito.mock(TokenUpdateResult.class);
+    ArgumentCaptor<TokenUpdateRequest> updateCaptor =
+        ArgumentCaptor.forClass(TokenUpdateRequest.class);
+
+    when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(protocolLayerClient.executeTokenUpdateTransaction(any(TokenUpdateRequest.class)))
+        .thenReturn(tokenUpdateResult);
+
+    nftClientImpl.updateNftType(tokenId, name, symbol);
+
+    verify(protocolLayerClient, times(1)).executeTokenUpdateTransaction(updateCaptor.capture());
+    TokenUpdateRequest request = updateCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(privateKey, request.adminKey());
+    Assertions.assertEquals(name, request.name());
+    Assertions.assertEquals(symbol, request.symbol());
+  }
+
+  @Test
+  void testUpdateNftTypeWithCustomAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final String name = "Updated NFT";
+    final String symbol = "UNFT";
+    final TokenUpdateResult tokenUpdateResult = Mockito.mock(TokenUpdateResult.class);
+    ArgumentCaptor<TokenUpdateRequest> updateCaptor =
+        ArgumentCaptor.forClass(TokenUpdateRequest.class);
+
+    when(protocolLayerClient.executeTokenUpdateTransaction(any(TokenUpdateRequest.class)))
+        .thenReturn(tokenUpdateResult);
+
+    nftClientImpl.updateNftType(tokenId, name, symbol, adminKey);
+
+    verify(protocolLayerClient, times(1)).executeTokenUpdateTransaction(updateCaptor.capture());
+    TokenUpdateRequest request = updateCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(adminKey, request.adminKey());
+    Assertions.assertEquals(name, request.name());
+    Assertions.assertEquals(symbol, request.symbol());
+  }
+
+  @Test
+  void testUpdateNftTypeThrowsForNull() {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final String name = "Updated NFT";
+    final String symbol = "UNFT";
+
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftType((TokenId) null, name, symbol));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.updateNftType(tokenId, null, symbol));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.updateNftType(tokenId, name, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftType((TokenId) null, name, symbol, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftType(tokenId, null, symbol, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftType(tokenId, name, null, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.updateNftType(tokenId, name, symbol, null));
+  }
+
+  @Test
+  void testUpdateNftTypeThrowsHieroException() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    when(operationalAccount.privateKey()).thenReturn(PrivateKey.generateECDSA());
+    when(protocolLayerClient.executeTokenUpdateTransaction(any(TokenUpdateRequest.class)))
+        .thenThrow(new HieroException("update failed"));
+
+    Assertions.assertThrows(
+        HieroException.class, () -> nftClientImpl.updateNftType(tokenId, "Updated NFT", "UNFT"));
   }
 
   @Test

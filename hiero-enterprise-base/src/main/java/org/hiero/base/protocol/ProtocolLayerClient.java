@@ -54,6 +54,8 @@ import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenUpdateResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -241,6 +243,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenDeleteResult executeTokenDeleteTransaction(
       @NonNull final TokenDeleteRequest request) throws HieroException;
+
+  /**
+   * Executes a token update transaction.
+   *
+   * @param request the request containing the details of the token update transaction
+   * @return the result of the token update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenUpdateResult executeTokenUpdateTransaction(
+      @NonNull final TokenUpdateRequest request) throws HieroException;
 
   /**
    * Executes a token associate transaction.

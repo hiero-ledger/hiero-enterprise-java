@@ -75,6 +75,8 @@ import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenUpdateResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -1825,6 +1827,61 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(NullPointerException.class, () -> new TokenDeleteResult(null, status));
     Assertions.assertThrows(
         NullPointerException.class, () -> new TokenDeleteResult(transactionId, null));
+  }
+
+  @Test
+  void testTokenUpdateRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final String name = "Updated NFT";
+    final String symbol = "UNFT";
+    final String tooLongSymbol =
+        IntStream.range(0, 101).mapToObj(i -> "a").reduce("", (a, b) -> a + b);
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenUpdateRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, adminKey, name, symbol));
+    Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of(tokenId, adminKey, name, symbol));
+    Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of(tokenId, adminKey, name, null));
+    Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of(tokenId, adminKey, null, symbol));
+    Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of("0.0.12345", adminKey, name, symbol));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> TokenUpdateRequest.of(tokenId, adminKey, null, null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenUpdateRequest.of(tokenId, adminKey, name, tooLongSymbol));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateRequest(
+                null, transactionValidDuration, tokenId, adminKey, name, symbol));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenUpdateRequest(maxTransactionFee, null, tokenId, adminKey, name, symbol));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateRequest(
+                maxTransactionFee, transactionValidDuration, null, adminKey, name, symbol));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, name, symbol));
+  }
+
+  @Test
+  void testTokenUpdateResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new TokenUpdateResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new TokenUpdateResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenUpdateResult(transactionId, null));
   }
 
   @Test

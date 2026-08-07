@@ -575,6 +575,71 @@ public interface NftClient {
   }
 
   /**
+   * Updates an NFT type (token class) name and symbol. The operator account key is used as the
+   * admin key. The NFT type must have been created with that key as admin (the default for {@link
+   * #createNftType} when the operator is the treasury).
+   *
+   * @param tokenId the ID of the NFT type to update
+   * @param name the new name of the NFT type
+   * @param symbol the new symbol of the NFT type
+   * @throws HieroException if the NFT type could not be updated
+   */
+  void updateNftType(@NonNull TokenId tokenId, @NonNull String name, @NonNull String symbol)
+      throws HieroException;
+
+  /**
+   * Updates an NFT type (token class) name and symbol. Must be signed by the admin key that was set
+   * when the NFT type was created.
+   *
+   * @param tokenId the ID of the NFT type to update
+   * @param name the new name of the NFT type
+   * @param symbol the new symbol of the NFT type
+   * @param adminKey the admin private key of the NFT type
+   * @throws HieroException if the NFT type could not be updated
+   */
+  void updateNftType(
+      @NonNull TokenId tokenId,
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull PrivateKey adminKey)
+      throws HieroException;
+
+  /**
+   * Updates an NFT type (token class) name and symbol.
+   *
+   * @param tokenId the ID of the NFT type to update
+   * @param name the new name of the NFT type
+   * @param symbol the new symbol of the NFT type
+   * @param adminKey the admin private key of the NFT type
+   * @throws HieroException if the NFT type could not be updated
+   */
+  default void updateNftType(
+      @NonNull String tokenId,
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull String adminKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    updateNftType(TokenId.fromString(tokenId), name, symbol, PrivateKey.fromString(adminKey));
+  }
+
+  /**
+   * Updates an NFT type (token class) name and symbol. The operator account key is used as the
+   * admin key.
+   *
+   * @param tokenId the ID of the NFT type to update
+   * @param name the new name of the NFT type
+   * @param symbol the new symbol of the NFT type
+   * @throws HieroException if the NFT type could not be updated
+   */
+  default void updateNftType(@NonNull String tokenId, @NonNull String name, @NonNull String symbol)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    updateNftType(TokenId.fromString(tokenId), name, symbol);
+  }
+
+  /**
    * Deletes an NFT type (token class). All NFTs of that type must have been burned first. The
    * operator account key is used as the admin key. The NFT type must have been created with that
    * key as admin (the default for {@link #createNftType} when the operator is the treasury).
