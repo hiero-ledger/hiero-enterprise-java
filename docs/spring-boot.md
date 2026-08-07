@@ -48,6 +48,7 @@ Configure your operator account credentials and target network in `application.p
 | `spring.hiero.privateKey`                                                                                                                                                 | **Required.** Your private key used to sign transactions.                                          |
 | `spring.hiero.network.name`                                                                                                                                               | Target network name. Valid values: `hedera-mainnet`, `hedera-testnet`. (Default `hedera-mainnet`). |
 | `spring.hiero.network.mirrorNode`                                                                                                                                         | *Optional.* Explicit endpoint URL for a custom mirror node.                                        |
+| `spring.hiero.network.mirror-node-java-rest`                                                                                                                              | *Optional.* Base URL for Mirror Node REST-Java (e.g. `http://localhost:8084` in Solo). Used for `/api/v1/network/*` on mirror-node 0.15x+. |
 | `spring.hiero.network.requestTimeoutInMs`                                                                                                                                 | *Optional.* Network request timeout threshold in milliseconds.                                     |
 
 ---
