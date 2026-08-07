@@ -49,8 +49,7 @@ public class TestConfigSource implements ConfigSource {
         .forEach(e -> properties.put(e.getKey(), e.getValue()));
 
     if ("hiero-solo-action".equals(properties.get("hiero.network.name"))) {
-      properties.putIfAbsent(
-          "hiero.network.mirror-node-java-rest", "http://localhost:8084");
+      properties.putIfAbsent("hiero.network.mirror-node-java-rest", "http://localhost:8084");
     }
 
     properties.forEach(
