@@ -49,11 +49,11 @@ jobs:
 
       - name: Wait for Mirror Node
         run: |
-          echo "Waiting for Mirror Node REST (Node.js) on http://localhost:5551..."
-          until curl --output /dev/null --silent --fail http://localhost:5551/health/readiness; do
+          echo "Waiting for Mirror Node REST (Node.js) on http://localhost:38081..."
+          until curl --output /dev/null --silent --fail http://localhost:38081/health/readiness; do
             echo "Mirror Node (rest) not ready, waiting..."
             kubectl get svc -n solo || true
-            curl --silent http://localhost:5551/health/readiness || echo "No response from mirrorNode REST readiness"
+            curl --silent http://localhost:38081/health/readiness || echo "No response from mirrorNode REST readiness"
             sleep 5
           done
           echo "Waiting for Mirror Node REST-Java on http://localhost:8084..."

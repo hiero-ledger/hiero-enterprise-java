@@ -50,7 +50,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
    * Constructor with optional REST-Java base URL for {@code /api/v1/network/*} (mirror-node
    * 0.15x+).
    *
-   * @param restClientBuilder builder with Node REST base URL (e.g. port 5551)
+   * @param restClientBuilder builder with Node REST base URL (e.g. port 38081)
    * @param mirrorNodeJavaRestBaseUrl optional base URL for REST-Java (e.g. {@code
    *     http://localhost:8084})
    */
