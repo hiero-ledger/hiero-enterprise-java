@@ -45,6 +45,7 @@ hiero.network.name=hedera-testnet
 | `hiero.privateKey` | **Required.** Your DER-encoded private key used to sign transactions. |
 | `hiero.network.name` | Target network name. Valid values: `hedera-mainnet`, `hedera-testnet`. (Default `hedera-mainnet`). |
 | `hiero.network.mirrornode` | *Optional.* Explicit endpoint URL for a custom mirror node. |
+| `hiero.network.mirror-node-java-rest` | *Optional.* Base URL for Mirror Node REST-Java (e.g. `http://localhost:8084` in Solo). Used for `/api/v1/network/*` on mirror-node 0.15x+. |
 | `hiero.network.requestTimeoutInMs` | *Optional.* Network request timeout threshold in milliseconds. |
 
 ### Configure Custom Network Nodes

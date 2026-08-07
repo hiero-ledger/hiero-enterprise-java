@@ -41,6 +41,11 @@ class HieroConfigImplTest {
           }
 
           @Override
+          public Optional<String> getMirrorNodeJavaRest() {
+            return Optional.empty();
+          }
+
+          @Override
           public Optional<Long> getRequestTimeoutInMs() {
             return Optional.empty();
           }
@@ -81,6 +86,11 @@ class HieroConfigImplTest {
 
           @Override
           public Optional<String> getMirrornode() {
+            return Optional.empty();
+          }
+
+          @Override
+          public Optional<String> getMirrorNodeJavaRest() {
             return Optional.empty();
           }
 
