@@ -56,8 +56,6 @@ public record TokenUpdateRequest(
       @Nullable String name,
       @Nullable String symbol) {
     Objects.requireNonNull(tokenId, "Token ID cannot be null");
-    assert name != null;
-    assert symbol != null;
     return of(TokenId.fromString(tokenId), adminKey, name, symbol);
   }
 }
