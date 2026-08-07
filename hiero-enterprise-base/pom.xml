@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.hiero</groupId>
     <artifactId>hiero-enterprise</artifactId>
-    <version>0.20.0-SNAPSHOT</version>
+    <version>0.21.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -16,7 +16,6 @@
   <name>Hiero Enterprise Base</name>
   <description>Base Library to work with Hiero in Spring and JakartaEE</description>
   <url>https://github.com/hiero-ledger/hiero-enterprise-java</url>
-
 
   <dependencies>
     <dependency>
@@ -60,6 +59,12 @@
       <groupId>io.grpc</groupId>
       <artifactId>grpc-okhttp</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.squareup.okio</groupId>
+          <artifactId>okio</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
@@ -69,6 +74,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okio</groupId>
+      <artifactId>okio-jvm</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

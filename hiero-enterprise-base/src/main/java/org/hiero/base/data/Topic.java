@@ -1,7 +1,7 @@
 package org.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.time.Instant;
 import java.util.List;
@@ -11,23 +11,20 @@ import org.jspecify.annotations.Nullable;
 
 public record Topic(
     @NonNull TopicId topicId,
-    @Nullable PublicKey adminKey,
+    @Nullable Key adminKey,
     @Nullable AccountId autoRenewAccount,
     int autoRenewPeriod,
     @NonNull Instant createdTimestamp,
     @NonNull List<FixedFee> fixedFees,
-    @Nullable List<PublicKey> feeExemptKeyList,
-    @Nullable PublicKey feeScheduleKey,
-    @Nullable PublicKey submitKey,
+    @Nullable List<Key> feeExemptKeyList,
+    @Nullable Key feeScheduleKey,
+    @Nullable Key submitKey,
     boolean deleted,
     String memo,
-    @NonNull Instant fromTimestamp,
-    @NonNull Instant toTimestamp) {
+    @NonNull TimestampRange timestampRange) {
   public Topic {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(createdTimestamp, "createdTimestamp must not be null");
     Objects.requireNonNull(fixedFees, "fixedFees must not be null");
-    Objects.requireNonNull(fromTimestamp, "fromTimestamp must not be null");
-    Objects.requireNonNull(toTimestamp, "toTimestamp must not be null");
   }
 }

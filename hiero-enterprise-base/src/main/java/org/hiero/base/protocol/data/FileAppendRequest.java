@@ -34,6 +34,7 @@ public record FileAppendRequest(
       throw new IllegalArgumentException(
           "File contents must be less than " + FILE_CREATE_MAX_BYTES + " bytes");
     }
+
     if (fileMemo != null && fileMemo.length() > 100) {
       throw new IllegalArgumentException("File memo must be less than 100 characters");
     }

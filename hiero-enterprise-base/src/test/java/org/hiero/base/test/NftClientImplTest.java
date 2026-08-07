@@ -22,6 +22,8 @@ import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
@@ -873,5 +875,48 @@ public class NftClientImplTest {
         () -> nftClientImpl.mintNfts(tokenId, (PrivateKey) null, metadata));
     Assertions.assertThrows(
         NullPointerException.class, () -> nftClientImpl.mintNfts(tokenId, supplyKey, null));
+  }
+
+  @Test
+  void testDeleteNftTypeWithOperatorAdminKey() throws HieroException {
+    final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenDeleteResult tokenDeleteResult = Mockito.mock(TokenDeleteResult.class);
+    ArgumentCaptor<TokenDeleteRequest> deleteCaptor =
+        ArgumentCaptor.forClass(TokenDeleteRequest.class);
+
+    when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(protocolLayerClient.executeTokenDeleteTransaction(any(TokenDeleteRequest.class)))
+        .thenReturn(tokenDeleteResult);
+
+    nftClientImpl.deleteNftType(tokenId);
+
+    verify(protocolLayerClient, times(1)).executeTokenDeleteTransaction(deleteCaptor.capture());
+    TokenDeleteRequest request = deleteCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(privateKey, request.adminKey());
+  }
+
+  @Test
+  void testDeleteNftTypeThrowsForNull() {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.deleteNftType((TokenId) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.deleteNftType((TokenId) null, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.deleteNftType(tokenId, null));
+  }
+
+  @Test
+  void testDeleteNftTypeThrowsHieroException() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    when(operationalAccount.privateKey()).thenReturn(PrivateKey.generateECDSA());
+    when(protocolLayerClient.executeTokenDeleteTransaction(any(TokenDeleteRequest.class)))
+        .thenThrow(new HieroException("delete failed"));
+
+    Assertions.assertThrows(HieroException.class, () -> nftClientImpl.deleteNftType(tokenId));
   }
 }

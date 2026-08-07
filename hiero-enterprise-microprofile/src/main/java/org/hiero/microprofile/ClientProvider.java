@@ -111,8 +111,10 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
-  AccountClient createAccountClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
-    return new AccountClientImpl(protocolLayerClient);
+  AccountClient createAccountClient(
+      @NonNull final ProtocolLayerClient protocolLayerClient,
+      @NonNull final HieroContext hieroContext) {
+    return new AccountClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
   }
 
   @NonNull

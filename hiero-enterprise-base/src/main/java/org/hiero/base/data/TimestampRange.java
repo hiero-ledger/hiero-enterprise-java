@@ -1,14 +1,7 @@
 package org.hiero.base.data;
 
 import java.time.Instant;
-import java.util.Objects;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /** Represents a range of timestamps. */
-public record TimestampRange(@NonNull Instant from, @NonNull Instant to) {
-
-  public TimestampRange {
-    Objects.requireNonNull(from, "from must not be null");
-    Objects.requireNonNull(to, "to must not be null");
-  }
-}
+public record TimestampRange(@Nullable Instant from, @Nullable Instant to) {}

@@ -7,6 +7,8 @@ import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.test.config.HieroTestContext;
@@ -55,5 +57,29 @@ public class ProtocolLayerClientTokenTests {
     // then
     Assertions.assertDoesNotThrow(
         () -> protocolLayerClient.executeBurnTokenTransaction(tokenBurnRequest));
+  }
+
+  @Test
+  void testDeleteNftType() throws Exception {
+    // given — create an empty NFT type (no minted serials)
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Delete NFT",
+            "DEL",
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            hieroTestContext.getOperatorAccount());
+    final TokenCreateResult tokenCreateResult =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest);
+    final TokenId tokenId = tokenCreateResult.tokenId();
+
+    // when
+    final TokenDeleteRequest tokenDeleteRequest =
+        TokenDeleteRequest.of(tokenId, hieroTestContext.getOperatorAccount().privateKey());
+    final TokenDeleteResult tokenDeleteResult =
+        protocolLayerClient.executeTokenDeleteTransaction(tokenDeleteRequest);
+
+    // then
+    Assertions.assertNotNull(tokenDeleteResult);
+    Assertions.assertNotNull(tokenDeleteResult.transactionId());
   }
 }

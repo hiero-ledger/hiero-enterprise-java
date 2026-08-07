@@ -18,7 +18,8 @@ public record TokenCreateRequest(
     @NonNull AccountId treasuryAccountId,
     @NonNull PrivateKey treasuryKey,
     @NonNull TokenType tokenType,
-    @Nullable PrivateKey supplyKey)
+    @Nullable PrivateKey supplyKey,
+    @Nullable PrivateKey adminKey)
     implements TransactionRequest {
 
   static final int MAX_SYMBOL_LENGTH = 100;
@@ -78,7 +79,8 @@ public record TokenCreateRequest(
         treasuryAccountId,
         treasuryKey,
         tokenType,
-        null);
+        null,
+        treasuryKey);
   }
 
   public static TokenCreateRequest of(
@@ -96,6 +98,7 @@ public record TokenCreateRequest(
         treasuryAccountId,
         treasuryKey,
         tokenType,
-        supplyKey);
+        supplyKey,
+        treasuryKey);
   }
 }

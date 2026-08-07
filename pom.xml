@@ -6,7 +6,7 @@
 
   <groupId>org.hiero</groupId>
   <artifactId>hiero-enterprise</artifactId>
-  <version>0.20.0-SNAPSHOT</version>
+  <version>0.21.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hiero Enterprise</name>
@@ -38,37 +38,76 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <hedera.sdk-version>2.71.0</hedera.sdk-version>
-    <grpc.version>1.58.0</grpc.version>
+    <grpc.version>1.83.0</grpc.version>
     <spring.version>6.1.8</spring.version>
-    <spring.boot.version>3.5.11</spring.boot.version>
+    <spring.boot.version>4.1.0</spring.boot.version>
+    <jersey.version>3.1.10</jersey.version>
+    <jakarta-ws-rs.version>3.1.0</jakarta-ws-rs.version>
+    <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
     <jspecify.version>1.0.0</jspecify.version>
     <dotenv.version>3.2.0</dotenv.version>
     <junit.version>6.0.3</junit.version>
-    <slf4j.version>2.0.17</slf4j.version>
+    <slf4j.version>2.0.18</slf4j.version>
     <helidon.version>4.3.4</helidon.version>
-    <helidon.test.version>3.2.11</helidon.test.version>
+    <helidon.test.version>3.2.19</helidon.test.version>
     <jakarta.enterprise.version>3.0.1</jakarta.enterprise.version>
     <microprofile.version>7.1</microprofile.version>
-    <quarkus.version>3.17.2</quarkus.version>
+    <quarkus.version>3.38.0</quarkus.version>
+    <guava.failureaccess.version>1.0.3</guava.failureaccess.version>
     <google.auto.version>1.1.1</google.auto.version>
+    <bouncycastle.version>1.85</bouncycastle.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
+    <okio.version>3.17.0</okio.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
-    <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
+    <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
     <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
     <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
     <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
-    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
     <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
-    <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
-    <jreleaser-maven-plugin.version>1.23.0</jreleaser-maven-plugin.version>
+    <cyclonedx-maven-plugin.version>2.9.3</cyclonedx-maven-plugin.version>
+    <jreleaser-maven-plugin.version>1.25.0</jreleaser-maven-plugin.version>
     <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
     <spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>${bouncycastle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk18on</artifactId>
+        <version>${bouncycastle.version}</version>
+      </dependency>
+      <!-- Override bcutil to keep bouncycastle modules version same -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcutil-jdk18on</artifactId>
+        <version>${bouncycastle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${jersey.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>${jakarta-ws-rs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>${jakarta-annotation.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -89,6 +128,11 @@
         <version>${quarkus.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>failureaccess</artifactId>
+        <version>${guava.failureaccess.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -174,7 +218,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.11.0</version>
+        <version>5.23.0</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -205,6 +249,11 @@
         <groupId>com.google.auto.service</groupId>
         <artifactId>auto-service-annotations</artifactId>
         <version>${google.auto.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okio</groupId>
+        <artifactId>okio-jvm</artifactId>
+        <version>${okio.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
