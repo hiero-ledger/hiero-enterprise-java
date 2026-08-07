@@ -8,6 +8,7 @@ import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
 import org.hiero.base.data.TransactionInfo;
+import org.hiero.base.mirrornode.query.TransactionQuery;
 import org.hiero.base.protocol.data.TransactionType;
 import org.jspecify.annotations.NonNull;
 
@@ -23,7 +24,8 @@ public interface TransactionRepository {
    * @return page of transactions
    * @throws HieroException if the search fails
    */
-  @NonNull Page<TransactionInfo> findByAccount(@NonNull AccountId accountId) throws HieroException;
+  @NonNull
+  Page<TransactionInfo> findByAccount(@NonNull AccountId accountId) throws HieroException;
 
   /**
    * Find all transactions associated with a specific account.
@@ -46,7 +48,8 @@ public interface TransactionRepository {
    * @return page of transactions
    * @throws HieroException if the search fails
    */
-  @NonNull Page<TransactionInfo> findByAccountAndType(
+  @NonNull
+  Page<TransactionInfo> findByAccountAndType(
       @NonNull AccountId accountId, @NonNull TransactionType type) throws HieroException;
 
   /**
@@ -64,7 +67,6 @@ public interface TransactionRepository {
     Objects.requireNonNull(type, "type must not be null");
     return findByAccountAndType(AccountId.fromString(accountId), type);
   }
-  ;
 
   /**
    * Find all transactions associated with a specific account and has specific transaction result.
@@ -74,8 +76,9 @@ public interface TransactionRepository {
    * @return page of transactions
    * @throws HieroException if the search fails
    */
-  @NonNull Page<TransactionInfo> findByAccountAndResult(
-      @NonNull AccountId accountId, @NonNull Result result) throws HieroException;
+  @NonNull
+  Page<TransactionInfo> findByAccountAndResult(@NonNull AccountId accountId, @NonNull Result result)
+      throws HieroException;
 
   /**
    * Find all transactions associated with a specific account and has specific transaction result.
@@ -92,7 +95,6 @@ public interface TransactionRepository {
     Objects.requireNonNull(result, "result must not be null");
     return findByAccountAndResult(AccountId.fromString(accountId), result);
   }
-  ;
 
   /**
    * Find all transactions associated with a specific account and has specific transaction
@@ -103,7 +105,8 @@ public interface TransactionRepository {
    * @return page of transactions
    * @throws HieroException if the search fails
    */
-  @NonNull Page<TransactionInfo> findByAccountAndModification(
+  @NonNull
+  Page<TransactionInfo> findByAccountAndModification(
       @NonNull AccountId accountId, @NonNull BalanceModification type) throws HieroException;
 
   /**
@@ -122,7 +125,16 @@ public interface TransactionRepository {
     Objects.requireNonNull(type, "type must not be null");
     return findByAccountAndModification(AccountId.fromString(accountId), type);
   }
-  ;
+
+  /**
+   * Find all transactions based on a specific query.
+   *
+   * @param query the transaction query
+   * @return page of transactions
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  Page<TransactionInfo> findAll(@NonNull TransactionQuery query) throws HieroException;
 
   /**
    * Find a specific transaction by its ID.
@@ -131,5 +143,6 @@ public interface TransactionRepository {
    * @return Optional containing the transaction if found
    * @throws HieroException if the search fails
    */
-  @NonNull Optional<TransactionInfo> findById(@NonNull String transactionId) throws HieroException;
+  @NonNull
+  Optional<TransactionInfo> findById(@NonNull String transactionId) throws HieroException;
 }
