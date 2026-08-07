@@ -1015,6 +1015,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#delete-nft-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Delete NFT Type
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1606,6 +1617,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#delete-nft-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Delete NFT Type
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1754,7 +1776,7 @@
 
 
 <h1 id="nft-client">NFT Client<a class="headerlink" href="#nft-client" title="Permanent link">&para;</a></h1>
-<p><code>NftClient</code> provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, and transferring NFTs between accounts.</p>
+<p><code>NftClient</code> provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, and deleting NFT types.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>NFT operations that submit transactions to the Hiero network require HBAR to pay transaction fees.<br />
@@ -1909,6 +1931,22 @@ The configured operator account is used as the transaction payer and must have a
 <tr>
 <td style="text-align: left;"><code>transferNfts(TokenId tokenId, List&lt;Long&gt; serialNumbers, Account fromAccount, AccountId toAccountId)</code></td>
 <td style="text-align: left;">Transfers multiple NFTs using an account object as sender.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteNftType(TokenId tokenId)</code></td>
+<td style="text-align: left;">Deletes an NFT type using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteNftType(TokenId tokenId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Deletes an NFT type using a custom admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteNftType(String tokenId)</code></td>
+<td style="text-align: left;">Deletes an NFT type using a token ID string and the operator admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteNftType(String tokenId, String adminKey)</code></td>
+<td style="text-align: left;">Deletes an NFT type using string token ID and admin key.</td>
 </tr>
 </tbody>
 </table>
@@ -2101,6 +2139,21 @@ The configured operator account is used as the transaction payer and must have a
 </span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="n">receiver</span>
 </span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="p">);</span>
 </span></code></pre></div>
+<hr />
+<h2 id="delete-nft-type">Delete NFT Type<a class="headerlink" href="#delete-nft-type" title="Permanent link">&para;</a></h2>
+<p>Deletes an NFT type (token class). You cannot delete a specific NFT serial; burn all serials first, then delete the type. Requires the admin key set at creation (by default the treasury key).</p>
+<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId)</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Provide <code>adminKey</code> when the NFT type was created with a custom treasury whose key differs from the configured operator account key.</p>
+</div>
 
 
 
