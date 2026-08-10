@@ -1,5 +1,6 @@
 package org.hiero.base.test;
 
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -7,6 +8,8 @@ import com.hedera.hashgraph.sdk.TokenType;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.AccountCreateRequest;
+import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
@@ -14,6 +17,7 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -152,7 +156,7 @@ public class ProtocolLayerClientTokenTests {
 
   @Test
   void testUpdateNftMetadataWithMetadataKey() throws Exception {
-    // given — create with a dedicated metadata key
+    // given — create with a dedicated metadata key, then transfer out of treasury
     final PrivateKey metadataKey = PrivateKey.generateECDSA();
     final Account operator = hieroTestContext.getOperatorAccount();
     final TokenCreateRequest tokenCreateRequest =
@@ -174,7 +178,17 @@ public class ProtocolLayerClientTokenTests {
         protocolLayerClient.executeMintTokenTransaction(tokenMintRequest);
     final Long serial = tokenMintResult.serials().get(0);
 
-    // when — update using the metadata key (works in treasury and after transfer)
+    final Account receiver =
+        protocolLayerClient
+            .executeAccountCreateTransaction(AccountCreateRequest.of(Hbar.from(1L)))
+            .newAccount();
+    protocolLayerClient.executeTokenAssociateTransaction(
+        TokenAssociateRequest.of(tokenId, receiver.accountId(), receiver.privateKey()));
+    protocolLayerClient.executeTransferTransaction(
+        TokenTransferRequest.of(
+            tokenId, serial, operator.accountId(), receiver.accountId(), operator.privateKey()));
+
+    // when — update using the metadata key after transfer out of treasury
     final byte[] updatedMetadata = "https://example.com/new".getBytes();
     final TokenUpdateNftsRequest updateRequest =
         TokenUpdateNftsRequest.of(tokenId, serial, updatedMetadata, metadataKey);
