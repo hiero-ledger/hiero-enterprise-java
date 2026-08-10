@@ -75,6 +75,8 @@ import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
+import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
@@ -1882,6 +1884,93 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(NullPointerException.class, () -> new TokenUpdateResult(null, status));
     Assertions.assertThrows(
         NullPointerException.class, () -> new TokenUpdateResult(transactionId, null));
+  }
+
+  @Test
+  void testTokenUpdateNftsRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final PrivateKey metadataKey = PrivateKey.generateECDSA();
+    final List<Long> serials = List.of(1L, 2L);
+    final byte[] metadata = "updated".getBytes(StandardCharsets.UTF_8);
+    final byte[] largeMetadata = new byte[101];
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenUpdateNftsRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                serials,
+                metadata,
+                metadataKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenUpdateNftsRequest.of(tokenId, serials, metadata, metadataKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenUpdateNftsRequest.of(tokenId, 1L, metadata, metadataKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenUpdateNftsRequest.of("0.0.12345", serials, metadata, metadataKey));
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenUpdateNftsRequest.of(tokenId, List.of(), metadata, metadataKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            TokenUpdateNftsRequest.of(
+                tokenId,
+                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L),
+                metadata,
+                metadataKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenUpdateNftsRequest.of(tokenId, List.of(-1L), metadata, metadataKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenUpdateNftsRequest.of(tokenId, serials, largeMetadata, metadataKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateNftsRequest(
+                null, transactionValidDuration, tokenId, serials, metadata, metadataKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateNftsRequest(
+                maxTransactionFee, null, tokenId, serials, metadata, metadataKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateNftsRequest(
+                maxTransactionFee, transactionValidDuration, null, serials, metadata, metadataKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateNftsRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, metadata, metadataKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateNftsRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, serials, null, metadataKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUpdateNftsRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, serials, metadata, null));
+  }
+
+  @Test
+  void testTokenUpdateNftsResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new TokenUpdateNftsResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenUpdateNftsResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenUpdateNftsResult(transactionId, null));
   }
 
   @Test

@@ -54,6 +54,8 @@ import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
+import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
@@ -253,6 +255,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenUpdateResult executeTokenUpdateTransaction(
       @NonNull final TokenUpdateRequest request) throws HieroException;
+
+  /**
+   * Executes a token update NFTs transaction (updates metadata for NFT serials).
+   *
+   * @param request the request containing the details of the NFT metadata update
+   * @return the result of the NFT metadata update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenUpdateNftsResult executeTokenUpdateNftsTransaction(
+      @NonNull final TokenUpdateNftsRequest request) throws HieroException;
 
   /**
    * Executes a token associate transaction.

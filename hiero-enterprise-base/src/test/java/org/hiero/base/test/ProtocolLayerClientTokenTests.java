@@ -12,6 +12,8 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
+import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
 import org.hiero.base.test.config.HieroTestContext;
@@ -110,5 +112,39 @@ public class ProtocolLayerClientTokenTests {
     Assertions.assertNotNull(tokenUpdateResult);
     Assertions.assertNotNull(tokenUpdateResult.transactionId());
     Assertions.assertEquals(Status.SUCCESS, tokenUpdateResult.status());
+  }
+
+  @Test
+  void testUpdateNftMetadata() throws Exception {
+    // given — mint stays in treasury so supply key can update metadata (HIP-850)
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Meta NFT",
+            "META",
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            hieroTestContext.getOperatorAccount());
+    final TokenCreateResult tokenCreateResult =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest);
+    final TokenId tokenId = tokenCreateResult.tokenId();
+
+    final TokenMintRequest tokenMintRequest =
+        TokenMintRequest.of(
+            tokenId, hieroTestContext.getOperatorAccount().privateKey(), "https://example.com/old");
+    final TokenMintResult tokenMintResult =
+        protocolLayerClient.executeMintTokenTransaction(tokenMintRequest);
+    final Long serial = tokenMintResult.serials().get(0);
+
+    // when
+    final byte[] updatedMetadata = "https://example.com/new".getBytes();
+    final TokenUpdateNftsRequest updateRequest =
+        TokenUpdateNftsRequest.of(
+            tokenId, serial, updatedMetadata, hieroTestContext.getOperatorAccount().privateKey());
+    final TokenUpdateNftsResult updateResult =
+        protocolLayerClient.executeTokenUpdateNftsTransaction(updateRequest);
+
+    // then
+    Assertions.assertNotNull(updateResult);
+    Assertions.assertNotNull(updateResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, updateResult.status());
   }
 }

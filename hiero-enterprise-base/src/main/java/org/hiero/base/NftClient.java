@@ -640,6 +640,92 @@ public interface NftClient {
   }
 
   /**
+   * Updates the metadata of a single NFT serial. The operator account key is used as the metadata
+   * key (or supply key while the NFT is held in treasury; see HIP-850).
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param metadata the new metadata (at most 100 bytes)
+   * @throws HieroException if the NFT metadata could not be updated
+   */
+  default void updateNftMetadata(
+      @NonNull TokenId tokenId, long serialNumber, @NonNull byte[] metadata) throws HieroException {
+    updateNftsMetadata(tokenId, List.of(serialNumber), metadata);
+  }
+
+  /**
+   * Updates the metadata of a single NFT serial. Must be signed by the token metadata key, or by
+   * the supply key while the NFT is held in the treasury (HIP-850).
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param metadataKey the metadata key (or supply key for treasury-held NFTs)
+   * @param metadata the new metadata (at most 100 bytes)
+   * @throws HieroException if the NFT metadata could not be updated
+   */
+  default void updateNftMetadata(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull PrivateKey metadataKey,
+      @NonNull byte[] metadata)
+      throws HieroException {
+    updateNftsMetadata(tokenId, List.of(serialNumber), metadataKey, metadata);
+  }
+
+  /**
+   * Updates the metadata of NFT serials. The operator account key is used as the metadata key (or
+   * supply key while the NFTs are held in treasury; see HIP-850). At most 10 serials may be updated
+   * in one call.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers to update
+   * @param metadata the new metadata (at most 100 bytes)
+   * @throws HieroException if the NFT metadata could not be updated
+   */
+  void updateNftsMetadata(
+      @NonNull TokenId tokenId, @NonNull List<Long> serialNumbers, @NonNull byte[] metadata)
+      throws HieroException;
+
+  /**
+   * Updates the metadata of NFT serials. Must be signed by the token metadata key, or by the supply
+   * key while the NFTs are held in the treasury (HIP-850). At most 10 serials may be updated in one
+   * call.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers to update
+   * @param metadataKey the metadata key (or supply key for treasury-held NFTs)
+   * @param metadata the new metadata (at most 100 bytes)
+   * @throws HieroException if the NFT metadata could not be updated
+   */
+  void updateNftsMetadata(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull PrivateKey metadataKey,
+      @NonNull byte[] metadata)
+      throws HieroException;
+
+  /**
+   * Updates the metadata of NFT serials.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers to update
+   * @param metadataKey the metadata key (or supply key for treasury-held NFTs)
+   * @param metadata the new metadata (at most 100 bytes)
+   * @throws HieroException if the NFT metadata could not be updated
+   */
+  default void updateNftsMetadata(
+      @NonNull String tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull String metadataKey,
+      @NonNull byte[] metadata)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(metadataKey, "metadataKey must not be null");
+    updateNftsMetadata(
+        TokenId.fromString(tokenId), serialNumbers, PrivateKey.fromString(metadataKey), metadata);
+  }
+
+  /**
    * Deletes an NFT type (token class). All NFTs of that type must have been burned first. The
    * operator account key is used as the admin key. The NFT type must have been created with that
    * key as admin (the default for {@link #createNftType} when the operator is the treasury).

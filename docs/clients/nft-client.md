@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, updating NFT types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -52,6 +52,11 @@
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
 | `updateNftType(String tokenId, String name, String symbol, String adminKey)` | Updates an NFT type using string token ID and admin key. |
+| `updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)` | Updates metadata for a single NFT using the operator key. |
+| `updateNftMetadata(TokenId tokenId, long serialNumber, PrivateKey metadataKey, byte[] metadata)` | Updates metadata for a single NFT using a custom metadata (or supply) key. |
+| `updateNftsMetadata(TokenId tokenId, List<Long> serialNumbers, byte[] metadata)` | Updates metadata for up to 10 NFT serials using the operator key. |
+| `updateNftsMetadata(TokenId tokenId, List<Long> serialNumbers, PrivateKey metadataKey, byte[] metadata)` | Updates metadata for up to 10 NFT serials using a custom metadata (or supply) key. |
+| `updateNftsMetadata(String tokenId, List<Long> serialNumbers, String metadataKey, byte[] metadata)` | Updates NFT metadata using string token ID and key. |
 | `deleteNftType(TokenId tokenId)` | Deletes an NFT type using the operator account as admin key. |
 | `deleteNftType(TokenId tokenId, PrivateKey adminKey)` | Deletes an NFT type using a custom admin key. |
 | `deleteNftType(String tokenId)` | Deletes an NFT type using a token ID string and the operator admin key. |
@@ -321,6 +326,39 @@ nftClient.updateNftType(tokenId, "Updated Demo NFT", "UDNFT", adminKey);
 !!! info
 
     Provide `adminKey` when the NFT type was created with a custom treasury whose key differs from the configured operator account key.
+
+---
+
+## Update NFT Metadata
+
+Updates the metadata of one or more NFT serials (at most 10 per call). Metadata is limited to 100 bytes. Requires the token metadata key, or the supply key while the NFT is still held by the treasury ([HIP-850](https://hips.hedera.com/hip/hip-850)).
+
+```java title="updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)"
+TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT");
+long serial = nftClient.mintNft(tokenId, "https://example.com/old".getBytes());
+
+nftClient.updateNftMetadata(
+    tokenId,
+    serial,
+    "https://example.com/new".getBytes()
+);
+```
+
+```java title="updateNftsMetadata(TokenId tokenId, List<Long> serialNumbers, PrivateKey metadataKey, byte[] metadata)"
+PrivateKey metadataKey = PrivateKey.generateED25519();
+List<Long> serials = List.of(1L, 2L);
+
+nftClient.updateNftsMetadata(
+    tokenId,
+    serials,
+    metadataKey,
+    "https://example.com/new".getBytes()
+);
+```
+
+!!! info
+
+    For NFT types created with the default operator supply/treasury keys, the operator key can update metadata while serials remain in the treasury. After transfer out of treasury, a dedicated metadata key set at token creation is required.
 
 ---
 
