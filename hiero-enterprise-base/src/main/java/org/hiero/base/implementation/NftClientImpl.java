@@ -85,6 +85,45 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @NonNull final PrivateKey metadataKey)
+      throws HieroException {
+    return createNftType(
+        name,
+        symbol,
+        operationalAccount.accountId(),
+        operationalAccount.privateKey(),
+        supplierKey,
+        metadataKey);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final PrivateKey supplierKey,
+      @NonNull final PrivateKey metadataKey)
+      throws HieroException {
+    Objects.requireNonNull(metadataKey, "metadataKey must not be null");
+    final TokenCreateRequest request =
+        TokenCreateRequest.of(
+            name,
+            symbol,
+            treasuryAccountId,
+            treasuryKey,
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            supplierKey,
+            metadataKey);
+    final TokenCreateResult tokenCreateResult = client.executeTokenCreateTransaction(request);
+    return tokenCreateResult.tokenId();
+  }
+
+  @Override
   public void associateNft(
       @NonNull final TokenId tokenId,
       @NonNull final AccountId accountId,
@@ -233,7 +272,7 @@ public class NftClientImpl implements NftClient {
       @NonNull TokenId tokenId,
       @NonNull List<Long> serialNumbers,
       @NonNull PrivateKey metadataKey,
-      byte @NonNull [] metadata)
+      @NonNull byte[] metadata)
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");

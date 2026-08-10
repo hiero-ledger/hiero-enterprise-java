@@ -596,6 +596,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (request.adminKey() != null) {
         transaction.setAdminKey(request.adminKey().getPublicKey());
       }
+      if (request.metadataKey() != null) {
+        transaction.setMetadataKey(request.metadataKey().getPublicKey());
+      }
       sign(transaction, request.treasuryKey(), request.supplyKey(), request.adminKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);

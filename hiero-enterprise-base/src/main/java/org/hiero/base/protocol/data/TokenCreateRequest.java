@@ -19,7 +19,8 @@ public record TokenCreateRequest(
     @NonNull PrivateKey treasuryKey,
     @NonNull TokenType tokenType,
     @Nullable PrivateKey supplyKey,
-    @Nullable PrivateKey adminKey)
+    @Nullable PrivateKey adminKey,
+    @Nullable PrivateKey metadataKey)
     implements TransactionRequest {
 
   static final int MAX_SYMBOL_LENGTH = 100;
@@ -80,7 +81,8 @@ public record TokenCreateRequest(
         treasuryKey,
         tokenType,
         null,
-        treasuryKey);
+        treasuryKey,
+        null);
   }
 
   public static TokenCreateRequest of(
@@ -99,6 +101,28 @@ public record TokenCreateRequest(
         treasuryKey,
         tokenType,
         supplyKey,
-        treasuryKey);
+        treasuryKey,
+        null);
+  }
+
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @NonNull final PrivateKey metadataKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey);
   }
 }

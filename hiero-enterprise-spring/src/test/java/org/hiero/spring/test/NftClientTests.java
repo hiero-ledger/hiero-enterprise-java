@@ -46,7 +46,22 @@ public class NftClientTests {
         () -> nftClient.createNftType(null, null, (AccountId) null, (PrivateKey) null));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> nftClient.createNftType(null, null, null, null, (PrivateKey) null));
+        () ->
+            nftClient.createNftType(
+                null, null, (AccountId) null, (PrivateKey) null, (PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            nftClient.createNftType(
+                null,
+                null,
+                (AccountId) null,
+                (PrivateKey) null,
+                (PrivateKey) null,
+                (PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClient.createNftType(null, null, (PrivateKey) null, (PrivateKey) null));
   }
 
   @Test

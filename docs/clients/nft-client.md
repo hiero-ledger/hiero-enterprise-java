@@ -22,6 +22,10 @@
 | `createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey)` | Creates an NFT type with custom treasury and supplier accounts. |
 | `createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey)` | Creates an NFT type with treasury and supplier keys as strings. |
 | `createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey)` | Creates an NFT type using an existing treasury account and custom supplier key. |
+| `createNftType(String name, String symbol, PrivateKey supplierKey, PrivateKey metadataKey)` | Creates an NFT type with a metadata key; operator is treasury. |
+| `createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey, PrivateKey metadataKey)` | Creates an NFT type with custom treasury, supplier, and metadata keys. |
+| `createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey, String metadataKey)` | Creates an NFT type with treasury, supplier, and metadata keys as strings. |
+| `createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey)` | Creates an NFT type using an existing treasury account with supplier and metadata keys. |
 | `associateNft(TokenId tokenId, AccountId accountId, PrivateKey accountKey)` | Associates an account with an NFT type. |
 | `associateNft(String tokenId, String accountId, String accountKey)` | Associates an account with an NFT type using string identifiers. |
 | `associateNft(TokenId tokenId, Account account)` | Associates an account object with an NFT type. |
@@ -97,6 +101,22 @@ TokenId tokenId =
         treasuryKey
     );
 ```
+
+```java title="createNftType(String name, String symbol, PrivateKey supplierKey, PrivateKey metadataKey)"
+PrivateKey supplierKey = PrivateKey.generateED25519();
+PrivateKey metadataKey = PrivateKey.generateED25519();
+
+TokenId tokenId = nftClient.createNftType(
+    "Metadata NFT",
+    "MNFT",
+    supplierKey,
+    metadataKey
+);
+```
+
+!!! info
+
+    Set a metadata key at creation if you need to update NFT serial metadata after the NFT leaves the treasury. While serials remain in the treasury, the supply key can also update metadata ([HIP-850](https://hips.hedera.com/hip/hip-850)).
 
 ---
 
@@ -346,7 +366,9 @@ nftClient.updateNftMetadata(
 
 ```java title="updateNftsMetadata(TokenId tokenId, List<Long> serialNumbers, PrivateKey metadataKey, byte[] metadata)"
 PrivateKey metadataKey = PrivateKey.generateED25519();
-List<Long> serials = List.of(1L, 2L);
+PrivateKey supplierKey = PrivateKey.generateED25519();
+TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT", supplierKey, metadataKey);
+List<Long> serials = nftClient.mintNfts(tokenId, supplierKey, "https://example.com/old".getBytes());
 
 nftClient.updateNftsMetadata(
     tokenId,
@@ -358,7 +380,7 @@ nftClient.updateNftsMetadata(
 
 !!! info
 
-    For NFT types created with the default operator supply/treasury keys, the operator key can update metadata while serials remain in the treasury. After transfer out of treasury, a dedicated metadata key set at token creation is required.
+    For NFT types created with the default operator supply/treasury keys, the operator key can update metadata while serials remain in the treasury. After transfer out of treasury, sign with the metadata key set at token creation.
 
 ---
 

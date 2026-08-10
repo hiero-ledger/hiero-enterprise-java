@@ -211,7 +211,73 @@ public class NftClientImplTest {
     Assertions.assertEquals(accountId, tokenCreateRequest.treasuryAccountId());
     Assertions.assertEquals(name, tokenCreateRequest.name());
     Assertions.assertEquals(symbol, tokenCreateRequest.symbol());
+    Assertions.assertNull(tokenCreateRequest.metadataKey());
 
+    Assertions.assertEquals(tokenId, result);
+  }
+
+  @Test
+  void testCreateNftWithMetadataKey() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
+
+    final String name = "TOKEN";
+    final String symbol = "NFT";
+    final PrivateKey supplierKey = PrivateKey.generateECDSA();
+    final PrivateKey treasuryKey = PrivateKey.generateECDSA();
+    final PrivateKey metadataKey = PrivateKey.generateECDSA();
+    final AccountId accountId = AccountId.fromString("1.2.3");
+
+    when(protocolLayerClient.executeTokenCreateTransaction(any(TokenCreateRequest.class)))
+        .thenReturn(tokenCreateResult);
+    when(tokenCreateResult.tokenId()).thenReturn(tokenId);
+
+    final TokenId result =
+        nftClientImpl.createNftType(name, symbol, accountId, treasuryKey, supplierKey, metadataKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenCreateTransaction(tokenRequestCaptor.capture());
+
+    TokenCreateRequest tokenCreateRequest = tokenRequestCaptor.getValue();
+
+    Assertions.assertEquals(treasuryKey, tokenCreateRequest.treasuryKey());
+    Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
+    Assertions.assertEquals(metadataKey, tokenCreateRequest.metadataKey());
+    Assertions.assertEquals(accountId, tokenCreateRequest.treasuryAccountId());
+    Assertions.assertEquals(name, tokenCreateRequest.name());
+    Assertions.assertEquals(symbol, tokenCreateRequest.symbol());
+    Assertions.assertEquals(tokenId, result);
+  }
+
+  @Test
+  void testCreateNftWithSupplierAndMetadataKey() throws HieroException {
+    final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final AccountId accountId = AccountId.fromString("1.2.3");
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
+
+    final String name = "TOKEN";
+    final String symbol = "NFT";
+    final PrivateKey supplierKey = PrivateKey.generateECDSA();
+    final PrivateKey metadataKey = PrivateKey.generateECDSA();
+
+    when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(operationalAccount.accountId()).thenReturn(accountId);
+    when(protocolLayerClient.executeTokenCreateTransaction(any(TokenCreateRequest.class)))
+        .thenReturn(tokenCreateResult);
+    when(tokenCreateResult.tokenId()).thenReturn(tokenId);
+
+    final TokenId result = nftClientImpl.createNftType(name, symbol, supplierKey, metadataKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenCreateTransaction(tokenRequestCaptor.capture());
+
+    TokenCreateRequest tokenCreateRequest = tokenRequestCaptor.getValue();
+
+    Assertions.assertEquals(privateKey, tokenCreateRequest.treasuryKey());
+    Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
+    Assertions.assertEquals(metadataKey, tokenCreateRequest.metadataKey());
+    Assertions.assertEquals(accountId, tokenCreateRequest.treasuryAccountId());
     Assertions.assertEquals(tokenId, result);
   }
 
@@ -227,7 +293,15 @@ public class NftClientImplTest {
         () -> nftClientImpl.createNftType(null, null, (AccountId) null, (PrivateKey) null));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> nftClientImpl.createNftType(null, null, null, null, (PrivateKey) null));
+        () -> nftClientImpl.createNftType(null, null, (AccountId) null, null, (PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            nftClientImpl.createNftType(
+                null, null, (AccountId) null, null, (PrivateKey) null, (PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.createNftType(null, null, (PrivateKey) null, (PrivateKey) null));
   }
 
   @Test

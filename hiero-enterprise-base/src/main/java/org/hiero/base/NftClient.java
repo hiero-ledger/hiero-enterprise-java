@@ -188,6 +188,110 @@ public interface NftClient {
   }
 
   /**
+   * Create a new NFT type with a metadata key. The operator account is used as treasury. The
+   * metadata key can authorize updates to NFT serial metadata, including after transfer out of the
+   * treasury (HIP-850).
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull PrivateKey supplierKey,
+      @NonNull PrivateKey metadataKey)
+      throws HieroException;
+
+  /**
+   * Create a new NFT type with a metadata key. The metadata key can authorize updates to NFT serial
+   * metadata, including after transfer out of the treasury (HIP-850).
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccountId the ID of the treasury account
+   * @param treasuryKey the private key of the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull AccountId treasuryAccountId,
+      @NonNull PrivateKey treasuryKey,
+      @NonNull PrivateKey supplierKey,
+      @NonNull PrivateKey metadataKey)
+      throws HieroException;
+
+  /**
+   * Create a new NFT type with a metadata key.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccountId the ID of the treasury account
+   * @param treasuryKey the private key of the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull
+  default TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull String treasuryAccountId,
+      @NonNull String treasuryKey,
+      @NonNull String supplierKey,
+      @NonNull String metadataKey)
+      throws HieroException {
+    Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
+    Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
+    Objects.requireNonNull(supplierKey, "supplierKey must not be null");
+    Objects.requireNonNull(metadataKey, "metadataKey must not be null");
+    return createNftType(
+        name,
+        symbol,
+        AccountId.fromString(treasuryAccountId),
+        PrivateKey.fromString(treasuryKey),
+        PrivateKey.fromString(supplierKey),
+        PrivateKey.fromString(metadataKey));
+  }
+
+  /**
+   * Create a new NFT type with a metadata key.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccount the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull
+  default TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull Account treasuryAccount,
+      @NonNull PrivateKey supplierKey,
+      @NonNull PrivateKey metadataKey)
+      throws HieroException {
+    Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
+    return createNftType(
+        name,
+        symbol,
+        treasuryAccount.accountId(),
+        treasuryAccount.privateKey(),
+        supplierKey,
+        metadataKey);
+  }
+
+  /**
    * Associate an account with an NFT type. If an account is associated with an NFT type, the
    * account can hold NFTs of that type. Otherwise, the account cannot hold NFTs of that type and
    * tranfer NFTs of that type will fail.

@@ -1707,9 +1707,20 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 tokenType,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
+    Assertions.assertDoesNotThrow(
+        () ->
+            TokenCreateRequest.of(
+                name,
+                symbol,
+                treasuryAccountId,
+                treasuryKey,
+                tokenType,
+                supplyKey,
+                PrivateKey.generateECDSA()));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1722,7 +1733,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 tokenType,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1735,7 +1747,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 tokenType,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1748,7 +1761,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 tokenType,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1761,7 +1775,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 tokenType,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1774,7 +1789,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 tokenType,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1787,7 +1803,8 @@ public class ProtocolLayerDataCreationTests {
                 treasuryKey,
                 null,
                 supplyKey,
-                treasuryKey));
+                treasuryKey,
+                null));
   }
 
   @Test

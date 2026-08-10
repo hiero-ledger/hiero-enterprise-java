@@ -1,8 +1,10 @@
 package org.hiero.base.test;
 
+import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
+import org.hiero.base.data.Account;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -139,6 +141,43 @@ public class ProtocolLayerClientTokenTests {
     final TokenUpdateNftsRequest updateRequest =
         TokenUpdateNftsRequest.of(
             tokenId, serial, updatedMetadata, hieroTestContext.getOperatorAccount().privateKey());
+    final TokenUpdateNftsResult updateResult =
+        protocolLayerClient.executeTokenUpdateNftsTransaction(updateRequest);
+
+    // then
+    Assertions.assertNotNull(updateResult);
+    Assertions.assertNotNull(updateResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, updateResult.status());
+  }
+
+  @Test
+  void testUpdateNftMetadataWithMetadataKey() throws Exception {
+    // given — create with a dedicated metadata key
+    final PrivateKey metadataKey = PrivateKey.generateECDSA();
+    final Account operator = hieroTestContext.getOperatorAccount();
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "MetaKey NFT",
+            "MKEY",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            metadataKey);
+    final TokenCreateResult tokenCreateResult =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest);
+    final TokenId tokenId = tokenCreateResult.tokenId();
+
+    final TokenMintRequest tokenMintRequest =
+        TokenMintRequest.of(tokenId, operator.privateKey(), "https://example.com/old");
+    final TokenMintResult tokenMintResult =
+        protocolLayerClient.executeMintTokenTransaction(tokenMintRequest);
+    final Long serial = tokenMintResult.serials().get(0);
+
+    // when — update using the metadata key (works in treasury and after transfer)
+    final byte[] updatedMetadata = "https://example.com/new".getBytes();
+    final TokenUpdateNftsRequest updateRequest =
+        TokenUpdateNftsRequest.of(tokenId, serial, updatedMetadata, metadataKey);
     final TokenUpdateNftsResult updateResult =
         protocolLayerClient.executeTokenUpdateNftsTransaction(updateRequest);
 
