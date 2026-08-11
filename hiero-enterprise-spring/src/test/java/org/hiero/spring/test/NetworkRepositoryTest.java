@@ -9,7 +9,6 @@ import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +34,7 @@ public class NetworkRepositoryTest {
   }
 
   @Test
-  @Disabled
+  //  @Disabled
   void findNetworkStake() throws HieroException {
     Optional<NetworkStake> result = networkRepository.stake();
 
@@ -44,7 +43,7 @@ public class NetworkRepositoryTest {
   }
 
   @Test
-  @Disabled
+  //  @Disabled
   void findNetworkSupplies() throws HieroException {
     Optional<NetworkSupplies> result = networkRepository.supplies();
 
