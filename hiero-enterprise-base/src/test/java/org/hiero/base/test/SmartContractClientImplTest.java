@@ -84,7 +84,7 @@ public class SmartContractClientImplTest {
   }
 
   @Test
-  public void sgouldCreateContractWithFileIdAndConstructorParameters() throws HieroException {
+  public void shouldCreateContractWithFileIdAndConstructorParameters() throws HieroException {
     final ContractId mockContractId = ContractId.fromString("0.0.1");
     final ContractCreateResult mockResponse = mock(ContractCreateResult.class);
 

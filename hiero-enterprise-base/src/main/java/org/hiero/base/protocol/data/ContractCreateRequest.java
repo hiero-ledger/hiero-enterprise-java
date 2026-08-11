@@ -19,7 +19,7 @@ public record ContractCreateRequest(
     @NonNull List<ContractParam<?>> constructorParams)
     implements TransactionRequest {
 
-  public static final Hbar DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE = Hbar.from(16);
+  public static final Hbar DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE = Hbar.from(100);
 
   public ContractCreateRequest {
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
