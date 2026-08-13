@@ -2,7 +2,6 @@ package org.hiero.base;
 
 import static org.hiero.base.implementation.ProtocolLayerClientImpl.DEFAULT_GAS;
 import static org.hiero.base.protocol.data.ContractCreateRequest.DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE;
-import static org.hiero.base.protocol.data.TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE;
 
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
@@ -191,7 +190,7 @@ public interface SmartContractClient {
     return callContractFunction(
         ContractId.fromString(contractId),
         functionName,
-        DEFAULT_MAX_TRANSACTION_FEE,
+        DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE,
         DEFAULT_GAS,
         params);
   }
@@ -214,7 +213,7 @@ public interface SmartContractClient {
     Objects.requireNonNull(functionName, "functionName must not be null");
 
     return callContractFunction(
-        contractId, functionName, DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_GAS, params);
+        contractId, functionName, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, params);
   }
 
   /**
