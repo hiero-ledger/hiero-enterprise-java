@@ -66,7 +66,10 @@ ContractId contractId =
 
 !!! info
 
-     You can also specify a maximum transaction fee and gas when deploying a contract.
+     When `maxTransactionFee` and `gas` are not specified, the client uses
+     **100 HBAR** as the default maximum transaction fee and **5_000_000** as the
+     default gas limit. You can also override these values by using the overload
+     that accepts `maxTransactionFee` and `gas`.
 
 ```java title="createContract(FileId fileId, Hbar maxTransactionFee, int gas, ContractParam<?>... constructorParams)"
 FileId fileId =
@@ -102,7 +105,10 @@ ContractCallResult result =
 
 !!! info
 
-     You can optionally specify a maximum transaction fee and gas when executing a contract function.
+     When `maxTransactionFee` and `gas` are not specified, the client uses
+     **100 HBAR** as the default maximum transaction fee and **5_000_000** as the
+     default gas limit. You can also override these values by using the overload
+     that accepts `maxTransactionFee` and `gas`.
 
 ```java title="callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam<?>... params)"
 ContractId contractId =
@@ -118,11 +124,12 @@ ContractCallResult result =
     );
 ```
 
-!!! warning
-   
+!!! warning 
+
     - The maximum `gas` that can be specified for a contract execution is **15_000_000**. 
     - The `maxTransactionFee` and `gas` values determine the maximum amount you are willing to pay for the transaction.
       If the required gas exceeds the specified limit or the maximum transaction fee is too low, the transaction may fail.
+
 
 !!! tip 
 
