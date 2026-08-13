@@ -830,72 +830,85 @@ public class ProtocolLayerDataCreationTests {
     final FileId fileId = FileId.fromString(fileIdString);
     final ContractParam<Long> contractParam = ContractParam.int32(1);
     final List<ContractParam<?>> constructorParams = List.of(contractParam);
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
 
     // then
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileIdString));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileIdString, contractParam));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileIdString, constructorParams));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, contractParam));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, constructorParams));
+    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileIdString, adminKey));
+    Assertions.assertDoesNotThrow(
+        () -> ContractCreateRequest.of(fileIdString, adminKey, contractParam));
+    Assertions.assertDoesNotThrow(
+        () -> ContractCreateRequest.of(fileIdString, adminKey, constructorParams));
+    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, adminKey));
+    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, adminKey, contractParam));
+    Assertions.assertDoesNotThrow(
+        () -> ContractCreateRequest.of(fileId, adminKey, constructorParams));
     Assertions.assertDoesNotThrow(
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, transactionValidDuration, fileId, constructorParams));
+                maxTransactionFee, transactionValidDuration, fileId, constructorParams, adminKey));
     Assertions.assertThrows(
-        NullPointerException.class, () -> ContractCreateRequest.of((String) null));
-    Assertions.assertThrows(
-        NullPointerException.class, () -> ContractCreateRequest.of((String) null, contractParam));
+        NullPointerException.class, () -> ContractCreateRequest.of((String) null, adminKey));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of((String) null, constructorParams));
+        () -> ContractCreateRequest.of((String) null, adminKey, contractParam));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of(fileIdString, (ContractParam<?>) null));
+        () -> ContractCreateRequest.of((String) null, adminKey, constructorParams));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of(fileIdString, (List<ContractParam<?>>) null));
-    Assertions.assertThrows(
-        NullPointerException.class, () -> ContractCreateRequest.of((FileId) null));
-    Assertions.assertThrows(
-        NullPointerException.class, () -> ContractCreateRequest.of((FileId) null, contractParam));
+        () -> ContractCreateRequest.of(fileIdString, adminKey, (ContractParam<?>) null));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of((FileId) null, constructorParams));
+        () -> ContractCreateRequest.of(fileIdString, adminKey, (List<ContractParam<?>>) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> ContractCreateRequest.of((FileId) null, adminKey));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of(fileId, (ContractParam<?>) null));
+        () -> ContractCreateRequest.of((FileId) null, adminKey, contractParam));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of(fileId, (List<ContractParam<?>>) null));
+        () -> ContractCreateRequest.of((FileId) null, adminKey, constructorParams));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new ContractCreateRequest(null, transactionValidDuration, fileId, constructorParams));
+        () -> ContractCreateRequest.of(fileId, adminKey, (ContractParam<?>) null));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new ContractCreateRequest(maxTransactionFee, null, fileId, constructorParams));
+        () -> ContractCreateRequest.of(fileId, adminKey, (List<ContractParam<?>>) null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, transactionValidDuration, null, constructorParams));
+                null, transactionValidDuration, fileId, constructorParams, adminKey));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new ContractCreateRequest(maxTransactionFee, transactionValidDuration, fileId, null));
+        () ->
+            new ContractCreateRequest(
+                maxTransactionFee, null, fileId, constructorParams, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new ContractCreateRequest(
+                maxTransactionFee, transactionValidDuration, null, constructorParams, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new ContractCreateRequest(
+                maxTransactionFee, transactionValidDuration, fileId, null, adminKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new ContractCreateRequest(
-                Hbar.from(-100), transactionValidDuration, fileId, constructorParams));
-    Assertions.assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            new ContractCreateRequest(maxTransactionFee, Duration.ZERO, fileId, constructorParams));
+                Hbar.from(-100), transactionValidDuration, fileId, constructorParams, adminKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, Duration.ofSeconds(-1), fileId, constructorParams));
+                maxTransactionFee, Duration.ZERO, fileId, constructorParams, adminKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new ContractCreateRequest(
+                maxTransactionFee, Duration.ofSeconds(-1), fileId, constructorParams, adminKey));
   }
 
   @Test
@@ -926,10 +939,11 @@ public class ProtocolLayerDataCreationTests {
     final ContractId contractId = ContractId.fromString(contractIdAsString);
     final ContractId transferFeeToContractId = ContractId.fromString("0.0.54321");
     final AccountId transferFeeToAccountId = new AccountId(0, 0, 54321);
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
 
     // then
-    Assertions.assertDoesNotThrow(() -> ContractDeleteRequest.of(contractIdAsString));
-    Assertions.assertDoesNotThrow(() -> ContractDeleteRequest.of(contractId));
+    Assertions.assertDoesNotThrow(
+        () -> ContractDeleteRequest.of(contractId, transferFeeToContractId, adminKey));
     Assertions.assertDoesNotThrow(
         () ->
             new ContractDeleteRequest(
@@ -937,7 +951,8 @@ public class ProtocolLayerDataCreationTests {
                 transactionValidDuration,
                 contractId,
                 transferFeeToContractId,
-                transferFeeToAccountId));
+                transferFeeToAccountId,
+                adminKey));
     Assertions.assertDoesNotThrow(
         () ->
             new ContractDeleteRequest(
@@ -945,7 +960,8 @@ public class ProtocolLayerDataCreationTests {
                 transactionValidDuration,
                 contractId,
                 null,
-                transferFeeToAccountId));
+                transferFeeToAccountId,
+                adminKey));
     Assertions.assertDoesNotThrow(
         () ->
             new ContractDeleteRequest(
@@ -953,42 +969,64 @@ public class ProtocolLayerDataCreationTests {
                 transactionValidDuration,
                 contractId,
                 transferFeeToContractId,
+                null,
+                adminKey));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new ContractDeleteRequest(
+                maxTransactionFee, transactionValidDuration, contractId, null, null, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> ContractDeleteRequest.of(null, transferFeeToContractId, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> ContractDeleteRequest.of(null, transferFeeToAccountId, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> ContractDeleteRequest.of(contractId, transferFeeToContractId, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> ContractDeleteRequest.of(contractId, transferFeeToAccountId, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new ContractDeleteRequest(
+                null,
+                transactionValidDuration,
+                contractId,
+                transferFeeToContractId,
+                transferFeeToAccountId,
+                adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new ContractDeleteRequest(
+                maxTransactionFee,
+                null,
+                contractId,
+                transferFeeToContractId,
+                transferFeeToAccountId,
+                adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new ContractDeleteRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                null,
+                transferFeeToContractId,
+                transferFeeToAccountId,
+                adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new ContractDeleteRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                contractId,
+                transferFeeToContractId,
+                transferFeeToAccountId,
                 null));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee, transactionValidDuration, contractId, null, null));
-    Assertions.assertThrows(
-        NullPointerException.class, () -> ContractDeleteRequest.of((String) null));
-    Assertions.assertThrows(
-        NullPointerException.class, () -> ContractDeleteRequest.of((ContractId) null));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () ->
-            new ContractDeleteRequest(
-                null,
-                transactionValidDuration,
-                contractId,
-                transferFeeToContractId,
-                transferFeeToAccountId));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee,
-                null,
-                contractId,
-                transferFeeToContractId,
-                transferFeeToAccountId));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                null,
-                transferFeeToContractId,
-                transferFeeToAccountId));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -997,7 +1035,8 @@ public class ProtocolLayerDataCreationTests {
                 transactionValidDuration,
                 contractId,
                 transferFeeToContractId,
-                transferFeeToAccountId));
+                transferFeeToAccountId,
+                adminKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -1006,7 +1045,8 @@ public class ProtocolLayerDataCreationTests {
                 Duration.ZERO,
                 contractId,
                 transferFeeToContractId,
-                transferFeeToAccountId));
+                transferFeeToAccountId,
+                adminKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -1015,7 +1055,8 @@ public class ProtocolLayerDataCreationTests {
                 Duration.ofSeconds(-1),
                 contractId,
                 transferFeeToContractId,
-                transferFeeToAccountId));
+                transferFeeToAccountId,
+                adminKey));
   }
 
   @Test

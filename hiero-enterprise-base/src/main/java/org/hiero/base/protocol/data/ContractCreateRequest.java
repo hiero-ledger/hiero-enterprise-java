@@ -2,6 +2,7 @@ package org.hiero.base.protocol.data;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,8 @@ public record ContractCreateRequest(
     @NonNull Hbar maxTransactionFee,
     @NonNull Duration transactionValidDuration,
     @NonNull FileId fileId,
-    @NonNull List<ContractParam<?>> constructorParams)
+    @NonNull List<ContractParam<?>> constructorParams,
+    @NonNull PrivateKey adminKey)
     implements TransactionRequest {
 
   public ContractCreateRequest {
@@ -21,6 +23,7 @@ public record ContractCreateRequest(
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
     Objects.requireNonNull(fileId, "fileId is required");
     Objects.requireNonNull(constructorParams, "constructorParams is required");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
     if (maxTransactionFee.toTinybars() < 0) {
       throw new IllegalArgumentException("maxTransactionFee must be non-negative");
     }
@@ -31,35 +34,44 @@ public record ContractCreateRequest(
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull String fileId, @Nullable ContractParam<?>... constructorParams) {
+      @NonNull String fileId,
+      @NonNull PrivateKey adminKey,
+      @Nullable ContractParam<?>... constructorParams) {
     Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), constructorParams);
+    return of(FileId.fromString(fileId), adminKey, constructorParams);
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull FileId fileId, @Nullable ContractParam<?>... constructorParams) {
+      @NonNull FileId fileId,
+      @NonNull PrivateKey adminKey,
+      @Nullable ContractParam<?>... constructorParams) {
     if (constructorParams == null) {
       return of(fileId, List.of());
     } else {
-      return of(fileId, List.of(constructorParams));
+      return of(fileId, adminKey, List.of(constructorParams));
     }
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull String fileId, @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull String fileId,
+      @NonNull PrivateKey adminKey,
+      @NonNull List<ContractParam<?>> constructorParams) {
     Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), constructorParams);
+    return of(FileId.fromString(fileId), adminKey, constructorParams);
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull FileId fileId, @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull FileId fileId,
+      @NonNull PrivateKey adminKey,
+      @NonNull List<ContractParam<?>> constructorParams) {
     return new ContractCreateRequest(
         DEFAULT_MAX_TRANSACTION_FEE,
         DEFAULT_TRANSACTION_VALID_DURATION,
         fileId,
-        List.copyOf(constructorParams));
+        List.copyOf(constructorParams),
+        adminKey);
   }
 }

@@ -3,6 +3,7 @@ package org.hiero.base.protocol.data;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import java.time.Duration;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
@@ -13,13 +14,15 @@ public record ContractDeleteRequest(
     @NonNull Duration transactionValidDuration,
     @NonNull ContractId contractId,
     @Nullable ContractId transferFeeToContractId,
-    @Nullable AccountId transferFeeToAccountId)
+    @Nullable AccountId transferFeeToAccountId,
+    @NonNull PrivateKey adminKey)
     implements TransactionRequest {
 
   public ContractDeleteRequest {
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
     Objects.requireNonNull(contractId, "contractId is required");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
     if (maxTransactionFee.toTinybars() < 0) {
       throw new IllegalArgumentException("maxTransactionFee must be non-negative");
     }
@@ -29,14 +32,30 @@ public record ContractDeleteRequest(
   }
 
   @NonNull
-  public static ContractDeleteRequest of(@NonNull String contractId) {
-    Objects.requireNonNull(contractId, "contractId must not be null");
-    return of(ContractId.fromString(contractId));
+  public static ContractDeleteRequest of(
+      @NonNull ContractId contractId,
+      @NonNull ContractId transferFeeToContractId,
+      @NonNull PrivateKey adminKey) {
+    return new ContractDeleteRequest(
+        DEFAULT_MAX_TRANSACTION_FEE,
+        DEFAULT_TRANSACTION_VALID_DURATION,
+        contractId,
+        transferFeeToContractId,
+        null,
+        adminKey);
   }
 
   @NonNull
-  public static ContractDeleteRequest of(@NonNull ContractId contractId) {
+  public static ContractDeleteRequest of(
+      @NonNull ContractId contractId,
+      @NonNull AccountId transferFeeToAccountId,
+      @NonNull PrivateKey adminKey) {
     return new ContractDeleteRequest(
-        DEFAULT_MAX_TRANSACTION_FEE, DEFAULT_TRANSACTION_VALID_DURATION, contractId, null, null);
+        DEFAULT_MAX_TRANSACTION_FEE,
+        DEFAULT_TRANSACTION_VALID_DURATION,
+        contractId,
+        null,
+        transferFeeToAccountId,
+        adminKey);
   }
 }
