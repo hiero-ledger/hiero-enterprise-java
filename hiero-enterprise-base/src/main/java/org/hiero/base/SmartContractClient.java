@@ -3,6 +3,7 @@ package org.hiero.base;
 import static org.hiero.base.implementation.ProtocolLayerClientImpl.DEFAULT_GAS;
 import static org.hiero.base.protocol.data.ContractCreateRequest.DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -260,5 +261,42 @@ public interface SmartContractClient {
       @NonNull Hbar maxTransactionFee,
       int gas,
       @Nullable ContractParam<?>... params)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract.
+   *
+   * @param contractId the ID of the contract to delete
+   */
+  default void deleteContract(@NonNull String contractId) throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    deleteContract(ContractId.fromString(contractId));
+  }
+
+  /**
+   * Deletes the specified smart contract.
+   *
+   * @param contractId the ID of the contract to delete
+   */
+  void deleteContract(@NonNull ContractId contractId) throws HieroException;
+
+  /**
+   * Deletes the specified smart contract and transfers its remaining balance to the specified
+   * contract.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param toContractId the ID of the contract that receives the remaining balance
+   */
+  void deleteContract(@NonNull ContractId contractId, @NonNull ContractId toContractId)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract and transfers its remaining balance to the specified
+   * account.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param toAccountId the ID of the account that receives the remaining balance
+   */
+  void deleteContract(@NonNull ContractId contractId, @NonNull AccountId toAccountId)
       throws HieroException;
 }

@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
@@ -13,12 +14,14 @@ import java.util.Objects;
 import org.hiero.base.FileClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.SmartContractClient;
+import org.hiero.base.data.Account;
 import org.hiero.base.data.ContractCallResult;
 import org.hiero.base.data.ContractParam;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.ContractCallRequest;
 import org.hiero.base.protocol.data.ContractCreateRequest;
 import org.hiero.base.protocol.data.ContractCreateResult;
+import org.hiero.base.protocol.data.ContractDeleteRequest;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -32,8 +35,12 @@ public class SmartContractClientImpl implements SmartContractClient {
 
   private final FileClient fileClient;
 
+  private final Account operatorAccount;
+
   public SmartContractClientImpl(
-      @NonNull final ProtocolLayerClient protocolLayerClient, FileClient fileClient) {
+      @NonNull final ProtocolLayerClient protocolLayerClient,
+      @NonNull final FileClient fileClient,
+      @NonNull final Account operationalAccount) {
     this.protocolLayerClient =
         Objects.requireNonNull(protocolLayerClient, "protocolLayerClient must not be null");
     this.fileClient = Objects.requireNonNull(fileClient, "fileClient must not be null");
@@ -58,8 +65,12 @@ public class SmartContractClientImpl implements SmartContractClient {
     try {
       final ContractCreateRequest request;
       if (constructorParams == null) {
+        request = ContractCreateRequest.of(fileId, operatorAccount.privateKey());
         request = ContractCreateRequest.of(fileId, maxTransactionFee, gas);
       } else {
+        request =
+            ContractCreateRequest.of(
+                fileId, operatorAccount.privateKey(), Arrays.asList(constructorParams));
         request =
             ContractCreateRequest.of(
                 fileId, maxTransactionFee, gas, Arrays.asList(constructorParams));
@@ -141,5 +152,33 @@ public class SmartContractClientImpl implements SmartContractClient {
       throw new HieroException(
           "Failed to call function '" + functionName + "' on contract with id " + contractId, e);
     }
+  }
+
+  @Override
+  public void deleteContract(@NonNull ContractId contractId) throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    deleteContract(contractId, operatorAccount.accountId());
+  }
+
+  @Override
+  public void deleteContract(@NonNull ContractId contractId, @NonNull ContractId toContractId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    Objects.requireNonNull(toContractId, "toContractId must not be null");
+    ContractDeleteRequest request =
+        ContractDeleteRequest.of(contractId, toContractId, operatorAccount.privateKey());
+
+    protocolLayerClient.executeContractDeleteTransaction(request);
+  }
+
+  @Override
+  public void deleteContract(@NonNull ContractId contractId, @NonNull AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    ContractDeleteRequest request =
+        ContractDeleteRequest.of(contractId, toAccountId, operatorAccount.privateKey());
+
+    protocolLayerClient.executeContractDeleteTransaction(request);
   }
 }
