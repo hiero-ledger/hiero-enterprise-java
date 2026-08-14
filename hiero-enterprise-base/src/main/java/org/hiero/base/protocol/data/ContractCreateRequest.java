@@ -47,7 +47,7 @@ public record ContractCreateRequest(
       @NonNull PrivateKey adminKey,
       @Nullable ContractParam<?>... constructorParams) {
     if (constructorParams == null) {
-      return of(fileId, List.of());
+      return of(fileId, adminKey, List.of());
     } else {
       return of(fileId, adminKey, List.of(constructorParams));
     }
