@@ -5,10 +5,12 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
+import java.util.List;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.AccountCreateRequest;
+import org.hiero.base.protocol.data.AccountCreateResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
@@ -22,6 +24,8 @@ import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.hiero.base.test.config.HieroTestContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,6 +72,56 @@ public class ProtocolLayerClientTokenTests {
     // then
     Assertions.assertDoesNotThrow(
         () -> protocolLayerClient.executeBurnTokenTransaction(tokenBurnRequest));
+  }
+
+  @Test
+  void testWipeNft() throws Exception {
+    // given — create wipeable NFT type, mint, transfer off treasury, then wipe
+    final Account operator = hieroTestContext.getOperatorAccount();
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Wipe NFT",
+            "WIP",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            null,
+            operator.privateKey());
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    final Long serial =
+        protocolLayerClient
+            .executeMintTokenTransaction(
+                TokenMintRequest.of(
+                    tokenId, operator.privateKey(), "https://example.com/wipe-metadata"))
+            .serials()
+            .get(0);
+
+    final AccountCreateResult accountCreateResult =
+        protocolLayerClient.executeAccountCreateTransaction(AccountCreateRequest.of(Hbar.from(2)));
+    final Account holder = accountCreateResult.newAccount();
+
+    protocolLayerClient.executeTokenAssociateTransaction(
+        TokenAssociateRequest.of(tokenId, holder.accountId(), holder.privateKey()));
+    protocolLayerClient.executeTransferTransaction(
+        TokenTransferRequest.of(
+            tokenId,
+            List.of(serial),
+            operator.accountId(),
+            holder.accountId(),
+            operator.privateKey()));
+
+    // when
+    final TokenWipeRequest wipeRequest =
+        TokenWipeRequest.of(tokenId, holder.accountId(), serial, operator.privateKey());
+    final TokenWipeResult wipeResult = protocolLayerClient.executeWipeTokenTransaction(wipeRequest);
+
+    // then
+    Assertions.assertNotNull(wipeResult);
+    Assertions.assertNotNull(wipeResult.transactionId());
+    Assertions.assertNotNull(wipeResult.totalSupply());
   }
 
   @Test

@@ -20,7 +20,8 @@ public record TokenCreateRequest(
     @NonNull TokenType tokenType,
     @Nullable PrivateKey supplyKey,
     @Nullable PrivateKey adminKey,
-    @Nullable PrivateKey metadataKey)
+    @Nullable PrivateKey metadataKey,
+    @Nullable PrivateKey wipeKey)
     implements TransactionRequest {
 
   static final int MAX_SYMBOL_LENGTH = 100;
@@ -82,6 +83,7 @@ public record TokenCreateRequest(
         tokenType,
         null,
         treasuryKey,
+        null,
         null);
   }
 
@@ -102,6 +104,7 @@ public record TokenCreateRequest(
         tokenType,
         supplyKey,
         treasuryKey,
+        null,
         null);
   }
 
@@ -123,6 +126,36 @@ public record TokenCreateRequest(
         tokenType,
         supplyKey,
         treasuryKey,
-        metadataKey);
+        metadataKey,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, and wipe keys.
+   *
+   * @param wipeKey the wipe key; required to wipe tokens from non-treasury accounts
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @NonNull final PrivateKey wipeKey) {
+    Objects.requireNonNull(wipeKey, "Wipe key cannot be null");
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey);
   }
 }

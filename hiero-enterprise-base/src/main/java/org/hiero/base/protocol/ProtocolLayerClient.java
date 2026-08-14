@@ -58,6 +58,8 @@ import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -304,6 +306,16 @@ public interface ProtocolLayerClient {
    * @throws HieroException if the transaction could not be executed
    */
   @NonNull TokenBurnResult executeBurnTokenTransaction(@NonNull final TokenBurnRequest request)
+      throws HieroException;
+
+  /**
+   * Executes a token wipe transaction (removes NFT serials from a non-treasury account).
+   *
+   * @param request the request containing the details of the wipe transaction
+   * @return the result of the wipe transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenWipeResult executeWipeTokenTransaction(@NonNull final TokenWipeRequest request)
       throws HieroException;
 
   /**

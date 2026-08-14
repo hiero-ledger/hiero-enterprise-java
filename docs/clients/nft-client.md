@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, transferring NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -48,6 +48,10 @@
 | `burnNft(TokenId tokenId, long serialNumber, PrivateKey supplyKey)` | Burns a single NFT using a custom supply key. |
 | `burnNfts(TokenId tokenId, Set<Long> serialNumbers)` | Burns multiple NFTs using the operator supply account. |
 | `burnNfts(TokenId tokenId, Set<Long> serialNumbers, PrivateKey supplyKey)` | Burns multiple NFTs using a custom supply key. |
+| `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)` | Wipes a single NFT from an account using the operator wipe key. |
+| `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId, PrivateKey wipeKey)` | Wipes a single NFT using a custom wipe key. |
+| `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId)` | Wipes multiple NFTs from an account using the operator wipe key. |
+| `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId, PrivateKey wipeKey)` | Wipes multiple NFTs using a custom wipe key. |
 | `transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers an NFT between accounts. |
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
@@ -295,6 +299,38 @@ nftClient.burnNfts(
 
 ---
 
+## Wipe NFT
+
+Wipes one or more NFTs from a non-treasury account. The wipe key must sign. Wiping removes the NFT from the account and decreases total supply. The treasury account cannot be wiped.
+
+```java title="wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)"
+AccountId holder = AccountId.fromString("0.0.1001");
+
+nftClient.wipeNft(
+    tokenId,
+    1L,
+    holder
+);
+```
+
+```java title="wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId, PrivateKey wipeKey)"
+Set<Long> serialNumbers = Set.of(1L, 2L, 3L);
+PrivateKey wipeKey = PrivateKey.generateED25519();
+
+nftClient.wipeNfts(
+    tokenId,
+    serialNumbers,
+    holder,
+    wipeKey
+);
+```
+
+!!! info
+
+    Newly created NFT types use the admin (treasury) key as the wipe key when no wipe key is set explicitly, so the operator key can wipe when the operator is also the treasury/admin.
+
+---
+
 ## Transfer NFT
 
 
@@ -305,11 +341,11 @@ AccountId sender = AccountId.fromString("0.0.1001");
 AccountId receiver = AccountId.fromString("0.0.1002");
 
 nftClient.transferNft(
-    tokenId,
+        tokenId,
     1L,
-    sender,
-    PrivateKey.generateED25519(),
-    receiver
+        sender,
+        PrivateKey.generateED25519(),
+receiver
 );
 ```
 
@@ -317,11 +353,11 @@ nftClient.transferNft(
 List<Long> serialNumbers = List.of(1L,2L);
 
 nftClient.transferNfts(
-    tokenId,
-    serialNumbers,
-    sender, 
-    PrivateKey.generateED25519(),
-    receiver
+        tokenId,
+        serialNumbers,
+        sender,
+        PrivateKey.generateED25519(),
+receiver
 );
 ```
 
@@ -358,8 +394,8 @@ TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT");
 long serial = nftClient.mintNft(tokenId, "https://example.com/old".getBytes());
 
 nftClient.updateNftMetadata(
-    tokenId,
-    serial,
+        tokenId,
+        serial,
     "https://example.com/new".getBytes()
 );
 ```
@@ -371,9 +407,9 @@ TokenId tokenId = nftClient.createNftType("Demo NFT", "DNFT", supplierKey, metad
 List<Long> serials = nftClient.mintNfts(tokenId, supplierKey, "https://example.com/old".getBytes());
 
 nftClient.updateNftsMetadata(
-    tokenId,
-    serials,
-    metadataKey,
+        tokenId,
+        serials,
+        metadataKey,
     "https://example.com/new".getBytes()
 );
 ```
