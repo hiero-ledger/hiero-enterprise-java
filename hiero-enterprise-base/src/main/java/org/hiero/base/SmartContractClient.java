@@ -266,6 +266,10 @@ public interface SmartContractClient {
   /**
    * Deletes the specified smart contract.
    *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
    * @param contractId the ID of the contract to delete
    */
   default void deleteContract(@NonNull String contractId) throws HieroException {
@@ -276,6 +280,10 @@ public interface SmartContractClient {
   /**
    * Deletes the specified smart contract.
    *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
    * @param contractId the ID of the contract to delete
    */
   void deleteContract(@NonNull ContractId contractId) throws HieroException;
@@ -283,6 +291,10 @@ public interface SmartContractClient {
   /**
    * Deletes the specified smart contract and transfers its remaining balance to the specified
    * contract.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
    *
    * @param contractId the ID of the contract to delete
    * @param toContractId the ID of the contract that receives the remaining balance
@@ -293,6 +305,10 @@ public interface SmartContractClient {
   /**
    * Deletes the specified smart contract and transfers its remaining balance to the specified
    * account.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
    *
    * @param contractId the ID of the contract to delete
    * @param toAccountId the ID of the account that receives the remaining balance

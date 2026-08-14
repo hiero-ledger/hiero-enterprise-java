@@ -25,6 +25,19 @@
 | `callContractFunction(ContractId contractId, String functionName, ContractParam<?>... params)`                                  | Executes a contract function using a contract ID.                                                                                                                                                                              |
 | `callContractFunction(String contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam<?>... params)`     | Executes a smart contract function using a contract ID string with a custom maximum transaction fee and gas limit.                                                                                                             |
 | `callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam<?>... params)` | Executes a smart contract function using a contract ID with a custom maximum transaction fee and gas limit.                                                                                                                    |
+| Method | Description |
+|:-------|:------------|
+| `createContract(String fileId, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode stored in a file ID string. |
+| `createContract(FileId fileId, ContractParam<?>... constructorParams)` | Creates a smart contract using an existing bytecode file. |
+| `createContract(byte[] contents, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode contents. |
+| `createContract(Path pathToBin, ContractParam<?>... constructorParams)` | Creates a smart contract using a bytecode file path. |
+| `callContractFunction(String contractId, String functionName, ContractParam<?>... params)` | Executes a contract function using a contract ID string. |
+| `callContractFunction(ContractId contractId, String functionName, ContractParam<?>... params)` | Executes a contract function using a contract ID. |
+| `deleteContract(String contractId)` | Marks the specified smart contract as deleted. |
+| `deleteContract(ContractId contractId)` | Marks the specified smart contract as deleted. |
+| `deleteContract(ContractId contractId, ContractId toContractId)` | Marks the specified smart contract as deleted and transfers its remaining balance to another contract. |
+| `deleteContract(ContractId contractId, AccountId toAccountId)` | Marks the specified smart contract as deleted and transfers its remaining balance to an account. |
+
 ---
 
 ## Create Contract
@@ -84,6 +97,48 @@ ContractId contractId =
     );
 ```
 
+
+---
+
+## Delete Contract
+
+Marks a smart contract as deleted on the Hiero network.
+
+!!! note
+
+    Deleting a smart contract marks the contract as deleted, but does not remove its bytecode
+    from the network. Subsequent function calls to the deleted contract may complete without
+    an error, but will not return any data produced by the called function.
+
+The remaining balance of the deleted contract can optionally be transferred to another contract
+or account.
+
+```java title="deleteContract(ContractId contractId)"
+ContractId contractId =
+    ContractId.fromString("0.0.5678");
+
+smartContractClient.deleteContract(contractId);
+```
+
+```java title="deleteContract(ContractId contractId, ContractId toContractId)"
+ContractId contractId =
+    ContractId.fromString("0.0.5678");
+
+ContractId toContractId =
+    ContractId.fromString("0.0.1234");
+
+smartContractClient.deleteContract(contractId, toContractId);
+```
+
+```java title="deleteContract(ContractId contractId, AccountId toAccountId)"
+ContractId contractId =
+    ContractId.fromString("0.0.5678");
+
+AccountId toAccountId =
+    AccountId.fromString("0.0.1001");
+
+smartContractClient.deleteContract(contractId, toAccountId);
+```
 
 ---
 

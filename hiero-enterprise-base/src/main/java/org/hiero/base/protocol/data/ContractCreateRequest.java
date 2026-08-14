@@ -69,6 +69,7 @@ public record ContractCreateRequest(
       @Nullable ContractParam<?>... constructorParams) {
     if (constructorParams == null) {
       return of(fileId, maxTransactionFee, gas, List.of());
+      return of(fileId, adminKey, List.of());
     } else {
       return of(fileId, adminKey, List.of(constructorParams));
       return of(fileId, maxTransactionFee, gas, List.of(constructorParams));
