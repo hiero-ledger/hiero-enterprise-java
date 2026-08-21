@@ -1699,6 +1699,22 @@ The configured operator account is used as the transaction payer and must have s
 <td style="text-align: left;">Creates a smart contract using a bytecode file path.</td>
 </tr>
 <tr>
+<td style="text-align: left;"><code>createContract(String fileId, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using bytecode stored in a file ID string with a custom maximum transaction fee and gas limit.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(FileId fileId, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using an existing bytecode file with a custom maximum transaction fee and gas limit.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(byte[] contents, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using bytecode contents with a custom maximum transaction fee and gas limit.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(Path pathToBin, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using a bytecode file path with a custom maximum transaction fee and gas limit.</td>
+</tr>
+<tr>
 <td style="text-align: left;"><code>callContractFunction(String contractId, String functionName, ContractParam&lt;?&gt;... params)</code></td>
 <td style="text-align: left;">Executes a contract function using a contract ID string.</td>
 </tr>
@@ -1706,9 +1722,20 @@ The configured operator account is used as the transaction payer and must have s
 <td style="text-align: left;"><code>callContractFunction(ContractId contractId, String functionName, ContractParam&lt;?&gt;... params)</code></td>
 <td style="text-align: left;">Executes a contract function using a contract ID.</td>
 </tr>
+<tr>
+<td style="text-align: left;"><code>callContractFunction(String contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... params)</code></td>
+<td style="text-align: left;">Executes a smart contract function using a contract ID string with a custom maximum transaction fee and gas limit.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... params)</code></td>
+<td style="text-align: left;">Executes a smart contract function using a contract ID with a custom maximum transaction fee and gas limit.</td>
+</tr>
+<tr>
+<td style="text-align: left;">---</td>
+<td style="text-align: left;"></td>
+</tr>
 </tbody>
 </table>
-<hr />
 <h2 id="create-contract">Create Contract<a class="headerlink" href="#create-contract" title="Permanent link">&para;</a></h2>
 <p>Deploys a smart contract to the Hiero network.</p>
 <div class="language-java highlight"><span class="filename">createContract(FileId fileId, ContractParam&lt;?&gt;... constructorParams)</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span>
@@ -1738,19 +1765,64 @@ The configured operator account is used as the transaction payer and must have s
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>When <code>maxTransactionFee</code> and <code>gas</code> are not specified, the client uses
+ <strong>100 HBAR</strong> as the default maximum transaction fee and <strong>5_000_000</strong> as the
+ default gas limit. You can also override these values by using the overload
+ that accepts <code>maxTransactionFee</code> and <code>gas</code>.</p>
+</div>
+<div class="language-java highlight"><span class="filename">createContract(FileId fileId, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... constructorParams)</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">createContract</span><span class="p">(</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="n">fileId</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">        </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">        </span><span class="mi">10_000_000</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="p">);</span>
+</span></code></pre></div>
 <hr />
 <h2 id="call-contract-function">Call Contract Function<a class="headerlink" href="#call-contract-function" title="Permanent link">&para;</a></h2>
 <p>Executes a function on an existing smart contract.</p>
-<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>When <code>maxTransactionFee</code> and <code>gas</code> are not specified, the client uses
+ <strong>100 HBAR</strong> as the default maximum transaction fee and <strong>5_000_000</strong> as the
+ default gas limit. You can also override these values by using the overload
+ that accepts <code>maxTransactionFee</code> and <code>gas</code>.</p>
+</div>
+<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="mi">10_000_000</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="p">);</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul>
+<li>The maximum <code>gas</code> that can be specified for a contract execution is <strong>15_000_000</strong>. </li>
+<li>The <code>maxTransactionFee</code> and <code>gas</code> values determine the maximum amount you are willing to pay for the transaction.
+  If the required gas exceeds the specified limit or the maximum transaction fee is too low, the transaction may fail.</li>
+</ul>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>See the <a href="../../utils/contract-param/">Contract Parameters</a> documentation for all supported Solidity parameter types, including strings, addresses, booleans, bytes, and numeric types.</p>
