@@ -65,8 +65,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       // account_id is null for burned NFTs — the mirror node intentionally omits the owner.
       final AccountId account =
           node.hasNonNull("account_id")
-              ? null
-              : AccountId.fromString(node.get("account_id").asText());
+              ? AccountId.fromString(node.get("account_id").asText())
+              : null;
       final long serial = node.get("serial_number").asLong();
       final byte[] metadata = node.get("metadata").binaryValue();
       return Optional.of(new Nft(parsedTokenId, serial, account, metadata));
