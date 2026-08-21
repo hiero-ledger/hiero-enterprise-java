@@ -1,5 +1,6 @@
 package org.hiero.base;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import java.nio.file.Path;
@@ -105,5 +106,58 @@ public interface SmartContractClient {
       @NonNull ContractId contractId,
       @NonNull String functionName,
       @Nullable ContractParam<?>... params)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   */
+  default void deleteContract(@NonNull String contractId) throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    deleteContract(ContractId.fromString(contractId));
+  }
+
+  /**
+   * Deletes the specified smart contract.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   */
+  void deleteContract(@NonNull ContractId contractId) throws HieroException;
+
+  /**
+   * Deletes the specified smart contract and transfers its remaining balance to the specified
+   * contract.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param toContractId the ID of the contract that receives the remaining balance
+   */
+  void deleteContract(@NonNull ContractId contractId, @NonNull ContractId toContractId)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract and transfers its remaining balance to the specified
+   * account.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param toAccountId the ID of the account that receives the remaining balance
+   */
+  void deleteContract(@NonNull ContractId contractId, @NonNull AccountId toAccountId)
       throws HieroException;
 }
