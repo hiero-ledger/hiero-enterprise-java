@@ -64,7 +64,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final TokenId parsedTokenId = TokenId.fromString(node.get("token_id").asText());
       // account_id is null for burned NFTs — the mirror node intentionally omits the owner.
       final AccountId account =
-          node.get("account_id").isNull()
+          node.hasNonNull("account_id")
               ? null
               : AccountId.fromString(node.get("account_id").asText());
       final long serial = node.get("serial_number").asLong();
@@ -928,60 +928,6 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .toList();
   }
 
-  @NonNull
-  private Stream<JsonNode> jsonArrayToStream(@NonNull final JsonNode node) {
-    Objects.requireNonNull(node, "jsonNode must not be null");
-    if (!node.isArray()) {
-      throw new JsonParseException("not an array", node);
-    }
-    return StreamSupport.stream(
-        Spliterators.spliteratorUnknownSize(node.iterator(), Spliterator.ORDERED), false);
-  }
-
-  private @NonNull Key parseKey(@NonNull JsonNode node) {
-    Objects.requireNonNull(node, "node must not be null");
-
-    String keyType = node.get("_type").asText();
-    String keyHex = node.get("key").asText();
-
-    return switch (keyType) {
-      case "ED25519" -> PublicKey.fromString(keyHex);
-
-      case "ECDSA_SECP256K1" -> PublicKey.fromStringECDSA(keyHex);
-
-      case "ProtobufEncoded" -> {
-        byte[] decodedBytes = HexFormat.of().parseHex(keyHex);
-        try {
-          yield Key.fromBytes(decodedBytes);
-        } catch (Exception e) {
-          throw new IllegalArgumentException("Invalid Protobuf encoding", e);
-        }
-      }
-
-      default -> throw new UnsupportedOperationException("Unknown key type: " + keyType);
-    };
-  }
-
-  private static Instant parseInstant(final @NonNull String jsonStr) {
-    Objects.requireNonNull(jsonStr, "jsonStr must not be null");
-    if (jsonStr.isEmpty()) {
-      return null;
-    }
-
-    String[] parts = jsonStr.split("\\.");
-
-    long seconds = Long.parseLong(parts[0]);
-    long nanos = 0;
-
-    if (parts.length > 1) {
-      String nanoString = parts[1];
-      nanoString = String.format("%-9s", nanoString).replace(' ', '0');
-      nanos = Long.parseLong(nanoString);
-    }
-
-    return Instant.ofEpochSecond(seconds, nanos);
-  }
-
   private Node.ServiceEndpoint parseServiceEndpoint(final JsonNode endpoint) {
     return new Node.ServiceEndpoint(
         endpoint.hasNonNull("ip_address_v4") ? endpoint.get("ip_address_v4").asText() : null,
@@ -1056,39 +1002,26 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final String fileId = node.hasNonNull("file_id") ? node.get("file_id").asText() : null;
 
       final List<Node.ServiceEndpoint> serviceEndpoints =
-          node.has("service_endpoints")
-              ? jsonArrayToStream(node.get("service_endpoints"))
-                  .map(this::parseServiceEndpoint)
-                  .toList()
-              : List.of();
+          jsonArrayToStream(node.get("service_endpoints")).map(this::parseServiceEndpoint).toList();
 
       final Node.ServiceEndpoint grpcProxyEndpoint =
-          node.has("grpc_proxy_endpoint") && !node.get("grpc_proxy_endpoint").isNull()
+          node.hasNonNull("grpc_proxy_endpoint")
               ? parseServiceEndpoint(node.get("grpc_proxy_endpoint"))
               : null;
 
-      final JsonNode timestampNode = node.get("timestamp");
-
-      final Instant fromTimestamp =
-          timestampNode != null && timestampNode.hasNonNull("from")
-              ? parseInstant(timestampNode.get("from").asText())
-              : null;
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
 
       final Instant toTimestamp =
-          timestampNode != null && timestampNode.hasNonNull("to")
-              ? parseInstant(timestampNode.get("to").asText())
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
               : null;
-
-      final JsonNode stakingPeriodNode = node.get("staking_period");
 
       final Instant stakingPeriodFrom =
-          stakingPeriodNode != null && stakingPeriodNode.hasNonNull("from")
-              ? parseInstant(stakingPeriodNode.get("from").asText())
-              : null;
+          parseInstant(node.get("staking_period").get("from").asText());
 
       final Instant stakingPeriodTo =
-          stakingPeriodNode != null && stakingPeriodNode.hasNonNull("to")
-              ? parseInstant(stakingPeriodNode.get("to").asText())
+          node.get("staking_period").hasNonNull("to")
+              ? parseInstant(node.get("staking_period").get("to").asText())
               : null;
 
       final TimestampRange timestampRange = new TimestampRange(fromTimestamp, toTimestamp);
@@ -1118,5 +1051,59 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
+  }
+
+  @NonNull
+  private Stream<JsonNode> jsonArrayToStream(@NonNull final JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.isArray()) {
+      throw new JsonParseException("not an array", node);
+    }
+    return StreamSupport.stream(
+        Spliterators.spliteratorUnknownSize(node.iterator(), Spliterator.ORDERED), false);
+  }
+
+  private @NonNull Key parseKey(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "node must not be null");
+
+    String keyType = node.get("_type").asText();
+    String keyHex = node.get("key").asText();
+
+    return switch (keyType) {
+      case "ED25519" -> PublicKey.fromString(keyHex);
+
+      case "ECDSA_SECP256K1" -> PublicKey.fromStringECDSA(keyHex);
+
+      case "ProtobufEncoded" -> {
+        byte[] decodedBytes = HexFormat.of().parseHex(keyHex);
+        try {
+          yield Key.fromBytes(decodedBytes);
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Invalid Protobuf encoding", e);
+        }
+      }
+
+      default -> throw new UnsupportedOperationException("Unknown key type: " + keyType);
+    };
+  }
+
+  private static Instant parseInstant(final @NonNull String jsonStr) {
+    Objects.requireNonNull(jsonStr, "jsonStr must not be null");
+    if (jsonStr.isEmpty()) {
+      return null;
+    }
+
+    String[] parts = jsonStr.split("\\.");
+
+    long seconds = Long.parseLong(parts[0]);
+    long nanos = 0;
+
+    if (parts.length > 1) {
+      String nanoString = parts[1];
+      nanoString = String.format("%-9s", nanoString).replace(' ', '0');
+      nanos = Long.parseLong(nanoString);
+    }
+
+    return Instant.ofEpochSecond(seconds, nanos);
   }
 }

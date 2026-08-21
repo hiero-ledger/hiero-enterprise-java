@@ -12,7 +12,6 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
@@ -38,6 +37,7 @@ import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransfer;
+import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.SinglePage;
@@ -65,7 +65,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final TokenId parsedTokenId = TokenId.fromString(jsonObject.getString("token_id"));
       // account_id is null for burned NFTs — the mirror node intentionally omits the owner.
       final AccountId account =
-          jsonObject.isNull("account_id")
+          hasNonNull(jsonObject, "account_id")
               ? null
               : AccountId.fromString(jsonObject.getString("account_id"));
       final long serial = jsonObject.getJsonNumber("serial_number").longValue();
@@ -312,7 +312,12 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       return List.of();
     }
 
+    if (!isArray(jsonObject.get("transactions"))) {
+      throw new IllegalArgumentException(
+          "Transactions jsonObject is not an array: " + jsonObject.get("transactions"));
+    }
     final JsonArray transactionsNode = jsonObject.getJsonArray("transactions");
+
     return jsonArrayToStream(transactionsNode)
         .map(
             (n) -> {
@@ -1035,6 +1040,150 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .toList();
   }
 
+  @Override
+  public @NonNull List<Node> toNodes(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+
+    if (!jsonObject.containsKey("nodes")) {
+      return List.of();
+    }
+
+    if (!isArray(jsonObject.get("nodes"))) {
+      throw new IllegalArgumentException(
+          "Nodes JSON value is not an array: " + jsonObject.get("nodes"));
+    }
+
+    final JsonArray nodes = jsonObject.get("nodes").asJsonArray();
+
+    return jsonArrayToStream(nodes)
+        .map(n -> toNode(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Node.ServiceEndpoint parseServiceEndpoint(final JsonObject jsonObject) {
+    return new Node.ServiceEndpoint(
+        hasNonNull(jsonObject, "ip_address_v4") ? jsonObject.getString("ip_address_v4") : null,
+        jsonObject.getInt("port"),
+        hasNonNull(jsonObject, "domain_name") ? jsonObject.getString("domain_name") : null);
+  }
+
+  private @NonNull Optional<Node> toNode(@NonNull JsonObject jsonObject) {
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
+
+    try {
+      final long nodeId = jsonObject.getJsonNumber("node_id").longValue();
+
+      final AccountId nodeAccountId =
+          hasNonNull(jsonObject, "node_account_id")
+              ? AccountId.fromString(jsonObject.getString("node_account_id"))
+              : null;
+
+      final String description =
+          hasNonNull(jsonObject, "description") ? jsonObject.getString("description") : null;
+
+      final String memo = hasNonNull(jsonObject, "memo") ? jsonObject.getString("memo") : null;
+
+      final String publicKey =
+          hasNonNull(jsonObject, "public_key") ? jsonObject.getString("public_key") : null;
+
+      final Key adminKey =
+          hasNonNull(jsonObject, "admin_key")
+              ? parseKey(jsonObject.getJsonObject("admin_key"))
+              : null;
+
+      final String nodeCertHash =
+          hasNonNull(jsonObject, "node_cert_hash") ? jsonObject.getString("node+cert_hash") : null;
+
+      final Long stake =
+          hasNonNull(jsonObject, "stake") ? jsonObject.getJsonNumber("stake").longValue() : null;
+
+      final Long minStake =
+          hasNonNull(jsonObject, "min_stake")
+              ? jsonObject.getJsonNumber("min_stake").longValue()
+              : null;
+
+      final Long maxStake =
+          hasNonNull(jsonObject, "max_stake")
+              ? jsonObject.getJsonNumber("max_stake").longValue()
+              : null;
+
+      final Long stakeRewarded =
+          hasNonNull(jsonObject, "stake_rewarded")
+              ? jsonObject.getJsonNumber("stake_rewarded").longValue()
+              : null;
+
+      final Long stakeNotRewarded =
+          hasNonNull(jsonObject, "stake_not_rewarded")
+              ? jsonObject.getJsonNumber("stake_not_rewarded").longValue()
+              : null;
+
+      final Long rewardRateStart =
+          hasNonNull(jsonObject, "reward_rate_start")
+              ? jsonObject.getJsonNumber("reward_rate_start").longValue()
+              : null;
+
+      final boolean declineReward =
+          hasNonNull(jsonObject, "decline_reward") && jsonObject.getBoolean("decline_reward");
+
+      final String fileId =
+          hasNonNull(jsonObject, "file_id") ? jsonObject.getString("file_id") : null;
+
+      final Instant stakingPeriodFrom =
+          parseInstant(jsonObject.getJsonObject("staking_period").getString("from"));
+
+      final Instant stakingPeriodTo =
+          hasNonNull(jsonObject.getJsonObject("staking_period"), "to")
+              ? parseInstant(jsonObject.getJsonObject("staking_period").getString("to"))
+              : null;
+
+      final TimestampRange timestampRange =
+          new TimestampRange(
+              parseInstant(jsonObject.getJsonObject("timestamp").getString("from")),
+              hasNonNull(jsonObject.getJsonObject("timestamp"), "to")
+                  ? parseInstant(jsonObject.getJsonObject("timestamp").getString("to"))
+                  : null);
+
+      final List<Node.ServiceEndpoint> serviceEndpoints =
+          jsonArrayToStream(jsonObject.getJsonArray("service_endpoints"))
+              .map(endpoint -> parseServiceEndpoint(endpoint.asJsonObject()))
+              .toList();
+
+      final Node.ServiceEndpoint grpcProxyEndpoint =
+          hasNonNull(jsonObject, "grpc_proxy_endpoint")
+              ? parseServiceEndpoint(jsonObject.getJsonObject("grpc_proxy_endpoint"))
+              : null;
+
+      return Optional.of(
+          new Node(
+              nodeId,
+              nodeAccountId,
+              description,
+              memo,
+              publicKey,
+              adminKey,
+              nodeCertHash,
+              stake,
+              minStake,
+              maxStake,
+              stakeRewarded,
+              stakeNotRewarded,
+              rewardRateStart,
+              declineReward,
+              fileId,
+              stakingPeriodFrom,
+              stakingPeriodTo,
+              timestampRange,
+              serviceEndpoints,
+              grpcProxyEndpoint));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
   @NonNull
   private Stream<JsonValue> jsonArrayToStream(@NonNull final JsonArray jsonObject) {
     return StreamSupport.stream(
@@ -1093,155 +1242,5 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
   private boolean isArray(JsonValue jsonValue) {
     return jsonValue != null && jsonValue.getValueType() == JsonValue.ValueType.ARRAY;
-  }
-
-  @Override
-  public @NonNull List<Node> toNodes(@NonNull JsonObject jsonObject) {
-    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
-
-    if (!jsonObject.containsKey("nodes")) {
-      return List.of();
-    }
-
-    final JsonValue jsonValue = jsonObject.get("nodes");
-
-    if (jsonValue == null || jsonValue.getValueType() != JsonValue.ValueType.ARRAY) {
-      throw new IllegalArgumentException("Nodes JSON value is not an array: " + jsonValue);
-    }
-
-    final JsonArray nodes = jsonValue.asJsonArray();
-
-    return jsonArrayToStream(nodes)
-        .map(n -> toNode(n.asJsonObject()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .toList();
-  }
-
-  private Node.ServiceEndpoint parseServiceEndpoint(final JsonObject jsonObject) {
-    return new Node.ServiceEndpoint(
-        jsonObject.getString("ip_address_v4", null),
-        jsonObject.getInt("port"),
-        jsonObject.getString("domain_name", null));
-  }
-
-  private @NonNull Optional<Node> toNode(@NonNull JsonObject jsonObject) {
-    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
-      return Optional.empty();
-    }
-
-    try {
-      final long nodeId = jsonObject.getJsonNumber("node_id").longValue();
-
-      final AccountId nodeAccountId =
-          jsonObject.containsKey("node_account_id") && !jsonObject.isNull("node_account_id")
-              ? AccountId.fromString(jsonObject.getString("node_account_id"))
-              : null;
-
-      final String description = getNullableString(jsonObject, "description").orElse(null);
-
-      final String memo = getNullableString(jsonObject, "memo").orElse(null);
-
-      final String publicKey =
-          jsonObject.containsKey("public_key") && !jsonObject.isNull("public_key")
-              ? jsonObject.getString("public_key")
-              : null;
-
-      final Key adminKey =
-          jsonObject.containsKey("admin_key") && !jsonObject.isNull("admin_key")
-              ? parseKey(jsonObject.getJsonObject("admin_key"))
-              : null;
-
-      final String nodeCertHash = getNullableString(jsonObject, "node_cert_hash").orElse(null);
-
-      final Long stake =
-          jsonObject.containsKey("stake") && !jsonObject.isNull("stake")
-              ? jsonObject.getJsonNumber("stake").longValue()
-              : null;
-
-      final Long minStake =
-          jsonObject.containsKey("min_stake") && !jsonObject.isNull("min_stake")
-              ? jsonObject.getJsonNumber("min_stake").longValue()
-              : null;
-
-      final Long maxStake =
-          jsonObject.containsKey("max_stake") && !jsonObject.isNull("max_stake")
-              ? jsonObject.getJsonNumber("max_stake").longValue()
-              : null;
-
-      final Long stakeRewarded =
-          jsonObject.containsKey("stake_rewarded") && !jsonObject.isNull("stake_rewarded")
-              ? jsonObject.getJsonNumber("stake_rewarded").longValue()
-              : null;
-
-      final Long stakeNotRewarded =
-          jsonObject.containsKey("stake_not_rewarded") && !jsonObject.isNull("stake_not_rewarded")
-              ? jsonObject.getJsonNumber("stake_not_rewarded").longValue()
-              : null;
-
-      final Long rewardRateStart =
-          jsonObject.containsKey("reward_rate_start") && !jsonObject.isNull("reward_rate_start")
-              ? jsonObject.getJsonNumber("reward_rate_start").longValue()
-              : null;
-
-      final boolean declineReward = jsonObject.getBoolean("decline_reward");
-
-      final String fileId = getNullableString(jsonObject, "file_id").orElse(null);
-
-      final JsonObject stakingPeriod = jsonObject.getJsonObject("staking_period");
-
-      final Instant stakingPeriodFrom =
-          stakingPeriod != null && stakingPeriod.containsKey("from")
-              ? parseInstant(stakingPeriod.getString("from"))
-              : null;
-
-      final Instant stakingPeriodTo =
-          stakingPeriod != null && stakingPeriod.containsKey("to") && !stakingPeriod.isNull("to")
-              ? parseInstant(stakingPeriod.getString("to"))
-              : null;
-
-      final TimestampRange timestampRange =
-          new TimestampRange(
-              parseInstant(jsonObject.getJsonObject("timestamp").getString("from")),
-              jsonObject.getJsonObject("timestamp").containsKey("to")
-                      && !jsonObject.getJsonObject("timestamp").isNull("to")
-                  ? Instant.parse(jsonObject.getJsonObject("timestamp").getString("to"))
-                  : null);
-
-      final List<Node.ServiceEndpoint> serviceEndpoints =
-          jsonArrayToStream(jsonObject.getJsonArray("service_endpoints"))
-              .map(endpoint -> parseServiceEndpoint(endpoint.asJsonObject()))
-              .toList();
-
-      final Node.ServiceEndpoint grpcProxyEndpoint =
-          jsonObject.containsKey("grpc_proxy_endpoint") && !jsonObject.isNull("grpc_proxy_endpoint")
-              ? parseServiceEndpoint(jsonObject.getJsonObject("grpc_proxy_endpoint"))
-              : null;
-
-      return Optional.of(
-          new Node(
-              nodeId,
-              nodeAccountId,
-              description,
-              memo,
-              publicKey,
-              adminKey,
-              nodeCertHash,
-              stake,
-              minStake,
-              maxStake,
-              stakeRewarded,
-              stakeNotRewarded,
-              rewardRateStart,
-              declineReward,
-              fileId,
-              stakingPeriodFrom,
-              stakingPeriodTo,
-              timestampRange,
-              serviceEndpoints,
-              grpcProxyEndpoint));
-    } catch (final Exception e) {
-      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
-    }
   }
 }
