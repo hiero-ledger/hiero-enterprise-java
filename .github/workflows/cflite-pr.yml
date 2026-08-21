@@ -1,0 +1,40 @@
+name: ClusterFuzzLite PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-fuzz:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build fuzz test classes
+        run: ./mvnw -q -DskipTests test-compile
+
+      - name: Validate fuzz classes and resources
+        run: |
+          test -f .clusterfuzzlite/project.yaml
+          test -f .clusterfuzzlite/Dockerfile
+          test -f .clusterfuzzlite/build.sh
+          test -d hiero-enterprise-base/src/test/resources/org/hiero/base/test/ContractParamFuzzTestsInputs || true
+          test -d hiero-enterprise-spring/src/test/resources/org/hiero/spring/test/MirrorNodeJsonConverterFuzzTestsInputs || true
