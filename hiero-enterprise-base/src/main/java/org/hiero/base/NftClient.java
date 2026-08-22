@@ -603,6 +603,107 @@ public interface NftClient {
       throws HieroException;
 
   /**
+   * Wipes an NFT from an account. The operator account key is used as the wipe key. The account
+   * must not be the token treasury. Wiping burns the NFT and decreases total supply.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param accountId the account to wipe the NFT from
+   * @throws HieroException if the NFT could not be wiped
+   */
+  default void wipeNft(@NonNull TokenId tokenId, long serialNumber, @NonNull AccountId accountId)
+      throws HieroException {
+    wipeNfts(tokenId, Set.of(serialNumber), accountId);
+  }
+
+  /**
+   * Wipes an NFT from an account. Must be signed by the token wipe key. The account must not be the
+   * token treasury.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param accountId the account to wipe the NFT from
+   * @param wipeKey the wipe key of the NFT type
+   * @throws HieroException if the NFT could not be wiped
+   */
+  default void wipeNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull AccountId accountId,
+      @NonNull PrivateKey wipeKey)
+      throws HieroException {
+    wipeNfts(tokenId, Set.of(serialNumber), accountId, wipeKey);
+  }
+
+  /**
+   * Wipes an NFT from an account.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param account the account to wipe the NFT from
+   * @param wipeKey the wipe key of the NFT type
+   * @throws HieroException if the NFT could not be wiped
+   */
+  default void wipeNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull Account account,
+      @NonNull PrivateKey wipeKey)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    wipeNft(tokenId, serialNumber, account.accountId(), wipeKey);
+  }
+
+  /**
+   * Wipes NFTs from an account. The operator account key is used as the wipe key. The account must
+   * not be the token treasury. Wiping burns the NFTs and decreases total supply.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param accountId the account to wipe the NFTs from
+   * @throws HieroException if the NFTs could not be wiped
+   */
+  void wipeNfts(
+      @NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers, @NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Wipes NFTs from an account. Must be signed by the token wipe key. The account must not be the
+   * token treasury.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param accountId the account to wipe the NFTs from
+   * @param wipeKey the wipe key of the NFT type
+   * @throws HieroException if the NFTs could not be wiped
+   */
+  void wipeNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Set<Long> serialNumbers,
+      @NonNull AccountId accountId,
+      @NonNull PrivateKey wipeKey)
+      throws HieroException;
+
+  /**
+   * Wipes NFTs from an account.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param account the account to wipe the NFTs from
+   * @param wipeKey the wipe key of the NFT type
+   * @throws HieroException if the NFTs could not be wiped
+   */
+  default void wipeNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Set<Long> serialNumbers,
+      @NonNull Account account,
+      @NonNull PrivateKey wipeKey)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    wipeNfts(tokenId, serialNumbers, account.accountId(), wipeKey);
+  }
+
+  /**
    * Transfer an NFT to another account.
    *
    * @param tokenId the ID of the NFT type

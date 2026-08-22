@@ -36,6 +36,7 @@ import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateNftsTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import com.hedera.hashgraph.sdk.TokenWipeTransaction;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
 import com.hedera.hashgraph.sdk.TopicMessageQuery;
@@ -113,6 +114,8 @@ import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -600,6 +603,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (request.metadataKey() != null) {
         transaction.setMetadataKey(request.metadataKey().getPublicKey());
       }
+      if (request.wipeKey() != null) {
+        transaction.setWipeKey(request.wipeKey().getPublicKey());
+      }
       sign(transaction, request.treasuryKey(), request.supplyKey(), request.adminKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
@@ -735,6 +741,27 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute burn token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenWipeResult executeWipeTokenTransaction(@NonNull final TokenWipeRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenWipeTransaction transaction =
+          new TokenWipeTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId())
+              .setSerials(List.copyOf(request.serials()));
+      sign(transaction, request.wipeKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_WIPE);
+      return new TokenWipeResult(receipt.transactionId, receipt.status, receipt.totalSupply);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute wipe token transaction", e);
     }
   }
 

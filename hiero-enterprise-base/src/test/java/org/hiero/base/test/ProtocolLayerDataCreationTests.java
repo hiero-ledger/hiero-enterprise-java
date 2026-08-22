@@ -81,6 +81,8 @@ import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.hiero.base.protocol.data.TopicCreateRequest;
 import org.hiero.base.protocol.data.TopicCreateResult;
 import org.hiero.base.protocol.data.TopicDeleteRequest;
@@ -1305,6 +1307,23 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testTokenWipeResultCreation() {
+    // Given
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+    final Long totalSupply = 0L;
+
+    // Then
+    Assertions.assertDoesNotThrow(() -> new TokenWipeResult(transactionId, status, totalSupply));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenWipeResult(null, status, totalSupply));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenWipeResult(transactionId, null, totalSupply));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenWipeResult(transactionId, status, null));
+  }
+
+  @Test
   public void testTokenAssociateResultCreation() {
     // Given
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
@@ -1800,6 +1819,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
@@ -1826,6 +1846,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1840,6 +1861,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1854,6 +1876,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1868,6 +1891,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1882,6 +1906,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1896,6 +1921,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 supplyKey,
                 treasuryKey,
+                null,
                 null));
   }
 
@@ -2125,6 +2151,73 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new TokenBurnRequest(
                 maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, null));
+  }
+
+  @Test
+  void testTokenWipeRequestCreation() {
+    // Given
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final AccountId accountId = AccountId.fromString("0.0.54321");
+    final PrivateKey wipeKey = PrivateKey.generateECDSA();
+    final Set<Long> serials = Set.of(1L, 2L, 3L);
+
+    // Then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, serials, wipeKey));
+    Assertions.assertDoesNotThrow(() -> TokenWipeRequest.of(tokenId, accountId, 1L, wipeKey));
+    Assertions.assertDoesNotThrow(() -> TokenWipeRequest.of(tokenId, accountId, serials, wipeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenWipeRequest(
+                null, transactionValidDuration, tokenId, accountId, serials, wipeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenWipeRequest(maxTransactionFee, null, tokenId, accountId, serials, wipeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee, transactionValidDuration, null, accountId, serials, wipeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, serials, wipeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, null, wipeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, serials, null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                accountId,
+                Set.of(),
+                wipeKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenWipeRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                accountId,
+                Set.of(-1L),
+                wipeKey));
   }
 
   @Test
