@@ -36,6 +36,7 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
@@ -407,6 +408,62 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
+  }
+
+  @Override
+  public @NonNull List<NftTransactionTransfer> toNftTransactionTransfers(
+      @NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("transactions")) {
+      return List.of();
+    }
+
+    if (!isArray(jsonObject.get("transactions"))) {
+      throw new IllegalArgumentException(
+          "NFT transaction history array is not an array: " + jsonObject.get("transactions"));
+    }
+    final JsonArray transactionsArray = jsonObject.getJsonArray("transactions");
+
+    return jsonArrayToStream(transactionsArray)
+        .map(n -> toNftTransactionTransfer(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<NftTransactionTransfer> toNftTransactionTransfer(
+      @NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final Instant consensusTimestamp = parseInstant(jsonObject.getString("consensus_timestamp"));
+      final boolean isApproval = jsonObject.getBoolean("is_approval");
+      final int nonce = jsonObject.getInt("nonce");
+      final AccountId receiverAccountId =
+          hasNonNull(jsonObject, "receiver_account_id")
+              ? AccountId.fromString(jsonObject.getString("receiver_account_id"))
+              : null;
+      final AccountId senderAccountId =
+          hasNonNull(jsonObject, "sender_account_id")
+              ? AccountId.fromString(jsonObject.getString("sender_account_id"))
+              : null;
+      final String transactionId = jsonObject.getString("transaction_id");
+      final TransactionType transactionType = TransactionType.from(jsonObject.getString("type"));
+
+      return Optional.of(
+          new NftTransactionTransfer(
+              consensusTimestamp,
+              isApproval,
+              nonce,
+              receiverAccountId,
+              senderAccountId,
+              transactionId,
+              transactionType));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
   }
 
   @Override

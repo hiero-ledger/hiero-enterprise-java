@@ -13,8 +13,10 @@ import org.hiero.base.HieroContext;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.Page;
 import org.hiero.base.mirrornode.NftRepository;
+import org.hiero.base.protocol.data.TransactionType;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -411,5 +413,38 @@ public class NftRepositoryTests {
     // then
     Assertions.assertNotNull(result);
     Assertions.assertFalse(result.isPresent());
+  }
+
+  @Test
+  void findTransactionHistory() throws Exception {
+    // given
+    final String name = "Tokemon cards";
+    final String symbol = "TOK";
+    final byte[] metadata = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+    final TokenId tokenId = nftClient.createNftType(name, symbol);
+    final long serial = nftClient.mintNft(tokenId, metadata);
+    final AccountId adminAccountId = hieroContext.getOperatorAccount().accountId();
+    final PrivateKey adminAccountPrivateKey = hieroContext.getOperatorAccount().privateKey();
+    final Account account = accountClient.createAccount();
+    final AccountId newOwner = account.accountId();
+    final PrivateKey newOwnerPrivateKey = account.privateKey();
+    nftClient.associateNft(tokenId, newOwner, newOwnerPrivateKey);
+    nftClient.transferNft(tokenId, serial, adminAccountId, adminAccountPrivateKey, newOwner);
+    hieroTestUtils.waitForMirrorNodeRecords();
+
+    // when
+    final Page<NftTransactionTransfer> slice =
+        nftRepository.findTransactionHistory(tokenId, serial);
+    final List<NftTransactionTransfer> result = getAll(slice);
+
+    // then
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(
+        result.stream()
+            .anyMatch(
+                transfer ->
+                    TransactionType.CRYPTO_TRANSFER.equals(transfer.type())
+                        && adminAccountId.equals(transfer.senderAccountId())
+                        && newOwner.equals(transfer.receiverAccountId())));
   }
 }

@@ -34,6 +34,7 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
@@ -358,6 +359,58 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull List<NftTransactionTransfer> toNftTransactionTransfers(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("transactions")) {
+      return List.of();
+    }
+    final JsonNode transactionsNode = node.get("transactions");
+    if (!transactionsNode.isArray()) {
+      throw new IllegalArgumentException(
+          "NFT transaction history node is not an array: " + transactionsNode);
+    }
+    return jsonArrayToStream(transactionsNode)
+        .map(n -> toNftTransactionTransfer(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<NftTransactionTransfer> toNftTransactionTransfer(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
+      final boolean isApproval = node.get("is_approval").asBoolean();
+      final int nonce = node.get("nonce").asInt();
+      final AccountId receiverAccountId =
+          node.hasNonNull("receiver_account_id")
+              ? AccountId.fromString(node.get("receiver_account_id").asText())
+              : null;
+      final AccountId senderAccountId =
+          node.hasNonNull("sender_account_id")
+              ? AccountId.fromString(node.get("sender_account_id").asText())
+              : null;
+      final String transactionId = node.get("transaction_id").asText();
+      final TransactionType transactionType = TransactionType.from(node.get("type").asText());
+
+      return Optional.of(
+          new NftTransactionTransfer(
+              consensusTimestamp,
+              isApproval,
+              nonce,
+              receiverAccountId,
+              senderAccountId,
+              transactionId,
+              transactionType));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
   }
 
   @Override

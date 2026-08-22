@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.NftTransactionTransfer;
 import org.hiero.base.data.Page;
 import org.jspecify.annotations.NonNull;
 
@@ -171,6 +172,32 @@ public interface NftRepository {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return findByOwnerAndTypeAndSerial(
         AccountId.fromString(owner), TokenId.fromString(tokenId), serialNumber);
+  }
+
+  /**
+   * Return the transaction history for a given NFT.
+   *
+   * @param tokenId id of the token type
+   * @param serialNumber serial of the NFT instance
+   * @return page of transaction history entries
+   * @throws HieroException if the search fails
+   */
+  @NonNull Page<NftTransactionTransfer> findTransactionHistory(
+      @NonNull TokenId tokenId, long serialNumber) throws HieroException;
+
+  /**
+   * Return the transaction history for a given NFT.
+   *
+   * @param tokenId id of the token type
+   * @param serialNumber serial of the NFT instance
+   * @return page of transaction history entries
+   * @throws HieroException if the search fails
+   */
+  @NonNull
+  default Page<NftTransactionTransfer> findTransactionHistory(
+      @NonNull String tokenId, long serialNumber) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return findTransactionHistory(TokenId.fromString(tokenId), serialNumber);
   }
 
   /**
