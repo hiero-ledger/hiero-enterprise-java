@@ -1,7 +1,6 @@
 package org.hiero.spring.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +30,6 @@ class MirrorNodeBalanceAndNetworkNodeConverterTest {
     assertEquals(AccountId.fromString("0.0.1001"), balances.get(0).account());
     assertEquals(TokenId.fromString("0.0.2002"), balances.get(0).tokens().get(0).tokenId());
   }
-
 
   private static String balancesJson() {
     return """

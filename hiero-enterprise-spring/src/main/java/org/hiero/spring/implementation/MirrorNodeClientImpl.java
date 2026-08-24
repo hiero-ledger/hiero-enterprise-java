@@ -227,15 +227,6 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   }
 
   @Override
-  public @NonNull Page<NetworkNode> queryNetworkNodes() throws HieroException {
-    final String path = "/api/v1/network/nodes";
-    final Function<JsonNode, List<NetworkNode>> dataExtractionFunction =
-        node -> jsonConverter.toNetworkNodes(node);
-    return new RestBasedPage<>(
-        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
-  }
-
-  @Override
   public @NonNull Page<TopicMessage> queryTopicMessages(TopicId topicId) {
     Objects.requireNonNull(topicId, "topicId must not be null");
     final String path = "/api/v1/topics/" + topicId + "/messages";

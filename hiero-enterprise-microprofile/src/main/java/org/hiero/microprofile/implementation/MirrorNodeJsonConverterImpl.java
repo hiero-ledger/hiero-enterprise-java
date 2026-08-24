@@ -915,7 +915,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     try {
       return Optional.of(
           new BalanceSnapshot(
-              parseTimestamp(jsonObject.getString("timestamp")), toAccountBalances(jsonObject)));
+              parseInstant(jsonObject.getString("timestamp")), toAccountBalances(jsonObject)));
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
