@@ -44,8 +44,10 @@ public class HieroEndpoint {
       final String memo =
           request.memo() == null || request.memo().isBlank() ? "sample-topic" : request.memo();
       return Response.ok(new TopicCreateResponse(topicClient.createTopic(memo).toString())).build();
+    } catch (final IllegalArgumentException e) {
+      return badRequest(e.getMessage());
     } catch (final Exception e) {
-      return Response.serverError().entity(e.getMessage()).build();
+      return serverError();
     }
   }
 
@@ -54,11 +56,26 @@ public class HieroEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   public Response transferToken(final TokenTransferRequest request) {
     try {
+      if (request == null
+          || request.tokenId() == null
+          || request.tokenId().isBlank()
+          || request.toAccountId() == null
+          || request.toAccountId().isBlank()) {
+        return badRequest("tokenId and toAccountId are required");
+      }
+
+      if (request.amount() <= 0) {
+        return badRequest("amount must be greater than zero");
+      }
+
       tokenClient.transferToken(
           TokenId.fromString(request.tokenId()), request.toAccountId(), request.amount());
+
       return Response.ok(new TokenTransferResponse("Token transfer submitted")).build();
+    } catch (final IllegalArgumentException e) {
+      return badRequest(e.getMessage());
     } catch (final Exception e) {
-      return Response.serverError().entity(e.getMessage()).build();
+      return serverError();
     }
   }
 
@@ -67,13 +84,38 @@ public class HieroEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   public Response callContract(final ContractCallRequest request) {
     try {
+      if (request == null
+          || request.contractId() == null
+          || request.contractId().isBlank()
+          || request.functionName() == null
+          || request.functionName().isBlank()) {
+        return badRequest("contractId and functionName are required");
+      }
+
       final ContractCallResult result =
           smartContractClient.callContractFunction(request.contractId(), request.functionName());
+
       return Response.ok(new ContractCallResponse(result.gasUsed(), result.cost().toString()))
           .build();
+    } catch (final IllegalArgumentException e) {
+      return badRequest(e.getMessage());
     } catch (final Exception e) {
-      return Response.serverError().entity(e.getMessage()).build();
+      return serverError();
     }
+  }
+
+  private static Response badRequest(final String message) {
+    return Response.status(Response.Status.BAD_REQUEST)
+        .type(MediaType.TEXT_PLAIN)
+        .entity(message)
+        .build();
+  }
+
+  private static Response serverError() {
+    return Response.serverError()
+        .type(MediaType.TEXT_PLAIN)
+        .entity("Unable to process the request")
+        .build();
   }
 
   public record TopicCreateRequest(String memo) {}

@@ -37,8 +37,10 @@ public final class HelidonSeSampleMain {
           valueOrDefault(request.query().first("memo").orElse(null), "sample-topic");
       final String topicId = clients.topicClient().createTopic(memo).toString();
       response.send("{\"topicId\":\"" + topicId + "\"}");
+    } catch (final IllegalArgumentException e) {
+      badRequest(response, e.getMessage());
     } catch (final Exception e) {
-      response.status(500).send(e.getMessage());
+      serverError(response);
     }
   }
 
@@ -50,8 +52,10 @@ public final class HelidonSeSampleMain {
       final long amount = Long.parseLong(requiredQuery(request, "amount"));
       clients.tokenClient().transferToken(TokenId.fromString(tokenId), toAccountId, amount);
       response.send("{\"status\":\"Token transfer submitted\"}");
+    } catch (final IllegalArgumentException e) {
+      badRequest(response, e.getMessage());
     } catch (final Exception e) {
-      response.status(500).send(e.getMessage());
+      serverError(response);
     }
   }
 
@@ -63,8 +67,10 @@ public final class HelidonSeSampleMain {
       final ContractCallResult result =
           clients.smartContractClient().callContractFunction(contractId, functionName);
       response.send("{\"gasUsed\":" + result.gasUsed() + ",\"cost\":\"" + result.cost() + "\"}");
+    } catch (final IllegalArgumentException e) {
+      badRequest(response, e.getMessage());
     } catch (final Exception e) {
-      response.status(500).send(e.getMessage());
+      serverError(response);
     }
   }
 
@@ -81,5 +87,13 @@ public final class HelidonSeSampleMain {
       return fallback;
     }
     return value;
+  }
+
+  private static void badRequest(final ServerResponse response, final String message) {
+    response.status(400).send(message);
+  }
+
+  private static void serverError(final ServerResponse response) {
+    response.status(500).send("Unable to process the request");
   }
 }
