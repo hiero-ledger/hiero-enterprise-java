@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.List;
 import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.BalanceSnapshot;
-import org.hiero.base.data.NetworkNode;
 import org.hiero.spring.implementation.MirrorNodeJsonConverterImpl;
 import org.junit.jupiter.api.Test;
 
@@ -33,18 +32,6 @@ class MirrorNodeBalanceAndNetworkNodeConverterTest {
     assertEquals(TokenId.fromString("0.0.2002"), balances.get(0).tokens().get(0).tokenId());
   }
 
-  @Test
-  void parsesNetworkNodes() throws Exception {
-    final JsonNode node = objectMapper.readTree(networkNodesJson());
-
-    final List<NetworkNode> nodes = converter.toNetworkNodes(node);
-
-    assertEquals(1, nodes.size());
-    assertEquals(0, nodes.get(0).nodeId());
-    assertEquals(AccountId.fromString("0.0.3"), nodes.get(0).nodeAccountId());
-    assertTrue(nodes.get(0).stakingPeriod() == null);
-    assertEquals("127.0.0.1", nodes.get(0).serviceEndpoints().get(0).ipAddressV4());
-  }
 
   private static String balancesJson() {
     return """

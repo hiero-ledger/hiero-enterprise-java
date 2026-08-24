@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.function.Function;
 import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.BalanceSnapshot;
-import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.Page;
 import org.hiero.spring.implementation.MirrorNodeClientImpl;
 import org.junit.jupiter.api.Test;
@@ -63,8 +62,6 @@ class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
     final Page<AccountBalance> balances = client.queryBalances();
     final Page<AccountBalance> balancesByAccount = client.queryBalancesByAccount(accountId);
     final BalanceSnapshot snapshot = client.queryBalanceSnapshot().orElseThrow();
-    final Page<NetworkNode> nodes = client.queryNetworkNodes();
-    final NetworkNode node = client.queryNetworkNodeById(0).orElseThrow();
 
     assertEquals(
         List.of(balancesPath, balancesByAccountPath, balancesPath, nodesPath, nodeByIdPath),
@@ -72,8 +69,6 @@ class MirrorNodeClientImplBalanceAndNetworkNodeEndpointsTest {
     assertEquals(1, balances.getSize());
     assertEquals(1, balancesByAccount.getSize());
     assertEquals(1, snapshot.balances().size());
-    assertEquals(1, nodes.getSize());
-    assertEquals(0, node.nodeId());
   }
 
   private static String requestPath(URI uri) {

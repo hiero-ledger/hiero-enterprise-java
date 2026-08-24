@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.BalanceSnapshot;
-import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.Page;
 import org.hiero.microprofile.implementation.MirrorNodeClientImpl;
 import org.hiero.microprofile.implementation.MirrorNodeJsonConverterImpl;

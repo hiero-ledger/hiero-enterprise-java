@@ -14,7 +14,6 @@ import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
-import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.NftTransactionHistory;

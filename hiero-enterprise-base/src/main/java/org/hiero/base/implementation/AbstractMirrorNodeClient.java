@@ -15,7 +15,6 @@ import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
-import org.hiero.base.data.NetworkNode;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
@@ -80,13 +79,6 @@ public abstract class AbstractMirrorNodeClient<JSON> implements MirrorNodeClient
   public @NonNull final Optional<BalanceSnapshot> queryBalanceSnapshot() throws HieroException {
     final JSON json = getRestClient().queryBalances();
     return getJsonConverter().toBalanceSnapshot(json);
-  }
-
-  @Override
-  public @NonNull final Optional<NetworkNode> queryNetworkNodeById(long nodeId)
-      throws HieroException {
-    final JSON json = getRestClient().queryNetworkNodeById(nodeId);
-    return getJsonConverter().toNetworkNodes(json).stream().findFirst();
   }
 
   @NonNull
