@@ -1984,35 +1984,35 @@ The configured operator account is used as the transaction payer and must have a
 </tr>
 <tr>
 <td style="text-align: left;"><code>burnNft(TokenId tokenId, long serialNumber)</code></td>
-<td style="text-align: left;">Burns a single NFT using the operator supply account.</td>
+<td style="text-align: left;">Burns a single NFT using the operator supply account. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>burnNft(TokenId tokenId, long serialNumber, PrivateKey supplyKey)</code></td>
-<td style="text-align: left;">Burns a single NFT using a custom supply key.</td>
+<td style="text-align: left;">Burns a single NFT using a custom supply key. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>burnNfts(TokenId tokenId, Set&lt;Long&gt; serialNumbers)</code></td>
-<td style="text-align: left;">Burns multiple NFTs using the operator supply account.</td>
+<td style="text-align: left;">Burns multiple NFTs using the operator supply account. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>burnNfts(TokenId tokenId, Set&lt;Long&gt; serialNumbers, PrivateKey supplyKey)</code></td>
-<td style="text-align: left;">Burns multiple NFTs using a custom supply key.</td>
+<td style="text-align: left;">Burns multiple NFTs using a custom supply key. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)</code></td>
-<td style="text-align: left;">Wipes a single NFT from an account using the operator wipe key.</td>
+<td style="text-align: left;">Wipes a single NFT from an account using the operator wipe key. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>wipeNft(TokenId tokenId, long serialNumber, AccountId accountId, PrivateKey wipeKey)</code></td>
-<td style="text-align: left;">Wipes a single NFT using a custom wipe key.</td>
+<td style="text-align: left;">Wipes a single NFT using a custom wipe key. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>wipeNfts(TokenId tokenId, Set&lt;Long&gt; serialNumbers, AccountId accountId)</code></td>
-<td style="text-align: left;">Wipes multiple NFTs from an account using the operator wipe key.</td>
+<td style="text-align: left;">Wipes multiple NFTs from an account using the operator wipe key. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>wipeNfts(TokenId tokenId, Set&lt;Long&gt; serialNumbers, AccountId accountId, PrivateKey wipeKey)</code></td>
-<td style="text-align: left;">Wipes multiple NFTs using a custom wipe key.</td>
+<td style="text-align: left;">Wipes multiple NFTs using a custom wipe key. Returns total supply.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)</code></td>
@@ -2227,11 +2227,11 @@ The configured operator account is used as the transaction payer and must have a
 </div>
 <hr />
 <h2 id="burn-nft">Burn NFT<a class="headerlink" href="#burn-nft" title="Permanent link">&para;</a></h2>
-<p>Permanently removes one or more NFTs from circulation.</p>
+<p>Permanently removes one or more NFTs from circulation. Returns the total supply of the NFT type after the burn.</p>
 <div class="language-java highlight"><span class="filename">burnNft(TokenId tokenId, long serialNumber)</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">TokenId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5000&quot;</span><span class="p">);</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">burnNft</span><span class="p">(</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kt">long</span><span class="w"> </span><span class="n">totalSupply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">burnNft</span><span class="p">(</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="mi">1L</span>
 </span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">);</span>
@@ -2242,7 +2242,7 @@ The configured operator account is used as the transaction payer and must have a
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">Set</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serialNumbers</span><span class="w"> </span><span class="o">=</span>
 </span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="n">Set</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="mi">2L</span><span class="p">,</span><span class="w"> </span><span class="mi">3L</span><span class="p">);</span>
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">burnNfts</span><span class="p">(</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="kt">long</span><span class="w"> </span><span class="n">totalSupply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">burnNfts</span><span class="p">(</span>
 </span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
 </span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="n">serialNumbers</span>
 </span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="p">);</span>
@@ -2253,7 +2253,7 @@ The configured operator account is used as the transaction payer and must have a
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">Set</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serialNumbers</span><span class="w"> </span><span class="o">=</span>
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="n">Set</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="mi">2L</span><span class="p">,</span><span class="w"> </span><span class="mi">3L</span><span class="p">);</span>
 </span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">burnNfts</span><span class="p">(</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="kt">long</span><span class="w"> </span><span class="n">totalSupply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">burnNfts</span><span class="p">(</span>
 </span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
 </span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">    </span><span class="n">serialNumbers</span><span class="p">,</span>
 </span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">supplyKey</span>
@@ -2265,10 +2265,10 @@ The configured operator account is used as the transaction payer and must have a
 </div>
 <hr />
 <h2 id="wipe-nft">Wipe NFT<a class="headerlink" href="#wipe-nft" title="Permanent link">&para;</a></h2>
-<p>Wipes one or more NFTs from a non-treasury account. The wipe key must sign. Wiping removes the NFT from the account and decreases total supply. The treasury account cannot be wiped.</p>
+<p>Wipes one or more NFTs from a non-treasury account. The wipe key must sign. Wiping removes the NFT from the account and decreases total supply. Returns the total supply of the NFT type after the wipe. The treasury account cannot be wiped.</p>
 <div class="language-java highlight"><span class="filename">wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">holder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1001&quot;</span><span class="p">);</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">wipeNft</span><span class="p">(</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kt">long</span><span class="w"> </span><span class="n">totalSupply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">wipeNft</span><span class="p">(</span>
 </span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="mi">1L</span><span class="p">,</span>
 </span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="n">holder</span>
@@ -2277,7 +2277,7 @@ The configured operator account is used as the transaction payer and must have a
 <div class="language-java highlight"><span class="filename">wipeNfts(TokenId tokenId, Set&lt;Long&gt; serialNumbers, AccountId accountId, PrivateKey wipeKey)</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Set</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serialNumbers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Set</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="mi">2L</span><span class="p">,</span><span class="w"> </span><span class="mi">3L</span><span class="p">);</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">wipeKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">wipeNfts</span><span class="p">(</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="kt">long</span><span class="w"> </span><span class="n">totalSupply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">wipeNfts</span><span class="p">(</span>
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
 </span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="n">serialNumbers</span><span class="p">,</span>
 </span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="n">holder</span><span class="p">,</span>
