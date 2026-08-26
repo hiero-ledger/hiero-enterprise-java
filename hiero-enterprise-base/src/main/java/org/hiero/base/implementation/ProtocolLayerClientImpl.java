@@ -735,6 +735,7 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
         throw new IllegalArgumentException("either amount or serial must be provided");
       }
 
+      sign(transaction, request.supplyKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_BURN);
       return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
