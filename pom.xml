@@ -57,7 +57,7 @@
     <google.auto.version>1.1.1</google.auto.version>
     <bouncycastle.version>1.85</bouncycastle.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
-    <okio.version>3.17.0</okio.version>
+    <okio.version>3.18.1</okio.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
