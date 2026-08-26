@@ -44,14 +44,14 @@
 | `mintNfts(String tokenId, byte[]... metadata)` | Mints multiple NFTs using token ID string. |
 | `mintNfts(TokenId tokenId, PrivateKey supplyKey, byte[]... metadata)` | Mints multiple NFTs using a custom supply key. |
 | `mintNfts(String tokenId, String supplyKey, byte[]... metadata)` | Mints multiple NFTs using string token ID and supply key. |
-| `burnNft(TokenId tokenId, long serialNumber)` | Burns a single NFT using the operator supply account. |
-| `burnNft(TokenId tokenId, long serialNumber, PrivateKey supplyKey)` | Burns a single NFT using a custom supply key. |
-| `burnNfts(TokenId tokenId, Set<Long> serialNumbers)` | Burns multiple NFTs using the operator supply account. |
-| `burnNfts(TokenId tokenId, Set<Long> serialNumbers, PrivateKey supplyKey)` | Burns multiple NFTs using a custom supply key. |
-| `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)` | Wipes a single NFT from an account using the operator wipe key. |
-| `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId, PrivateKey wipeKey)` | Wipes a single NFT using a custom wipe key. |
-| `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId)` | Wipes multiple NFTs from an account using the operator wipe key. |
-| `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId, PrivateKey wipeKey)` | Wipes multiple NFTs using a custom wipe key. |
+| `burnNft(TokenId tokenId, long serialNumber)` | Burns a single NFT using the operator supply account. Returns total supply. |
+| `burnNft(TokenId tokenId, long serialNumber, PrivateKey supplyKey)` | Burns a single NFT using a custom supply key. Returns total supply. |
+| `burnNfts(TokenId tokenId, Set<Long> serialNumbers)` | Burns multiple NFTs using the operator supply account. Returns total supply. |
+| `burnNfts(TokenId tokenId, Set<Long> serialNumbers, PrivateKey supplyKey)` | Burns multiple NFTs using a custom supply key. Returns total supply. |
+| `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)` | Wipes a single NFT from an account using the operator wipe key. Returns total supply. |
+| `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId, PrivateKey wipeKey)` | Wipes a single NFT using a custom wipe key. Returns total supply. |
+| `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId)` | Wipes multiple NFTs from an account using the operator wipe key. Returns total supply. |
+| `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId, PrivateKey wipeKey)` | Wipes multiple NFTs using a custom wipe key. Returns total supply. |
 | `transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers an NFT between accounts. |
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
@@ -252,13 +252,13 @@ List<Long> serialNumbers =
 
 ## Burn NFT
 
-Permanently removes one or more NFTs from circulation.
+Permanently removes one or more NFTs from circulation. Returns the total supply of the NFT type after the burn.
 
 ```java title="burnNft(TokenId tokenId, long serialNumber)"
 TokenId tokenId =
     TokenId.fromString("0.0.5000");
 
-nftClient.burnNft(
+long totalSupply = nftClient.burnNft(
     tokenId,
     1L
 );
@@ -271,7 +271,7 @@ TokenId tokenId =
 Set<Long> serialNumbers =
     Set.of(1L, 2L, 3L);
 
-nftClient.burnNfts(
+long totalSupply = nftClient.burnNfts(
     tokenId,
     serialNumbers
     );
@@ -284,7 +284,7 @@ TokenId tokenId =
 Set<Long> serialNumbers =
     Set.of(1L, 2L, 3L);
 
-nftClient.burnNfts(
+long totalSupply = nftClient.burnNfts(
     tokenId,
     serialNumbers,
     supplyKey
@@ -301,12 +301,12 @@ nftClient.burnNfts(
 
 ## Wipe NFT
 
-Wipes one or more NFTs from a non-treasury account. The wipe key must sign. Wiping removes the NFT from the account and decreases total supply. The treasury account cannot be wiped.
+Wipes one or more NFTs from a non-treasury account. The wipe key must sign. Wiping removes the NFT from the account and decreases total supply. Returns the total supply of the NFT type after the wipe. The treasury account cannot be wiped.
 
 ```java title="wipeNft(TokenId tokenId, long serialNumber, AccountId accountId)"
 AccountId holder = AccountId.fromString("0.0.1001");
 
-nftClient.wipeNft(
+long totalSupply = nftClient.wipeNft(
     tokenId,
     1L,
     holder
@@ -317,7 +317,7 @@ nftClient.wipeNft(
 Set<Long> serialNumbers = Set.of(1L, 2L, 3L);
 PrivateKey wipeKey = PrivateKey.generateED25519();
 
-nftClient.wipeNfts(
+long totalSupply = nftClient.wipeNfts(
     tokenId,
     serialNumbers,
     holder,

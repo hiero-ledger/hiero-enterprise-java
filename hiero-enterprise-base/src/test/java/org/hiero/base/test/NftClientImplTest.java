@@ -427,12 +427,14 @@ public class NftClientImplTest {
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final long serials = 1L;
+    final long totalSupply = 0L;
 
     when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(tokenBurnRequest.totalSupply()).thenReturn(totalSupply);
     when(protocolLayerClient.executeBurnTokenTransaction(any(TokenBurnRequest.class)))
         .thenReturn(tokenBurnRequest);
 
-    nftClientImpl.burnNft(tokenId, serials);
+    final long result = nftClientImpl.burnNft(tokenId, serials);
 
     verify(operationalAccount, times(1)).privateKey();
     verify(protocolLayerClient, times(1)).executeBurnTokenTransaction(tokenBurnCaptor.capture());
@@ -441,6 +443,7 @@ public class NftClientImplTest {
     Assertions.assertEquals(tokenId, request.tokenId());
     Assertions.assertEquals(Set.of(serials), request.serials());
     Assertions.assertEquals(privateKey, request.supplyKey());
+    Assertions.assertEquals(totalSupply, result);
   }
 
   @Test
@@ -450,11 +453,13 @@ public class NftClientImplTest {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final long serials = 1L;
     final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final long totalSupply = 0L;
 
+    when(tokenBurnRequest.totalSupply()).thenReturn(totalSupply);
     when(protocolLayerClient.executeBurnTokenTransaction(any(TokenBurnRequest.class)))
         .thenReturn(tokenBurnRequest);
 
-    nftClientImpl.burnNft(tokenId, serials, privateKey);
+    final long result = nftClientImpl.burnNft(tokenId, serials, privateKey);
 
     verify(protocolLayerClient, times(1)).executeBurnTokenTransaction(tokenBurnCaptor.capture());
 
@@ -462,6 +467,7 @@ public class NftClientImplTest {
     Assertions.assertEquals(tokenId, request.tokenId());
     Assertions.assertEquals(Set.of(serials), request.serials());
     Assertions.assertEquals(privateKey, request.supplyKey());
+    Assertions.assertEquals(totalSupply, result);
   }
 
   @Test
@@ -471,12 +477,14 @@ public class NftClientImplTest {
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final Set<Long> serials = Set.of(1L);
+    final long totalSupply = 0L;
 
     when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(tokenBurnRequest.totalSupply()).thenReturn(totalSupply);
     when(protocolLayerClient.executeBurnTokenTransaction(any(TokenBurnRequest.class)))
         .thenReturn(tokenBurnRequest);
 
-    nftClientImpl.burnNfts(tokenId, serials);
+    final long result = nftClientImpl.burnNfts(tokenId, serials);
 
     verify(operationalAccount, times(1)).privateKey();
     verify(protocolLayerClient, times(1)).executeBurnTokenTransaction(tokenBurnCaptor.capture());
@@ -485,6 +493,7 @@ public class NftClientImplTest {
     Assertions.assertEquals(tokenId, request.tokenId());
     Assertions.assertEquals(serials, request.serials());
     Assertions.assertEquals(privateKey, request.supplyKey());
+    Assertions.assertEquals(totalSupply, result);
   }
 
   @Test
@@ -494,11 +503,13 @@ public class NftClientImplTest {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final Set<Long> serials = Set.of(1L);
     final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final long totalSupply = 0L;
 
+    when(tokenBurnRequest.totalSupply()).thenReturn(totalSupply);
     when(protocolLayerClient.executeBurnTokenTransaction(any(TokenBurnRequest.class)))
         .thenReturn(tokenBurnRequest);
 
-    nftClientImpl.burnNfts(tokenId, serials, privateKey);
+    final long result = nftClientImpl.burnNfts(tokenId, serials, privateKey);
 
     verify(protocolLayerClient, times(1)).executeBurnTokenTransaction(tokenBurnCaptor.capture());
 
@@ -506,6 +517,7 @@ public class NftClientImplTest {
     Assertions.assertEquals(tokenId, request.tokenId());
     Assertions.assertEquals(serials, request.serials());
     Assertions.assertEquals(privateKey, request.supplyKey());
+    Assertions.assertEquals(totalSupply, result);
   }
 
   @Test
@@ -547,12 +559,14 @@ public class NftClientImplTest {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId accountId = AccountId.fromString("0.0.100");
     final long serial = 1L;
+    final long totalSupply = 0L;
 
     when(operationalAccount.privateKey()).thenReturn(wipeKey);
+    when(tokenWipeResult.totalSupply()).thenReturn(totalSupply);
     when(protocolLayerClient.executeWipeTokenTransaction(any(TokenWipeRequest.class)))
         .thenReturn(tokenWipeResult);
 
-    nftClientImpl.wipeNft(tokenId, serial, accountId);
+    final long result = nftClientImpl.wipeNft(tokenId, serial, accountId);
 
     verify(protocolLayerClient, times(1)).executeWipeTokenTransaction(tokenWipeCaptor.capture());
     final TokenWipeRequest request = tokenWipeCaptor.getValue();
@@ -560,6 +574,7 @@ public class NftClientImplTest {
     Assertions.assertEquals(accountId, request.accountId());
     Assertions.assertEquals(Set.of(serial), request.serials());
     Assertions.assertEquals(wipeKey, request.wipeKey());
+    Assertions.assertEquals(totalSupply, result);
   }
 
   @Test
@@ -569,11 +584,13 @@ public class NftClientImplTest {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final AccountId accountId = AccountId.fromString("0.0.100");
     final Set<Long> serials = Set.of(1L, 2L);
+    final long totalSupply = 0L;
 
+    when(tokenWipeResult.totalSupply()).thenReturn(totalSupply);
     when(protocolLayerClient.executeWipeTokenTransaction(any(TokenWipeRequest.class)))
         .thenReturn(tokenWipeResult);
 
-    nftClientImpl.wipeNfts(tokenId, serials, accountId, wipeKey);
+    final long result = nftClientImpl.wipeNfts(tokenId, serials, accountId, wipeKey);
 
     verify(protocolLayerClient, times(1)).executeWipeTokenTransaction(tokenWipeCaptor.capture());
     final TokenWipeRequest request = tokenWipeCaptor.getValue();
@@ -581,6 +598,7 @@ public class NftClientImplTest {
     Assertions.assertEquals(accountId, request.accountId());
     Assertions.assertEquals(serials, request.serials());
     Assertions.assertEquals(wipeKey, request.wipeKey());
+    Assertions.assertEquals(totalSupply, result);
   }
 
   @Test

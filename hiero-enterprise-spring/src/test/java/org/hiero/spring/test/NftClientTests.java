@@ -311,12 +311,14 @@ public class NftClientTests {
     final byte[] metadata2 = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
     final Account supplierAccount = accountClient.createAccount();
 
-    final TokenId tokenId = nftClient.createNftType(name, symbol);
-    final List<Long> serial = nftClient.mintNfts(tokenId, metadata1, metadata2);
+    final TokenId tokenId = nftClient.createNftType(name, symbol, supplierAccount.privateKey());
+    final List<Long> serial =
+        nftClient.mintNfts(tokenId, supplierAccount.privateKey(), metadata1, metadata2);
 
-    Assertions.assertDoesNotThrow(() -> nftClient.burnNft(tokenId, serial.get(0)));
-    Assertions.assertDoesNotThrow(
-        () -> nftClient.burnNft(tokenId, serial.get(1), supplierAccount.privateKey()));
+    Assertions.assertEquals(
+        1L, nftClient.burnNft(tokenId, serial.get(0), supplierAccount.privateKey()));
+    Assertions.assertEquals(
+        0L, nftClient.burnNft(tokenId, serial.get(1), supplierAccount.privateKey()));
   }
 
   @Test
@@ -327,12 +329,14 @@ public class NftClientTests {
     final byte[] metadata2 = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
     final Account supplierAccount = accountClient.createAccount();
 
-    final TokenId tokenId = nftClient.createNftType(name, symbol);
-    final List<Long> serials = nftClient.mintNfts(tokenId, metadata1, metadata2);
+    final TokenId tokenId = nftClient.createNftType(name, symbol, supplierAccount.privateKey());
+    final List<Long> serials =
+        nftClient.mintNfts(tokenId, supplierAccount.privateKey(), metadata1, metadata2);
 
-    Assertions.assertDoesNotThrow(() -> nftClient.burnNfts(tokenId, Set.of(serials.get(0))));
-    Assertions.assertDoesNotThrow(
-        () -> nftClient.burnNfts(tokenId, Set.of(serials.get(1)), supplierAccount.privateKey()));
+    Assertions.assertEquals(
+        1L, nftClient.burnNfts(tokenId, Set.of(serials.get(0)), supplierAccount.privateKey()));
+    Assertions.assertEquals(
+        0L, nftClient.burnNfts(tokenId, Set.of(serials.get(1)), supplierAccount.privateKey()));
   }
 
   @Test

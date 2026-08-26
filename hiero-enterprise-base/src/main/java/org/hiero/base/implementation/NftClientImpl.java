@@ -14,6 +14,7 @@ import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
+import org.hiero.base.protocol.data.TokenBurnResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
@@ -24,6 +25,7 @@ import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.jspecify.annotations.NonNull;
 
 public class NftClientImpl implements NftClient {
@@ -203,28 +205,29 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
-  public void burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers)
+  public long burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers)
       throws HieroException {
-    burnNfts(tokenId, serialNumbers, operationalAccount.privateKey());
+    return burnNfts(tokenId, serialNumbers, operationalAccount.privateKey());
   }
 
   @Override
-  public void burnNfts(
+  public long burnNfts(
       @NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers, @NonNull PrivateKey supplyKey)
       throws HieroException {
     final TokenBurnRequest request = TokenBurnRequest.of(tokenId, serialNumbers, supplyKey);
-    client.executeBurnTokenTransaction(request);
+    final TokenBurnResult result = client.executeBurnTokenTransaction(request);
+    return result.totalSupply();
   }
 
   @Override
-  public void wipeNfts(
+  public long wipeNfts(
       @NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers, @NonNull AccountId accountId)
       throws HieroException {
-    wipeNfts(tokenId, serialNumbers, accountId, operationalAccount.privateKey());
+    return wipeNfts(tokenId, serialNumbers, accountId, operationalAccount.privateKey());
   }
 
   @Override
-  public void wipeNfts(
+  public long wipeNfts(
       @NonNull TokenId tokenId,
       @NonNull Set<Long> serialNumbers,
       @NonNull AccountId accountId,
@@ -236,7 +239,8 @@ public class NftClientImpl implements NftClient {
     Objects.requireNonNull(wipeKey, "wipeKey must not be null");
     final TokenWipeRequest request =
         TokenWipeRequest.of(tokenId, accountId, serialNumbers, wipeKey);
-    client.executeWipeTokenTransaction(request);
+    final TokenWipeResult result = client.executeWipeTokenTransaction(request);
+    return result.totalSupply();
   }
 
   @Override
