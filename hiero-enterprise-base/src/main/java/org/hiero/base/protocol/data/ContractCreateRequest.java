@@ -16,9 +16,8 @@ public record ContractCreateRequest(
     @NonNull Hbar maxTransactionFee,
     @NonNull Duration transactionValidDuration,
     @NonNull FileId fileId,
-    @NonNull List<ContractParam<?>> constructorParams,
-    @NonNull PrivateKey adminKey)
     int gas,
+    @NonNull PrivateKey adminKey,
     @NonNull List<ContractParam<?>> constructorParams)
     implements TransactionRequest {
 
@@ -46,67 +45,55 @@ public record ContractCreateRequest(
   @NonNull
   public static ContractCreateRequest of(
       @NonNull String fileId,
-      @NonNull PrivateKey adminKey,
-      @Nullable ContractParam<?>... constructorParams) {
-      @NonNull String fileId,
       @NonNull Hbar maxTransactionFee,
       int gas,
+      @NonNull PrivateKey adminKey,
       @Nullable ContractParam<?>... constructorParams) {
     Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), adminKey, constructorParams);
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
-    return of(FileId.fromString(fileId), maxTransactionFee, gas, constructorParams);
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    return of(FileId.fromString(fileId), maxTransactionFee, gas, adminKey, constructorParams);
   }
 
   @NonNull
   public static ContractCreateRequest of(
       @NonNull FileId fileId,
-      @NonNull PrivateKey adminKey,
-      @Nullable ContractParam<?>... constructorParams) {
-      @NonNull FileId fileId,
       @NonNull Hbar maxTransactionFee,
       int gas,
+      @NonNull PrivateKey adminKey,
       @Nullable ContractParam<?>... constructorParams) {
     if (constructorParams == null) {
-      return of(fileId, maxTransactionFee, gas, List.of());
-      return of(fileId, adminKey, List.of());
+      return of(fileId, maxTransactionFee, gas, adminKey, List.of());
     } else {
-      return of(fileId, adminKey, List.of(constructorParams));
-      return of(fileId, maxTransactionFee, gas, List.of(constructorParams));
+      return of(fileId, maxTransactionFee, gas, adminKey, List.of(constructorParams));
     }
   }
 
   @NonNull
   public static ContractCreateRequest of(
       @NonNull String fileId,
-      @NonNull PrivateKey adminKey,
-      @NonNull List<ContractParam<?>> constructorParams) {
-      @NonNull String fileId,
       @NonNull Hbar maxTransactionFee,
       int gas,
+      @NonNull PrivateKey adminKey,
       @NonNull List<ContractParam<?>> constructorParams) {
     Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), adminKey, constructorParams);
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
-    return of(FileId.fromString(fileId), maxTransactionFee, gas, constructorParams);
+    return of(FileId.fromString(fileId), maxTransactionFee, gas, adminKey, constructorParams);
   }
 
   @NonNull
   public static ContractCreateRequest of(
       @NonNull FileId fileId,
-      @NonNull PrivateKey adminKey,
-      @NonNull List<ContractParam<?>> constructorParams) {
-      @NonNull FileId fileId,
       @NonNull Hbar maxTransactionFee,
       int gas,
+      @NonNull PrivateKey adminKey,
       @NonNull List<ContractParam<?>> constructorParams) {
     return new ContractCreateRequest(
         maxTransactionFee,
         DEFAULT_TRANSACTION_VALID_DURATION,
         fileId,
-        List.copyOf(constructorParams),
-        adminKey);
         gas,
+        adminKey,
         List.copyOf(constructorParams));
   }
 }

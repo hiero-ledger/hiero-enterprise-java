@@ -903,130 +903,128 @@ public class ProtocolLayerDataCreationTests {
 
     // then
     Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileIdString, maxTransactionFee, gas));
+        () -> ContractCreateRequest.of(fileIdString, maxTransactionFee, gas, adminKey));
     Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileIdString, maxTransactionFee, gas, contractParam));
+        () ->
+            ContractCreateRequest.of(
+                fileIdString, maxTransactionFee, gas, adminKey, contractParam));
     Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileIdString, maxTransactionFee, gas, constructorParams));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, maxTransactionFee, gas));
+        () ->
+            ContractCreateRequest.of(
+                fileIdString, maxTransactionFee, gas, adminKey, constructorParams));
     Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, contractParam));
+        () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey));
     Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, constructorParams));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileIdString, adminKey));
+        () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey, contractParam));
     Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileIdString, adminKey, contractParam));
-    Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileIdString, adminKey, constructorParams));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, adminKey));
-    Assertions.assertDoesNotThrow(() -> ContractCreateRequest.of(fileId, adminKey, contractParam));
-    Assertions.assertDoesNotThrow(
-        () -> ContractCreateRequest.of(fileId, adminKey, constructorParams));
+        () ->
+            ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey, constructorParams));
+
     Assertions.assertDoesNotThrow(
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, transactionValidDuration, fileId, constructorParams, adminKey));
-                maxTransactionFee, transactionValidDuration, fileId, gas, constructorParams));
-    Assertions.assertThrows(
-        NullPointerException.class, () -> ContractCreateRequest.of((String) null, adminKey));
-        NullPointerException.class,
-        () -> ContractCreateRequest.of((String) null, maxTransactionFee, gas));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of((String) null, adminKey, contractParam));
-        NullPointerException.class, () -> ContractCreateRequest.of(fileId, null, gas));
+                maxTransactionFee,
+                transactionValidDuration,
+                fileId,
+                gas,
+                adminKey,
+                constructorParams));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> ContractCreateRequest.of((String) null, maxTransactionFee, gas, contractParam));
-        () -> ContractCreateRequest.of((String) null, adminKey, constructorParams));
+        () -> ContractCreateRequest.of((String) null, maxTransactionFee, gas, adminKey));
     Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of((String) null, maxTransactionFee, gas, constructorParams));
-        () -> ContractCreateRequest.of(fileIdString, adminKey, (ContractParam<?>) null));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of(fileIdString, null, gas, constructorParams));
-        () -> ContractCreateRequest.of(fileIdString, adminKey, (List<ContractParam<?>>) null));
+        NullPointerException.class, () -> ContractCreateRequest.of(fileId, null, gas, adminKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             ContractCreateRequest.of(
-                fileIdString, maxTransactionFee, gas, (ContractParam<?>) null));
-        NullPointerException.class, () -> ContractCreateRequest.of((FileId) null, adminKey));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of((FileId) null, adminKey, contractParam));
-        NullPointerException.class,
-        () ->
-            ContractCreateRequest.of(
-                fileIdString, maxTransactionFee, gas, (List<ContractParam<?>>) null));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of((FileId) null, adminKey, constructorParams));
-        () -> ContractCreateRequest.of((FileId) null, maxTransactionFee, gas));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of(fileId, adminKey, (ContractParam<?>) null));
-        () -> ContractCreateRequest.of((FileId) null, maxTransactionFee, gas, contractParam));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of((FileId) null, maxTransactionFee, gas, constructorParams));
-        () -> ContractCreateRequest.of(fileId, adminKey, (List<ContractParam<?>>) null));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, (ContractParam<?>) null));
-        () ->
-            new ContractCreateRequest(
-                null, transactionValidDuration, fileId, constructorParams, adminKey));
+                (String) null, maxTransactionFee, gas, adminKey, contractParam));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             ContractCreateRequest.of(
-                fileId, maxTransactionFee, gas, (List<ContractParam<?>>) null));
+                (String) null, maxTransactionFee, gas, adminKey, constructorParams));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> ContractCreateRequest.of(fileIdString, null, gas, adminKey, constructorParams));
+    Assertions.assertThrows(
+        NullPointerException.class,
         () ->
-            new ContractCreateRequest(
-                maxTransactionFee, null, fileId, constructorParams, adminKey));
+            ContractCreateRequest.of(
+                fileIdString, maxTransactionFee, gas, adminKey, (ContractParam<?>) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> ContractCreateRequest.of((FileId) null, maxTransactionFee, gas, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            ContractCreateRequest.of(
+                (FileId) null, maxTransactionFee, gas, adminKey, contractParam));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            ContractCreateRequest.of(
+                (FileId) null, maxTransactionFee, gas, adminKey, constructorParams));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            ContractCreateRequest.of(
+                fileId, maxTransactionFee, gas, adminKey, (ContractParam<?>) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            ContractCreateRequest.of(
+                fileId, maxTransactionFee, gas, adminKey, (List<ContractParam<?>>) null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new ContractCreateRequest(
-                null, transactionValidDuration, fileId, gas, constructorParams));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> new ContractCreateRequest(maxTransactionFee, null, fileId, gas, constructorParams));
-                maxTransactionFee, transactionValidDuration, null, constructorParams, adminKey));
+                null, transactionValidDuration, fileId, gas, adminKey, constructorParams));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, transactionValidDuration, null, gas, constructorParams));
+                maxTransactionFee, null, fileId, gas, adminKey, constructorParams));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, transactionValidDuration, fileId, gas, null));
+                maxTransactionFee,
+                transactionValidDuration,
+                null,
+                gas,
+                adminKey,
+                constructorParams));
+    Assertions.assertThrows(
+        NullPointerException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, transactionValidDuration, fileId, null, adminKey));
+                maxTransactionFee, transactionValidDuration, fileId, gas, adminKey, null));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new ContractCreateRequest(
-                Hbar.from(-100), transactionValidDuration, fileId, gas, constructorParams));
-                Hbar.from(-100), transactionValidDuration, fileId, constructorParams, adminKey));
+                Hbar.from(-100),
+                transactionValidDuration,
+                fileId,
+                gas,
+                adminKey,
+                constructorParams));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, Duration.ZERO, fileId, gas, constructorParams));
-            new ContractCreateRequest(
-                maxTransactionFee, Duration.ZERO, fileId, constructorParams, adminKey));
+                maxTransactionFee, Duration.ZERO, fileId, gas, adminKey, constructorParams));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new ContractCreateRequest(
-                maxTransactionFee, Duration.ofSeconds(-1), fileId, gas, constructorParams));
-                maxTransactionFee, Duration.ofSeconds(-1), fileId, constructorParams, adminKey));
+                maxTransactionFee,
+                Duration.ofSeconds(-1),
+                fileId,
+                gas,
+                adminKey,
+                constructorParams));
   }
 
   @Test

@@ -44,6 +44,7 @@ public class SmartContractClientImpl implements SmartContractClient {
     this.protocolLayerClient =
         Objects.requireNonNull(protocolLayerClient, "protocolLayerClient must not be null");
     this.fileClient = Objects.requireNonNull(fileClient, "fileClient must not be null");
+    this.operatorAccount = Objects.requireNonNull(operationalAccount, "operationalAccount");
   }
 
   @NonNull
@@ -65,15 +66,16 @@ public class SmartContractClientImpl implements SmartContractClient {
     try {
       final ContractCreateRequest request;
       if (constructorParams == null) {
-        request = ContractCreateRequest.of(fileId, operatorAccount.privateKey());
-        request = ContractCreateRequest.of(fileId, maxTransactionFee, gas);
+        request =
+            ContractCreateRequest.of(fileId, maxTransactionFee, gas, operatorAccount.privateKey());
       } else {
         request =
             ContractCreateRequest.of(
-                fileId, operatorAccount.privateKey(), Arrays.asList(constructorParams));
-        request =
-            ContractCreateRequest.of(
-                fileId, maxTransactionFee, gas, Arrays.asList(constructorParams));
+                fileId,
+                maxTransactionFee,
+                gas,
+                operatorAccount.privateKey(),
+                Arrays.asList(constructorParams));
       }
       final ContractCreateResult result =
           protocolLayerClient.executeContractCreateTransaction(request);
