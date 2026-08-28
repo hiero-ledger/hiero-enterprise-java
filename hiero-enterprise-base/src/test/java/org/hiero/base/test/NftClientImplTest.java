@@ -16,7 +16,30 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
-import org.hiero.base.protocol.data.*;
+import org.hiero.base.protocol.data.TokenAssociateRequest;
+import org.hiero.base.protocol.data.TokenAssociateResult;
+import org.hiero.base.protocol.data.TokenBurnRequest;
+import org.hiero.base.protocol.data.TokenBurnResult;
+import org.hiero.base.protocol.data.TokenCreateRequest;
+import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
+import org.hiero.base.protocol.data.TokenDeleteResult;
+import org.hiero.base.protocol.data.TokenDissociateRequest;
+import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenMintRequest;
+import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenTransferRequest;
+import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
+import org.hiero.base.protocol.data.TokenUpdateNftsResult;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenUpdateResult;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -798,7 +821,6 @@ public class NftClientImplTest {
 
   @Test
   void testFreezeNft() throws HieroException {
-
     final TokenFreezeResult tokenFreezeResult = Mockito.mock(TokenFreezeResult.class);
     final PrivateKey freezeKey = PrivateKey.generateECDSA();
     final TokenId tokenId = TokenId.fromString("1.2.3");
@@ -833,6 +855,47 @@ public class NftClientImplTest {
     verify(protocolLayerClient, times(1))
         .executeTokenFreezeTransaction(tokenFreezeCaptor.capture());
     final TokenFreezeRequest request = tokenFreezeCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(accountId, request.accountId());
+    Assertions.assertEquals(freezeKey, request.freezeKey());
+  }
+
+  @Test
+  void testUnfreezeNft() throws HieroException {
+    final TokenUnfreezeResult tokenUnfreezeResult = Mockito.mock(TokenUnfreezeResult.class);
+    final PrivateKey freezeKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+
+    when(operationalAccount.privateKey()).thenReturn(freezeKey);
+    when(protocolLayerClient.executeTokenUnfreezeTransaction(any(TokenUnfreezeRequest.class)))
+        .thenReturn(tokenUnfreezeResult);
+
+    nftClientImpl.unfreezeNft(tokenId, accountId);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenUnfreezeTransaction(tokenUnfreezeCaptor.capture());
+    final TokenUnfreezeRequest request = tokenUnfreezeCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(accountId, request.accountId());
+    Assertions.assertEquals(freezeKey, request.freezeKey());
+  }
+
+  @Test
+  void testUnfreezeNftWithCustomFreezeKey() throws HieroException {
+    final TokenUnfreezeResult tokenUnfreezeResult = Mockito.mock(TokenUnfreezeResult.class);
+    final PrivateKey freezeKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+
+    when(protocolLayerClient.executeTokenUnfreezeTransaction(any(TokenUnfreezeRequest.class)))
+        .thenReturn(tokenUnfreezeResult);
+
+    nftClientImpl.unfreezeNft(tokenId, accountId, freezeKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenUnfreezeTransaction(tokenUnfreezeCaptor.capture());
+    final TokenUnfreezeRequest request = tokenUnfreezeCaptor.getValue();
     Assertions.assertEquals(tokenId, request.tokenId());
     Assertions.assertEquals(accountId, request.accountId());
     Assertions.assertEquals(freezeKey, request.freezeKey());
