@@ -167,6 +167,7 @@ public record TokenCreateRequest(
   /**
    * Creates a token create request with supply, optional metadata, wipe, and freeze keys.
    *
+   * @param wipeKey the wipe key; optional unless wiping from non-treasury accounts
    * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
    */
   public static TokenCreateRequest of(
@@ -177,9 +178,8 @@ public record TokenCreateRequest(
       @NonNull final TokenType tokenType,
       @NonNull final PrivateKey supplyKey,
       @Nullable final PrivateKey metadataKey,
-      @NonNull final PrivateKey wipeKey,
+      @Nullable final PrivateKey wipeKey,
       @Nullable final PrivateKey freezeKey) {
-    Objects.requireNonNull(wipeKey, "Wipe key cannot be null");
     return new TokenCreateRequest(
         Hbar.from(100),
         TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
