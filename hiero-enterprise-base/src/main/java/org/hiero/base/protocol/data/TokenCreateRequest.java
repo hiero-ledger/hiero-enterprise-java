@@ -21,7 +21,8 @@ public record TokenCreateRequest(
     @Nullable PrivateKey supplyKey,
     @Nullable PrivateKey adminKey,
     @Nullable PrivateKey metadataKey,
-    @Nullable PrivateKey wipeKey)
+    @Nullable PrivateKey wipeKey,
+    @Nullable PrivateKey freezeKey)
     implements TransactionRequest {
 
   static final int MAX_SYMBOL_LENGTH = 100;
@@ -84,6 +85,7 @@ public record TokenCreateRequest(
         null,
         treasuryKey,
         null,
+        null,
         null);
   }
 
@@ -104,6 +106,7 @@ public record TokenCreateRequest(
         tokenType,
         supplyKey,
         treasuryKey,
+        null,
         null,
         null);
   }
@@ -127,6 +130,7 @@ public record TokenCreateRequest(
         supplyKey,
         treasuryKey,
         metadataKey,
+        null,
         null);
   }
 
@@ -156,6 +160,38 @@ public record TokenCreateRequest(
         supplyKey,
         treasuryKey,
         metadataKey,
-        wipeKey);
+        wipeKey,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, wipe, and freeze keys.
+   *
+   * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @NonNull final PrivateKey wipeKey,
+      @Nullable final PrivateKey freezeKey) {
+    Objects.requireNonNull(wipeKey, "Wipe key cannot be null");
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        freezeKey);
   }
 }

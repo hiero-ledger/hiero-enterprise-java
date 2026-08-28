@@ -33,7 +33,9 @@ import com.hedera.hashgraph.sdk.TokenBurnTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
+import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenUnfreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateNftsTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
 import com.hedera.hashgraph.sdk.TokenWipeTransaction;
@@ -106,10 +108,14 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -606,6 +612,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (request.wipeKey() != null) {
         transaction.setWipeKey(request.wipeKey().getPublicKey());
       }
+      if (request.freezeKey() != null) {
+        transaction.setFreezeKey(request.freezeKey().getPublicKey());
+      }
       sign(transaction, request.treasuryKey(), request.supplyKey(), request.adminKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
@@ -716,6 +725,46 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenDissociateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute dissociate token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenFreezeResult executeTokenFreezeTransaction(@NonNull final TokenFreezeRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenFreezeTransaction transaction =
+          new TokenFreezeTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId());
+      sign(transaction, request.freezeKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_FREEZE);
+      return new TokenFreezeResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute freeze token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenUnfreezeResult executeTokenUnfreezeTransaction(
+      @NonNull final TokenUnfreezeRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenUnfreezeTransaction transaction =
+          new TokenUnfreezeTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId())
+              .setAccountId(request.accountId());
+      sign(transaction, request.freezeKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_UNFREEZE);
+      return new TokenUnfreezeResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute unfreeze token transaction", e);
     }
   }
 

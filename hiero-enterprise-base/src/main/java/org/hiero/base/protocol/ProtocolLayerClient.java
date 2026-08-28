@@ -50,10 +50,14 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -287,6 +291,26 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenDissociateResult executeTokenDissociateTransaction(
       @NonNull final TokenDissociateRequest request) throws HieroException;
+
+  /**
+   * Executes a token freeze transaction.
+   *
+   * @param request the request containing the details of the token freeze transaction
+   * @return the result of the token freeze transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenFreezeResult executeTokenFreezeTransaction(
+      @NonNull final TokenFreezeRequest request) throws HieroException;
+
+  /**
+   * Executes a token unfreeze transaction.
+   *
+   * @param request the request containing the details of the token unfreeze transaction
+   * @return the result of the token unfreeze transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenUnfreezeResult executeTokenUnfreezeTransaction(
+      @NonNull final TokenUnfreezeRequest request) throws HieroException;
 
   /**
    * Executes a token mint transaction.

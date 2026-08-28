@@ -19,9 +19,11 @@ import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenWipeRequest;
@@ -175,6 +177,40 @@ public class NftClientImpl implements NftClient {
     final TokenDissociateRequest request =
         TokenDissociateRequest.of(tokenIds, accountId, accountKey);
     client.executeTokenDissociateTransaction(request);
+  }
+
+  @Override
+  public void freezeNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    freezeNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void freezeNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey freezeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(freezeKey, "freezeKey must not be null");
+    final TokenFreezeRequest request = TokenFreezeRequest.of(tokenId, accountId, freezeKey);
+    client.executeTokenFreezeTransaction(request);
+  }
+
+  @Override
+  public void unfreezeNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    unfreezeNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void unfreezeNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey freezeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(freezeKey, "freezeKey must not be null");
+    final TokenUnfreezeRequest request = TokenUnfreezeRequest.of(tokenId, accountId, freezeKey);
+    client.executeTokenUnfreezeTransaction(request);
   }
 
   @Override

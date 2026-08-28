@@ -73,10 +73,14 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -1352,6 +1356,33 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testTokenFreezeResultCreation() {
+    // Given
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    // Then
+    Assertions.assertDoesNotThrow(() -> new TokenFreezeResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new TokenFreezeResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenFreezeResult(transactionId, null));
+  }
+
+  @Test
+  public void testTokenUnfreezeResultCreation() {
+    // Given
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    // Then
+    Assertions.assertDoesNotThrow(() -> new TokenUnfreezeResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenUnfreezeResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenUnfreezeResult(transactionId, null));
+  }
+
+  @Test
   void testFileUpdateResultCreation() {
     // Given
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
@@ -1820,6 +1851,7 @@ public class ProtocolLayerDataCreationTests {
                 supplyKey,
                 treasuryKey,
                 null,
+                null,
                 null));
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
@@ -1847,6 +1879,7 @@ public class ProtocolLayerDataCreationTests {
                 supplyKey,
                 treasuryKey,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1861,6 +1894,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null));
     Assertions.assertThrows(
@@ -1877,6 +1911,7 @@ public class ProtocolLayerDataCreationTests {
                 supplyKey,
                 treasuryKey,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1891,6 +1926,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null));
     Assertions.assertThrows(
@@ -1907,6 +1943,7 @@ public class ProtocolLayerDataCreationTests {
                 supplyKey,
                 treasuryKey,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -1921,6 +1958,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null));
   }
@@ -2298,6 +2336,85 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new TokenDissociateRequest(
                 maxTransactionFee, transactionValidDuration, tokenIds, accountId, null));
+  }
+
+  @Test
+  void testTokenFreezeRequestCreation() {
+    // Given
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final AccountId accountId = AccountId.fromString("0.0.54321");
+    final PrivateKey freezeKey = PrivateKey.generateECDSA();
+
+    // Then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenFreezeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, freezeKey));
+    Assertions.assertDoesNotThrow(() -> TokenFreezeRequest.of(tokenId, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFreezeRequest(null, transactionValidDuration, tokenId, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenFreezeRequest(maxTransactionFee, null, tokenId, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFreezeRequest(
+                maxTransactionFee, transactionValidDuration, null, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFreezeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFreezeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, null));
+  }
+
+  @Test
+  void testTokenUnfreezeRequestCreation() {
+    // Given
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final AccountId accountId = AccountId.fromString("0.0.54321");
+    final PrivateKey freezeKey = PrivateKey.generateECDSA();
+
+    // Then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenUnfreezeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, freezeKey));
+    Assertions.assertDoesNotThrow(() -> TokenUnfreezeRequest.of(tokenId, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUnfreezeRequest(
+                null, transactionValidDuration, tokenId, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenUnfreezeRequest(maxTransactionFee, null, tokenId, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUnfreezeRequest(
+                maxTransactionFee, transactionValidDuration, null, accountId, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUnfreezeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, freezeKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenUnfreezeRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, accountId, null));
   }
 
   @Test

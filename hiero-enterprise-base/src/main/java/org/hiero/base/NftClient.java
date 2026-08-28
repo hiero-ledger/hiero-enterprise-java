@@ -56,7 +56,7 @@ public interface NftClient {
       @NonNull String name, @NonNull String symbol, @NonNull String supplierKey)
       throws HieroException {
     Objects.requireNonNull(supplierKey, "supplierKey must not be null");
-    return createNftType(name, symbol, PrivateKey.fromString(supplierKey));
+    return createNftType(name, symbol, PrivateKey.fromStringDER(supplierKey));
   }
 
   /**
@@ -96,7 +96,10 @@ public interface NftClient {
     Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
     Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
     return createNftType(
-        name, symbol, AccountId.fromString(treasuryAccountId), PrivateKey.fromString(treasuryKey));
+        name,
+        symbol,
+        AccountId.fromString(treasuryAccountId),
+        PrivateKey.fromStringDER(treasuryKey));
   }
 
   /**
@@ -161,8 +164,8 @@ public interface NftClient {
         name,
         symbol,
         AccountId.fromString(treasuryAccountId),
-        PrivateKey.fromString(treasuryKey),
-        PrivateKey.fromString(supplierKey));
+        PrivateKey.fromStringDER(treasuryKey),
+        PrivateKey.fromStringDER(supplierKey));
   }
 
   /**
@@ -257,9 +260,9 @@ public interface NftClient {
         name,
         symbol,
         AccountId.fromString(treasuryAccountId),
-        PrivateKey.fromString(treasuryKey),
-        PrivateKey.fromString(supplierKey),
-        PrivateKey.fromString(metadataKey));
+        PrivateKey.fromStringDER(treasuryKey),
+        PrivateKey.fromStringDER(supplierKey),
+        PrivateKey.fromStringDER(metadataKey));
   }
 
   /**
@@ -324,7 +327,7 @@ public interface NftClient {
     associateNft(
         TokenId.fromString(tokenId),
         AccountId.fromString(accountId),
-        PrivateKey.fromString(accountKey));
+        PrivateKey.fromStringDER(accountKey));
   }
 
   /**
@@ -401,7 +404,7 @@ public interface NftClient {
     dissociateNft(
         TokenId.fromString(tokenId),
         AccountId.fromString(accountId),
-        PrivateKey.fromString(accountKey));
+        PrivateKey.fromStringDER(accountKey));
   }
   ;
 
@@ -444,6 +447,115 @@ public interface NftClient {
     dissociateNft(tokenIds, account.accountId(), account.privateKey());
   }
   ;
+
+  /**
+   * Freezes an account for the given NFT type. The operator account key is used as the freeze key.
+   * A frozen account cannot send or receive NFTs of that type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to freeze
+   * @throws HieroException if the account could not be frozen for the NFT type
+   */
+  void freezeNft(@NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Freezes an account for the given NFT type. Must be signed by the token freeze key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to freeze
+   * @param freezeKey the freeze key of the NFT type
+   * @throws HieroException if the account could not be frozen for the NFT type
+   */
+  void freezeNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey freezeKey)
+      throws HieroException;
+
+  /**
+   * Freezes an account for the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to freeze
+   * @param freezeKey the freeze key of the NFT type
+   * @throws HieroException if the account could not be frozen for the NFT type
+   */
+  default void freezeNft(
+      @NonNull String tokenId, @NonNull String accountId, @NonNull String freezeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(freezeKey, "freezeKey must not be null");
+    freezeNft(
+        TokenId.fromString(tokenId),
+        AccountId.fromString(accountId),
+        PrivateKey.fromStringDER(freezeKey));
+  }
+
+  /**
+   * Freezes an account for the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param account the account to freeze
+   * @throws HieroException if the account could not be frozen for the NFT type
+   */
+  default void freezeNft(@NonNull TokenId tokenId, @NonNull Account account) throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    freezeNft(tokenId, account.accountId(), account.privateKey());
+  }
+
+  /**
+   * Unfreezes an account for the given NFT type. The operator account key is used as the freeze
+   * key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to unfreeze
+   * @throws HieroException if the account could not be unfrozen for the NFT type
+   */
+  void unfreezeNft(@NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Unfreezes an account for the given NFT type. Must be signed by the token freeze key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to unfreeze
+   * @param freezeKey the freeze key of the NFT type
+   * @throws HieroException if the account could not be unfrozen for the NFT type
+   */
+  void unfreezeNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey freezeKey)
+      throws HieroException;
+
+  /**
+   * Unfreezes an account for the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to unfreeze
+   * @param freezeKey the freeze key of the NFT type
+   * @throws HieroException if the account could not be unfrozen for the NFT type
+   */
+  default void unfreezeNft(
+      @NonNull String tokenId, @NonNull String accountId, @NonNull String freezeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(freezeKey, "freezeKey must not be null");
+    unfreezeNft(
+        TokenId.fromString(tokenId),
+        AccountId.fromString(accountId),
+        PrivateKey.fromStringDER(freezeKey));
+  }
+
+  /**
+   * Unfreezes an account for the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param account the account to unfreeze
+   * @throws HieroException if the account could not be unfrozen for the NFT type
+   */
+  default void unfreezeNft(@NonNull TokenId tokenId, @NonNull Account account)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    unfreezeNft(tokenId, account.accountId(), account.privateKey());
+  }
 
   /**
    * Mint a new NFT of the given type. The NFT is minted by the operator account. The operator
@@ -495,7 +607,7 @@ public interface NftClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
-    return mintNft(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), metadata);
+    return mintNft(TokenId.fromString(tokenId), PrivateKey.fromStringDER(supplyKey), metadata);
   }
 
   /**
@@ -554,7 +666,7 @@ public interface NftClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
-    return mintNfts(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), metadata);
+    return mintNfts(TokenId.fromString(tokenId), PrivateKey.fromStringDER(supplyKey), metadata);
   }
 
   /**
@@ -836,7 +948,7 @@ public interface NftClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
-    updateNftType(TokenId.fromString(tokenId), name, symbol, PrivateKey.fromString(adminKey));
+    updateNftType(TokenId.fromString(tokenId), name, symbol, PrivateKey.fromStringDER(adminKey));
   }
 
   /**
@@ -937,7 +1049,10 @@ public interface NftClient {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(metadataKey, "metadataKey must not be null");
     updateNftsMetadata(
-        TokenId.fromString(tokenId), serialNumbers, PrivateKey.fromString(metadataKey), metadata);
+        TokenId.fromString(tokenId),
+        serialNumbers,
+        PrivateKey.fromStringDER(metadataKey),
+        metadata);
   }
 
   /**
@@ -971,7 +1086,7 @@ public interface NftClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
-    deleteNftType(TokenId.fromString(tokenId), PrivateKey.fromString(adminKey));
+    deleteNftType(TokenId.fromString(tokenId), PrivateKey.fromStringDER(adminKey));
   }
 
   default void deleteNftType(@NonNull String tokenId) throws HieroException {

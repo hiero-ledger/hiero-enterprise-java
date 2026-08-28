@@ -36,6 +36,14 @@
 | `dissociateNft(TokenId tokenId, Account account)` | Removes an NFT association using an account object. |
 | `dissociateNft(List<TokenId> tokenIds, AccountId accountId, PrivateKey accountKey)` | Removes multiple NFT type associations from an account. |
 | `dissociateNft(List<TokenId> tokenIds, Account account)` | Removes multiple NFT associations using an account object. |
+| `freezeNft(TokenId tokenId, AccountId accountId)` | Freezes an account for an NFT type using the operator freeze key. |
+| `freezeNft(TokenId tokenId, AccountId accountId, PrivateKey freezeKey)` | Freezes an account for an NFT type using a custom freeze key. |
+| `freezeNft(String tokenId, String accountId, String freezeKey)` | Freezes an account using string identifiers. |
+| `freezeNft(TokenId tokenId, Account account)` | Freezes an account using an account object. |
+| `unfreezeNft(TokenId tokenId, AccountId accountId)` | Unfreezes an account for an NFT type using the operator freeze key. |
+| `unfreezeNft(TokenId tokenId, AccountId accountId, PrivateKey freezeKey)` | Unfreezes an account for an NFT type using a custom freeze key. |
+| `unfreezeNft(String tokenId, String accountId, String freezeKey)` | Unfreezes an account using string identifiers. |
+| `unfreezeNft(TokenId tokenId, Account account)` | Unfreezes an account using an account object. |
 | `mintNft(TokenId tokenId, byte[] metadata)` | Mints a new NFT using the operator account as supply account. |
 | `mintNft(String tokenId, byte[] metadata)` | Mints a new NFT using token ID string. |
 | `mintNft(TokenId tokenId, PrivateKey supplyKey, byte[] metadata)` | Mints a new NFT using a custom supply key. |
@@ -198,49 +206,74 @@ nftClient.dissociateNft(
 
 ---
 
+## Freeze / Unfreeze NFT Account
+
+Freezes or unfreezes an account for an NFT type. A frozen account cannot send or receive NFTs of that type until it is unfrozen. The token must have been created with a freeze key.
+
+```java title="freezeNft(TokenId tokenId, AccountId accountId)"
+TokenId tokenId = TokenId.fromString("0.0.5000");
+AccountId accountId = AccountId.fromString("0.0.1001");
+
+nftClient.freezeNft(tokenId, accountId);
+```
+
+```java title="unfreezeNft(TokenId tokenId, AccountId accountId, PrivateKey freezeKey)"
+TokenId tokenId = TokenId.fromString("0.0.5000");
+AccountId accountId = AccountId.fromString("0.0.1001");
+PrivateKey freezeKey = PrivateKey.generateED25519();
+
+nftClient.unfreezeNft(tokenId, accountId, freezeKey);
+```
+
+:::note
+The operator account key is used as the freeze key when no custom key is provided. The NFT type must have a freeze key set at creation time for freeze and unfreeze to succeed.
+:::
+
+---
+
 ## Mint NFT
 
 Creates one or more NFT instances for an NFT token type.
 
 ```java title="mintNft(TokenId tokenId, byte[] metadata)" 
 TokenId tokenId =
-    TokenId.fromString("0.0.5000");
+        TokenId.fromString("0.0.5000");
 
 byte[] metadata =
-    "NFT metadata".getBytes();
+        "NFT metadata".getBytes();
 
 long serialNumber =
-    nftClient.mintNft(
-        tokenId,
-        metadata
-    );
+        nftClient.mintNft(
+                tokenId,
+                metadata
+        );
 ```
 
 
 ```java title="mintNfts(TokenId tokenId, byte[]... metadata)" 
 TokenId tokenId =
-    TokenId.fromString("0.0.5000");
+        TokenId.fromString("0.0.5000");
 
 List<Long> serialNumbers =
-    nftClient.mintNfts(
-        tokenId,
-        "NFT One".getBytes(),
-        "NFT Two".getBytes()
-    );
+        nftClient.mintNfts(
+                tokenId,
+                "NFT One".getBytes(),
+                "NFT Two".getBytes()
+        );
 ```
 
 
 ```java title="mintNfts(TokenId tokenId, PrivateKey supplyKey, byte[]... metadata)" 
 TokenId tokenId =
-    TokenId.fromString("0.0.5000");
+        TokenId.fromString("0.0.5000");
 
 List<Long> serialNumbers =
-    nftClient.mintNfts(
-        tokenId,
-        supplyKey,
-        "NFT One".getBytes(),
-        "NFT Two".getBytes()
-    );
+        nftClient.mintNfts(
+                tokenId,
+                supplyKey,
+                "NFT One".getBytes(),
+                "NFT Two".getBytes()
+        );
 ```
 
 !!! info
@@ -256,39 +289,39 @@ Permanently removes one or more NFTs from circulation. Returns the total supply 
 
 ```java title="burnNft(TokenId tokenId, long serialNumber)"
 TokenId tokenId =
-    TokenId.fromString("0.0.5000");
+        TokenId.fromString("0.0.5000");
 
 long totalSupply = nftClient.burnNft(
-    tokenId,
-    1L
+        tokenId,
+        1L
 );
 ```
 
 ```java title="burnNfts(TokenId tokenId, Set<Long> serialNumbers)"
 TokenId tokenId =
-    TokenId.fromString("0.0.5000");
+        TokenId.fromString("0.0.5000");
 
 Set<Long> serialNumbers =
-    Set.of(1L, 2L, 3L);
+        Set.of(1L, 2L, 3L);
 
 long totalSupply = nftClient.burnNfts(
-    tokenId,
-    serialNumbers
-    );
+        tokenId,
+        serialNumbers
+);
 ```
 
 ```java title="burnNfts(TokenId tokenId, Set<Long> serialNumbers, PrivateKey supplyKey)"
 TokenId tokenId =
-    TokenId.fromString("0.0.5000");
+        TokenId.fromString("0.0.5000");
 
 Set<Long> serialNumbers =
-    Set.of(1L, 2L, 3L);
+        Set.of(1L, 2L, 3L);
 
 long totalSupply = nftClient.burnNfts(
-    tokenId,
-    serialNumbers,
-    supplyKey
-    );
+        tokenId,
+        serialNumbers,
+        supplyKey
+);
 ```
 
 
@@ -307,9 +340,9 @@ Wipes one or more NFTs from a non-treasury account. The wipe key must sign. Wipi
 AccountId holder = AccountId.fromString("0.0.1001");
 
 long totalSupply = nftClient.wipeNft(
-    tokenId,
-    1L,
-    holder
+        tokenId,
+        1L,
+        holder
 );
 ```
 
@@ -318,10 +351,10 @@ Set<Long> serialNumbers = Set.of(1L, 2L, 3L);
 PrivateKey wipeKey = PrivateKey.generateED25519();
 
 long totalSupply = nftClient.wipeNfts(
-    tokenId,
-    serialNumbers,
-    holder,
-    wipeKey
+        tokenId,
+        serialNumbers,
+        holder,
+        wipeKey
 );
 ```
 

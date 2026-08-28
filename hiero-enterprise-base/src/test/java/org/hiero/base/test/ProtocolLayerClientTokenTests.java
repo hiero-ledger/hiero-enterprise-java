@@ -17,9 +17,13 @@ import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -122,6 +126,51 @@ public class ProtocolLayerClientTokenTests {
     Assertions.assertNotNull(wipeResult);
     Assertions.assertNotNull(wipeResult.transactionId());
     Assertions.assertNotNull(wipeResult.totalSupply());
+  }
+
+  @Test
+  void testFreezeAndUnfreezeNftAccount() throws Exception {
+    // given — create NFT type with freeze key, associate holder account
+    final Account operator = hieroTestContext.getOperatorAccount();
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Freeze NFT",
+            "FRZ",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            null,
+            null,
+            operator.privateKey());
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    final AccountCreateResult accountCreateResult =
+        protocolLayerClient.executeAccountCreateTransaction(AccountCreateRequest.of(Hbar.from(2)));
+    final Account holder = accountCreateResult.newAccount();
+
+    protocolLayerClient.executeTokenAssociateTransaction(
+        TokenAssociateRequest.of(tokenId, holder.accountId(), holder.privateKey()));
+
+    // when — freeze then unfreeze
+    final TokenFreezeRequest freezeRequest =
+        TokenFreezeRequest.of(tokenId, holder.accountId(), operator.privateKey());
+    final TokenFreezeResult freezeResult =
+        protocolLayerClient.executeTokenFreezeTransaction(freezeRequest);
+
+    final TokenUnfreezeRequest unfreezeRequest =
+        TokenUnfreezeRequest.of(tokenId, holder.accountId(), operator.privateKey());
+    final TokenUnfreezeResult unfreezeResult =
+        protocolLayerClient.executeTokenUnfreezeTransaction(unfreezeRequest);
+
+    // then
+    Assertions.assertNotNull(freezeResult);
+    Assertions.assertNotNull(freezeResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, freezeResult.status());
+    Assertions.assertNotNull(unfreezeResult);
+    Assertions.assertNotNull(unfreezeResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, unfreezeResult.status());
   }
 
   @Test
