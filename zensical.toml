@@ -44,7 +44,7 @@ nav = [
             { "ContractCallResult" = "utils/contract-call-result.md" },
             { "ContractVerificationClient" = "utils/contract-verification-client.md" }
         ]}
-    ]}
+    ]},
 ]
 
 [project.theme]

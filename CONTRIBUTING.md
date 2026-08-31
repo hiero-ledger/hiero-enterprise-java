@@ -35,8 +35,7 @@ Thank you for your interest in contributing to Hiero Hiero Enterprise Java!
 - [Signing Guide](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/signing.md)
 - [Rebasing Guide](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/rebasing.md)
 - [Merge Conflicts Guide](https://github.com/hiero-ledger/sdk-collaboration-hub/blob/main/guides/issue-progression/for-developers/merge_conflicts.md)
-- [Testing Guide](docs/testing-forks.md)
-
+- [Testing Guide](docs/testing-forks.md)- [Fuzz Testing Guide](docs/fuzzing.md)
 
 #### ⚠️ A Note on Breaking Changes
 

@@ -178,6 +178,13 @@ The file should look like this:
 spring.hiero.accountId=0.0.3447271
 spring.hiero.privateKey=2130020100312346052b8104400304220420c236508c429395a8180b1230f436d389adc5afaa9145456783b57b2045c6cc37
 ```
+## Testing
+
+This project introduces the use of Fuzz Testing for dynamic code analysis. 
+Below are links to this information that provide insight into the testing process. 
+
+**[Fuzzing](/docs/fuzzing.md)**
+**[Testing Forks](/docs/testing-forks.md)**
 
 ### Create a release
 
