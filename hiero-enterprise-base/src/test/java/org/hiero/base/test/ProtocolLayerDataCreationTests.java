@@ -77,10 +77,12 @@ import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -1325,6 +1327,28 @@ public class ProtocolLayerDataCreationTests {
         NullPointerException.class, () -> new TokenWipeResult(transactionId, null, totalSupply));
     Assertions.assertThrows(
         NullPointerException.class, () -> new TokenWipeResult(transactionId, status, null));
+  }
+
+  @Test
+  void testTokenPauseRequest() {
+    final TokenId tokenId = TokenId.fromString("0.0.123");
+    final PrivateKey pauseKey = PrivateKey.generateED25519();
+
+    final TokenPauseRequest request = TokenPauseRequest.of(tokenId, pauseKey);
+
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(pauseKey, request.pauseKey());
+  }
+
+  @Test
+  void testTokenUnpauseRequest() {
+    final TokenId tokenId = TokenId.fromString("0.0.123");
+    final PrivateKey unpauseKey = PrivateKey.generateED25519();
+
+    final TokenUnpauseRequest request = TokenUnpauseRequest.of(tokenId, unpauseKey);
+
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(unpauseKey, request.unpauseKey());
   }
 
   @Test

@@ -280,6 +280,34 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
+  public void pauseNft(@NonNull TokenId tokenId) throws HieroException {
+    pauseNft(tokenId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void pauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey)
+      throws HieroException {
+
+    final TokenPauseRequest request = TokenPauseRequest.of(tokenId, pauseKey);
+
+    client.executePauseTokenTransaction(request);
+  }
+
+  @Override
+  public void unpauseNft(@NonNull TokenId tokenId) throws HieroException {
+    unpauseNft(tokenId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void unpauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey)
+      throws HieroException {
+
+    final TokenUnpauseRequest request = TokenUnpauseRequest.of(tokenId, pauseKey);
+
+    client.executeUnpauseTokenTransaction(request);
+  }
+
+  @Override
   public void transferNft(
       @NonNull final TokenId tokenId,
       final long serialNumber,

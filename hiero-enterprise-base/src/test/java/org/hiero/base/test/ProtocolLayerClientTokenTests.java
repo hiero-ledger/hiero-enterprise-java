@@ -21,9 +21,13 @@ import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -171,6 +175,73 @@ public class ProtocolLayerClientTokenTests {
     Assertions.assertNotNull(unfreezeResult);
     Assertions.assertNotNull(unfreezeResult.transactionId());
     Assertions.assertEquals(Status.SUCCESS, unfreezeResult.status());
+  }
+
+  @Test
+  void testPauseNft() throws Exception {
+    // given
+    final Account operator = hieroTestContext.getOperatorAccount();
+
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Pause NFT",
+            "PAUSE",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            null,
+            operator.privateKey());
+
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    // when
+    final TokenPauseRequest pauseRequest = TokenPauseRequest.of(tokenId, operator.privateKey());
+
+    final TokenPauseResult pauseResult =
+        protocolLayerClient.executePauseTokenTransaction(pauseRequest);
+
+    // then
+    Assertions.assertNotNull(pauseResult);
+    Assertions.assertNotNull(pauseResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, pauseResult.status());
+  }
+
+  @Test
+  void testUnpauseNft() throws Exception {
+    // given
+    final Account operator = hieroTestContext.getOperatorAccount();
+
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Unpause NFT",
+            "UNPAUSE",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            null,
+            operator.privateKey());
+
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    final TokenPauseRequest pauseRequest = TokenPauseRequest.of(tokenId, operator.privateKey());
+
+    protocolLayerClient.executePauseTokenTransaction(pauseRequest);
+
+    // when
+    final TokenUnpauseRequest unpauseRequest =
+        TokenUnpauseRequest.of(tokenId, operator.privateKey());
+
+    final TokenUnpauseResult unpauseResult =
+        protocolLayerClient.executeUnpauseTokenTransaction(unpauseRequest);
+
+    // then
+    Assertions.assertNotNull(unpauseResult);
+    Assertions.assertNotNull(unpauseResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, unpauseResult.status());
   }
 
   @Test

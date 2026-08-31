@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, pausing, unpausing, transferring NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -60,6 +60,8 @@
 | `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId, PrivateKey wipeKey)` | Wipes a single NFT using a custom wipe key. Returns total supply. |
 | `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId)` | Wipes multiple NFTs from an account using the operator wipe key. Returns total supply. |
 | `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId, PrivateKey wipeKey)` | Wipes multiple NFTs using a custom wipe key. Returns total supply. |
+| `pauseNfts(TokenId tokenId, PrivateKey pauseKey)` | pauses the NFT's from an account using the pause key.
+| `unpauseNfts(TokenId tokenId, , PrivateKey pauseKey)` | unpauses the NFT's from an account using the pause key.
 | `transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers an NFT between accounts. |
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
@@ -363,6 +365,42 @@ long totalSupply = nftClient.wipeNfts(
     Newly created NFT types use the admin (treasury) key as the wipe key when no wipe key is set explicitly, so the operator key can wipe when the operator is also the treasury/admin.
 
 ---
+
+## Pause NFT
+
+Pauses an NFT type, preventing NFT transfers and other token operations while the type is paused. The pause key must sign the transaction. The NFT type must have a pause key configured.
+
+```java nftClient.pauseNft(tokenId);
+
+PrivateKey pauseKey = PrivateKey.generateED25519();
+
+nftClient.pauseNft(
+    tokenId,
+    pauseKey
+);
+```
+
+!!! info
+
+The pause key is configured when the NFT type is created or updated. When using the overload without an explicit pause key, the operator key is used to sign the transaction.
+
+## Unpause NFT
+
+Unpauses a paused NFT type, allowing NFT transfers and other token operations to resume. The pause key must sign the transaction. The NFT type must have a pause key configured.
+
+```java nftClient.unpauseNft(tokenId);
+
+PrivateKey pauseKey = PrivateKey.generateED25519();
+
+nftClient.unpauseNft(
+    tokenId,
+    pauseKey
+);
+```
+
+!!! info
+
+The same pause key that is configured for the NFT type must be used to pause or unpause it. When using the overload without an explicit pause key, the operator key is used to sign the transaction.
 
 ## Transfer NFT
 

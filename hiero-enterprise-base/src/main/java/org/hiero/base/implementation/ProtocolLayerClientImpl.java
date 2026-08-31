@@ -795,6 +795,48 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   }
 
   @Override
+  public TokenPauseResult executePauseTokenTransaction(@NonNull final TokenPauseRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenPauseTransaction transaction =
+          new TokenPauseTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId());
+
+      sign(transaction, request.pauseKey());
+
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_PAUSE);
+      return new TokenPauseResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute pause token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenUnpauseResult executeUnpauseTokenTransaction(
+      @NonNull final TokenUnpauseRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenUnpauseTransaction transaction =
+          new TokenUnpauseTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId());
+
+      sign(transaction, request.pauseKey());
+
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_UNPAUSE);
+      return new TokenUnpauseResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute unpause token transaction", e);
+    }
+  }
+
+  @Override
   public TokenWipeResult executeWipeTokenTransaction(@NonNull final TokenWipeRequest request)
       throws HieroException {
     Objects.requireNonNull(request, "request must not be null");
