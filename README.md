@@ -1,5 +1,13 @@
 # Hiero Enterprise Java
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hiero-ledger/hiero-enterprise-java/badge)](https://scorecard.dev/viewer/?uri=github.com/hiero-ledger/hiero-enterprise-java)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12402/badge)](https://www.bestpractices.dev/projects/12402)
+[![License](https://img.shields.io/badge/license-apache2-blue.svg)](LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/org.hiero/hiero-enterprise.svg?label=maven)](https://central.sonatype.com/artifact/org.hiero/hiero-enterprise)
+[![Build CI](https://img.shields.io/github/actions/workflow/status/hiero-ledger/hiero-enterprise-java/maven.yml)](https://github.com/hiero-ledger/hiero-enterprise-java/actions/workflows/maven.yaml)
+![Java](https://img.shields.io/badge/java-21%2B-blue)
+
+
 This project provides Java modules to interact with a [Hiero network](https://hiero.org) in a Java Enterprise application.
 The project provides integrations to Spring Boot or Eclipse Microprofile (like Quarkus) for interacting with Hiero.
 This module is based on the [Hedera Java SDK](https://github.com/hashgraph/hedera-sdk-java)(will be migrated to Hiero Java SDK in near future) and provides a set of managed services to interact with a Hiero network.
