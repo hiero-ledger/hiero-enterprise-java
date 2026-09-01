@@ -21,6 +21,14 @@
 | `createContract(FileId fileId, Hbar maxTransactionFee, int gas, ContractParam<?>... constructorParams)`                         | Creates a smart contract using an existing bytecode file with a custom maximum transaction fee and gas limit.                                                                                                                  |
 | `createContract(byte[] contents, Hbar maxTransactionFee, int gas, ContractParam<?>... constructorParams)`                       | Creates a smart contract using bytecode contents with a custom maximum transaction fee and gas limit.                                                                                                                          |
 | `createContract(Path pathToBin, Hbar maxTransactionFee, int gas, ContractParam<?>... constructorParams)`                        | Creates a smart contract using a bytecode file path with a custom maximum transaction fee and gas limit.                                                                                                                       |
+| `createContract(String fileId, String adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode stored in a file ID string and sets the specified private key as the contract admin key. |
+| `createContract(FileId fileId, PrivateKey adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using an existing bytecode file and sets the specified private key as the contract admin key. |
+| `createContract(byte[] contents, PrivateKey adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode contents and sets the specified private key as the contract admin key. |
+| `createContract(Path pathToBin, PrivateKey adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using a bytecode file path and sets the specified private key as the contract admin key. |
+| `createContract(String fileId, Hbar maxTransactionFee, int gas, String adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode stored in a file ID string with a custom maximum transaction fee, gas limit, and admin key. |
+| `createContract(FileId fileId, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using an existing bytecode file with a custom maximum transaction fee, gas limit, and admin key. |
+| `createContract(byte[] contents, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode contents with a custom maximum transaction fee, gas limit, and admin key. |
+| `createContract(Path pathToBin, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams)` | Creates a smart contract using a bytecode file path with a custom maximum transaction fee, gas limit, and admin key. |
 | `callContractFunction(String contractId, String functionName, ContractParam<?>... params)`                                      | Executes a contract function using a contract ID string.                                                                                                                                                                       |
 | `callContractFunction(ContractId contractId, String functionName, ContractParam<?>... params)`                                  | Executes a contract function using a contract ID.                                                                                                                                                                              |
 | `callContractFunction(String contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam<?>... params)`     | Executes a smart contract function using a contract ID string with a custom maximum transaction fee and gas limit.                                                                                                             |
@@ -88,6 +96,50 @@ ContractId contractId =
         ContractParam.string("Hello Hiero")
     );
 ```
+
+A contract can be deployed with an admin key by using the `createContract` overloads that accept a `PrivateKey`. The admin key can be used to authorize administrative operations on the contract, such as deleting the contract.
+
+```java title="createContract(FileId fileId, PrivateKey adminKey, ContractParam<?>... constructorParams)"
+FileId fileId =
+    FileId.fromString("0.0.1234");
+
+PrivateKey adminKey =
+    PrivateKey.fromStringDER("...");
+
+ContractId contractId =
+    smartContractClient.createContract(
+        fileId,
+        adminKey,
+        ContractParam.string("Hello Hiero")
+    );
+```
+
+The maximum transaction fee and gas limit can also be customized when deploying a contract with an admin key.
+
+```java title="createContract(FileId fileId, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams)"
+FileId fileId =
+    FileId.fromString("0.0.1234");
+
+PrivateKey adminKey =
+    PrivateKey.fromStringDER("...");
+
+ContractId contractId =
+    smartContractClient.createContract(
+        fileId,
+        Hbar.from(20),
+        10_000_000,
+        adminKey,
+        ContractParam.string("Hello Hiero")
+    );
+```
+
+!!! note
+
+```
+The admin key is specified during contract creation. Use the `PrivateKey` overloads when you already have a `PrivateKey` instance. 
+The `String` overload accepts a DER-encoded private key string and converts it to a `PrivateKey`.
+```
+
 
 
 ---

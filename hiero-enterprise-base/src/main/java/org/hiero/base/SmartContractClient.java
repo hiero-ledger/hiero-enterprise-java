@@ -9,6 +9,8 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import java.nio.file.Path;
 import java.util.Objects;
+
+import com.hedera.hashgraph.sdk.PrivateKey;
 import org.hiero.base.data.ContractCallResult;
 import org.hiero.base.data.ContractParam;
 import org.jspecify.annotations.NonNull;
@@ -169,6 +171,160 @@ public interface SmartContractClient {
       int gas,
       @Nullable ContractParam<?>... constructorParams)
       throws HieroException;
+
+  /**
+   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   *
+   * @param fileId the ID of the file containing the contract bytecode
+   * @param adminKey the private key string der to use as the admin key for the contract
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  default @NonNull ContractId createContract(
+      String fileId,
+      String adminKey,
+      ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+
+    return createContract(FileId.fromString(fileId), PrivateKey.fromStringDER(adminKey), constructorParams);
+  }
+
+  /**
+   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   *
+   * @param fileId the ID of the file containing the contract bytecode
+   * @param adminKey the private key to use as the admin key for the contract
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  default @NonNull ContractId createContract(
+      FileId fileId,
+      PrivateKey adminKey,
+      ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    return createContract(fileId, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
+  }
+
+  /**
+   * Create a new smart contract with the given contents, using the specified admin key.
+   * The contents must be the bytecode for the contract.
+   *
+   * @param contents the contents of the contract
+   * @param adminKey the private key to use as the admin key for the contract
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  default @NonNull ContractId createContract(
+      byte[] contents,
+      PrivateKey adminKey,
+      ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(contents, "contents must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    return createContract(contents, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
+  }
+
+  /**
+   * Create a new smart contract based on a file. The contents of the file must be the bytecode for
+   * the contract.
+   *
+   * @param pathToBin the path to the file containing the contract bytecode
+   * @param adminKey the private key to use as the admin key for the contract
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  default @NonNull ContractId createContract(
+      Path pathToBin,
+      PrivateKey adminKey,
+      ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(pathToBin, "pathToBin must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    return createContract(pathToBin, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
+  }
+
+  /**
+   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   *
+   * @param fileId the ID of the file containing the contract bytecode
+   * @param adminKey the private key string der to use as the admin key for the contract
+   * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  default @NonNull ContractId createContract(
+      String fileId,
+      Hbar maxTransactionFee,
+      int gas,
+      String adminKey,
+      ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    return createContract(FileId.fromString(fileId), maxTransactionFee, gas, PrivateKey.fromStringDER(adminKey), constructorParams);
+  }
+
+
+  /**
+   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   *
+   * @param fileId the ID of the file containing the contract bytecode
+   * @param adminKey the private key to use as the admin key for the contract
+   * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  @NonNull ContractId createContract(
+      FileId fileId,
+      Hbar maxTransactionFee,
+      int gas,
+      PrivateKey adminKey,
+      ContractParam<?>... constructorParams) throws HieroException;
+
+  /**
+   * Create a new smart contract with the given contents, using the specified admin key.
+   * The contents must be the bytecode for the contract.
+   *
+   * @param contents the contents of the contract
+   * @param adminKey the private key to use as the admin key for the contract
+   * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  @NonNull ContractId createContract(
+      byte[] contents,
+      Hbar maxTransactionFee,
+      int gas,
+      PrivateKey adminKey,
+      ContractParam<?>... constructorParams) throws HieroException;
+
+  /**
+   * Create a new smart contract based on a file. The contents of the file must be the bytecode for
+   * the contract.
+   *
+   * @param pathToBin the path to the file containing the contract bytecode
+   * @param adminKey the private key to use as the admin key for the contract
+   * @param maxTransactionFee the custom max transaction fee in Hbar
+   * @param gas the custom max gas that can be spent
+   * @param constructorParams the parameters to pass to the contract constructor
+   * @return the ID of the new contract
+   * @throws HieroException if the contract could not be created
+   */
+  @NonNull ContractId createContract(
+      Path pathToBin,
+      Hbar maxTransactionFee,
+      int gas,
+      PrivateKey adminKey,
+      ContractParam<?>... constructorParams) throws HieroException;
 
   /**
    * Call a function on a smart contract.

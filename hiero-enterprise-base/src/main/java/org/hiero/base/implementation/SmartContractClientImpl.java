@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
+
+import com.hedera.hashgraph.sdk.PrivateKey;
 import org.hiero.base.FileClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.SmartContractClient;
@@ -58,31 +60,7 @@ public class SmartContractClientImpl implements SmartContractClient {
     Objects.requireNonNull(fileId, "fileId must not be null");
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
 
-    if (gas < 0 || gas > MAX_GAS_LIMIT) {
-      throw new IllegalArgumentException(
-          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
-    }
-
-    try {
-      final ContractCreateRequest request;
-      if (constructorParams == null) {
-        request =
-            ContractCreateRequest.of(fileId, maxTransactionFee, gas, operatorAccount.privateKey());
-      } else {
-        request =
-            ContractCreateRequest.of(
-                fileId,
-                maxTransactionFee,
-                gas,
-                operatorAccount.privateKey(),
-                Arrays.asList(constructorParams));
-      }
-      final ContractCreateResult result =
-          protocolLayerClient.executeContractCreateTransaction(request);
-      return result.contractId();
-    } catch (Exception e) {
-      throw new HieroException("Failed to create contract with fileId " + fileId, e);
-    }
+    return createContract(fileId, maxTransactionFee, gas, operatorAccount.privateKey(), constructorParams);
   }
 
   @NonNull
@@ -96,14 +74,7 @@ public class SmartContractClientImpl implements SmartContractClient {
     Objects.requireNonNull(contents, "contents must not be null");
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
 
-    final FileId fileId = fileClient.createFile(contents);
-    try {
-      return createContract(fileId, maxTransactionFee, gas, constructorParams);
-    } catch (Exception e) {
-      throw new HieroException("Failed to create contract out of byte array", e);
-    } finally {
-      fileClient.deleteFile(fileId);
-    }
+    return createContract(contents, maxTransactionFee, gas, operatorAccount.privateKey(), constructorParams);
   }
 
   @NonNull
@@ -117,9 +88,67 @@ public class SmartContractClientImpl implements SmartContractClient {
     Objects.requireNonNull(pathToBin, "pathToBin must not be null");
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
 
+    return createContract(pathToBin, maxTransactionFee, gas, operatorAccount.privateKey(), constructorParams);
+  }
+
+  @Override
+  public @NonNull ContractId createContract(FileId fileId, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+
+    if (gas < 0 || gas > MAX_GAS_LIMIT) {
+      throw new IllegalArgumentException(
+          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
+    }
+
+    try {
+      final ContractCreateRequest request;
+      if (constructorParams == null) {
+        request =
+            ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey);
+      } else {
+        request =
+            ContractCreateRequest.of(
+                fileId,
+                maxTransactionFee,
+                gas,
+                adminKey,
+                Arrays.asList(constructorParams));
+      }
+      final ContractCreateResult result =
+          protocolLayerClient.executeContractCreateTransaction(request);
+      return result.contractId();
+    } catch (Exception e) {
+      throw new HieroException("Failed to create contract with fileId " + fileId, e);
+    }
+  }
+
+  @Override
+  public @NonNull ContractId createContract(byte[] contents, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(contents, "contents must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+
+    final FileId fileId = fileClient.createFile(contents);
+    try {
+      return createContract(fileId, maxTransactionFee, gas, adminKey, constructorParams);
+    } catch (Exception e) {
+      throw new HieroException("Failed to create contract out of byte array", e);
+    } finally {
+      fileClient.deleteFile(fileId);
+    }
+  }
+
+  @Override
+  public @NonNull ContractId createContract(Path pathToBin, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam<?>... constructorParams) throws HieroException {
+    Objects.requireNonNull(pathToBin, "pathToBin must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+
     try {
       final byte[] bytes = Files.readAllBytes(pathToBin);
-      return createContract(bytes, maxTransactionFee, gas, constructorParams);
+      return createContract(bytes, maxTransactionFee, gas, adminKey, constructorParams);
     } catch (Exception e) {
       throw new HieroException("Failed to create contract from path " + pathToBin, e);
     }
