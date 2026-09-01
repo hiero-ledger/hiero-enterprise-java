@@ -4,10 +4,16 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-public record BalanceSnapshot(@NonNull Instant timestamp, @NonNull List<AccountBalance> balances) {
+/**
+ * Represents a snapshot of account and token balances.
+ *
+ * @param timestamp the consensus timestamp associated with the balance
+ * @param balances the account balances included in the snapshot
+ */
+public record BalanceSnapshot(@Nullable Instant timestamp, @NonNull List<AccountBalance> balances) {
   public BalanceSnapshot {
-    Objects.requireNonNull(timestamp, "timestamp must not be null");
     balances = List.copyOf(Objects.requireNonNull(balances, "balances must not be null"));
   }
 }

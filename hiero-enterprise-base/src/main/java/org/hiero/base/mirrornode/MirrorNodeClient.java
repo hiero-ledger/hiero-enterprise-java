@@ -304,13 +304,39 @@ public interface MirrorNodeClient {
    */
   @NonNull Optional<NetworkSupplies> queryNetworkSupplies() throws HieroException;
 
+  /**
+   * Queries the latest balance snapshot of the network.
+   *
+   * @return the Optional containing the balance snapshot
+   * @throws HieroException if an error occurs
+   */
   @NonNull Optional<BalanceSnapshot> queryBalanceSnapshot() throws HieroException;
 
+  /**
+   * Queries the account balances for all accounts on the network.
+   *
+   * @return the Page containing the account balances
+   * @throws HieroException if an error occurs
+   */
   @NonNull Page<AccountBalance> queryBalances() throws HieroException;
 
+  /**
+   * Queries the account balance for the specified account.
+   *
+   * @param accountId the ID of the account whose balance is queried
+   * @return the Page containing the account balances
+   * @throws HieroException if an error occurs
+   */
   @NonNull Page<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
       throws HieroException;
 
+  /**
+   * Queries the account balance for the specified account.
+   *
+   * @param accountId the ID of the account whose balance is queried
+   * @return the Page containing the account balances
+   * @throws HieroException if an error occurs
+   */
   @NonNull
   default Page<AccountBalance> queryBalancesByAccount(@NonNull String accountId)
       throws HieroException {

@@ -1,11 +1,12 @@
 package org.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.TokenId;
-import java.util.Objects;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-public record TokenBalance(@NonNull TokenId tokenId, long balance) {
-  public TokenBalance {
-    Objects.requireNonNull(tokenId, "tokenId must not be null");
-  }
-}
+/**
+ * Represents the balance of a token held by an account.
+ *
+ * @param tokenId the network entity ID of the token
+ * @param balance the token balance in the token's smallest denomination
+ */
+public record TokenBalance(@Nullable TokenId tokenId, long balance) {}
