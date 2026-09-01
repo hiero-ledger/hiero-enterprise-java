@@ -25,14 +25,6 @@
 | `callContractFunction(ContractId contractId, String functionName, ContractParam<?>... params)`                                  | Executes a contract function using a contract ID.                                                                                                                                                                              |
 | `callContractFunction(String contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam<?>... params)`     | Executes a smart contract function using a contract ID string with a custom maximum transaction fee and gas limit.                                                                                                             |
 | `callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam<?>... params)` | Executes a smart contract function using a contract ID with a custom maximum transaction fee and gas limit.                                                                                                                    |
-| Method | Description |
-|:-------|:------------|
-| `createContract(String fileId, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode stored in a file ID string. |
-| `createContract(FileId fileId, ContractParam<?>... constructorParams)` | Creates a smart contract using an existing bytecode file. |
-| `createContract(byte[] contents, ContractParam<?>... constructorParams)` | Creates a smart contract using bytecode contents. |
-| `createContract(Path pathToBin, ContractParam<?>... constructorParams)` | Creates a smart contract using a bytecode file path. |
-| `callContractFunction(String contractId, String functionName, ContractParam<?>... params)` | Executes a contract function using a contract ID string. |
-| `callContractFunction(ContractId contractId, String functionName, ContractParam<?>... params)` | Executes a contract function using a contract ID. |
 | `deleteContract(String contractId)` | Marks the specified smart contract as deleted. |
 | `deleteContract(ContractId contractId)` | Marks the specified smart contract as deleted. |
 | `deleteContract(ContractId contractId, ContractId toContractId)` | Marks the specified smart contract as deleted and transfers its remaining balance to another contract. |
