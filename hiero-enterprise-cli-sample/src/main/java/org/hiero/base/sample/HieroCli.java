@@ -8,11 +8,7 @@ import picocli.CommandLine.Command;
     mixinStandardHelpOptions = true,
     version = "1.0",
     description = "Hiero Enterprise CLI - interact with the Hiero network",
-    subcommands = {
-      CreateAccountCommand.class,
-      CreateTopicCommand.class,
-      SendMessageCommand.class
-    })
+    subcommands = {CreateAccountCommand.class, CreateTopicCommand.class, SendMessageCommand.class})
 public class HieroCli implements Runnable {
 
   public static void main(final String[] args) {
