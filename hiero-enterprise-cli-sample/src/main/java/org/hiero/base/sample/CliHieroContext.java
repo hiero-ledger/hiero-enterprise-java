@@ -16,7 +16,8 @@ public class CliHieroContext implements HieroContext {
   private final Account operationalAccount;
   private final Client client;
 
-  public CliHieroContext(final String accountIdStr, final String privateKeyStr, final String network) {
+  public CliHieroContext(
+      final String accountIdStr, final String privateKeyStr, final String network) {
     final AccountId accountId = AccountId.fromString(accountIdStr);
     final PrivateKey privateKey = PrivateKey.fromString(privateKeyStr);
     final PublicKey publicKey = privateKey.getPublicKey();
@@ -24,13 +25,10 @@ public class CliHieroContext implements HieroContext {
 
     final NetworkSettings networkSettings =
         NetworkSettings.forIdentifier(network)
-            .orElseThrow(
-                () -> new IllegalStateException("Unknown network: " + network));
+            .orElseThrow(() -> new IllegalStateException("Unknown network: " + network));
 
     final Map<String, AccountId> nodes = new HashMap<>();
-    networkSettings
-        .getConsensusNodes()
-        .forEach(n -> nodes.put(n.getAddress(), n.getAccountId()));
+    networkSettings.getConsensusNodes().forEach(n -> nodes.put(n.getAddress(), n.getAccountId()));
 
     client = Client.forNetwork(nodes);
     if (!networkSettings.getMirrorNodeAddresses().isEmpty()) {

@@ -7,22 +7,40 @@ import org.hiero.base.protocol.ProtocolLayerClient;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "send-message", description = "Send a message to a Hiero topic", mixinStandardHelpOptions = true)
+@Command(
+    name = "send-message",
+    description = "Send a message to a Hiero topic",
+    mixinStandardHelpOptions = true)
 public class SendMessageCommand implements Runnable {
 
-  @Option(names = {"-n", "--network"}, description = "Hiero network", defaultValue = "hedera-testnet")
+  @Option(
+      names = {"-n", "--network"},
+      description = "Hiero network",
+      defaultValue = "hedera-testnet")
   private String network;
 
-  @Option(names = {"-a", "--account-id"}, description = "Operator account ID", required = true)
+  @Option(
+      names = {"-a", "--account-id"},
+      description = "Operator account ID",
+      required = true)
   private String accountId;
 
-  @Option(names = {"-k", "--private-key"}, description = "Operator private key", required = true)
+  @Option(
+      names = {"-k", "--private-key"},
+      description = "Operator private key",
+      required = true)
   private String privateKey;
 
-  @Option(names = {"-t", "--topic-id"}, description = "Topic ID", required = true)
+  @Option(
+      names = {"-t", "--topic-id"},
+      description = "Topic ID",
+      required = true)
   private String topicId;
 
-  @Option(names = {"-msg", "--message"}, description = "Message content", required = true)
+  @Option(
+      names = {"-msg", "--message"},
+      description = "Message content",
+      required = true)
   private String message;
 
   @Override
@@ -30,7 +48,8 @@ public class SendMessageCommand implements Runnable {
     try {
       final CliHieroContext context = new CliHieroContext(accountId, privateKey, network);
       final ProtocolLayerClient protocolClient = new ProtocolLayerClientImpl(context);
-      final TopicClient topicClient = new TopicClientImpl(protocolClient, context.getOperatorAccount());
+      final TopicClient topicClient =
+          new TopicClientImpl(protocolClient, context.getOperatorAccount());
       System.out.println("Sending message to topic " + topicId + "...");
       topicClient.submitMessage(topicId, message);
       System.out.println("Message sent successfully!");

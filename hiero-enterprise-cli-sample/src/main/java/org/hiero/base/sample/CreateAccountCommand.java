@@ -1,23 +1,35 @@
 package org.hiero.base.sample;
 
 import org.hiero.base.AccountClient;
+import org.hiero.base.data.Account;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
-import org.hiero.base.data.Account;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "create-account", description = "Create a new Hiero account", mixinStandardHelpOptions = true)
+@Command(
+    name = "create-account",
+    description = "Create a new Hiero account",
+    mixinStandardHelpOptions = true)
 public class CreateAccountCommand implements Runnable {
 
-  @Option(names = {"-n", "--network"}, description = "Hiero network", defaultValue = "hedera-testnet")
+  @Option(
+      names = {"-n", "--network"},
+      description = "Hiero network",
+      defaultValue = "hedera-testnet")
   private String network;
 
-  @Option(names = {"-a", "--account-id"}, description = "Operator account ID", required = true)
+  @Option(
+      names = {"-a", "--account-id"},
+      description = "Operator account ID",
+      required = true)
   private String accountId;
 
-  @Option(names = {"-k", "--private-key"}, description = "Operator private key", required = true)
+  @Option(
+      names = {"-k", "--private-key"},
+      description = "Operator private key",
+      required = true)
   private String privateKey;
 
   @Override
