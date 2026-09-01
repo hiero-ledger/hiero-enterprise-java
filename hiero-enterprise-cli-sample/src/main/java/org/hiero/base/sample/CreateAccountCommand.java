@@ -37,7 +37,8 @@ public class CreateAccountCommand implements Runnable {
     try {
       final CliHieroContext context = new CliHieroContext(accountId, privateKey, network);
       final ProtocolLayerClient protocolClient = new ProtocolLayerClientImpl(context);
-      final AccountClient accountClient = new AccountClientImpl(protocolClient);
+      final AccountClient accountClient =
+          new AccountClientImpl(protocolClient, context.getOperatorAccount());
       System.out.println("Creating account on " + network + "...");
       final Account account = accountClient.createAccount();
       System.out.println("Account created: " + account.accountId());
