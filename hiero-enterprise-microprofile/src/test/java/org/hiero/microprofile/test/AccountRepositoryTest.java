@@ -19,6 +19,7 @@ import org.hiero.base.data.TokenAirdrop;
 import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.microprofile.ClientProvider;
+import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,8 @@ public class AccountRepositoryTest {
   @Inject private AccountRepository accountRepository;
 
   @Inject private AccountClient accountClient;
+
+  @Inject private HieroTestUtils hieroTestUtils;
 
   @BeforeAll
   static void setup() {
@@ -145,8 +148,7 @@ public class AccountRepositoryTest {
 
   private AccountId newAccountVisibleOnMirrorNode() throws Exception {
     final Account account = accountClient.createAccount();
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
     return account.accountId();
   }
 }
