@@ -629,6 +629,50 @@ public class NftClientImplTest {
   }
 
   @Test
+  void testPauseNft() throws HieroException {
+    final TokenPauseResult result = Mockito.mock(TokenPauseResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final PrivateKey pauseKey = PrivateKey.generateECDSA();
+
+    when(operationalAccount.privateKey()).thenReturn(pauseKey);
+
+    when(protocolLayerClient.executePauseTokenTransaction(any(TokenPauseRequest.class)))
+        .thenReturn(result);
+
+    nftClientImpl.pauseNft(tokenId);
+
+    verify(protocolLayerClient).executePauseTokenTransaction(pauseRequestCaptor.capture());
+
+    final TokenPauseRequest request = pauseRequestCaptor.getValue();
+
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(pauseKey, request.pauseKey());
+  }
+
+  @Test
+  void testUnpauseNft() throws HieroException {
+    final TokenUnpauseResult result = Mockito.mock(TokenUnpauseResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final PrivateKey unpauseKey = PrivateKey.generateECDSA();
+
+    when(operationalAccount.privateKey()).thenReturn(unpauseKey);
+
+    when(protocolLayerClient.executeUnpauseTokenTransaction(any(TokenUnpauseRequest.class)))
+        .thenReturn(result);
+
+    nftClientImpl.unpauseNft(tokenId);
+
+    verify(protocolLayerClient).executeUnpauseTokenTransaction(unpauseRequestCaptor.capture());
+
+    final TokenUnpauseRequest request = unpauseRequestCaptor.getValue();
+
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(unpauseKey, request.unpauseKey());
+  }
+
+  @Test
   void testAssociateNft() throws HieroException {
     final TokenAssociateResult tokenAssociateResult = Mockito.mock(TokenAssociateResult.class);
 

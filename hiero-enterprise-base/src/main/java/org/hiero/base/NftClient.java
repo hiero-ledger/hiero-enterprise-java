@@ -826,6 +826,50 @@ public interface NftClient {
   }
 
   /**
+   * Pauses an NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @throws HieroException if the NFT type could not be paused
+   */
+  void pauseNft(@NonNull TokenId tokenId) throws HieroException;
+
+  void pauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey) throws HieroException;
+
+  /**
+   * Unpauses an NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @throws HieroException if the NFT type could not be unpaused
+   */
+  void unpauseNft(@NonNull TokenId tokenId) throws HieroException;
+
+  void unpauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey) throws HieroException;
+
+  default void pauseNft(@NonNull String tokenId) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    pauseNft(TokenId.fromString(tokenId));
+  }
+
+  default void pauseNft(@NonNull String tokenId, @NonNull String pauseKey) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(pauseKey, "pauseKey must not be null");
+
+    pauseNft(TokenId.fromString(tokenId), PrivateKey.fromString(pauseKey));
+  }
+
+  default void unpauseNft(@NonNull String tokenId) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    unpauseNft(TokenId.fromString(tokenId));
+  }
+
+  default void unpauseNft(@NonNull String tokenId, @NonNull String pauseKey) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(pauseKey, "pauseKey must not be null");
+
+    unpauseNft(TokenId.fromString(tokenId), PrivateKey.fromString(pauseKey));
+  }
+
+  /**
    * Transfer an NFT to another account.
    *
    * @param tokenId the ID of the NFT type
