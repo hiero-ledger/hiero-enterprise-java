@@ -7,10 +7,9 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import java.nio.file.Path;
 import java.util.Objects;
-
-import com.hedera.hashgraph.sdk.PrivateKey;
 import org.hiero.base.data.ContractCallResult;
 import org.hiero.base.data.ContractParam;
 import org.jspecify.annotations.NonNull;
@@ -173,7 +172,8 @@ public interface SmartContractClient {
       throws HieroException;
 
   /**
-   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   * Create a new smart contract based on the file with the given file ID, using the specified admin
+   * key.
    *
    * @param fileId the ID of the file containing the contract bytecode
    * @param adminKey the private key string der to use as the admin key for the contract
@@ -182,17 +182,17 @@ public interface SmartContractClient {
    * @throws HieroException if the contract could not be created
    */
   default @NonNull ContractId createContract(
-      String fileId,
-      String adminKey,
-      ContractParam<?>... constructorParams) throws HieroException {
+      String fileId, String adminKey, ContractParam<?>... constructorParams) throws HieroException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
 
-    return createContract(FileId.fromString(fileId), PrivateKey.fromStringDER(adminKey), constructorParams);
+    return createContract(
+        FileId.fromString(fileId), PrivateKey.fromStringDER(adminKey), constructorParams);
   }
 
   /**
-   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   * Create a new smart contract based on the file with the given file ID, using the specified admin
+   * key.
    *
    * @param fileId the ID of the file containing the contract bytecode
    * @param adminKey the private key to use as the admin key for the contract
@@ -201,17 +201,17 @@ public interface SmartContractClient {
    * @throws HieroException if the contract could not be created
    */
   default @NonNull ContractId createContract(
-      FileId fileId,
-      PrivateKey adminKey,
-      ContractParam<?>... constructorParams) throws HieroException {
+      FileId fileId, PrivateKey adminKey, ContractParam<?>... constructorParams)
+      throws HieroException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
-    return createContract(fileId, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
+    return createContract(
+        fileId, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
   }
 
   /**
-   * Create a new smart contract with the given contents, using the specified admin key.
-   * The contents must be the bytecode for the contract.
+   * Create a new smart contract with the given contents, using the specified admin key. The
+   * contents must be the bytecode for the contract.
    *
    * @param contents the contents of the contract
    * @param adminKey the private key to use as the admin key for the contract
@@ -220,12 +220,16 @@ public interface SmartContractClient {
    * @throws HieroException if the contract could not be created
    */
   default @NonNull ContractId createContract(
-      byte[] contents,
-      PrivateKey adminKey,
-      ContractParam<?>... constructorParams) throws HieroException {
+      byte[] contents, PrivateKey adminKey, ContractParam<?>... constructorParams)
+      throws HieroException {
     Objects.requireNonNull(contents, "contents must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
-    return createContract(contents, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
+    return createContract(
+        contents,
+        DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE,
+        DEFAULT_GAS,
+        adminKey,
+        constructorParams);
   }
 
   /**
@@ -239,16 +243,21 @@ public interface SmartContractClient {
    * @throws HieroException if the contract could not be created
    */
   default @NonNull ContractId createContract(
-      Path pathToBin,
-      PrivateKey adminKey,
-      ContractParam<?>... constructorParams) throws HieroException {
+      Path pathToBin, PrivateKey adminKey, ContractParam<?>... constructorParams)
+      throws HieroException {
     Objects.requireNonNull(pathToBin, "pathToBin must not be null");
     Objects.requireNonNull(adminKey, "adminKey must not be null");
-    return createContract(pathToBin, DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE, DEFAULT_GAS, adminKey, constructorParams);
+    return createContract(
+        pathToBin,
+        DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE,
+        DEFAULT_GAS,
+        adminKey,
+        constructorParams);
   }
 
   /**
-   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   * Create a new smart contract based on the file with the given file ID, using the specified admin
+   * key.
    *
    * @param fileId the ID of the file containing the contract bytecode
    * @param adminKey the private key string der to use as the admin key for the contract
@@ -263,15 +272,21 @@ public interface SmartContractClient {
       Hbar maxTransactionFee,
       int gas,
       String adminKey,
-      ContractParam<?>... constructorParams) throws HieroException {
+      ContractParam<?>... constructorParams)
+      throws HieroException {
     Objects.requireNonNull(fileId, "fileId must not be null");
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
-    return createContract(FileId.fromString(fileId), maxTransactionFee, gas, PrivateKey.fromStringDER(adminKey), constructorParams);
+    return createContract(
+        FileId.fromString(fileId),
+        maxTransactionFee,
+        gas,
+        PrivateKey.fromStringDER(adminKey),
+        constructorParams);
   }
 
-
   /**
-   * Create a new smart contract based on the file with the given file ID, using the specified admin key.
+   * Create a new smart contract based on the file with the given file ID, using the specified admin
+   * key.
    *
    * @param fileId the ID of the file containing the contract bytecode
    * @param adminKey the private key to use as the admin key for the contract
@@ -286,11 +301,12 @@ public interface SmartContractClient {
       Hbar maxTransactionFee,
       int gas,
       PrivateKey adminKey,
-      ContractParam<?>... constructorParams) throws HieroException;
+      ContractParam<?>... constructorParams)
+      throws HieroException;
 
   /**
-   * Create a new smart contract with the given contents, using the specified admin key.
-   * The contents must be the bytecode for the contract.
+   * Create a new smart contract with the given contents, using the specified admin key. The
+   * contents must be the bytecode for the contract.
    *
    * @param contents the contents of the contract
    * @param adminKey the private key to use as the admin key for the contract
@@ -305,7 +321,8 @@ public interface SmartContractClient {
       Hbar maxTransactionFee,
       int gas,
       PrivateKey adminKey,
-      ContractParam<?>... constructorParams) throws HieroException;
+      ContractParam<?>... constructorParams)
+      throws HieroException;
 
   /**
    * Create a new smart contract based on a file. The contents of the file must be the bytecode for
@@ -324,7 +341,8 @@ public interface SmartContractClient {
       Hbar maxTransactionFee,
       int gas,
       PrivateKey adminKey,
-      ContractParam<?>... constructorParams) throws HieroException;
+      ContractParam<?>... constructorParams)
+      throws HieroException;
 
   /**
    * Call a function on a smart contract.
@@ -427,6 +445,7 @@ public interface SmartContractClient {
    * will not return any data produced by the called function.
    *
    * @param contractId the ID of the contract to delete
+   * @throws HieroException if the function could not be called
    */
   default void deleteContract(@NonNull String contractId) throws HieroException {
     Objects.requireNonNull(contractId, "contractId must not be null");
@@ -441,6 +460,7 @@ public interface SmartContractClient {
    * will not return any data produced by the called function.
    *
    * @param contractId the ID of the contract to delete
+   * @throws HieroException if the function could not be called
    */
   void deleteContract(@NonNull ContractId contractId) throws HieroException;
 
@@ -454,6 +474,7 @@ public interface SmartContractClient {
    *
    * @param contractId the ID of the contract to delete
    * @param toContractId the ID of the contract that receives the remaining balance
+   * @throws HieroException if the function could not be called
    */
   void deleteContract(@NonNull ContractId contractId, @NonNull ContractId toContractId)
       throws HieroException;
@@ -468,7 +489,76 @@ public interface SmartContractClient {
    *
    * @param contractId the ID of the contract to delete
    * @param toAccountId the ID of the account that receives the remaining balance
+   * @throws HieroException if the function could not be called
    */
   void deleteContract(@NonNull ContractId contractId, @NonNull AccountId toAccountId)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract with specific adminKey.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param adminKey the private key string as der to use as the admin key for the contract
+   * @throws HieroException if the function could not be called
+   */
+  default void deleteContract(@NonNull String contractId, @NonNull String adminKey)
+      throws HieroException {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    deleteContract(ContractId.fromString(contractId), PrivateKey.fromStringDER(adminKey));
+  }
+
+  /**
+   * Deletes the specified smart contract with specific adminKey.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param adminKey the private key to use as the admin key for the contract
+   * @throws HieroException if the function could not be called
+   */
+  void deleteContract(@NonNull ContractId contractId, @NonNull PrivateKey adminKey)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract and transfers its remaining balance to the specified
+   * contract with specific adminKey.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param toContractId the ID of the contract that receives the remaining balance
+   * @param adminKey the private key to use as the admin key for the contract
+   * @throws HieroException if the function could not be called
+   */
+  void deleteContract(
+      @NonNull ContractId contractId,
+      @NonNull ContractId toContractId,
+      @NonNull PrivateKey adminKey)
+      throws HieroException;
+
+  /**
+   * Deletes the specified smart contract and transfers its remaining balance to the specified
+   * account with specific adminKey.
+   *
+   * <p>After delete, contract is marked as deleted, but its bytecode is not removed from the
+   * network. Subsequent function calls to the deleted contract may complete without an error, but
+   * will not return any data produced by the called function.
+   *
+   * @param contractId the ID of the contract to delete
+   * @param toAccountId the ID of the account that receives the remaining balance
+   * @param adminKey the private key to use as the admin key for the contract
+   * @throws HieroException if the function could not be called
+   */
+  void deleteContract(
+      @NonNull ContractId contractId, @NonNull AccountId toAccountId, @NonNull PrivateKey adminKey)
       throws HieroException;
 }
