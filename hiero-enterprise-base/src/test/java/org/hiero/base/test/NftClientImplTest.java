@@ -1024,6 +1024,7 @@ public class NftClientImplTest {
 
     nftClientImpl.grantKycNft(tokenId, accountId);
 
+    verify(operationalAccount, times(1)).privateKey();
     verify(protocolLayerClient, times(1))
         .executeTokenGrantKycTransaction(tokenGrantKycCaptor.capture());
     final TokenGrantKycRequest request = tokenGrantKycCaptor.getValue();
@@ -1065,6 +1066,7 @@ public class NftClientImplTest {
 
     nftClientImpl.revokeKycNft(tokenId, accountId);
 
+    verify(operationalAccount, times(1)).privateKey();
     verify(protocolLayerClient, times(1))
         .executeTokenRevokeKycTransaction(tokenRevokeKycCaptor.capture());
     final TokenRevokeKycRequest request = tokenRevokeKycCaptor.getValue();
