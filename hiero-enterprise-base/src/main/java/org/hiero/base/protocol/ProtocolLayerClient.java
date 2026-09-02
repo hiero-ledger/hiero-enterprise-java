@@ -52,8 +52,12 @@ import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
@@ -311,6 +315,26 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenUnfreezeResult executeTokenUnfreezeTransaction(
       @NonNull final TokenUnfreezeRequest request) throws HieroException;
+
+  /**
+   * Executes a token grant KYC transaction.
+   *
+   * @param request the request containing the details of the token grant KYC transaction
+   * @return the result of the token grant KYC transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenGrantKycResult executeTokenGrantKycTransaction(
+      @NonNull final TokenGrantKycRequest request) throws HieroException;
+
+  /**
+   * Executes a token revoke KYC transaction.
+   *
+   * @param request the request containing the details of the token revoke KYC transaction
+   * @return the result of the token revoke KYC transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenRevokeKycResult executeTokenRevokeKycTransaction(
+      @NonNull final TokenRevokeKycRequest request) throws HieroException;
 
   /**
    * Executes a token mint transaction.

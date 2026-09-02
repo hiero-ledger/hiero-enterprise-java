@@ -26,6 +26,10 @@
 | `createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey, PrivateKey metadataKey)` | Creates an NFT type with custom treasury, supplier, and metadata keys. |
 | `createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey, String metadataKey)` | Creates an NFT type with treasury, supplier, and metadata keys as strings. |
 | `createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey)` | Creates an NFT type using an existing treasury account with supplier and metadata keys. |
+| `createNftType(String name, String symbol, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey)` | Creates an NFT type with optional metadata and KYC keys; operator is treasury. |
+| `createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey)` | Creates an NFT type with optional metadata and KYC keys. |
+| `createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey, String metadataKey, String kycKey)` | Creates an NFT type with optional metadata and KYC keys as strings. |
+| `createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey)` | Creates an NFT type using an existing treasury account with optional metadata and KYC keys. |
 | `associateNft(TokenId tokenId, AccountId accountId, PrivateKey accountKey)` | Associates an account with an NFT type. |
 | `associateNft(String tokenId, String accountId, String accountKey)` | Associates an account with an NFT type using string identifiers. |
 | `associateNft(TokenId tokenId, Account account)` | Associates an account object with an NFT type. |
@@ -44,6 +48,14 @@
 | `unfreezeNft(TokenId tokenId, AccountId accountId, PrivateKey freezeKey)` | Unfreezes an account for an NFT type using a custom freeze key. |
 | `unfreezeNft(String tokenId, String accountId, String freezeKey)` | Unfreezes an account using string identifiers. |
 | `unfreezeNft(TokenId tokenId, Account account)` | Unfreezes an account using an account object. |
+| `grantKycNft(TokenId tokenId, AccountId accountId)` | Grants KYC for an account on an NFT type using the operator KYC key. |
+| `grantKycNft(TokenId tokenId, AccountId accountId, PrivateKey kycKey)` | Grants KYC for an account on an NFT type using a custom KYC key. |
+| `grantKycNft(String tokenId, String accountId, String kycKey)` | Grants KYC using string identifiers. |
+| `grantKycNft(TokenId tokenId, Account account)` | Grants KYC using an account object. |
+| `revokeKycNft(TokenId tokenId, AccountId accountId)` | Revokes KYC for an account on an NFT type using the operator KYC key. |
+| `revokeKycNft(TokenId tokenId, AccountId accountId, PrivateKey kycKey)` | Revokes KYC for an account on an NFT type using a custom KYC key. |
+| `revokeKycNft(String tokenId, String accountId, String kycKey)` | Revokes KYC using string identifiers. |
+| `revokeKycNft(TokenId tokenId, Account account)` | Revokes KYC using an account object. |
 | `mintNft(TokenId tokenId, byte[] metadata)` | Mints a new NFT using the operator account as supply account. |
 | `mintNft(String tokenId, byte[] metadata)` | Mints a new NFT using token ID string. |
 | `mintNft(TokenId tokenId, PrivateKey supplyKey, byte[] metadata)` | Mints a new NFT using a custom supply key. |
@@ -227,6 +239,31 @@ nftClient.unfreezeNft(tokenId, accountId, freezeKey);
 
 :::note
 The operator account key is used as the freeze key when no custom key is provided. The NFT type must have a freeze key set at creation time for freeze and unfreeze to succeed.
+:::
+
+---
+
+## Grant / Revoke KYC for NFT Account
+
+Grants or revokes KYC for an account on an NFT type. When a token has a KYC key, accounts must be KYC-granted before they can receive that token. The token must have been created with a KYC key.
+
+```java title="grantKycNft(TokenId tokenId, AccountId accountId)"
+TokenId tokenId = TokenId.fromString("0.0.5000");
+AccountId accountId = AccountId.fromString("0.0.1001");
+
+nftClient.grantKycNft(tokenId, accountId);
+```
+
+```java title="revokeKycNft(TokenId tokenId, AccountId accountId, PrivateKey kycKey)"
+TokenId tokenId = TokenId.fromString("0.0.5000");
+AccountId accountId = AccountId.fromString("0.0.1001");
+PrivateKey kycKey = PrivateKey.generateED25519();
+
+nftClient.revokeKycNft(tokenId, accountId, kycKey);
+```
+
+:::note
+The operator account key is used as the KYC key when no custom key is provided. The NFT type must have a KYC key set at creation time for grant and revoke KYC to succeed.
 :::
 
 ---

@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.hiero.base.data.Account;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for interacting with a Hiero network. This interface provides methods for interacting
@@ -295,6 +296,117 @@ public interface NftClient {
   }
 
   /**
+   * Create a new NFT type with optional metadata and KYC keys. The operator account is used as
+   * treasury.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull PrivateKey supplierKey,
+      @Nullable PrivateKey metadataKey,
+      @Nullable PrivateKey kycKey)
+      throws HieroException;
+
+  /**
+   * Create a new NFT type with optional metadata and KYC keys.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccountId the ID of the treasury account
+   * @param treasuryKey the private key of the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull AccountId treasuryAccountId,
+      @NonNull PrivateKey treasuryKey,
+      @NonNull PrivateKey supplierKey,
+      @Nullable PrivateKey metadataKey,
+      @Nullable PrivateKey kycKey)
+      throws HieroException;
+
+  /**
+   * Create a new NFT type with optional metadata and KYC keys.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccountId the ID of the treasury account
+   * @param treasuryKey the private key of the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull
+  default TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull String treasuryAccountId,
+      @NonNull String treasuryKey,
+      @NonNull String supplierKey,
+      @Nullable String metadataKey,
+      @Nullable String kycKey)
+      throws HieroException {
+    Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
+    Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
+    Objects.requireNonNull(supplierKey, "supplierKey must not be null");
+    return createNftType(
+        name,
+        symbol,
+        AccountId.fromString(treasuryAccountId),
+        PrivateKey.fromStringDER(treasuryKey),
+        PrivateKey.fromStringDER(supplierKey),
+        metadataKey == null ? null : PrivateKey.fromStringDER(metadataKey),
+        kycKey == null ? null : PrivateKey.fromStringDER(kycKey));
+  }
+
+  /**
+   * Create a new NFT type with optional metadata and KYC keys.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccount the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull
+  default TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull Account treasuryAccount,
+      @NonNull PrivateKey supplierKey,
+      @Nullable PrivateKey metadataKey,
+      @Nullable PrivateKey kycKey)
+      throws HieroException {
+    Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
+    return createNftType(
+        name,
+        symbol,
+        treasuryAccount.accountId(),
+        treasuryAccount.privateKey(),
+        supplierKey,
+        metadataKey,
+        kycKey);
+  }
+
+  /**
    * Associate an account with an NFT type. If an account is associated with an NFT type, the
    * account can hold NFTs of that type. Otherwise, the account cannot hold NFTs of that type and
    * tranfer NFTs of that type will fail.
@@ -555,6 +667,116 @@ public interface NftClient {
       throws HieroException {
     Objects.requireNonNull(account, "account must not be null");
     unfreezeNft(tokenId, account.accountId(), account.privateKey());
+  }
+
+  /**
+   * Grants KYC for an account on the given NFT type. The operator account key is used as the KYC
+   * key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to grant KYC for
+   * @throws HieroException if KYC could not be granted for the account
+   */
+  void grantKycNft(@NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Grants KYC for an account on the given NFT type. Must be signed by the token KYC key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to grant KYC for
+   * @param kycKey the KYC key of the NFT type
+   * @throws HieroException if KYC could not be granted for the account
+   */
+  void grantKycNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey kycKey)
+      throws HieroException;
+
+  /**
+   * Grants KYC for an account on the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to grant KYC for
+   * @param kycKey the KYC key of the NFT type
+   * @throws HieroException if KYC could not be granted for the account
+   */
+  default void grantKycNft(
+      @NonNull String tokenId, @NonNull String accountId, @NonNull String kycKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(kycKey, "kycKey must not be null");
+    grantKycNft(
+        TokenId.fromString(tokenId),
+        AccountId.fromString(accountId),
+        PrivateKey.fromStringDER(kycKey));
+  }
+
+  /**
+   * Grants KYC for an account on the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param account the account to grant KYC for
+   * @throws HieroException if KYC could not be granted for the account
+   */
+  default void grantKycNft(@NonNull TokenId tokenId, @NonNull Account account)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    grantKycNft(tokenId, account.accountId(), account.privateKey());
+  }
+
+  /**
+   * Revokes KYC for an account on the given NFT type. The operator account key is used as the KYC
+   * key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to revoke KYC for
+   * @throws HieroException if KYC could not be revoked for the account
+   */
+  void revokeKycNft(@NonNull TokenId tokenId, @NonNull AccountId accountId) throws HieroException;
+
+  /**
+   * Revokes KYC for an account on the given NFT type. Must be signed by the token KYC key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to revoke KYC for
+   * @param kycKey the KYC key of the NFT type
+   * @throws HieroException if KYC could not be revoked for the account
+   */
+  void revokeKycNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey kycKey)
+      throws HieroException;
+
+  /**
+   * Revokes KYC for an account on the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param accountId the ID of the account to revoke KYC for
+   * @param kycKey the KYC key of the NFT type
+   * @throws HieroException if KYC could not be revoked for the account
+   */
+  default void revokeKycNft(
+      @NonNull String tokenId, @NonNull String accountId, @NonNull String kycKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(kycKey, "kycKey must not be null");
+    revokeKycNft(
+        TokenId.fromString(tokenId),
+        AccountId.fromString(accountId),
+        PrivateKey.fromStringDER(kycKey));
+  }
+
+  /**
+   * Revokes KYC for an account on the given NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param account the account to revoke KYC for
+   * @throws HieroException if KYC could not be revoked for the account
+   */
+  default void revokeKycNft(@NonNull TokenId tokenId, @NonNull Account account)
+      throws HieroException {
+    Objects.requireNonNull(account, "account must not be null");
+    revokeKycNft(tokenId, account.accountId(), account.privateKey());
   }
 
   /**

@@ -20,8 +20,10 @@ import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
@@ -29,6 +31,7 @@ import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenWipeRequest;
 import org.hiero.base.protocol.data.TokenWipeResult;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NftClientImpl implements NftClient {
 
@@ -96,13 +99,7 @@ public class NftClientImpl implements NftClient {
       @NonNull final PrivateKey supplierKey,
       @NonNull final PrivateKey metadataKey)
       throws HieroException {
-    return createNftType(
-        name,
-        symbol,
-        operationalAccount.accountId(),
-        operationalAccount.privateKey(),
-        supplierKey,
-        metadataKey);
+    return createNftType(name, symbol, supplierKey, metadataKey, null);
   }
 
   @Override
@@ -114,7 +111,38 @@ public class NftClientImpl implements NftClient {
       @NonNull final PrivateKey supplierKey,
       @NonNull final PrivateKey metadataKey)
       throws HieroException {
-    Objects.requireNonNull(metadataKey, "metadataKey must not be null");
+    return createNftType(
+        name, symbol, treasuryAccountId, treasuryKey, supplierKey, metadataKey, null);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey)
+      throws HieroException {
+    return createNftType(
+        name,
+        symbol,
+        operationalAccount.accountId(),
+        operationalAccount.privateKey(),
+        supplierKey,
+        metadataKey,
+        kycKey);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey)
+      throws HieroException {
     final TokenCreateRequest request =
         TokenCreateRequest.of(
             name,
@@ -123,7 +151,10 @@ public class NftClientImpl implements NftClient {
             treasuryKey,
             TokenType.NON_FUNGIBLE_UNIQUE,
             supplierKey,
-            metadataKey);
+            metadataKey,
+            null,
+            null,
+            kycKey);
     final TokenCreateResult tokenCreateResult = client.executeTokenCreateTransaction(request);
     return tokenCreateResult.tokenId();
   }
@@ -211,6 +242,40 @@ public class NftClientImpl implements NftClient {
     Objects.requireNonNull(freezeKey, "freezeKey must not be null");
     final TokenUnfreezeRequest request = TokenUnfreezeRequest.of(tokenId, accountId, freezeKey);
     client.executeTokenUnfreezeTransaction(request);
+  }
+
+  @Override
+  public void grantKycNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    grantKycNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void grantKycNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey kycKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(kycKey, "kycKey must not be null");
+    final TokenGrantKycRequest request = TokenGrantKycRequest.of(tokenId, accountId, kycKey);
+    client.executeTokenGrantKycTransaction(request);
+  }
+
+  @Override
+  public void revokeKycNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    revokeKycNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void revokeKycNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey kycKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(kycKey, "kycKey must not be null");
+    final TokenRevokeKycRequest request = TokenRevokeKycRequest.of(tokenId, accountId, kycKey);
+    client.executeTokenRevokeKycTransaction(request);
   }
 
   @Override

@@ -19,8 +19,12 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
@@ -171,6 +175,52 @@ public class ProtocolLayerClientTokenTests {
     Assertions.assertNotNull(unfreezeResult);
     Assertions.assertNotNull(unfreezeResult.transactionId());
     Assertions.assertEquals(Status.SUCCESS, unfreezeResult.status());
+  }
+
+  @Test
+  void testGrantAndRevokeKycNftAccount() throws Exception {
+    // given — create NFT type with KYC key, associate holder account
+    final Account operator = hieroTestContext.getOperatorAccount();
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "KYC NFT",
+            "KYC",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            null,
+            null,
+            null,
+            operator.privateKey());
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    final AccountCreateResult accountCreateResult =
+        protocolLayerClient.executeAccountCreateTransaction(AccountCreateRequest.of(Hbar.from(2)));
+    final Account holder = accountCreateResult.newAccount();
+
+    protocolLayerClient.executeTokenAssociateTransaction(
+        TokenAssociateRequest.of(tokenId, holder.accountId(), holder.privateKey()));
+
+    // when — grant then revoke KYC
+    final TokenGrantKycRequest grantKycRequest =
+        TokenGrantKycRequest.of(tokenId, holder.accountId(), operator.privateKey());
+    final TokenGrantKycResult grantKycResult =
+        protocolLayerClient.executeTokenGrantKycTransaction(grantKycRequest);
+
+    final TokenRevokeKycRequest revokeKycRequest =
+        TokenRevokeKycRequest.of(tokenId, holder.accountId(), operator.privateKey());
+    final TokenRevokeKycResult revokeKycResult =
+        protocolLayerClient.executeTokenRevokeKycTransaction(revokeKycRequest);
+
+    // then
+    Assertions.assertNotNull(grantKycResult);
+    Assertions.assertNotNull(grantKycResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, grantKycResult.status());
+    Assertions.assertNotNull(revokeKycResult);
+    Assertions.assertNotNull(revokeKycResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, revokeKycResult.status());
   }
 
   @Test

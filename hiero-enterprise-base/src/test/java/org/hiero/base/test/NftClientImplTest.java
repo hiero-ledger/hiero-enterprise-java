@@ -28,8 +28,12 @@ import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
+import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
@@ -67,6 +71,10 @@ public class NftClientImplTest {
       ArgumentCaptor.forClass(TokenFreezeRequest.class);
   ArgumentCaptor<TokenUnfreezeRequest> tokenUnfreezeCaptor =
       ArgumentCaptor.forClass(TokenUnfreezeRequest.class);
+  ArgumentCaptor<TokenGrantKycRequest> tokenGrantKycCaptor =
+      ArgumentCaptor.forClass(TokenGrantKycRequest.class);
+  ArgumentCaptor<TokenRevokeKycRequest> tokenRevokeKycCaptor =
+      ArgumentCaptor.forClass(TokenRevokeKycRequest.class);
   ArgumentCaptor<TokenMintRequest> tokenMintCaptor =
       ArgumentCaptor.forClass(TokenMintRequest.class);
 
@@ -290,6 +298,68 @@ public class NftClientImplTest {
     Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
     Assertions.assertEquals(metadataKey, tokenCreateRequest.metadataKey());
     Assertions.assertEquals(accountId, tokenCreateRequest.treasuryAccountId());
+    Assertions.assertEquals(tokenId, result);
+  }
+
+  @Test
+  void testCreateNftWithKycKey() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
+
+    final String name = "TOKEN";
+    final String symbol = "NFT";
+    final PrivateKey supplierKey = PrivateKey.generateECDSA();
+    final PrivateKey treasuryKey = PrivateKey.generateECDSA();
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+    final AccountId accountId = AccountId.fromString("1.2.3");
+
+    when(protocolLayerClient.executeTokenCreateTransaction(any(TokenCreateRequest.class)))
+        .thenReturn(tokenCreateResult);
+    when(tokenCreateResult.tokenId()).thenReturn(tokenId);
+
+    final TokenId result =
+        nftClientImpl.createNftType(
+            name, symbol, accountId, treasuryKey, supplierKey, null, kycKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenCreateTransaction(tokenRequestCaptor.capture());
+
+    TokenCreateRequest tokenCreateRequest = tokenRequestCaptor.getValue();
+
+    Assertions.assertEquals(kycKey, tokenCreateRequest.kycKey());
+    Assertions.assertNull(tokenCreateRequest.metadataKey());
+    Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
+    Assertions.assertEquals(tokenId, result);
+  }
+
+  @Test
+  void testCreateNftWithSupplierAndKycKey() throws HieroException {
+    final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final AccountId accountId = AccountId.fromString("1.2.3");
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
+
+    final String name = "TOKEN";
+    final String symbol = "NFT";
+    final PrivateKey supplierKey = PrivateKey.generateECDSA();
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+
+    when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(operationalAccount.accountId()).thenReturn(accountId);
+    when(protocolLayerClient.executeTokenCreateTransaction(any(TokenCreateRequest.class)))
+        .thenReturn(tokenCreateResult);
+    when(tokenCreateResult.tokenId()).thenReturn(tokenId);
+
+    final TokenId result = nftClientImpl.createNftType(name, symbol, supplierKey, null, kycKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenCreateTransaction(tokenRequestCaptor.capture());
+
+    TokenCreateRequest tokenCreateRequest = tokenRequestCaptor.getValue();
+
+    Assertions.assertEquals(kycKey, tokenCreateRequest.kycKey());
+    Assertions.assertNull(tokenCreateRequest.metadataKey());
+    Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
     Assertions.assertEquals(tokenId, result);
   }
 
@@ -939,6 +1009,128 @@ public class NftClientImplTest {
         () -> nftClientImpl.unfreezeNft(tokenId, (AccountId) null, freezeKey));
     Assertions.assertThrows(
         NullPointerException.class, () -> nftClientImpl.unfreezeNft(tokenId, accountId, null));
+  }
+
+  @Test
+  void testGrantKycNft() throws HieroException {
+    final TokenGrantKycResult tokenGrantKycResult = Mockito.mock(TokenGrantKycResult.class);
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+
+    when(operationalAccount.privateKey()).thenReturn(kycKey);
+    when(protocolLayerClient.executeTokenGrantKycTransaction(any(TokenGrantKycRequest.class)))
+        .thenReturn(tokenGrantKycResult);
+
+    nftClientImpl.grantKycNft(tokenId, accountId);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenGrantKycTransaction(tokenGrantKycCaptor.capture());
+    final TokenGrantKycRequest request = tokenGrantKycCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(accountId, request.accountId());
+    Assertions.assertEquals(kycKey, request.kycKey());
+  }
+
+  @Test
+  void testGrantKycNftWithCustomKycKey() throws HieroException {
+    final TokenGrantKycResult tokenGrantKycResult = Mockito.mock(TokenGrantKycResult.class);
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+
+    when(protocolLayerClient.executeTokenGrantKycTransaction(any(TokenGrantKycRequest.class)))
+        .thenReturn(tokenGrantKycResult);
+
+    nftClientImpl.grantKycNft(tokenId, accountId, kycKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenGrantKycTransaction(tokenGrantKycCaptor.capture());
+    final TokenGrantKycRequest request = tokenGrantKycCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(accountId, request.accountId());
+    Assertions.assertEquals(kycKey, request.kycKey());
+  }
+
+  @Test
+  void testRevokeKycNft() throws HieroException {
+    final TokenRevokeKycResult tokenRevokeKycResult = Mockito.mock(TokenRevokeKycResult.class);
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+
+    when(operationalAccount.privateKey()).thenReturn(kycKey);
+    when(protocolLayerClient.executeTokenRevokeKycTransaction(any(TokenRevokeKycRequest.class)))
+        .thenReturn(tokenRevokeKycResult);
+
+    nftClientImpl.revokeKycNft(tokenId, accountId);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenRevokeKycTransaction(tokenRevokeKycCaptor.capture());
+    final TokenRevokeKycRequest request = tokenRevokeKycCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(accountId, request.accountId());
+    Assertions.assertEquals(kycKey, request.kycKey());
+  }
+
+  @Test
+  void testRevokeKycNftWithCustomKycKey() throws HieroException {
+    final TokenRevokeKycResult tokenRevokeKycResult = Mockito.mock(TokenRevokeKycResult.class);
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+
+    when(protocolLayerClient.executeTokenRevokeKycTransaction(any(TokenRevokeKycRequest.class)))
+        .thenReturn(tokenRevokeKycResult);
+
+    nftClientImpl.revokeKycNft(tokenId, accountId, kycKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenRevokeKycTransaction(tokenRevokeKycCaptor.capture());
+    final TokenRevokeKycRequest request = tokenRevokeKycCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(accountId, request.accountId());
+    Assertions.assertEquals(kycKey, request.kycKey());
+  }
+
+  @Test
+  void testGrantKycNftNullParam() {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.grantKycNft((TokenId) null, accountId));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.grantKycNft(tokenId, (AccountId) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.grantKycNft((TokenId) null, accountId, kycKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.grantKycNft(tokenId, (AccountId) null, kycKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.grantKycNft(tokenId, accountId, null));
+  }
+
+  @Test
+  void testRevokeKycNftNullParam() {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId accountId = AccountId.fromString("0.0.100");
+    final PrivateKey kycKey = PrivateKey.generateECDSA();
+
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.revokeKycNft((TokenId) null, accountId));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.revokeKycNft(tokenId, (AccountId) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.revokeKycNft((TokenId) null, accountId, kycKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.revokeKycNft(tokenId, (AccountId) null, kycKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.revokeKycNft(tokenId, accountId, null));
   }
 
   @Test

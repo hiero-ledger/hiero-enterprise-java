@@ -22,7 +22,8 @@ public record TokenCreateRequest(
     @Nullable PrivateKey adminKey,
     @Nullable PrivateKey metadataKey,
     @Nullable PrivateKey wipeKey,
-    @Nullable PrivateKey freezeKey)
+    @Nullable PrivateKey freezeKey,
+    @Nullable PrivateKey kycKey)
     implements TransactionRequest {
 
   static final int MAX_SYMBOL_LENGTH = 100;
@@ -86,6 +87,7 @@ public record TokenCreateRequest(
         treasuryKey,
         null,
         null,
+        null,
         null);
   }
 
@@ -106,6 +108,7 @@ public record TokenCreateRequest(
         tokenType,
         supplyKey,
         treasuryKey,
+        null,
         null,
         null,
         null);
@@ -130,6 +133,7 @@ public record TokenCreateRequest(
         supplyKey,
         treasuryKey,
         metadataKey,
+        null,
         null,
         null);
   }
@@ -161,6 +165,7 @@ public record TokenCreateRequest(
         treasuryKey,
         metadataKey,
         wipeKey,
+        null,
         null);
   }
 
@@ -192,6 +197,41 @@ public record TokenCreateRequest(
         treasuryKey,
         metadataKey,
         wipeKey,
-        freezeKey);
+        freezeKey,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, wipe, freeze, and KYC keys.
+   *
+   * @param wipeKey the wipe key; optional unless wiping from non-treasury accounts
+   * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
+   * @param kycKey the KYC key; required to grant or revoke KYC for the token
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey wipeKey,
+      @Nullable final PrivateKey freezeKey,
+      @Nullable final PrivateKey kycKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        freezeKey,
+        kycKey);
   }
 }
