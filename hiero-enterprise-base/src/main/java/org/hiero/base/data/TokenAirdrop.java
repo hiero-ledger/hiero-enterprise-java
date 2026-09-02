@@ -9,15 +9,12 @@ import org.jspecify.annotations.Nullable;
 /** Represents a pending or outstanding token airdrop. */
 public record TokenAirdrop(
     long amount,
-    @NonNull AccountId receiverId,
-    @NonNull AccountId senderId,
+    @Nullable AccountId receiverId,
+    @Nullable AccountId senderId,
     @Nullable Long serialNumber,
     @NonNull TimestampRange timestamp,
-    @NonNull TokenId tokenId) {
+    @Nullable TokenId tokenId) {
   public TokenAirdrop {
-    Objects.requireNonNull(receiverId, "receiverId must not be null");
-    Objects.requireNonNull(senderId, "senderId must not be null");
     Objects.requireNonNull(timestamp, "timestamp must not be null");
-    Objects.requireNonNull(tokenId, "tokenId must not be null");
   }
 }

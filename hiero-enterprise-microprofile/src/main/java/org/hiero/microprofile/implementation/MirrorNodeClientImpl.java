@@ -35,8 +35,6 @@ import org.jspecify.annotations.NonNull;
 
 public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
-  private static final String ACCOUNTS_PATH = "/api/v1/accounts";
-
   private final MirrorNodeRestClientImpl restClient;
 
   private final MirrorNodeJsonConverter<JsonObject> jsonConverter;
@@ -156,7 +154,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<CryptoAllowance> queryCryptoAllowances(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = ACCOUNTS_PATH + "/" + accountId + "/allowances/crypto";
+    final String path = "/api/v1/accounts/" + accountId + "/allowances/crypto";
     final Function<JsonObject, List<CryptoAllowance>> dataExtractionFunction =
         node -> jsonConverter.toCryptoAllowances(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -166,7 +164,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<TokenAllowance> queryTokenAllowances(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = ACCOUNTS_PATH + "/" + accountId + "/allowances/tokens";
+    final String path = "/api/v1/accounts/" + accountId + "/allowances/tokens";
     final Function<JsonObject, List<TokenAllowance>> dataExtractionFunction =
         node -> jsonConverter.toTokenAllowances(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -176,7 +174,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<NftAllowance> queryNftAllowances(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = ACCOUNTS_PATH + "/" + accountId + "/allowances/nfts";
+    final String path = "/api/v1/accounts/" + accountId + "/allowances/nfts";
     final Function<JsonObject, List<NftAllowance>> dataExtractionFunction =
         node -> jsonConverter.toNftAllowances(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -186,7 +184,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<StakingReward> queryStakingRewards(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = ACCOUNTS_PATH + "/" + accountId + "/rewards";
+    final String path = "/api/v1/accounts/" + accountId + "/rewards";
     final Function<JsonObject, List<StakingReward>> dataExtractionFunction =
         node -> jsonConverter.toStakingRewards(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -196,7 +194,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<TokenAirdrop> queryOutstandingAirdrops(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = ACCOUNTS_PATH + "/" + accountId + "/airdrops/outstanding";
+    final String path = "/api/v1/accounts/" + accountId + "/airdrops/outstanding";
     final Function<JsonObject, List<TokenAirdrop>> dataExtractionFunction =
         node -> jsonConverter.toTokenAirdrops(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
@@ -206,7 +204,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<TokenAirdrop> queryPendingAirdrops(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = ACCOUNTS_PATH + "/" + accountId + "/airdrops/pending";
+    final String path = "/api/v1/accounts/" + accountId + "/airdrops/pending";
     final Function<JsonObject, List<TokenAirdrop>> dataExtractionFunction =
         node -> jsonConverter.toTokenAirdrops(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);

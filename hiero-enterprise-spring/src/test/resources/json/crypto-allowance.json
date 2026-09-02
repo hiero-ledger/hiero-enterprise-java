@@ -1,0 +1,12 @@
+{
+  "allowances": [
+    {
+      "amount": 75,
+      "amount_granted": 100,
+      "owner": "0.0.2",
+      "spender": "0.0.8",
+      "timestamp": {"from": "1586567700.453054000", "to": null}
+    }
+  ],
+  "links": {"next": null}
+}
