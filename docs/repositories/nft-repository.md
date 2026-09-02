@@ -6,20 +6,22 @@ NftRepository provides APIs for querying NFT information from a Hiero Mirror Nod
 
 ## Methods
 
-| Method | Description |
-|:-------|:------------|
-| `findTypesByOwner(AccountId ownerId)` | Retrieves NFT types owned by a specific account. |
-| `findTypesByOwner(String ownerId)` | Retrieves NFT types owned by an account using an account ID string. |
-| `findByOwner(AccountId ownerId)` | Retrieves all NFTs owned by a specific account. |
-| `findByOwner(String ownerId)` | Retrieves all NFTs owned by an account using an account ID string. |
-| `findByType(TokenId tokenId)` | Retrieves all NFTs belonging to a specific NFT type. |
-| `findByType(String tokenId)` | Retrieves NFTs belonging to a token type using a token ID string. |
-| `findByTypeAndSerial(TokenId tokenId, long serialNumber)` | Retrieves an NFT by token type and serial number. |
-| `findByTypeAndSerial(String tokenId, long serialNumber)` | Retrieves an NFT using token ID string and serial number. |
-| `findByOwnerAndType(AccountId ownerId, TokenId tokenId)` | Retrieves NFTs of a specific type owned by an account. |
-| `findByOwnerAndType(String ownerId, String tokenId)` | Retrieves NFTs using owner and token ID strings. |
-| `findByOwnerAndTypeAndSerial(AccountId owner, TokenId tokenId, long serialNumber)` | Retrieves a specific NFT owned by an account. |
-| `findByOwnerAndTypeAndSerial(String owner, String tokenId, long serialNumber)` | Retrieves a specific NFT using string identifiers. |
+| Method                                                                             | Description                                                                            |
+|:-----------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------|
+| `findTypesByOwner(AccountId ownerId)`                                              | Retrieves NFT types owned by a specific account.                                       |
+| `findTypesByOwner(String ownerId)`                                                 | Retrieves NFT types owned by an account using an account ID string.                    |
+| `findByOwner(AccountId ownerId)`                                                   | Retrieves all NFTs owned by a specific account.                                        |
+| `findByOwner(String ownerId)`                                                      | Retrieves all NFTs owned by an account using an account ID string.                     |
+| `findByType(TokenId tokenId)`                                                      | Retrieves all NFTs belonging to a specific NFT type.                                   |
+| `findByType(String tokenId)`                                                       | Retrieves NFTs belonging to a token type using a token ID string.                      |
+| `findByTypeAndSerial(TokenId tokenId, long serialNumber)`                          | Retrieves an NFT by token type and serial number.                                      |
+| `findByTypeAndSerial(String tokenId, long serialNumber)`                           | Retrieves an NFT using token ID string and serial number.                              |
+| `findByOwnerAndType(AccountId ownerId, TokenId tokenId)`                           | Retrieves NFTs of a specific type owned by an account.                                 |
+| `findByOwnerAndType(String ownerId, String tokenId)`                               | Retrieves NFTs using owner and token ID strings.                                       |
+| `findByOwnerAndTypeAndSerial(AccountId owner, TokenId tokenId, long serialNumber)` | Retrieves a specific NFT owned by an account.                                          |
+| `findByOwnerAndTypeAndSerial(String owner, String tokenId, long serialNumber)`     | Retrieves a specific NFT using string identifiers.                                     |
+| `findTransactionHistory(TokenId tokenId, long serialNumber)`                       | Retreives list of transactions history for NFT using token ID and serialnumber.        |
+| `findTransactionHistory(String tokenId, long serialNumber)`                        | Retreives list of transactions history for NFT using token ID string and serialnumber. |
 
 ---
 
@@ -107,6 +109,18 @@ TokenId tokenId =
 Optional<Nft> nft =
     nftRepository.findByOwnerAndTypeAndSerial(
         owner,
+        tokenId,
+        1
+    );
+```
+
+## Find NFT Transaction History
+```java title="findTransactionHistory(TokenId tokenId, long serialNumber)"
+TokenId tokenId =
+    TokenId.fromString("0.0.5678");
+
+List<NftTransactionHistory> transactionHistory = 
+    nftRepository.findTransactionHistory(
         tokenId,
         1
     );
