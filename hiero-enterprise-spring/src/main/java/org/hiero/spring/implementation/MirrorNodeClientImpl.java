@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import org.hiero.base.HieroException;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
@@ -178,6 +179,26 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
     final String path = "/api/v1/tokens/" + tokenId + "/balances?account.id=" + accountId;
     final Function<JsonNode, List<Balance>> dataExtractionFunction =
         node -> jsonConverter.toBalances(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<AccountBalance> queryBalances() throws HieroException {
+    final String path = "/api/v1/balances";
+    final Function<JsonNode, List<AccountBalance>> dataExtractionFunction =
+        node -> jsonConverter.toAccountBalances(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/balances?account.id=" + accountId;
+    final Function<JsonNode, List<AccountBalance>> dataExtractionFunction =
+        node -> jsonConverter.toAccountBalances(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
   }

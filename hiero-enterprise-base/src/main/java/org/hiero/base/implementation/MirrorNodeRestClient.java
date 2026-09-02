@@ -53,6 +53,24 @@ public interface MirrorNodeRestClient<JSON> {
   }
 
   @NonNull
+  default JSON queryBalances() throws HieroException {
+    return doGetCall("/api/v1/balances");
+  }
+
+  @NonNull
+  default JSON queryNetworkNodes() throws HieroException {
+    return doGetCall("/api/v1/network/nodes");
+  }
+
+  @NonNull
+  default JSON queryNetworkNodeById(final long nodeId) throws HieroException {
+    if (nodeId < 0) {
+      throw new IllegalArgumentException("nodeId must not be negative");
+    }
+    return doGetCall("/api/v1/network/nodes?node.id=" + nodeId);
+  }
+
+  @NonNull
   default JSON queryTokenById(TokenId tokenId) throws HieroException {
     return doGetCall("/api/v1/tokens/" + tokenId);
   }
