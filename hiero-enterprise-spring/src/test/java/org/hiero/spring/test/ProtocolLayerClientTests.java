@@ -2,6 +2,7 @@ package org.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -143,7 +144,9 @@ public class ProtocolLayerClientTests {
     final FileId fileId = result.fileId();
     final Hbar maxTransactionFee = Hbar.from(16);
     final int gas = 5_000_000;
-    final ContractCreateRequest request = ContractCreateRequest.of(fileId, maxTransactionFee, gas);
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final ContractCreateRequest request =
+        ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey);
 
     // when
     final ContractCreateResult contractCreateResult =

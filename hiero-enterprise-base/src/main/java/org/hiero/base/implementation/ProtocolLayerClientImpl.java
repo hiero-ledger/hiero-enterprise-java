@@ -340,7 +340,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
             .setTransactionValidDuration(request.transactionValidDuration())
             .setBytecodeFileId(request.fileId())
             .setGas(request.gas())
-            .setConstructorParameters(constructorParams);
+            .setConstructorParameters(constructorParams)
+            .setAdminKey(request.adminKey());
+    sign(transaction, request.adminKey());
     final TransactionReceipt receipt =
         executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_CREATE);
     return new ContractCreateResult(receipt.transactionId, receipt.status, receipt.contractId);
@@ -361,6 +363,8 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     if (request.transferFeeToAccountId() != null) {
       transaction.setTransferAccountId(request.transferFeeToAccountId());
     }
+
+    sign(transaction, request.adminKey());
     final TransactionReceipt receipt =
         executeTransactionAndWaitOnReceipt(transaction, TransactionType.CONTRACT_DELETE);
     return new ContractDeleteResult(receipt.transactionId, receipt.status);
