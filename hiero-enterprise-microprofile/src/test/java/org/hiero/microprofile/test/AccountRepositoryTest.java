@@ -149,6 +149,7 @@ public class AccountRepositoryTest {
   private AccountId newAccountVisibleOnMirrorNode() throws Exception {
     final Account account = accountClient.createAccount();
     hieroTestUtils.waitForMirrorNodeRecords();
+    Thread.sleep(10000);
     return account.accountId();
   }
 }
