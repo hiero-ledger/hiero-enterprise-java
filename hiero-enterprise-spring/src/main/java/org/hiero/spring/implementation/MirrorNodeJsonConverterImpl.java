@@ -25,6 +25,7 @@ import org.hiero.base.data.Balance;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.CustomFee;
 import org.hiero.base.data.ExchangeRate;
 import org.hiero.base.data.ExchangeRates;
@@ -34,14 +35,18 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.SinglePage;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenAirdrop;
+import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.TokenTransfer;
 import org.hiero.base.data.Topic;
@@ -175,6 +180,244 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           node.hasNonNull("balance") ? node.get("balance").get("balance").asLong() : 0;
       return Optional.of(
           new AccountInfo(accountId, evmAddress, balance, ethereumNonce, pendingReward));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<CryptoAllowance> toCryptoAllowances(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("allowances")) {
+      return List.of();
+    }
+    final JsonNode allowancesNode = node.get("allowances");
+    if (!allowancesNode.isArray()) {
+      throw new IllegalArgumentException(
+          "Crypto allowances node is not an array: " + allowancesNode);
+    }
+    return jsonArrayToStream(allowancesNode)
+        .map(this::toCryptoAllowance)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<TokenAllowance> toTokenAllowances(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("allowances")) {
+      return List.of();
+    }
+    final JsonNode allowancesNode = node.get("allowances");
+    if (!allowancesNode.isArray()) {
+      throw new IllegalArgumentException(
+          "Token allowances node is not an array: " + allowancesNode);
+    }
+    return jsonArrayToStream(allowancesNode)
+        .map(this::toTokenAllowance)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<NftAllowance> toNftAllowances(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("allowances")) {
+      return List.of();
+    }
+    final JsonNode allowancesNode = node.get("allowances");
+    if (!allowancesNode.isArray()) {
+      throw new IllegalArgumentException("NFT allowances node is not an array: " + allowancesNode);
+    }
+    return jsonArrayToStream(allowancesNode)
+        .map(this::toNftAllowance)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<StakingReward> toStakingRewards(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("rewards")) {
+      return List.of();
+    }
+    final JsonNode rewardsNode = node.get("rewards");
+    if (!rewardsNode.isArray()) {
+      throw new IllegalArgumentException("Staking rewards node is not an array: " + rewardsNode);
+    }
+    return jsonArrayToStream(rewardsNode)
+        .map(this::toStakingReward)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  @Override
+  public @NonNull List<TokenAirdrop> toTokenAirdrops(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("airdrops")) {
+      return List.of();
+    }
+    final JsonNode airdropsNode = node.get("airdrops");
+    if (!airdropsNode.isArray()) {
+      throw new IllegalArgumentException("Token airdrops node is not an array: " + airdropsNode);
+    }
+    return jsonArrayToStream(airdropsNode)
+        .map(this::toTokenAirdrop)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<CryptoAllowance> toCryptoAllowance(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final long amount = node.get("amount").asLong();
+      final long amountGranted = node.get("amount_granted").asLong();
+      final AccountId owner =
+          node.hasNonNull("owner") ? AccountId.fromString(node.get("owner").asText()) : null;
+      final AccountId spender =
+          node.hasNonNull("spender") ? AccountId.fromString(node.get("spender").asText()) : null;
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
+      final Instant toTimestamp =
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
+              : null;
+
+      return Optional.of(
+          new CryptoAllowance(
+              amount,
+              amountGranted,
+              owner,
+              spender,
+              new TimestampRange(fromTimestamp, toTimestamp)));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private Optional<TokenAllowance> toTokenAllowance(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final long amount = node.get("amount").asLong();
+      final long amountGranted = node.get("amount_granted").asLong();
+      final AccountId owner =
+          node.hasNonNull("owner") ? AccountId.fromString(node.get("owner").asText()) : null;
+      final AccountId spender =
+          node.hasNonNull("spender") ? AccountId.fromString(node.get("spender").asText()) : null;
+      final TokenId tokenId =
+          node.hasNonNull("token_id") ? TokenId.fromString(node.get("token_id").asText()) : null;
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
+      final Instant toTimestamp =
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
+              : null;
+
+      return Optional.of(
+          new TokenAllowance(
+              amount,
+              amountGranted,
+              owner,
+              spender,
+              new TimestampRange(fromTimestamp, toTimestamp),
+              tokenId));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private Optional<NftAllowance> toNftAllowance(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final boolean approvalForAll = node.get("approved_for_all").asBoolean();
+      final AccountId owner =
+          node.hasNonNull("owner") ? AccountId.fromString(node.get("owner").asText()) : null;
+      final AccountId spender =
+          node.hasNonNull("spender") ? AccountId.fromString(node.get("spender").asText()) : null;
+      final TokenId tokenId =
+          node.hasNonNull("token_id") ? TokenId.fromString(node.get("token_id").asText()) : null;
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
+      final Instant toTimestamp =
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
+              : null;
+
+      return Optional.of(
+          new NftAllowance(
+              approvalForAll,
+              owner,
+              spender,
+              new TimestampRange(fromTimestamp, toTimestamp),
+              tokenId));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private Optional<StakingReward> toStakingReward(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+
+    try {
+      final AccountId accountId =
+          node.hasNonNull("account_id")
+              ? AccountId.fromString(node.get("account_id").asText())
+              : null;
+      final long amount = node.get("amount").asLong();
+      final Instant timestamp = parseInstant(node.get("timestamp").asText());
+      return Optional.of(new StakingReward(accountId, amount, timestamp));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private Optional<TokenAirdrop> toTokenAirdrop(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final long amount = node.get("amount").asLong();
+      final AccountId receiverId =
+          node.hasNonNull("receiver_id")
+              ? AccountId.fromString(node.get("receiver_id").asText())
+              : null;
+      final AccountId senderId =
+          node.hasNonNull("sender_id")
+              ? AccountId.fromString(node.get("sender_id").asText())
+              : null;
+      final Long serialNumber =
+          node.has("serial_number") ? node.get("serial_number").asLong() : null;
+      final TokenId tokenId =
+          node.hasNonNull("token_id") ? TokenId.fromString(node.get("token_id").asText()) : null;
+      final Instant fromTimestamp = parseInstant(node.get("timestamp").get("from").asText());
+      final Instant toTimestamp =
+          node.get("timestamp").hasNonNull("to")
+              ? parseInstant(node.get("timestamp").get("to").asText())
+              : null;
+
+      return Optional.of(
+          new TokenAirdrop(
+              amount,
+              receiverId,
+              senderId,
+              serialNumber,
+              new TimestampRange(fromTimestamp, toTimestamp),
+              tokenId));
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }

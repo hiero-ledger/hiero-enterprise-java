@@ -46,6 +46,7 @@ jobs:
         uses: hiero-ledger/hiero-solo-action@bdae0a37df52190b6b3801c1c981c0ed37f4616e # v0.23.0
         with:
           installMirrorNode: true
+          mirrorNodeVersion: v0.153.0
 
       - name: Wait for Mirror Node
         run: |
