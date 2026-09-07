@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -76,6 +76,10 @@
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Transfers multiple NFTs using an account object as sender. |
+| `airdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops an NFT between accounts. May become pending if the receiver lacks auto-association slots. |
+| `airdropNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Airdrops an NFT using an account object as sender. |
+| `airdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops multiple NFTs between accounts. |
+| `airdropNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Airdrops multiple NFTs using an account object as sender. |
 | `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
@@ -428,6 +432,37 @@ nftClient.transferNfts(
         sender,
         PrivateKey.generateED25519(),
 receiver
+);
+```
+
+---
+
+## Airdrop NFT
+
+Airdrops ownership of one or more NFTs to a receiver. Unlike a standard transfer, if the receiver is not associated and has no available auto-association slots, the airdrop may become pending until claimed or canceled.
+
+```java title="airdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)"
+AccountId sender = AccountId.fromString("0.0.1001");
+AccountId receiver = AccountId.fromString("0.0.1002");
+
+nftClient.airdropNft(
+    tokenId,
+    1L,
+    sender,
+    PrivateKey.generateED25519(),
+    receiver
+);
+```
+
+```java title="airdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)"
+List<Long> serialNumbers = List.of(1L, 2L);
+
+nftClient.airdropNfts(
+    tokenId,
+    serialNumbers,
+    sender,
+    PrivateKey.generateED25519(),
+    receiver
 );
 ```
 

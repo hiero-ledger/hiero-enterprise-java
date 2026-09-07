@@ -40,6 +40,8 @@ import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
+import org.hiero.base.protocol.data.TokenAirdropRequest;
+import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -375,6 +377,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenTransferResult executeTransferTransaction(
       @NonNull final TokenTransferRequest request) throws HieroException;
+
+  /**
+   * Executes a token airdrop transaction for NFTs.
+   *
+   * @param request the request containing the details of the NFT airdrop transaction
+   * @return the result of the token airdrop transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenAirdropResult executeTokenAirdropTransaction(
+      @NonNull final TokenAirdropRequest request) throws HieroException;
 
   /**
    * Executes an HBAR transfer transaction.

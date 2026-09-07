@@ -1124,6 +1124,86 @@ public interface NftClient {
   }
 
   /**
+   * Airdrops an NFT to another account. Unlike a standard transfer, if the receiver lacks available
+   * auto-association slots the airdrop may become pending rather than failing.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param fromAccountId the ID of the account that holds the NFT
+   * @param fromAccountKey the private key of the account that holds the NFT
+   * @param toAccountId the ID of the account that should receive the NFT
+   * @throws HieroException if the NFT could not be airdropped
+   */
+  void airdropNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey,
+      @NonNull AccountId toAccountId)
+      throws HieroException;
+
+  /**
+   * Airdrops an NFT to another account. Unlike a standard transfer, if the receiver lacks available
+   * auto-association slots the airdrop may become pending rather than failing.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param fromAccount the account that holds the NFT
+   * @param toAccountId the ID of the account that should receive the NFT
+   * @throws HieroException if the NFT could not be airdropped
+   */
+  default void airdropNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull Account fromAccount,
+      @NonNull AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    airdropNft(
+        tokenId, serialNumber, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+  }
+
+  /**
+   * Airdrops NFTs to another account. Unlike a standard transfer, if the receiver lacks available
+   * auto-association slots the airdrop may become pending rather than failing.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param fromAccountId the ID of the account that holds the NFTs
+   * @param fromAccountKey the private key of the account that holds the NFTs
+   * @param toAccountId the ID of the account that should receive the NFTs
+   * @throws HieroException if the NFTs could not be airdropped
+   */
+  void airdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey,
+      @NonNull AccountId toAccountId)
+      throws HieroException;
+
+  /**
+   * Airdrops NFTs to another account. Unlike a standard transfer, if the receiver lacks available
+   * auto-association slots the airdrop may become pending rather than failing.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param fromAccount the account that holds the NFTs
+   * @param toAccountId the ID of the account that should receive the NFTs
+   * @throws HieroException if the NFTs could not be airdropped
+   */
+  default void airdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull Account fromAccount,
+      @NonNull AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    airdropNfts(
+        tokenId, serialNumbers, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+  }
+
+  /**
    * Updates an NFT type (token class) name and symbol. The operator account key is used as the
    * admin key. The NFT type must have been created with that key as admin (the default for {@link
    * #createNftType} when the operator is the treasury).

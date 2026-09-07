@@ -12,6 +12,7 @@ import org.hiero.base.HieroException;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
@@ -366,6 +367,35 @@ public class NftClientImpl implements NftClient {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, serialNumber, fromAccountId, toAccountId, fromAccountKey);
     client.executeTransferTransaction(request);
+  }
+
+  @Override
+  public void airdropNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    airdropNfts(tokenId, List.of(serialNumber), fromAccountId, fromAccountKey, toAccountId);
+  }
+
+  @Override
+  public void airdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+    Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    final TokenAirdropRequest request =
+        TokenAirdropRequest.of(tokenId, serialNumbers, fromAccountId, toAccountId, fromAccountKey);
+    client.executeTokenAirdropTransaction(request);
   }
 
   @Override
