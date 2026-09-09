@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.hiero.base.data.Account;
@@ -1201,6 +1202,44 @@ public interface NftClient {
     Objects.requireNonNull(fromAccount, "fromAccount must not be null");
     airdropNfts(
         tokenId, serialNumbers, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+  }
+
+  /**
+   * Airdrops NFTs to one or more accounts. Each map entry sends the given serial to the mapped
+   * receiver. Unlike a standard transfer, if a receiver lacks available auto-association slots the
+   * airdrop may become pending rather than failing.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumberToAccountId map of NFT serial number to receiving account ID
+   * @param fromAccountId the ID of the account that holds the NFTs
+   * @param fromAccountKey the private key of the account that holds the NFTs
+   * @throws HieroException if the NFTs could not be airdropped
+   */
+  void airdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey)
+      throws HieroException;
+
+  /**
+   * Airdrops NFTs to one or more accounts. Each map entry sends the given serial to the mapped
+   * receiver. Unlike a standard transfer, if a receiver lacks available auto-association slots the
+   * airdrop may become pending rather than failing.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumberToAccountId map of NFT serial number to receiving account ID
+   * @param fromAccount the account that holds the NFTs
+   * @throws HieroException if the NFTs could not be airdropped
+   */
+  default void airdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull Account fromAccount)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    airdropNfts(
+        tokenId, serialNumberToAccountId, fromAccount.accountId(), fromAccount.privateKey());
   }
 
   /**

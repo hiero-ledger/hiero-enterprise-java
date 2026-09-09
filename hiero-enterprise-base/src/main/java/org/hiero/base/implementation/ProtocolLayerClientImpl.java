@@ -935,11 +935,11 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setMaxTransactionFee(request.maxTransactionFee())
               .setTransactionValidDuration(request.transactionValidDuration());
       request
-          .serials()
+          .serialToReceiver()
           .forEach(
-              serial ->
+              (serial, receiver) ->
                   transaction.addNftTransfer(
-                      new NftId(request.tokenId(), serial), request.sender(), request.receiver()));
+                      request.tokenId().nft(serial), request.sender(), receiver));
       sign(transaction, request.senderKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_AIRDROP);

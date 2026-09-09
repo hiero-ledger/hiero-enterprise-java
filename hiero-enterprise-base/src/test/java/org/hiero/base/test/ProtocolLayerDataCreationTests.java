@@ -22,7 +22,9 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 import org.hiero.base.data.Account;
@@ -1672,7 +1674,9 @@ public class ProtocolLayerDataCreationTests {
     final List<Long> serials = List.of(1L, 2L);
     final AccountId sender = AccountId.fromString("0.0.5678");
     final AccountId receiver = AccountId.fromString("0.0.9876");
+    final AccountId receiver2 = AccountId.fromString("0.0.9877");
     final PrivateKey senderKey = PrivateKey.generateECDSA();
+    final Map<Long, AccountId> serialToReceiver = Map.of(1L, receiver, 2L, receiver2);
 
     Assertions.assertDoesNotThrow(
         () ->
@@ -1680,24 +1684,25 @@ public class ProtocolLayerDataCreationTests {
                 maxTransactionFee,
                 transactionValidDuration,
                 tokenId,
-                serials,
+                serialToReceiver,
                 sender,
-                receiver,
                 senderKey));
     Assertions.assertDoesNotThrow(
         () -> TokenAirdropRequest.of(tokenId, 1L, sender, receiver, senderKey));
     Assertions.assertDoesNotThrow(
         () -> TokenAirdropRequest.of(tokenId, serials, sender, receiver, senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenAirdropRequest.of(tokenId, serialToReceiver, sender, senderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new TokenAirdropRequest(
-                null, transactionValidDuration, tokenId, serials, sender, receiver, senderKey));
+                null, transactionValidDuration, tokenId, serialToReceiver, sender, senderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new TokenAirdropRequest(
-                maxTransactionFee, null, tokenId, serials, sender, receiver, senderKey));
+                maxTransactionFee, null, tokenId, serialToReceiver, sender, senderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1705,10 +1710,14 @@ public class ProtocolLayerDataCreationTests {
                 maxTransactionFee,
                 transactionValidDuration,
                 null,
-                serials,
+                serialToReceiver,
                 sender,
-                receiver,
                 senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, sender, senderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -1716,30 +1725,7 @@ public class ProtocolLayerDataCreationTests {
                 maxTransactionFee,
                 transactionValidDuration,
                 tokenId,
-                null,
-                sender,
-                receiver,
-                senderKey));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () ->
-            new TokenAirdropRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                serials,
-                null,
-                receiver,
-                senderKey));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () ->
-            new TokenAirdropRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                serials,
-                sender,
+                serialToReceiver,
                 null,
                 senderKey));
     Assertions.assertThrows(
@@ -1749,20 +1735,23 @@ public class ProtocolLayerDataCreationTests {
                 maxTransactionFee,
                 transactionValidDuration,
                 tokenId,
-                serials,
+                serialToReceiver,
                 sender,
-                receiver,
                 null));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
             new TokenAirdropRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, Map.of(), sender, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenAirdropRequest(
                 maxTransactionFee,
                 transactionValidDuration,
                 tokenId,
-                List.of(),
+                Map.of(-1L, receiver),
                 sender,
-                receiver,
                 senderKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
@@ -1771,9 +1760,25 @@ public class ProtocolLayerDataCreationTests {
                 maxTransactionFee,
                 transactionValidDuration,
                 tokenId,
-                List.of(-1L),
+                Map.of(0L, receiver),
                 sender,
-                receiver,
+                senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenAirdropRequest.of(tokenId, List.of(), sender, receiver, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                IntStream.rangeClosed(1, 21)
+                    .boxed()
+                    .collect(
+                        java.util.stream.Collectors.toMap(
+                            i -> (long) i, i -> receiver, (a, b) -> a, LinkedHashMap::new)),
+                sender,
                 senderKey));
   }
 

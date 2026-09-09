@@ -5,7 +5,9 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.hiero.base.HieroException;
@@ -388,13 +390,31 @@ public class NftClientImpl implements NftClient {
       @NonNull final PrivateKey fromAccountKey,
       @NonNull final AccountId toAccountId)
       throws HieroException {
-    Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    if (serialNumbers.isEmpty()) {
+      throw new IllegalArgumentException("serials must not be empty");
+    }
+    final Map<Long, AccountId> serialNumberToAccountId = new LinkedHashMap<>();
+    for (final Long serialNumber : serialNumbers) {
+      serialNumberToAccountId.put(serialNumber, toAccountId);
+    }
+    airdropNfts(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+  }
+
+  @Override
+  public void airdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumberToAccountId, "serialNumberToAccountId must not be null");
     Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
     Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
-    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
     final TokenAirdropRequest request =
-        TokenAirdropRequest.of(tokenId, serialNumbers, fromAccountId, toAccountId, fromAccountKey);
+        TokenAirdropRequest.of(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
     client.executeTokenAirdropTransaction(request);
   }
 

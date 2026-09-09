@@ -78,8 +78,10 @@
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Transfers multiple NFTs using an account object as sender. |
 | `airdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops an NFT between accounts. May become pending if the receiver lacks auto-association slots. |
 | `airdropNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Airdrops an NFT using an account object as sender. |
-| `airdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops multiple NFTs between accounts. |
-| `airdropNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Airdrops multiple NFTs using an account object as sender. |
+| `airdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops multiple NFTs to a single receiver. |
+| `airdropNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Airdrops multiple NFTs to a single receiver using an account object as sender. |
+| `airdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)` | Airdrops NFTs to one or more receivers (serial → account map). |
+| `airdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, Account fromAccount)` | Airdrops NFTs to one or more receivers using an account object as sender. |
 | `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
@@ -439,7 +441,7 @@ receiver
 
 ## Airdrop NFT
 
-Airdrops ownership of one or more NFTs to a receiver. Unlike a standard transfer, if the receiver is not associated and has no available auto-association slots, the airdrop may become pending until claimed or canceled.
+Airdrops ownership of one or more NFTs to one or more receivers using `TokenAirdropTransaction`. Unlike a standard transfer, if a receiver is not associated and has no available auto-association slots, the airdrop may become pending until claimed or canceled. Hedera limits a single airdrop transaction to at most 20 NFT ownership changes (see [Airdrop a token](https://docs.hedera.com/native/tokens/airdrop)).
 
 ```java title="airdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)"
 AccountId sender = AccountId.fromString("0.0.1001");
@@ -463,6 +465,19 @@ nftClient.airdropNfts(
     sender,
     PrivateKey.generateED25519(),
     receiver
+);
+```
+
+```java title="airdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)"
+AccountId alice = AccountId.fromString("0.0.1002");
+AccountId bob = AccountId.fromString("0.0.1003");
+Map<Long, AccountId> serialNumberToAccountId = Map.of(1L, alice, 2L, bob);
+
+nftClient.airdropNfts(
+    tokenId,
+    serialNumberToAccountId,
+    sender,
+    PrivateKey.generateED25519()
 );
 ```
 

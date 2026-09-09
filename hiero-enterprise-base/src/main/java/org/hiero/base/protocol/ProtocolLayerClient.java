@@ -379,7 +379,8 @@ public interface ProtocolLayerClient {
       @NonNull final TokenTransferRequest request) throws HieroException;
 
   /**
-   * Executes a token airdrop transaction for NFTs.
+   * Executes a token airdrop transaction for NFTs. The request may target a single receiver or map
+   * each serial to a different receiver.
    *
    * @param request the request containing the details of the NFT airdrop transaction
    * @return the result of the token airdrop transaction
