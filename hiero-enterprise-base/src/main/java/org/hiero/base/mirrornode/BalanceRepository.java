@@ -45,10 +45,10 @@ public interface BalanceRepository {
   }
 
   /**
-   * Returns a snapshot of account and token balances.
+   * Returns latest snapshot of account and token balances on network.
    *
    * @return an optional containing the balance snapshot, or empty if no snapshot
    * @throws HieroException if the balance data cannot be retrieved
    */
-  @NonNull Optional<BalanceSnapshot> findSnapshot() throws HieroException;
+  @NonNull Optional<BalanceSnapshot> getSnapshot() throws HieroException;
 }

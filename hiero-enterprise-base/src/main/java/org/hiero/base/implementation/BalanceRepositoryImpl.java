@@ -32,7 +32,7 @@ public class BalanceRepositoryImpl implements BalanceRepository {
   }
 
   @Override
-  public @NonNull Optional<BalanceSnapshot> findSnapshot() throws HieroException {
+  public @NonNull Optional<BalanceSnapshot> getSnapshot() throws HieroException {
     return mirrorNodeClient.queryBalanceSnapshot();
   }
 }
