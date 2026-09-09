@@ -861,7 +861,6 @@ public class NftClientImplTest {
     final PrivateKey privateKey = PrivateKey.generateECDSA();
     final PublicKey publicKey = privateKey.getPublicKey();
 
-
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final Account account = new Account(accountId, publicKey, privateKey);
 
