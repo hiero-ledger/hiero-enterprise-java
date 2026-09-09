@@ -31,7 +31,7 @@ Page<AccountBalance> balances =
 AccountId accountId =
     AccountId.fromString("0.0.1234");
 
-Page<AccountBalance> balance =
+Optional<AccountBalance> balance =
     balanceRepository.findByAccount(accountId);
 ```
 

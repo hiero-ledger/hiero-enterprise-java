@@ -216,14 +216,15 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   }
 
   @Override
-  public @NonNull Page<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
+  public @NonNull Optional<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     final String path = "/api/v1/balances?account.id=" + accountId;
     final Function<JsonNode, List<AccountBalance>> dataExtractionFunction =
         node -> jsonConverter.toAccountBalances(node);
     return new RestBasedPage<>(
-        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+            objectMapper, restClient.mutate().clone(), path, dataExtractionFunction)
+        .getData().stream().findFirst();
   }
 
   @Override

@@ -25,7 +25,7 @@ public class BalanceRepositoryImpl implements BalanceRepository {
   }
 
   @Override
-  public @NonNull Page<AccountBalance> findByAccount(@NonNull AccountId accountId)
+  public @NonNull Optional<AccountBalance> findByAccount(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return mirrorNodeClient.queryBalancesByAccount(accountId);

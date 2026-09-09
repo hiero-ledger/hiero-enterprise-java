@@ -15,7 +15,6 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.BalanceSnapshot;
@@ -591,7 +590,6 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(jsonConverter.toBalanceSnapshot(node).isEmpty());
   }
 
-
   @Test
   void shouldParseValidAccountBalance() {
     final JsonNode node = loadJson("balance.json");
@@ -617,7 +615,6 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(node2));
   }
-
 
   // Helper
   private JsonNode loadJson(String filename) {

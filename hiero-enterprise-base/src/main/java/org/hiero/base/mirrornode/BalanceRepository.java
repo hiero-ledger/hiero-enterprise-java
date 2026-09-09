@@ -26,20 +26,21 @@ public interface BalanceRepository {
    * Returns the balance for the specified account.
    *
    * @param accountId the account whose balance is requested
-   * @return a page containing the account balance
+   * @return optional containing the account balance
    * @throws HieroException if the balance data cannot be retrieved
    */
-  @NonNull Page<AccountBalance> findByAccount(@NonNull AccountId accountId) throws HieroException;
+  @NonNull Optional<AccountBalance> findByAccount(@NonNull AccountId accountId)
+      throws HieroException;
 
   /**
    * Returns the balance for the specified account.
    *
    * @param accountId the account whose balance is requested
-   * @return a page containing the account balance
+   * @return optional containing the account balance
    * @throws HieroException if the balance data cannot be retrieved
    */
   @NonNull
-  default Page<AccountBalance> findByAccount(@NonNull String accountId) throws HieroException {
+  default Optional<AccountBalance> findByAccount(@NonNull String accountId) throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return findByAccount(AccountId.fromString(accountId));
   }

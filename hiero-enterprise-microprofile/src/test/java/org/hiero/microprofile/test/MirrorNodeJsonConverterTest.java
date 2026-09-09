@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
-
 import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.BalanceSnapshot;
@@ -605,7 +604,6 @@ public class MirrorNodeJsonConverterTest {
         IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(jsonObject2));
   }
 
-
   // Balance
   @Test
   void shouldParseValidBalanceSnapshot() {
@@ -621,7 +619,6 @@ public class MirrorNodeJsonConverterTest {
     final JsonObject jsonObject = Json.createObjectBuilder().build();
     Assertions.assertTrue(jsonConverter.toBalanceSnapshot(jsonObject).isEmpty());
   }
-
 
   @Test
   void shouldParseValidAccountBalance() {
@@ -644,7 +641,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(jsonObject1));
 
-    JsonObject jsonObject2 =parseJson("{\"balances\": {}}");
+    JsonObject jsonObject2 = parseJson("{\"balances\": {}}");
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(jsonObject2));
   }

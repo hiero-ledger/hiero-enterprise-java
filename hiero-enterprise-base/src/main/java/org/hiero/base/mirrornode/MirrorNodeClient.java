@@ -324,21 +324,21 @@ public interface MirrorNodeClient {
    * Queries the account balance for the specified account.
    *
    * @param accountId the ID of the account whose balance is queried
-   * @return the Page containing the account balances
+   * @return the Optional containing the account balances
    * @throws HieroException if an error occurs
    */
-  @NonNull Page<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
+  @NonNull Optional<AccountBalance> queryBalancesByAccount(@NonNull AccountId accountId)
       throws HieroException;
 
   /**
    * Queries the account balance for the specified account.
    *
    * @param accountId the ID of the account whose balance is queried
-   * @return the Page containing the account balances
+   * @return the Optional containing the account balances
    * @throws HieroException if an error occurs
    */
   @NonNull
-  default Page<AccountBalance> queryBalancesByAccount(@NonNull String accountId)
+  default Optional<AccountBalance> queryBalancesByAccount(@NonNull String accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     return queryBalancesByAccount(AccountId.fromString(accountId));
