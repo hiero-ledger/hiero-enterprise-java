@@ -56,12 +56,16 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -365,6 +369,26 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenWipeResult executeWipeTokenTransaction(@NonNull final TokenWipeRequest request)
       throws HieroException;
+
+  /**
+   * Executes a token pause transaction.
+   *
+   * @param request the request containing the details of the token pause transaction
+   * @return the result of the token pause transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenPauseResult executePauseTokenTransaction(@NonNull final TokenPauseRequest request)
+      throws HieroException;
+
+  /**
+   * Executes a token unpause transaction.
+   *
+   * @param request the request containing the details of the token unpause transaction
+   * @return the result of the token unpause transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenUnpauseResult executeUnpauseTokenTransaction(
+      @NonNull final TokenUnpauseRequest request) throws HieroException;
 
   /**
    * Executes a transfer transaction for an NFT.
