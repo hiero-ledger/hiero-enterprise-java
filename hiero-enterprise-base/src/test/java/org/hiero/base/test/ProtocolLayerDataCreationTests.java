@@ -22,7 +22,9 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 import org.hiero.base.data.Account;
@@ -63,6 +65,8 @@ import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
+import org.hiero.base.protocol.data.TokenAirdropRequest;
+import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -1222,6 +1226,17 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testTokenAirdropResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new TokenAirdropResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new TokenAirdropResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenAirdropResult(transactionId, null));
+  }
+
+  @Test
   public void testHbarTransferResultCreation() {
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
     final Status status = Status.SUCCESS;
@@ -1648,6 +1663,122 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 sender,
                 receiver,
+                senderKey));
+  }
+
+  @Test
+  void testTokenAirdropRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.1234");
+    final List<Long> serials = List.of(1L, 2L);
+    final AccountId sender = AccountId.fromString("0.0.5678");
+    final AccountId receiver = AccountId.fromString("0.0.9876");
+    final AccountId receiver2 = AccountId.fromString("0.0.9877");
+    final PrivateKey senderKey = PrivateKey.generateECDSA();
+    final Map<Long, AccountId> serialToReceiver = Map.of(1L, receiver, 2L, receiver2);
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                serialToReceiver,
+                sender,
+                senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenAirdropRequest.of(tokenId, 1L, sender, receiver, senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenAirdropRequest.of(tokenId, serials, sender, receiver, senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenAirdropRequest.of(tokenId, serialToReceiver, sender, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                null, transactionValidDuration, tokenId, serialToReceiver, sender, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee, null, tokenId, serialToReceiver, sender, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                null,
+                serialToReceiver,
+                sender,
+                senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, sender, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                serialToReceiver,
+                null,
+                senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                serialToReceiver,
+                sender,
+                null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, Map.of(), sender, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                Map.of(-1L, receiver),
+                sender,
+                senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                Map.of(0L, receiver),
+                sender,
+                senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenAirdropRequest.of(tokenId, List.of(), sender, receiver, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                IntStream.rangeClosed(1, 21)
+                    .boxed()
+                    .collect(
+                        java.util.stream.Collectors.toMap(
+                            i -> (long) i, i -> receiver, (a, b) -> a, LinkedHashMap::new)),
+                sender,
                 senderKey));
   }
 

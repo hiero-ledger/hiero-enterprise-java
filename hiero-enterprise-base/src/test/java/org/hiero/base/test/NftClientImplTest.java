@@ -11,11 +11,14 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.TokenAirdropRequest;
+import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -59,6 +62,8 @@ public class NftClientImplTest {
       ArgumentCaptor.forClass(TokenCreateRequest.class);
   ArgumentCaptor<TokenTransferRequest> tokenTransferCaptor =
       ArgumentCaptor.forClass(TokenTransferRequest.class);
+  ArgumentCaptor<TokenAirdropRequest> tokenAirdropCaptor =
+      ArgumentCaptor.forClass(TokenAirdropRequest.class);
   ArgumentCaptor<TokenBurnRequest> tokenBurnCaptor =
       ArgumentCaptor.forClass(TokenBurnRequest.class);
   ArgumentCaptor<TokenWipeRequest> tokenWipeCaptor =
@@ -496,6 +501,135 @@ public class NftClientImplTest {
         NullPointerException.class, () -> nftClientImpl.transferNft(null, 1L, null, null, null));
     Assertions.assertThrows(
         NullPointerException.class, () -> nftClientImpl.transferNfts(null, null, null, null, null));
+  }
+
+  @Test
+  void testAirdropNft() throws HieroException {
+    final TokenAirdropResult tokenAirdropResult = Mockito.mock(TokenAirdropResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final long serialNumber = 1L;
+    final AccountId fromAccount = AccountId.fromString("1.2.3");
+    final AccountId toAccount = AccountId.fromString("4.5.6");
+    final PrivateKey fromAccountKey = PrivateKey.generateECDSA();
+
+    when(protocolLayerClient.executeTokenAirdropTransaction(any(TokenAirdropRequest.class)))
+        .thenReturn(tokenAirdropResult);
+    nftClientImpl.airdropNft(tokenId, serialNumber, fromAccount, fromAccountKey, toAccount);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenAirdropTransaction(tokenAirdropCaptor.capture());
+
+    final TokenAirdropRequest request = tokenAirdropCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(Map.of(serialNumber, toAccount), request.serialToReceiver());
+    Assertions.assertEquals(fromAccount, request.sender());
+    Assertions.assertEquals(fromAccountKey, request.senderKey());
+  }
+
+  @Test
+  void testAirdropNfts() throws HieroException {
+    final TokenAirdropResult tokenAirdropResult = Mockito.mock(TokenAirdropResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<Long> serialNumbers = List.of(1L, 2L);
+    final AccountId fromAccount = AccountId.fromString("1.2.3");
+    final AccountId toAccount = AccountId.fromString("4.5.6");
+    final PrivateKey fromAccountKey = PrivateKey.generateECDSA();
+
+    when(protocolLayerClient.executeTokenAirdropTransaction(any(TokenAirdropRequest.class)))
+        .thenReturn(tokenAirdropResult);
+    nftClientImpl.airdropNfts(tokenId, serialNumbers, fromAccount, fromAccountKey, toAccount);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenAirdropTransaction(tokenAirdropCaptor.capture());
+
+    final TokenAirdropRequest request = tokenAirdropCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(Map.of(1L, toAccount, 2L, toAccount), request.serialToReceiver());
+    Assertions.assertEquals(fromAccount, request.sender());
+    Assertions.assertEquals(fromAccountKey, request.senderKey());
+  }
+
+  @Test
+  void testAirdropNftsToMultipleReceivers() throws HieroException {
+    final TokenAirdropResult tokenAirdropResult = Mockito.mock(TokenAirdropResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId fromAccount = AccountId.fromString("1.2.3");
+    final AccountId toAccount1 = AccountId.fromString("4.5.6");
+    final AccountId toAccount2 = AccountId.fromString("7.8.9");
+    final PrivateKey fromAccountKey = PrivateKey.generateECDSA();
+    final Map<Long, AccountId> serialNumberToAccountId = Map.of(1L, toAccount1, 2L, toAccount2);
+
+    when(protocolLayerClient.executeTokenAirdropTransaction(any(TokenAirdropRequest.class)))
+        .thenReturn(tokenAirdropResult);
+    nftClientImpl.airdropNfts(tokenId, serialNumberToAccountId, fromAccount, fromAccountKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenAirdropTransaction(tokenAirdropCaptor.capture());
+
+    final TokenAirdropRequest request = tokenAirdropCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(serialNumberToAccountId, request.serialToReceiver());
+    Assertions.assertEquals(fromAccount, request.sender());
+    Assertions.assertEquals(fromAccountKey, request.senderKey());
+  }
+
+  @Test
+  void testAirdropNftThrowsExceptionForInvalidTokenId() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId fromAccount = AccountId.fromString("1.2.3");
+    final AccountId toAccount = AccountId.fromString("4.5.6");
+    final PrivateKey fromAccountKey = PrivateKey.generateECDSA();
+    final long serial = 1L;
+
+    when(protocolLayerClient.executeTokenAirdropTransaction(any(TokenAirdropRequest.class)))
+        .thenThrow(new HieroException("Failed to execute token airdrop transaction"));
+
+    Assertions.assertThrows(
+        HieroException.class,
+        () -> nftClientImpl.airdropNft(tokenId, serial, fromAccount, fromAccountKey, toAccount));
+  }
+
+  @Test
+  void testAirdropNftThrowsExceptionForInvalidSerial() {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId fromAccount = AccountId.fromString("1.2.3");
+    final AccountId toAccount = AccountId.fromString("4.5.6");
+    final PrivateKey fromAccountKey = PrivateKey.generateECDSA();
+
+    IllegalArgumentException e1 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> nftClientImpl.airdropNft(tokenId, -1L, fromAccount, fromAccountKey, toAccount));
+    Assertions.assertEquals("serial must be positive", e1.getMessage());
+
+    IllegalArgumentException e2 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                nftClientImpl.airdropNfts(
+                    tokenId, List.of(), fromAccount, fromAccountKey, toAccount));
+    Assertions.assertEquals("serials must not be empty", e2.getMessage());
+
+    IllegalArgumentException e3 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> nftClientImpl.airdropNfts(tokenId, Map.of(), fromAccount, fromAccountKey));
+    Assertions.assertEquals("serialToReceiver must not be empty", e3.getMessage());
+  }
+
+  @Test
+  void testAirdropNftNullParams() {
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.airdropNft(null, 1L, null, null, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.airdropNfts(null, (List<Long>) null, null, null, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.airdropNfts(null, (Map<Long, AccountId>) null, null, null));
   }
 
   @Test

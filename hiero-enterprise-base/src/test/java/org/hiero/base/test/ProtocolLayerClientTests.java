@@ -91,6 +91,8 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTransferTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenAirdropTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTokenGrantKycTransaction(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTokenRevokeKycTransaction(null));
