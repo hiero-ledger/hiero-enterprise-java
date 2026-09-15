@@ -21,18 +21,10 @@ public class HieroNetworkConfiguration {
   @ConfigProperty(name = "nodes")
   private Optional<String> nodes;
 
-  @ConfigProperty(name = "mirrornode")
-  private Optional<String> mirrornode;
-
-  /**
-   * Optional base URL for the Java REST API (e.g. {@code http://localhost:8084} in Solo). Required
-   * for {@code /api/v1/network/*} on mirror-node 0.15x+, where those routes are served by REST-Java
-   * only while the Node REST API remains the primary host for most other {@code /api/v1} paths.
-   */
-  @ConfigProperty(name = "mirror-node-java-rest")
-  private Optional<String> mirrorNodeJavaRest;
-
+  @ConfigProperty(name = "request-timeout")
   private Optional<Long> requestTimeoutInMs;
+
+  public MirrorNode mirrorNode = new MirrorNode();
 
   public Optional<Long> getRequestTimeoutInMs() {
     return requestTimeoutInMs;
@@ -42,8 +34,8 @@ public class HieroNetworkConfiguration {
     return name;
   }
 
-  public Optional<String> getMirrornode() {
-    return mirrornode;
+  public MirrorNode getMirrornode() {
+    return mirrorNode;
   }
 
   public Optional<String> getMirrorNodeJavaRest() {
@@ -68,5 +60,39 @@ public class HieroNetworkConfiguration {
               return new ConsensusNode(ip, port, account);
             })
         .collect(Collectors.toUnmodifiableSet());
+  }
+
+  public static class MirrorNode {
+    @ConfigProperty(name = "hiero.network.mirrornode.rest-url")
+    Optional<String> restUrl = Optional.empty();
+
+    @ConfigProperty(name = "hiero.network.mirrornode.grpc-addresses")
+    public Optional<String> grpcAddresses = Optional.empty();
+
+    /**
+     * Optional base URL for the Java REST API (e.g. {@code http://localhost:8084} in Solo).
+     * Required for {@code /api/v1/network/*} on mirror-node 0.15x+, where those routes are served
+     * by REST-Java only while the Node REST API remains the primary host for most other {@code
+     * /api/v1} paths.
+     */
+    @ConfigProperty(name = "hiero.network.mirror-node-java-rest")
+    private Optional<String> mirrorNodeJavaRest;
+
+    public Optional<String> getRestUrl() {
+      return restUrl;
+    }
+
+    public Optional<String> getJavaRest() {
+      return mirrorNodeJavaRest;
+    }
+
+    public Set<String> getGrpcAddresses() {
+      // eg: mirrornode.mirrornode:443,testnet.mirrornode:5600
+      return grpcAddresses
+          .map(n -> n.split(","))
+          .map(n -> Stream.of(n))
+          .orElse(Stream.empty())
+          .collect(Collectors.toUnmodifiableSet());
+    }
   }
 }

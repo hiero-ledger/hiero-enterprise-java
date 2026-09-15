@@ -2,6 +2,7 @@ package org.hiero.spring.implementation;
 
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @ConfigurationProperties(prefix = "spring.hiero.network")
 public class HieroNetworkProperties {
@@ -19,7 +20,7 @@ public class HieroNetworkProperties {
   private List<HieroNode> nodes;
 
   /** Mirror node endpoint to connect to. */
-  private String mirrorNode;
+  @NestedConfigurationProperty private MirrorNode mirrorNode = new MirrorNode();
 
   /**
    * Optional base URL for the Java REST API (e.g. {@code http://localhost:8084} in Solo). Required
@@ -38,11 +39,11 @@ public class HieroNetworkProperties {
     this.name = name;
   }
 
-  public String getMirrorNode() {
+  public MirrorNode getMirrorNode() {
     return mirrorNode;
   }
 
-  public void setMirrorNode(String mirrorNode) {
+  public void setMirrorNode(MirrorNode mirrorNode) {
     this.mirrorNode = mirrorNode;
   }
 
@@ -68,5 +69,29 @@ public class HieroNetworkProperties {
 
   public void setRequestTimeoutInMs(Long requestTimeoutInMs) {
     this.requestTimeoutInMs = requestTimeoutInMs;
+  }
+
+  public static class MirrorNode {
+    /** Mirror node RestApi endpoint. */
+    private String restUrl;
+
+    /** List of mirror node gRPC endpoints. */
+    private List<String> grpcAddresses;
+
+    public String getRestUrl() {
+      return restUrl;
+    }
+
+    public void setRestUrl(String restUrl) {
+      this.restUrl = restUrl;
+    }
+
+    public List<String> getGrpcAddresses() {
+      return grpcAddresses;
+    }
+
+    public void setGrpcAddresses(List<String> grpcAddresses) {
+      this.grpcAddresses = grpcAddresses;
+    }
   }
 }

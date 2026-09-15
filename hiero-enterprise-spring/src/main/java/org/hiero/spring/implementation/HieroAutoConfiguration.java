@@ -2,7 +2,6 @@ package org.hiero.spring.implementation;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import org.hiero.base.AccountClient;
 import org.hiero.base.FileClient;
@@ -128,13 +127,18 @@ public class HieroAutoConfiguration {
       havingValue = "true",
       matchIfMissing = true)
   MirrorNodeClient mirrorNodeClient(
-      final HieroContext hieroContext, final HieroProperties properties) {
+      final HieroContext hieroContext,
+      final HieroProperties properties,
+      final HieroConfig hieroConfig) {
     final String mirrorNodeEndpoint;
-    final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
-    if (mirrorNetwork.isEmpty()) {
-      throw new IllegalArgumentException("Mirror node endpoint must be set");
+    final String mirrorNetwork = hieroConfig.getMirrorNodeRestUrl().orElse(null);
+
+    if (mirrorNetwork == null || mirrorNetwork.isBlank()) {
+      throw new IllegalArgumentException("Mirror node rest endpoint must be set");
     }
-    mirrorNodeEndpoint = mirrorNetwork.get(0);
+
+    mirrorNodeEndpoint = mirrorNetwork;
+
     final String baseUri;
     try {
       URL url = new URI(mirrorNodeEndpoint).toURL();

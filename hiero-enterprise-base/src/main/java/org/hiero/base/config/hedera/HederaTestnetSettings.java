@@ -23,8 +23,13 @@ public final class HederaTestnetSettings implements NetworkSettings {
   }
 
   @Override
-  public @NonNull Set<String> getMirrorNodeAddresses() {
-    return Set.of("https://testnet.mirrornode.hedera.com:443");
+  public @NonNull Set<String> getMirrorNodeGrpcAddresses() {
+    return Set.of("testnet.mirrornode.hedera.com:443");
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.of("https://testnet.mirrornode.hedera.com");
   }
 
   @Override

@@ -25,7 +25,9 @@ public class HieroConfigImpl implements HieroConfig {
 
   private final String networkName;
 
-  private final Set<String> mirrorNodeAddresses;
+  private final Set<String> mirrorNodeGrpcAddresses;
+
+  private final Optional<String> mirrorNodeRestUrl;
 
   private final Set<ConsensusNode> consensusNodes;
 
@@ -53,13 +55,18 @@ public class HieroConfigImpl implements HieroConfig {
     if (networkSettings.isPresent()) {
       final NetworkSettings settings = networkSettings.get();
       networkName = settings.getNetworkName().orElse(networkConfiguration.getName().orElse(null));
-      mirrorNodeAddresses = Collections.unmodifiableSet(settings.getMirrorNodeAddresses());
+      mirrorNodeGrpcAddresses = Collections.unmodifiableSet(settings.getMirrorNodeGrpcAddresses());
+      mirrorNodeRestUrl = settings.getMirrorNodeRestUrl();
       consensusNodes = Collections.unmodifiableSet(settings.getConsensusNodes());
       chainId = settings.chainId().orElse(null);
       relayUrl = settings.relayUrl().orElse(null);
     } else {
       networkName = networkConfiguration.getName().orElse(null);
-      mirrorNodeAddresses = networkConfiguration.getMirrornode().map(Set::of).orElse(Set.of());
+      mirrorNodeGrpcAddresses =
+          networkConfiguration.getMirrornode().getGrpcAddresses() == null
+              ? Set.of()
+              : Set.copyOf(networkConfiguration.getMirrornode().getGrpcAddresses());
+      mirrorNodeRestUrl = networkConfiguration.getMirrornode().getRestUrl();
       consensusNodes = Collections.unmodifiableSet(networkConfiguration.getNodes());
       chainId = null;
       relayUrl = null;
@@ -82,8 +89,13 @@ public class HieroConfigImpl implements HieroConfig {
   }
 
   @Override
-  public @NonNull Set<String> getMirrorNodeAddresses() {
-    return mirrorNodeAddresses;
+  public @NonNull Set<String> getMirrorNodeGrpcAddresses() {
+    return mirrorNodeGrpcAddresses;
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return mirrorNodeRestUrl;
   }
 
   @Override
