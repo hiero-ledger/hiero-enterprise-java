@@ -150,7 +150,7 @@ public class ClientProvider {
             .getMirrorNodeRestUrl()
             .orElseThrow(() -> new IllegalStateException("No mirror node addresses configured"));
     final MirrorNodeRestClientImpl restClient =
-        new MirrorNodeRestClientImpl(target, networkConfiguration.getMirrorNodeJavaRest());
+        new MirrorNodeRestClientImpl(target, networkConfiguration.getMirrornode().getJavaRest());
     final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();
     return new MirrorNodeClientImpl(restClient, jsonConverter);
   }

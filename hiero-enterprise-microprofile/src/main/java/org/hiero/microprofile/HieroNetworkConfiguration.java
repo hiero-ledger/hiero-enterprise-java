@@ -38,10 +38,6 @@ public class HieroNetworkConfiguration {
     return mirrorNode;
   }
 
-  public Optional<String> getMirrorNodeJavaRest() {
-    return mirrorNodeJavaRest != null ? mirrorNodeJavaRest : Optional.empty();
-  }
-
   public Set<ConsensusNode> getNodes() {
     return nodes
         .map(n -> n.split(","))
@@ -76,7 +72,7 @@ public class HieroNetworkConfiguration {
      * /api/v1} paths.
      */
     @ConfigProperty(name = "hiero.network.mirror-node-java-rest")
-    private Optional<String> mirrorNodeJavaRest;
+    private Optional<String> mirrorNodeJavaRest = Optional.empty();
 
     public Optional<String> getRestUrl() {
       return restUrl;
