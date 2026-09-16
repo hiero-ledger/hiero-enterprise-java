@@ -1,14 +1,19 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessage;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.*;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class TopicClientImpl implements TopicClient {
   private final ProtocolLayerClient client;
@@ -215,6 +220,27 @@ public class TopicClientImpl implements TopicClient {
     Objects.requireNonNull(submitKey, "submitKey must not be null");
     Objects.requireNonNull(message, "message must not be null");
     submitMessage(topicId, submitKey, message.getBytes());
+  }
+
+  @Override
+  public SubscriptionHandle subscribeTopic(
+      @NonNull TopicId topicId,
+      @NonNull Consumer<TopicMessage> handler,
+      @Nullable Instant startTime,
+      @Nullable Instant endTime,
+      long limit)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
+    if (limit != -1 && limit <= 0) {
+      throw new IllegalArgumentException("limit must be -1 for (infinite) or greater than 0");
+    }
+
+    final TopicMessageRequest request =
+        TopicMessageRequest.of(topicId, handler, startTime, endTime, limit);
+    final TopicMessageResult result = client.executeTopicMessageQuery(request);
+    return result.subscriptionHandle();
   }
 
   @Override
