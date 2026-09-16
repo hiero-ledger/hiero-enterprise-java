@@ -19,6 +19,7 @@ import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
@@ -165,6 +166,32 @@ public interface MirrorNodeClient {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     return queryNftsByAccountAndTokenIdAndSerial(
         AccountId.fromString(accountId), TokenId.fromString(tokenId), serialNumber);
+  }
+
+  /**
+   * Queries the transaction history for a specific NFT.
+   *
+   * @param tokenId the token ID
+   * @param serialNumber the NFT serial number
+   * @return a page of NFT transaction history entries
+   * @throws HieroException if an error occurs during the query
+   */
+  @NonNull Page<NftTransactionHistory> queryNftTransactionHistory(
+      @NonNull TokenId tokenId, long serialNumber) throws HieroException;
+
+  /**
+   * Queries the transaction history for a specific NFT.
+   *
+   * @param tokenId the token ID
+   * @param serialNumber the NFT serial number
+   * @return a page of NFT transaction history entries
+   * @throws HieroException if an error occurs during the query
+   */
+  @NonNull
+  default Page<NftTransactionHistory> queryNftTransactionHistory(
+      @NonNull String tokenId, long serialNumber) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    return queryNftTransactionHistory(TokenId.fromString(tokenId), serialNumber);
   }
 
   /**
