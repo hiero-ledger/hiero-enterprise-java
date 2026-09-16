@@ -1,10 +1,13 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
-import java.time.Duration;
+import com.hedera.hashgraph.sdk.TopicMessage;
 import java.time.Instant;
+import java.time.Duration;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
@@ -367,5 +370,26 @@ public class TopicClientImpl implements TopicClient {
     Objects.requireNonNull(message, "message must not be null");
     TopicSubmitMessageRequest request = TopicSubmitMessageRequest.of(topicId, submitKey, message);
     client.executeTopicMessageSubmitTransaction(request);
+  }
+
+  @Override
+  public SubscriptionHandle subscribeTopic(
+      @NonNull TopicId topicId,
+      @NonNull Consumer<TopicMessage> handler,
+      @Nullable Instant startTime,
+      @Nullable Instant endTime,
+      long limit)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
+    if (limit != -1 && limit <= 0) {
+      throw new IllegalArgumentException("limit must be -1 for (infinite) or greater than 0");
+    }
+
+    final TopicMessageRequest request =
+        TopicMessageRequest.of(topicId, handler, startTime, endTime, limit);
+    final TopicMessageResult result = client.executeTopicMessageQuery(request);
+    return result.subscriptionHandle();
   }
 }
