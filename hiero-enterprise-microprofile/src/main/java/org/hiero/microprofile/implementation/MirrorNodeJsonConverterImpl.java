@@ -22,8 +22,10 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
@@ -44,6 +46,7 @@ import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenBalance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.TokenTransfer;
 import org.hiero.base.data.Topic;
@@ -815,11 +818,13 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     if (!jsonObject.containsKey("balances")) {
       return List.of();
     }
-    final JsonArray balancesArray = jsonObject.getJsonArray("balances");
-    if (balancesArray == null) {
-      throw new IllegalArgumentException("TokenBalances array is not an array: " + balancesArray);
+
+    if (!isArray(jsonObject.get("balances"))) {
+      throw new IllegalArgumentException(
+          "TokenBalances array is not an array: " + jsonObject.get("balances"));
     }
 
+    final JsonArray balancesArray = jsonObject.getJsonArray("balances");
     Spliterator<JsonValue> spliterator =
         Spliterators.spliteratorUnknownSize(balancesArray.iterator(), Spliterator.ORDERED);
     return StreamSupport.stream(spliterator, false)
@@ -844,6 +849,88 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       final long decimals = jsonObject.getJsonNumber("decimals").longValue();
 
       return Optional.of(new Balance(account, balance, decimals));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
+  public @NonNull Optional<BalanceSnapshot> toBalanceSnapshot(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty() || jsonObject.containsKey("_status")) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new BalanceSnapshot(
+              hasNonNull(jsonObject, "timestamp")
+                  ? parseInstant(jsonObject.getString("timestamp"))
+                  : null,
+              toAccountBalances(jsonObject)));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<AccountBalance> toAccountBalances(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (!jsonObject.containsKey("balances")) {
+      return List.of();
+    }
+
+    if (!isArray(jsonObject.get("balances"))) {
+      throw new IllegalArgumentException(
+          "Account balances array is not an array: " + jsonObject.get("balances"));
+    }
+
+    final JsonArray balancesArray = jsonObject.getJsonArray("balances");
+    return jsonArrayToStream(balancesArray)
+        .map(n -> toAccountBalance(n.asJsonObject()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<AccountBalance> toAccountBalance(@NonNull JsonObject jsonObject) {
+    Objects.requireNonNull(jsonObject, "jsonObject must not be null");
+    if (jsonObject.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new AccountBalance(
+              hasNonNull(jsonObject, "account")
+                  ? AccountId.fromString(jsonObject.getString("account"))
+                  : null,
+              jsonObject.getJsonNumber("balance").longValue(),
+              toTokenBalances(jsonObject)));
+    } catch (final Exception e) {
+      throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
+    }
+  }
+
+  private List<TokenBalance> toTokenBalances(@NonNull JsonObject jsonObject) {
+    if (!jsonObject.containsKey("tokens") || jsonObject.isNull("tokens")) {
+      return List.of();
+    }
+
+    if (!isArray(jsonObject.get("tokens"))) {
+      throw new IllegalArgumentException(
+          "Token balances array is not an array: " + jsonObject.get("tokens"));
+    }
+
+    final JsonArray tokensArray = jsonObject.getJsonArray("tokens");
+    return jsonArrayToStream(tokensArray).map(n -> toTokenBalance(n.asJsonObject())).toList();
+  }
+
+  private TokenBalance toTokenBalance(@NonNull JsonObject jsonObject) {
+    try {
+      return new TokenBalance(
+          hasNonNull(jsonObject, "token_id")
+              ? TokenId.fromString(jsonObject.getString("token_id"))
+              : null,
+          jsonObject.getJsonNumber("balance").longValue());
     } catch (final Exception e) {
       throw new IllegalStateException("Can not parse JSON: " + jsonObject, e);
     }
