@@ -106,6 +106,7 @@ public interface HieroConfig {
       final Client client = Client.forNetwork(nodes);
       final List<String> mirrorNodeAddresses = getMirrorNodeGrpcAddress().stream().toList();
       client.setMirrorNetwork(mirrorNodeAddresses);
+      System.out.println(mirrorNodeAddresses);
       client.setOperator(getOperatorAccount().accountId(), getOperatorAccount().privateKey());
       getRequestTimeout().ifPresent(client::setRequestTimeout);
       return client;
