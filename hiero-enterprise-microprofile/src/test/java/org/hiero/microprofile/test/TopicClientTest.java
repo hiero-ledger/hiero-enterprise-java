@@ -1,6 +1,5 @@
 package org.hiero.microprofile.test;
 
-import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.Configuration;
@@ -14,6 +13,7 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
+import org.hiero.base.data.Subscription;
 import org.hiero.microprofile.ClientProvider;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -43,7 +43,7 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
             (message) -> {
@@ -69,7 +69,7 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
             (message) -> {
@@ -113,7 +113,7 @@ public class TopicClientTest {
 
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
-    final SubscriptionHandle handler =
+    final Subscription handler =
         Assertions.assertDoesNotThrow(
             () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end, -1));
 

@@ -1,12 +1,12 @@
 package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessage;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.hiero.base.data.Subscription;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -351,10 +351,10 @@ public interface TopicClient {
    *
    * @param topicId the topicId of topic
    * @param handler the handler to call when a message is receive
-   * @return SubscriptionHandle for the Topic
+   * @return Subscription for the Topic
    * @throws HieroException if Topic could not be subscribed
    */
-  default SubscriptionHandle subscribeTopic(
+  default Subscription subscribeTopic(
       @NonNull String topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(handler, "handler must not be null");
@@ -366,10 +366,10 @@ public interface TopicClient {
    *
    * @param topicId the topicId of topic
    * @param handler the handler to call when a message is receive
-   * @return SubscriptionHandle for the Topic
+   * @return Subscription for the Topic
    * @throws HieroException if Topic could not be subscribed
    */
-  default SubscriptionHandle subscribeTopic(
+  default Subscription subscribeTopic(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler) throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
     Objects.requireNonNull(handler, "handler must not be null");
@@ -383,10 +383,10 @@ public interface TopicClient {
    * @param topicId the topicId of topic
    * @param handler the handler to call when a message is receive
    * @param limit the number of message to return
-   * @return SubscriptionHandle for the Topic
+   * @return Subscription for the Topic
    * @throws HieroException if Topic could not be subscribed
    */
-  default SubscriptionHandle subscribeTopic(
+  default Subscription subscribeTopic(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> handler, long limit)
       throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
@@ -401,10 +401,10 @@ public interface TopicClient {
    * @param topicId the topicId of topic
    * @param handler the handler to call when a message is receive
    * @param limit the number of message to return
-   * @return SubscriptionHandle for the Topic
+   * @return Subscription for the Topic
    * @throws HieroException if Topic could not be subscribed
    */
-  default SubscriptionHandle subscribeTopic(
+  default Subscription subscribeTopic(
       @NonNull String topicId, @NonNull Consumer<TopicMessage> handler, long limit)
       throws HieroException {
     Objects.requireNonNull(topicId, "topicId must not be null");
@@ -421,10 +421,10 @@ public interface TopicClient {
    * @param startTime time to start subscribing to a topic
    * @param endTime time to stop subscribing to a topic
    * @param limit the number of message to return
-   * @return SubscriptionHandle for the Topic
+   * @return Subscription for the Topic
    * @throws HieroException if Topic could not be subscribed
    */
-  SubscriptionHandle subscribeTopic(
+  Subscription subscribeTopic(
       @NonNull TopicId topicId,
       @NonNull Consumer<TopicMessage> handler,
       @Nullable Instant startTime,

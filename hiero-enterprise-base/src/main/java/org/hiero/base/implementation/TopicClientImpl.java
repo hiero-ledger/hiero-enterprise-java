@@ -1,7 +1,6 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessage;
 import java.time.Instant;
@@ -10,6 +9,7 @@ import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.Subscription;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.*;
 import org.jspecify.annotations.NonNull;
@@ -223,7 +223,7 @@ public class TopicClientImpl implements TopicClient {
   }
 
   @Override
-  public SubscriptionHandle subscribeTopic(
+  public Subscription subscribeTopic(
       @NonNull TopicId topicId,
       @NonNull Consumer<TopicMessage> handler,
       @Nullable Instant startTime,
@@ -244,7 +244,8 @@ public class TopicClientImpl implements TopicClient {
     final TopicMessageRequest request =
         TopicMessageRequest.of(topicId, handler, startTime, endTime, limit);
     final TopicMessageResult result = client.executeTopicMessageQuery(request);
-    return result.subscriptionHandle();
+
+    return new TopicSubscription(result.subscriptionHandle());
   }
 
   @Override
