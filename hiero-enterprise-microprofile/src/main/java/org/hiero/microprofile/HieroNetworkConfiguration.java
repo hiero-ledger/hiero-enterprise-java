@@ -32,6 +32,9 @@ public class HieroNetworkConfiguration {
   @ConfigProperty(name = "mirror-node-java-rest")
   private Optional<String> mirrorNodeJavaRest;
 
+  @ConfigProperty(name = "mirrornode-grpc-address")
+  private Optional<String> mirrorNodeGrpcAddress;
+
   private Optional<Long> requestTimeoutInMs;
 
   public Optional<Long> getRequestTimeoutInMs() {
@@ -48,6 +51,10 @@ public class HieroNetworkConfiguration {
 
   public Optional<String> getMirrorNodeJavaRest() {
     return mirrorNodeJavaRest != null ? mirrorNodeJavaRest : Optional.empty();
+  }
+
+  public Optional<String> getMirrorNodeGrpcAddress() {
+    return mirrorNodeGrpcAddress != null ? mirrorNodeGrpcAddress : Optional.empty();
   }
 
   public Set<ConsensusNode> getNodes() {

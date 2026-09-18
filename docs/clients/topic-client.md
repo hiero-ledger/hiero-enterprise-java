@@ -41,6 +41,11 @@
 | `submitMessage(String topicId, String submitKey, byte[] message)` | Submits a byte array message using topic ID and submit key strings. |
 | `submitMessage(TopicId topicId, PrivateKey submitKey, String message)` | Submits a string message using a custom submit key. |
 | `submitMessage(String topicId, String submitKey, String message)` | Submits a string message using topic ID and submit key strings. |
+| `subscribeTopic(TopicId topicId, Consumer<TopicMessage> handler)` | Subscribes to a topic and receives messages through the provided handler. |
+| `subscribeTopic(String topicId, Consumer<TopicMessage> handler)` | Subscribes to a topic using a topic ID string and receives messages through the provided handler. |
+| `subscribeTopic(TopicId topicId, Consumer<TopicMessage> handler, long limit)` | Subscribes to a topic and receives up to the specified number of messages. |
+| `subscribeTopic(String topicId, Consumer<TopicMessage> handler, long limit)` | Subscribes to a topic using a topic ID string and receives up to the specified number of messages. |
+| `subscribeTopic(TopicId topicId, Consumer<TopicMessage> handler, Instant startTime, Instant endTime, long limit)` | Subscribes to a topic within the specified time range and message limit. |
 
 ---
 
@@ -278,3 +283,60 @@ topicClient.submitMessage(
     "Private message"
 );
 ```
+
+---
+
+## Subscribe to Topic
+
+Subscribe to a topic and receive messages through a `Consumer<TopicMessage>` handler.
+
+```java title="subscribeTopic(TopicId topicId, Consumer<TopicMessage> handler)"
+TopicId topicId =
+    TopicId.fromString("0.0.1234");
+
+Subscription handler = topicClient.subscribeTopic(
+    topicId,
+    message -> {
+        System.out.println("Received message: " + message);
+    }
+);
+```
+
+!!! info 
+
+    The `limit` specifies the maximum number of messages to receive. Use `-1` for no message limit.
+
+```java title="subscribeTopic(TopicId topicId, Consumer<TopicMessage> handler, long limit)"
+TopicId topicId =
+    TopicId.fromString("0.0.1234");
+
+Subscription handler = topicClient.subscribeTopic(
+    topicId,
+    message -> {
+        System.out.println("Received message: " + message);
+    },
+    10
+);
+```
+
+```java title="subscribeTopic(TopicId topicId, Consumer<TopicMessage> handler, Instant startTime, Instant endTIme, long limit)"
+Instant startTime =
+    Instant.parse("2026-01-01T00:00:00Z");
+
+Instant endTime =
+    Instant.parse("2026-01-01T01:00:00Z");
+
+Subscription handler = topicClient.subscribeTopic(
+    topicId,
+    message -> {
+        System.out.println("Received message: " + message);
+    },
+    startTime,
+    endTime,
+    10
+);
+```
+
+!!! tip
+
+    The above methods returns a [Subscription](../utils/subscription.md) that can be used to manage the subscription for the topic.
