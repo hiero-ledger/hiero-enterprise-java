@@ -294,7 +294,7 @@ Subscribe to a topic and receive messages through a `Consumer<TopicMessage>` han
 TopicId topicId =
     TopicId.fromString("0.0.1234");
 
-topicClient.subscribeTopic(
+Subscription handler = topicClient.subscribeTopic(
     topicId,
     message -> {
         System.out.println("Received message: " + message);
@@ -310,7 +310,7 @@ topicClient.subscribeTopic(
 TopicId topicId =
     TopicId.fromString("0.0.1234");
 
-topicClient.subscribeTopic(
+Subscription handler = topicClient.subscribeTopic(
     topicId,
     message -> {
         System.out.println("Received message: " + message);
@@ -326,7 +326,7 @@ Instant startTime =
 Instant endTime =
     Instant.parse("2026-01-01T01:00:00Z");
 
-topicClient.subscribeTopic(
+Subscription handler = topicClient.subscribeTopic(
     topicId,
     message -> {
         System.out.println("Received message: " + message);
@@ -339,4 +339,4 @@ topicClient.subscribeTopic(
 
 !!! tip
 
-    The above methods returns a `SubscriptionHandle` that can be used to manage the subscription.
+    The above methods returns a [Subscription](../utils/subscription.md) that can be used to manage the subscription for the topic.
