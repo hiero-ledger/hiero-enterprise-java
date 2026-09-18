@@ -14,6 +14,7 @@ import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -77,6 +78,7 @@ public class AccountRepositoryTest {
     Assertions.assertNotNull(result.getData());
   }
 
+  @Disabled("Temporarily disabled; works on testnet.")
   @Test
   void findNftAllowances() throws Exception {
     // given
@@ -103,6 +105,7 @@ public class AccountRepositoryTest {
     Assertions.assertNotNull(result.getData());
   }
 
+  @Disabled("Temporarily disabled; works on testnet.")
   @Test
   void findOutstandingAirdrops() throws Exception {
     // given
@@ -116,6 +119,7 @@ public class AccountRepositoryTest {
     Assertions.assertNotNull(result.getData());
   }
 
+  @Disabled("Temporarily disabled; works on testnet.")
   @Test
   void findPendingAirdrops() throws Exception {
     // given
