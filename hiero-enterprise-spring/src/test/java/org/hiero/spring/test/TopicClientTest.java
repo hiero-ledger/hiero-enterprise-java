@@ -2,7 +2,6 @@ package org.hiero.spring.test;
 
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.time.Duration;
 import java.time.Instant;
@@ -13,6 +12,7 @@ import java.time.Instant;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
+import org.hiero.base.data.Subscription;
 import org.hiero.test.HieroTestUtils;
 import org.hiero.base.data.Account;
 import org.junit.jupiter.api.Assertions;
@@ -289,7 +289,7 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
             (message) -> {
@@ -333,7 +333,7 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
             (message) -> {
@@ -356,7 +356,7 @@ public class TopicClientTest {
 
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
-    final SubscriptionHandle handler =
+    final Subscription handler =
         Assertions.assertDoesNotThrow(
             () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end, -1));
 

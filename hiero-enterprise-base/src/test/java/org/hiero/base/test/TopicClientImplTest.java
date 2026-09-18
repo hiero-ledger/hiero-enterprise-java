@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.TopicMessage;
 import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.Subscription;
 import org.hiero.base.implementation.TopicClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.TopicCreateRequest;
@@ -800,7 +801,7 @@ public class TopicClientImplTest {
         .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
-    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription);
+    final Subscription handler = topicClient.subscribeTopic(topicId, subscription);
 
     verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());
     final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
@@ -830,7 +831,7 @@ public class TopicClientImplTest {
         .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
-    final SubscriptionHandle handler = topicClient.subscribeTopic(topicId, subscription, limit);
+    final Subscription handler = topicClient.subscribeTopic(topicId, subscription, limit);
 
     verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());
     final TopicMessageRequest capture = topicSubscribeCaptor.getValue();
@@ -862,7 +863,7 @@ public class TopicClientImplTest {
         .thenReturn(topicMessageResult);
     when(topicMessageResult.subscriptionHandle()).thenReturn(subscriptionHandle);
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(topicId, subscription, startTime, endTime, limit);
 
     verify(protocolLayerClient, times(1)).executeTopicMessageQuery(topicSubscribeCaptor.capture());

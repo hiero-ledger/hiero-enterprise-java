@@ -17,6 +17,7 @@ import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
+import org.hiero.base.data.Subscription;
 import org.hiero.base.data.Account;
 import org.hiero.microprofile.ClientProvider;
 import org.hiero.test.HieroTestUtils;
@@ -304,7 +305,7 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
             (message) -> {
@@ -330,7 +331,7 @@ public class TopicClientTest {
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
-    final SubscriptionHandle handler =
+    final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
             (message) -> {
@@ -374,9 +375,10 @@ public class TopicClientTest {
 
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
-    final SubscriptionHandle handler =
+    final Subscription handler =
         Assertions.assertDoesNotThrow(
             () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end, -1));
+
     Assertions.assertNotNull(handler);
     handler.unsubscribe();
     }
