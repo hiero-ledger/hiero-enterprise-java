@@ -83,7 +83,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
   }
 
   @Override
-  public ContractVerificationState verify(
+  public @NonNull ContractVerificationState verify(
       @NonNull final ContractId contractId,
       @NonNull final String contractName,
       @NonNull final Map<String, String> files)
@@ -116,6 +116,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
               + getChainId()
               + "/0x"
               + contractId.toEvmAddress();
+
       final String resultBody =
           restClient
               .post()
@@ -136,53 +137,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
       return pollVerificationStatus(verificationId);
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
-    }
-  }
-
-  private ContractVerificationState pollVerificationStatus(final @NonNull String verificationId) {
-    Objects.requireNonNull(verificationId, "verificationId must not be null");
-
-    final long deadline = System.nanoTime() + POLL_TIMEOUT.toNanos();
-    try {
-      final String uri = CONTRACT_VERIFICATION_URL + "/v2/verify/" + verificationId;
-
-      while (System.nanoTime() < deadline) {
-        final String status =
-            restClient
-                .get()
-                .uri(uri)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
-                .body(String.class);
-
-        final JsonNode rootNode = objectMapper.readTree(status);
-
-        if (!rootNode.get("isJobCompleted").asBoolean(false)) {
-          Thread.sleep(POLL_INTERVAL.toMillis());
-          continue;
-        }
-
-        if (!rootNode.get("contract").hasNonNull("match")) {
-          return ContractVerificationState.NONE;
-        }
-
-        final String matchStatus = rootNode.get("contract").get("match").asText(null);
-
-        if (matchStatus.equals("exact_match")) {
-          return ContractVerificationState.FULL;
-        }
-
-        if (matchStatus.equals("match")) {
-          return ContractVerificationState.PARTIAL;
-        }
-
-        return ContractVerificationState.NONE;
-      }
-
-      throw new HieroException(
-          "Timed out waiting for contract verification job: " + verificationId);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
   }
 
@@ -217,15 +171,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
       final JsonNode rootNode = objectMapper.readTree(resultBody);
 
       final String matchStatus = rootNode.get("match").asText();
-      if (matchStatus.equals("match")) {
-        return ContractVerificationState.PARTIAL;
-      }
-
-      if (matchStatus.equals("exact_match")) {
-        return ContractVerificationState.FULL;
-      }
-
-      return ContractVerificationState.NONE;
+      return resolveVerificationState(matchStatus);
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
     }
@@ -277,5 +223,56 @@ public class ContractVerificationClientImplementation implements ContractVerific
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
     }
+  }
+
+  private ContractVerificationState pollVerificationStatus(final @NonNull String verificationId) {
+    Objects.requireNonNull(verificationId, "verificationId must not be null");
+
+    final long deadline = System.nanoTime() + POLL_TIMEOUT.toNanos();
+    try {
+      final String uri = CONTRACT_VERIFICATION_URL + "/v2/verify/" + verificationId;
+
+      while (System.nanoTime() < deadline) {
+        final String status =
+            restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
+                .body(String.class);
+
+        final JsonNode rootNode = objectMapper.readTree(status);
+
+        if (!rootNode.get("isJobCompleted").asBoolean(false)) {
+          Thread.sleep(POLL_INTERVAL.toMillis());
+          continue;
+        }
+
+        if (!rootNode.get("contract").hasNonNull("match")) {
+          return ContractVerificationState.NONE;
+        }
+
+        final String matchStatus = rootNode.get("contract").get("match").asText(null);
+        return resolveVerificationState(matchStatus);
+      }
+
+      throw new HieroException(
+          "Timed out waiting for contract verification job: " + verificationId);
+    } catch (Exception e) {
+      throw new RuntimeException(
+          "Error checking contract verification status: " + verificationId, e);
+    }
+  }
+
+  private ContractVerificationState resolveVerificationState(final @NonNull String status) {
+    if (status.equals("exact_match")) {
+      return ContractVerificationState.FULL;
+    }
+
+    if (status.equals("match")) {
+      return ContractVerificationState.PARTIAL;
+    }
+
+    return ContractVerificationState.NONE;
   }
 }
