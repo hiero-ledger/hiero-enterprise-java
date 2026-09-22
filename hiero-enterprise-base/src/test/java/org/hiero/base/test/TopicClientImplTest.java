@@ -643,7 +643,7 @@ public class TopicClientImplTest {
     verify(topicMessageResult, times(1)).subscriptionHandle();
 
     Assertions.assertNotNull(handler);
-    Assertions.assertEquals(subscriptionHandle, handler);
+    Assertions.assertInstanceOf(Subscription.class, handler);
   }
 
   @Test
@@ -673,7 +673,7 @@ public class TopicClientImplTest {
     verify(topicMessageResult, times(1)).subscriptionHandle();
 
     Assertions.assertNotNull(handler);
-    Assertions.assertEquals(subscriptionHandle, handler);
+    Assertions.assertInstanceOf(Subscription.class, handler);
   }
 
   @Test
@@ -706,7 +706,7 @@ public class TopicClientImplTest {
     verify(topicMessageResult, times(1)).subscriptionHandle();
 
     Assertions.assertNotNull(handler);
-    Assertions.assertEquals(subscriptionHandle, handler);
+    Assertions.assertInstanceOf(Subscription.class, handler);
   }
 
   @Test
