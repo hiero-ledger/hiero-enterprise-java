@@ -314,7 +314,7 @@ public class TopicClientTest {
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
-    Thread.sleep(5000); // Make sure to wait after message get recorded in mirrornode
+    Thread.sleep(20000); // Make sure to wait after message get recorded in mirrornode
 
     Assertions.assertNotNull(handler);
     Assertions.assertEquals(1, messages.size());
@@ -341,11 +341,11 @@ public class TopicClientTest {
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
-    Thread.sleep(5000); // Make sure to wait after message get recorded in mirrornode
+    Thread.sleep(20000); // Make sure to wait after message get recorded in mirrornode
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
-    Thread.sleep(5000); // Make sure to wait after message get recorded in mirrornode
+    Thread.sleep(20000); // Make sure to wait after message get recorded in mirrornode
 
     Assertions.assertNotNull(handler);
     Assertions.assertEquals(limit, messages.size());
