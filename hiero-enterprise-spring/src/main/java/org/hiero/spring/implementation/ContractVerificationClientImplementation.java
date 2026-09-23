@@ -2,15 +2,16 @@ package org.hiero.spring.implementation;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedera.hashgraph.sdk.ContractId;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.StreamSupport;
 import org.hiero.base.HieroException;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
@@ -23,14 +24,11 @@ import org.springframework.web.client.RestClient;
 
 public class ContractVerificationClientImplementation implements ContractVerificationClient {
 
-  private static final String CONTRACT_VERIFICATION_URL = "https://server-verify.hashscan.io";
+  private static final String CONTRACT_VERIFICATION_URL = "https://sourcify.dev/server";
+  private static final Duration POLL_INTERVAL = Duration.ofSeconds(1);
+  private static final Duration POLL_TIMEOUT = Duration.ofMinutes(5);
 
-  private record VerifyRequest(
-      String address,
-      String chain,
-      String creatorTxHash,
-      String chosenContract,
-      Map<String, String> files) {}
+  private record VerifyRequest(Map<String, String> sources, Map<String, Object> metadata) {}
 
   private final HieroConfig hieroConfig;
 
@@ -85,7 +83,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
   }
 
   @Override
-  public ContractVerificationState verify(
+  public @NonNull ContractVerificationState verify(
       @NonNull final ContractId contractId,
       @NonNull final String contractName,
       @NonNull final Map<String, String> files)
@@ -94,56 +92,49 @@ public class ContractVerificationClientImplementation implements ContractVerific
     Objects.requireNonNull(contractName, "contractName must not be null");
     Objects.requireNonNull(files, "files must not be null");
 
+    if (!files.containsKey("metadata.json")) {
+      throw new IllegalArgumentException("metadata.json must be present in files");
+    }
+
     final ContractVerificationState state = checkVerification(contractId);
+
     if (state != ContractVerificationState.NONE) {
       throw new IllegalStateException("Contract is already verified");
     }
 
-    final VerifyRequest verifyRequest =
-        new VerifyRequest(contractId.toSolidityAddress(), getChainId(), "", contractName, files);
     try {
+      final Map<String, String> sources = new HashMap<>(files);
+      final String metadataJson = sources.remove("metadata.json");
+
+      final Map<String, Object> metadata =
+          objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
+      final VerifyRequest verifyRequest = new VerifyRequest(sources, metadata);
+
+      final String uri =
+          CONTRACT_VERIFICATION_URL
+              + "/v2/verify/metadata/"
+              + getChainId()
+              + "/0x"
+              + contractId.toEvmAddress();
+
       final String resultBody =
           restClient
               .post()
-              .uri(CONTRACT_VERIFICATION_URL + "/verify")
+              .uri(uri)
               .contentType(APPLICATION_JSON)
               .accept(APPLICATION_JSON)
               .body(verifyRequest)
               .retrieve()
-              .onStatus(
-                  HttpStatusCode::is4xxClientError,
-                  (request, response) -> {
-                    handleError(request, response);
-                  })
+              .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
               .body(String.class);
+
       final JsonNode rootNode = objectMapper.readTree(resultBody);
-      final JsonNode resultNode = rootNode.get("result");
-      if (resultNode != null) {
-        if (resultNode.isArray()) {
-          final List<JsonNode> results =
-              StreamSupport.stream(resultNode.spliterator(), false).toList();
-          if (results.size() != 1) {
-            throw new RuntimeException("Expected exactly one result, got " + results.size());
-          }
-          final JsonNode result = results.get(0);
-          final JsonNode statusNode = result.get("status");
-          if (statusNode != null) {
-            if (statusNode.asText().equals("perfect")) {
-              return ContractVerificationState.FULL;
-            } else if (statusNode.asText().equals("false")) {
-              return ContractVerificationState.NONE;
-            } else {
-              throw new RuntimeException("Status is not success: " + statusNode.asText());
-            }
-          } else {
-            throw new RuntimeException("No status in response");
-          }
-        } else {
-          throw new RuntimeException("Result is not an array");
-        }
-      } else {
-        throw new RuntimeException("No result in response");
+      if (!rootNode.hasNonNull("verificationId")) {
+        throw new HieroException("Response does not contain verificationId");
       }
+
+      final String verificationId = rootNode.get("verificationId").asText();
+      return pollVerificationStatus(verificationId);
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
     }
@@ -156,53 +147,31 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
     final String uri =
         CONTRACT_VERIFICATION_URL
-            + "/check-by-addresses"
-            + "?addresses="
-            + contractId.toSolidityAddress()
-            + "&chainIds="
-            + getChainId();
+            + "/v2/contract/"
+            + getChainId()
+            + "/0x"
+            + contractId.toEvmAddress()
+            + "?fields=sources";
 
     try {
       final String resultBody =
           restClient
               .get()
               .uri(uri)
-              .accept(APPLICATION_JSON)
               .retrieve()
-              .onStatus(
-                  HttpStatusCode::is4xxClientError,
-                  (request, response) -> {
-                    handleError(request, response);
-                  })
-              .onStatus(
-                  HttpStatusCode::is5xxServerError,
-                  (request, response) -> {
-                    handleError(request, response);
-                  })
+              .onStatus(status -> status.value() == 404, (request, response) -> {})
+              .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
+              .onStatus(HttpStatusCode::is5xxServerError, this::handleError)
               .body(String.class);
 
-      final JsonNode rootNode = objectMapper.readTree(resultBody);
-      if (rootNode.isArray()) {
-        final List<JsonNode> results = StreamSupport.stream(rootNode.spliterator(), false).toList();
-        if (results.size() != 1) {
-          throw new RuntimeException("Expected exactly one result, got " + results.size());
-        }
-        final JsonNode result = results.get(0);
-        final JsonNode statusNode = result.get("status");
-        if (statusNode != null) {
-          if (statusNode.asText().equals("perfect")) {
-            return ContractVerificationState.FULL;
-          } else if (statusNode.asText().equals("false")) {
-            return ContractVerificationState.NONE;
-          } else {
-            throw new RuntimeException("Status is not success: " + statusNode.asText());
-          }
-        } else {
-          throw new RuntimeException("No status in response");
-        }
-      } else {
-        throw new RuntimeException("Result is not an array");
+      if (resultBody == null || resultBody.isBlank()) {
+        return ContractVerificationState.NONE;
       }
+
+      final JsonNode rootNode = objectMapper.readTree(resultBody);
+
+      final String matchStatus = rootNode.get("match").asText();
+      return resolveVerificationState(matchStatus);
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
     }
@@ -219,48 +188,91 @@ public class ContractVerificationClientImplementation implements ContractVerific
     Objects.requireNonNull(fileContent, "fileContent must not be null");
 
     final ContractVerificationState state = checkVerification(contractId);
-    if (state != ContractVerificationState.FULL) {
+    if (state != ContractVerificationState.FULL && state != ContractVerificationState.PARTIAL) {
       throw new IllegalStateException("Contract is not verified");
     }
 
     final String uri =
-        CONTRACT_VERIFICATION_URL + "/files/" + getChainId() + "/" + contractId.toSolidityAddress();
+        CONTRACT_VERIFICATION_URL
+            + "/v2/contract/"
+            + getChainId()
+            + "/0x"
+            + contractId.toEvmAddress()
+            + "?fields=sources";
 
     try {
       final String resultBody =
           restClient
               .get()
               .uri(uri)
-              .header("accept", "application/json")
+              .accept(APPLICATION_JSON)
               .retrieve()
-              .onStatus(
-                  HttpStatusCode::is4xxClientError,
-                  (request, response) -> {
-                    handleError(request, response);
-                  })
+              .onStatus(status -> status.value() == 404, (request, response) -> {})
+              .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
+              .onStatus(HttpStatusCode::is5xxServerError, this::handleError)
               .body(String.class);
 
-      final JsonNode rootNode = objectMapper.readTree(resultBody);
-      if (rootNode.isArray()) {
-        final List<JsonNode> results =
-            StreamSupport.stream(rootNode.spliterator(), false)
-                .filter(node -> node.get("name").asText().equals(fileName))
-                .toList();
-        if (results.size() != 1) {
-          throw new RuntimeException("Expected exactly one result, got " + results.size());
-        }
-        final JsonNode result = results.get(0);
-        final JsonNode contentNode = result.get("content");
-        if (contentNode != null) {
-          return contentNode.asText().equals(fileContent);
-        } else {
-          throw new RuntimeException("No content in response");
-        }
-      } else {
-        throw new RuntimeException("Result is not an array");
+      if (resultBody == null || resultBody.isBlank()) {
+        return false;
       }
+
+      final JsonNode rootNode = objectMapper.readTree(resultBody);
+      final JsonNode contentNode = rootNode.path("sources").path(fileName).path("content");
+
+      return !contentNode.isMissingNode() && fileContent.equals(contentNode.asText());
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
     }
+  }
+
+  private ContractVerificationState pollVerificationStatus(final @NonNull String verificationId) {
+    Objects.requireNonNull(verificationId, "verificationId must not be null");
+
+    final long deadline = System.nanoTime() + POLL_TIMEOUT.toNanos();
+    try {
+      final String uri = CONTRACT_VERIFICATION_URL + "/v2/verify/" + verificationId;
+
+      while (System.nanoTime() < deadline) {
+        final String status =
+            restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
+                .body(String.class);
+
+        final JsonNode rootNode = objectMapper.readTree(status);
+
+        if (!rootNode.get("isJobCompleted").asBoolean(false)) {
+          Thread.sleep(POLL_INTERVAL.toMillis());
+          continue;
+        }
+
+        if (!rootNode.get("contract").hasNonNull("match")) {
+          return ContractVerificationState.NONE;
+        }
+
+        final String matchStatus = rootNode.get("contract").get("match").asText(null);
+        return resolveVerificationState(matchStatus);
+      }
+
+      throw new HieroException(
+          "Timed out waiting for contract verification job: " + verificationId);
+    } catch (Exception e) {
+      throw new RuntimeException(
+          "Error checking contract verification status: " + verificationId, e);
+    }
+  }
+
+  private ContractVerificationState resolveVerificationState(final @NonNull String status) {
+    if (status.equals("exact_match")) {
+      return ContractVerificationState.FULL;
+    }
+
+    if (status.equals("match")) {
+      return ContractVerificationState.PARTIAL;
+    }
+
+    return ContractVerificationState.NONE;
   }
 }
