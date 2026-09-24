@@ -10,13 +10,18 @@ import java.util.stream.Stream;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
+import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.ExchangeRates;
 import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenAirdrop;
+import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
 import org.hiero.base.data.TopicMessage;
@@ -52,6 +57,146 @@ public class MirrorNodeJsonConverterTest {
   @MethodSource("emptyNodes")
   void shouldReturnEmptyAccountInfoOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toAccountInfo(node).isEmpty());
+  }
+
+  @Test
+  void shouldParseValidCryptoAllowance() {
+    final JsonNode node = loadJson("crypto-allowance.json");
+    final List<CryptoAllowance> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toCryptoAllowances(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyCryptoAllowance() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toCryptoAllowances(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenCryptoAllowanceIsNotArray() throws Exception {
+    // null value
+    JsonNode node1 = mapper.readTree("{\"allowances\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toCryptoAllowances(node1));
+
+    // not array
+    JsonNode node2 = mapper.readTree("{\"allowances\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toCryptoAllowances(node2));
+  }
+
+  @Test
+  void shouldParseValidTokenAllowance() {
+    final JsonNode node = loadJson("token-allowance.json");
+    final List<TokenAllowance> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toTokenAllowances(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyTokenAllowance() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toTokenAllowances(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenTokenAllowanceIsNotArray() throws Exception {
+    // null value
+    JsonNode node1 = mapper.readTree("{\"allowances\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTokenAllowances(node1));
+
+    // not array
+    JsonNode node2 = mapper.readTree("{\"allowances\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTokenAllowances(node2));
+  }
+
+  @Test
+  void shouldParseValidNftAllowance() {
+    final JsonNode node = loadJson("nft-allowance.json");
+    final List<NftAllowance> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toNftAllowances(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyNftAllowance() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toNftAllowances(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenNftAllowanceIsNotArray() throws Exception {
+    // null value
+    JsonNode node1 = mapper.readTree("{\"allowances\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNftAllowances(node1));
+
+    // not array
+    JsonNode node2 = mapper.readTree("{\"allowances\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNftAllowances(node2));
+  }
+
+  @Test
+  void shouldParseValidRewards() {
+    final JsonNode node = loadJson("staking-rewards.json");
+    final List<StakingReward> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toStakingRewards(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyRewards() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toStakingRewards(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenRewardsIsNotArray() throws Exception {
+    // null value
+    JsonNode node1 = mapper.readTree("{\"rewards\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toStakingRewards(node1));
+
+    // not array
+    JsonNode node2 = mapper.readTree("{\"rewards\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toStakingRewards(node2));
+  }
+
+  @Test
+  void shouldParseValidTokenAirdrop() {
+    final JsonNode node = loadJson("token-airdrop.json");
+    final List<TokenAirdrop> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toTokenAirdrops(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyTokenAirdrop() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toTokenAirdrops(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenAirdropIsNotArray() throws Exception {
+    // null value
+    JsonNode node1 = mapper.readTree("{\"airdrops\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTokenAirdrops(node1));
+
+    // not array
+    JsonNode node2 = mapper.readTree("{\"airdrops\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toTokenAirdrops(node2));
   }
 
   // Blocks
