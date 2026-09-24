@@ -86,8 +86,10 @@ public class ClientProvider {
   @ApplicationScoped
   SmartContractClient createSmartContractClient(
       @NonNull final ProtocolLayerClient protocolLayerClient,
-      @NonNull final FileClient fileClient) {
-    return new SmartContractClientImpl(protocolLayerClient, fileClient);
+      @NonNull final FileClient fileClient,
+      @NonNull final HieroContext hieroContext) {
+    return new SmartContractClientImpl(
+        protocolLayerClient, fileClient, hieroContext.getOperatorAccount());
   }
 
   @NonNull
