@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, updating NFT metadata and types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, canceling pending NFT airdrops, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -82,6 +82,12 @@
 | `airdropNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Airdrops multiple NFTs to a single receiver using an account object as sender. |
 | `airdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)` | Airdrops NFTs to one or more receivers (serial → account map). |
 | `airdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, Account fromAccount)` | Airdrops NFTs to one or more receivers using an account object as sender. |
+| `cancelAirdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Cancels a pending NFT airdrop. The sender must sign. |
+| `cancelAirdropNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Cancels a pending NFT airdrop using an account object as sender. |
+| `cancelAirdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Cancels pending NFT airdrops to a single receiver. |
+| `cancelAirdropNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Cancels pending NFT airdrops to a single receiver using an account object as sender. |
+| `cancelAirdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)` | Cancels pending NFT airdrops (serial → receiver map). |
+| `cancelAirdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, Account fromAccount)` | Cancels pending NFT airdrops using an account object as sender. |
 | `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
@@ -474,6 +480,50 @@ AccountId bob = AccountId.fromString("0.0.1003");
 Map<Long, AccountId> serialNumberToAccountId = Map.of(1L, alice, 2L, bob);
 
 nftClient.airdropNfts(
+    tokenId,
+    serialNumberToAccountId,
+    sender,
+    PrivateKey.generateED25519()
+);
+```
+
+---
+
+## Cancel Airdrop NFT
+
+Cancels one or more pending NFT airdrops using `TokenCancelAirdropTransaction`. Each cancellation is identified by the NFT type, serial number, sender (the account that initiated the airdrop), and receiver (the account that was to receive the NFT). The sender must sign the transaction. Hedera limits a single cancel transaction to at most 10 pending airdrop IDs (see [Cancel a token](https://docs.hedera.com/native/tokens/cancel)).
+
+```java title="cancelAirdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)"
+AccountId sender = AccountId.fromString("0.0.1001");
+AccountId receiver = AccountId.fromString("0.0.1002");
+
+nftClient.cancelAirdropNft(
+    tokenId,
+    1L,
+    sender,
+    PrivateKey.generateED25519(),
+    receiver
+);
+```
+
+```java title="cancelAirdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)"
+List<Long> serialNumbers = List.of(1L, 2L);
+
+nftClient.cancelAirdropNfts(
+    tokenId,
+    serialNumbers,
+    sender,
+    PrivateKey.generateED25519(),
+    receiver
+);
+```
+
+```java title="cancelAirdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)"
+AccountId alice = AccountId.fromString("0.0.1002");
+AccountId bob = AccountId.fromString("0.0.1003");
+Map<Long, AccountId> serialNumberToAccountId = Map.of(1L, alice, 2L, bob);
+
+nftClient.cancelAirdropNfts(
     tokenId,
     serialNumberToAccountId,
     sender,
