@@ -71,6 +71,7 @@ import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
+import org.hiero.base.protocol.data.TokenCancelAirdropRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
@@ -1774,6 +1775,72 @@ public class ProtocolLayerDataCreationTests {
                 transactionValidDuration,
                 tokenId,
                 IntStream.rangeClosed(1, 21)
+                    .boxed()
+                    .collect(
+                        java.util.stream.Collectors.toMap(
+                            i -> (long) i, i -> receiver, (a, b) -> a, LinkedHashMap::new)),
+                sender,
+                senderKey));
+  }
+
+  @Test
+  void testTokenCancelAirdropRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.1234");
+    final List<Long> serials = List.of(1L, 2L);
+    final AccountId sender = AccountId.fromString("0.0.5678");
+    final AccountId receiver = AccountId.fromString("0.0.9876");
+    final AccountId receiver2 = AccountId.fromString("0.0.9877");
+    final PrivateKey senderKey = PrivateKey.generateECDSA();
+    final Map<Long, AccountId> serialToReceiver = Map.of(1L, receiver, 2L, receiver2);
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenCancelAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                serialToReceiver,
+                sender,
+                senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenCancelAirdropRequest.of(tokenId, 1L, sender, receiver, senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenCancelAirdropRequest.of(tokenId, serials, sender, receiver, senderKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenCancelAirdropRequest.of(tokenId, serialToReceiver, sender, senderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenCancelAirdropRequest(
+                null, transactionValidDuration, tokenId, serialToReceiver, sender, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenCancelAirdropRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, Map.of(), sender, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenCancelAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                Map.of(-1L, receiver),
+                sender,
+                senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenCancelAirdropRequest.of(tokenId, List.of(), sender, receiver, senderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TokenCancelAirdropRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                IntStream.rangeClosed(1, 11)
                     .boxed()
                     .collect(
                         java.util.stream.Collectors.toMap(
