@@ -157,12 +157,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
     Objects.requireNonNull(contractId, "contractId must not be null");
 
     final String uri =
-        CONTRACT_VERIFICATION_URL
-            + "/contract/"
-            + getChainId()
-            + "/0x"
-            + contractId.toEvmAddress()
-            + "?fields=sources";
+        CONTRACT_VERIFICATION_URL + "/contract/" + getChainId() + "/0x" + contractId.toEvmAddress();
 
     try {
       final String resultBody =
@@ -181,7 +176,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
       }
 
       final JsonNode rootNode = objectMapper.readTree(resultBody);
-
       final String matchStatus = rootNode.get("match").asText(null);
       return resolveVerificationState(matchStatus);
     } catch (Exception e) {
@@ -198,11 +192,6 @@ public class ContractVerificationClientImplementation implements ContractVerific
     Objects.requireNonNull(contractId, "contractId must not be null");
     Objects.requireNonNull(fileName, "fileName must not be null");
     Objects.requireNonNull(fileContent, "fileContent must not be null");
-
-    final ContractVerificationState state = checkVerification(contractId);
-    if (state != ContractVerificationState.FULL && state != ContractVerificationState.PARTIAL) {
-      throw new IllegalStateException("Contract is not verified");
-    }
 
     final String uri =
         CONTRACT_VERIFICATION_URL
@@ -229,7 +218,15 @@ public class ContractVerificationClientImplementation implements ContractVerific
       }
 
       final JsonNode rootNode = objectMapper.readTree(resultBody);
-      final JsonNode contentNode = rootNode.path("sources").path(fileName).path("content");
+
+      final ContractVerificationState state =
+          resolveVerificationState(rootNode.get("match").asText(null));
+      if (state != ContractVerificationState.FULL && state != ContractVerificationState.PARTIAL) {
+        throw new IllegalStateException("Contract is not verified");
+      }
+
+      final JsonNode contentNode =
+          rootNode.path("sources").path("contracts/" + fileName).path("content");
 
       return !contentNode.isMissingNode() && fileContent.equals(contentNode.asText());
     } catch (Exception e) {

@@ -105,6 +105,10 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       }
 
       final String resultBody = response.readEntity(String.class);
+      if (resultBody == null || resultBody.isBlank()) {
+        throw new HieroException("Error verifying contract");
+      }
+
       final JsonObject root = parseJsonObject(resultBody);
 
       final String verificationId = root.getString("verificationId", null);
@@ -125,15 +129,9 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
     Objects.requireNonNull(contractId, "contractId must not be null");
 
     final String uri =
-        CONTRACT_VERIFICATION_URL
-            + "/contract/"
-            + getChainId()
-            + "/0x"
-            + contractId.toEvmAddress()
-            + "?fields=sources";
+        CONTRACT_VERIFICATION_URL + "/contract/" + getChainId() + "/0x" + contractId.toEvmAddress();
 
     try (Response response = webClient.target(uri).request(MediaType.APPLICATION_JSON).get()) {
-
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
         return ContractVerificationState.NONE;
       }
@@ -143,7 +141,6 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       }
 
       final String resultBody = response.readEntity(String.class);
-
       if (resultBody == null || resultBody.isBlank()) {
         return ContractVerificationState.NONE;
       }
@@ -163,12 +160,6 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
     Objects.requireNonNull(fileName, "fileName must not be null");
     Objects.requireNonNull(fileContent, "fileContent must not be null");
 
-    final ContractVerificationState state = checkVerification(contractId);
-
-    if (state != ContractVerificationState.FULL && state != ContractVerificationState.PARTIAL) {
-      throw new IllegalStateException("Contract is not verified");
-    }
-
     final String uri =
         CONTRACT_VERIFICATION_URL
             + "/contract/"
@@ -178,7 +169,6 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
             + "?fields=sources";
 
     try (Response response = webClient.target(uri).request(MediaType.APPLICATION_JSON).get()) {
-
       if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
         return false;
       }
@@ -188,18 +178,24 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       }
 
       final String resultBody = response.readEntity(String.class);
-
       if (resultBody == null || resultBody.isBlank()) {
         return false;
       }
 
       final JsonObject root = parseJsonObject(resultBody);
+
+      final ContractVerificationState state =
+          resolveVerificationState(root.getString("match", null));
+      if (state != ContractVerificationState.FULL && state != ContractVerificationState.PARTIAL) {
+        throw new IllegalStateException("Contract is not verified");
+      }
+
       final JsonObject sources = root.getJsonObject("sources");
       if (sources == null) {
         return false;
       }
 
-      final JsonObject source = sources.getJsonObject(fileName);
+      final JsonObject source = sources.getJsonObject("contracts/" + fileName);
       if (source == null) {
         return false;
       }
