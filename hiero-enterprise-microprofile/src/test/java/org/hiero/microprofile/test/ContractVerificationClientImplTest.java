@@ -54,7 +54,11 @@ public class ContractVerificationClientImplTest {
     // when
     final ContractVerificationState state =
         verificationClient.verify(contractId, contractName, contractSource, contractMetadata);
+
+    verificationClient.checkVerification(contractId);
+    var test = verificationClient.checkVerification(contractId, "HelloWorld.sol", contractSource);
     // then
+    Assertions.assertTrue(test);
     Assertions.assertEquals(ContractVerificationState.FULL, state);
   }
 }
