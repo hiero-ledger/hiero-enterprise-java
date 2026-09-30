@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, canceling pending NFT airdrops, updating NFT metadata and types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, canceling pending NFT airdrops, rejecting unwanted NFTs, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -88,6 +88,10 @@
 | `cancelAirdropNfts(TokenId tokenId, List<Long> serialNumbers, Account fromAccount, AccountId toAccountId)` | Cancels pending NFT airdrops to a single receiver using an account object as sender. |
 | `cancelAirdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)` | Cancels pending NFT airdrops (serial → receiver map). |
 | `cancelAirdropNfts(TokenId tokenId, Map<Long, AccountId> serialNumberToAccountId, Account fromAccount)` | Cancels pending NFT airdrops using an account object as sender. |
+| `rejectNft(TokenId tokenId, long serialNumber, AccountId ownerAccountId, PrivateKey ownerAccountKey)` | Rejects an NFT (e.g. an unwanted airdrop) and returns it to the treasury. |
+| `rejectNft(TokenId tokenId, long serialNumber, Account ownerAccount)` | Rejects an NFT using an account object as owner. |
+| `rejectNfts(TokenId tokenId, List<Long> serialNumbers, AccountId ownerAccountId, PrivateKey ownerAccountKey)` | Rejects up to 10 NFTs and returns them to the treasury. |
+| `rejectNfts(TokenId tokenId, List<Long> serialNumbers, Account ownerAccount)` | Rejects up to 10 NFTs using an account object as owner. |
 | `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
@@ -529,6 +533,30 @@ nftClient.cancelAirdropNfts(
     sender,
     PrivateKey.generateED25519()
 );
+```
+
+---
+
+## Reject NFT
+
+Rejects one or more NFTs held by an account, for example unwanted airdrops, using `TokenRejectTransaction`. Rejected NFTs are returned to the treasury of the NFT type without charging custom fees. Rejection does not dissociate the account from the NFT type, and it fails if the NFT type is paused or the account is frozen for it. Hedera limits a single reject transaction to at most 10 rejections (see [Reject a token](https://docs.hedera.com/native/tokens/reject-airdrop)).
+
+```java title="rejectNft(TokenId tokenId, long serialNumber, AccountId ownerAccountId, PrivateKey ownerAccountKey)"
+AccountId owner = AccountId.fromString("0.0.1002");
+
+nftClient.rejectNft(
+    tokenId,
+    1L,
+    owner,
+    PrivateKey.generateED25519()
+);
+```
+
+```java title="rejectNfts(TokenId tokenId, List<Long> serialNumbers, Account ownerAccount)"
+Account owner = accountClient.createAccount();
+List<Long> serialNumbers = List.of(1L, 2L);
+
+nftClient.rejectNfts(tokenId, serialNumbers, owner);
 ```
 
 ---

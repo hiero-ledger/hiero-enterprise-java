@@ -37,6 +37,8 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRejectRequest;
+import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
@@ -68,6 +70,8 @@ public class NftClientImplTest {
       ArgumentCaptor.forClass(TokenAirdropRequest.class);
   ArgumentCaptor<TokenCancelAirdropRequest> tokenCancelAirdropCaptor =
       ArgumentCaptor.forClass(TokenCancelAirdropRequest.class);
+  ArgumentCaptor<TokenRejectRequest> tokenRejectCaptor =
+      ArgumentCaptor.forClass(TokenRejectRequest.class);
   ArgumentCaptor<TokenBurnRequest> tokenBurnCaptor =
       ArgumentCaptor.forClass(TokenBurnRequest.class);
   ArgumentCaptor<TokenWipeRequest> tokenWipeCaptor =
@@ -775,6 +779,131 @@ public class NftClientImplTest {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> nftClientImpl.cancelAirdropNfts(null, (Map<Long, AccountId>) null, null, null));
+  }
+
+  @Test
+  void testRejectNft() throws HieroException {
+    final TokenRejectResult tokenRejectResult = Mockito.mock(TokenRejectResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final long serialNumber = 1L;
+    final AccountId ownerAccount = AccountId.fromString("4.5.6");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+
+    when(protocolLayerClient.executeTokenRejectTransaction(any(TokenRejectRequest.class)))
+        .thenReturn(tokenRejectResult);
+    nftClientImpl.rejectNft(tokenId, serialNumber, ownerAccount, ownerAccountKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenRejectTransaction(tokenRejectCaptor.capture());
+
+    final TokenRejectRequest request = tokenRejectCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(List.of(serialNumber), request.serials());
+    Assertions.assertEquals(ownerAccount, request.owner());
+    Assertions.assertEquals(ownerAccountKey, request.ownerKey());
+  }
+
+  @Test
+  void testRejectNftWithAccount() throws HieroException {
+    final TokenRejectResult tokenRejectResult = Mockito.mock(TokenRejectResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final long serialNumber = 1L;
+    final AccountId ownerAccountId = AccountId.fromString("4.5.6");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+    final Account ownerAccount =
+        new Account(ownerAccountId, ownerAccountKey.getPublicKey(), ownerAccountKey);
+
+    when(protocolLayerClient.executeTokenRejectTransaction(any(TokenRejectRequest.class)))
+        .thenReturn(tokenRejectResult);
+    nftClientImpl.rejectNft(tokenId, serialNumber, ownerAccount);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenRejectTransaction(tokenRejectCaptor.capture());
+
+    final TokenRejectRequest request = tokenRejectCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(List.of(serialNumber), request.serials());
+    Assertions.assertEquals(ownerAccountId, request.owner());
+    Assertions.assertEquals(ownerAccountKey, request.ownerKey());
+  }
+
+  @Test
+  void testRejectNfts() throws HieroException {
+    final TokenRejectResult tokenRejectResult = Mockito.mock(TokenRejectResult.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<Long> serialNumbers = List.of(1L, 2L);
+    final AccountId ownerAccount = AccountId.fromString("4.5.6");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+
+    when(protocolLayerClient.executeTokenRejectTransaction(any(TokenRejectRequest.class)))
+        .thenReturn(tokenRejectResult);
+    nftClientImpl.rejectNfts(tokenId, serialNumbers, ownerAccount, ownerAccountKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenRejectTransaction(tokenRejectCaptor.capture());
+
+    final TokenRejectRequest request = tokenRejectCaptor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(serialNumbers, request.serials());
+    Assertions.assertEquals(ownerAccount, request.owner());
+    Assertions.assertEquals(ownerAccountKey, request.ownerKey());
+  }
+
+  @Test
+  void testRejectNftThrowsExceptionForInvalidTokenId() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId ownerAccount = AccountId.fromString("4.5.6");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+
+    when(protocolLayerClient.executeTokenRejectTransaction(any(TokenRejectRequest.class)))
+        .thenThrow(new HieroException("Failed to execute token reject transaction"));
+
+    Assertions.assertThrows(
+        HieroException.class,
+        () -> nftClientImpl.rejectNft(tokenId, 1L, ownerAccount, ownerAccountKey));
+  }
+
+  @Test
+  void testRejectNftThrowsExceptionForInvalidSerial() {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId ownerAccount = AccountId.fromString("4.5.6");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+
+    IllegalArgumentException e1 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> nftClientImpl.rejectNft(tokenId, -1L, ownerAccount, ownerAccountKey));
+    Assertions.assertEquals("serial must be positive", e1.getMessage());
+
+    IllegalArgumentException e2 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> nftClientImpl.rejectNfts(tokenId, List.of(), ownerAccount, ownerAccountKey));
+    Assertions.assertEquals("serials must not be empty", e2.getMessage());
+
+    IllegalArgumentException e3 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                nftClientImpl.rejectNfts(tokenId, List.of(1L, 1L), ownerAccount, ownerAccountKey));
+    Assertions.assertEquals("serials must not contain duplicates", e3.getMessage());
+  }
+
+  @Test
+  void testRejectNftNullParams() {
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.rejectNft(null, 1L, (AccountId) null, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.rejectNft(null, 1L, (Account) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.rejectNfts(null, null, (AccountId) null, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClientImpl.rejectNfts(null, null, (Account) null));
   }
 
   @Test

@@ -22,11 +22,13 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import org.hiero.base.data.Account;
 import org.hiero.base.data.ContractParam;
 import org.hiero.base.protocol.data.AccountBalanceRequest;
@@ -84,6 +86,8 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRejectRequest;
+import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
@@ -1238,6 +1242,17 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testTokenRejectResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new TokenRejectResult(transactionId, status));
+    Assertions.assertThrows(NullPointerException.class, () -> new TokenRejectResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenRejectResult(transactionId, null));
+  }
+
+  @Test
   public void testHbarTransferResultCreation() {
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
     final Status status = Status.SUCCESS;
@@ -1847,6 +1862,80 @@ public class ProtocolLayerDataCreationTests {
                             i -> (long) i, i -> receiver, (a, b) -> a, LinkedHashMap::new)),
                 sender,
                 senderKey));
+  }
+
+  @Test
+  void testTokenRejectRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.1234");
+    final List<Long> serials = List.of(1L, 2L);
+    final AccountId owner = AccountId.fromString("0.0.5678");
+    final PrivateKey ownerKey = PrivateKey.generateECDSA();
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenRejectRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, serials, owner, ownerKey));
+    Assertions.assertDoesNotThrow(() -> TokenRejectRequest.of(tokenId, 1L, owner, ownerKey));
+    Assertions.assertDoesNotThrow(() -> TokenRejectRequest.of(tokenId, serials, owner, ownerKey));
+    Assertions.assertDoesNotThrow(
+        () ->
+            TokenRejectRequest.of(
+                tokenId, LongStream.rangeClosed(1, 10).boxed().toList(), owner, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenRejectRequest(
+                null, transactionValidDuration, tokenId, serials, owner, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> new TokenRejectRequest(maxTransactionFee, null, tokenId, serials, owner, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenRejectRequest(
+                maxTransactionFee, transactionValidDuration, null, serials, owner, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenRejectRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, owner, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenRejectRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, serials, null, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenRejectRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, serials, owner, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenRejectRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                Arrays.asList(1L, null),
+                owner,
+                ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenRejectRequest.of(tokenId, List.of(), owner, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> TokenRejectRequest.of(tokenId, 0L, owner, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> TokenRejectRequest.of(tokenId, -1L, owner, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenRejectRequest.of(tokenId, List.of(1L, 1L), owner, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            TokenRejectRequest.of(
+                tokenId, LongStream.rangeClosed(1, 11).boxed().toList(), owner, ownerKey));
   }
 
   @Test

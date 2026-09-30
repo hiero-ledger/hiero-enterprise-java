@@ -27,6 +27,7 @@ import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRejectRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
@@ -465,6 +466,32 @@ public class NftClientImpl implements NftClient {
         TokenCancelAirdropRequest.of(
             tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
     client.executeTokenCancelAirdropTransaction(request);
+  }
+
+  @Override
+  public void rejectNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey)
+      throws HieroException {
+    rejectNfts(tokenId, List.of(serialNumber), ownerAccountId, ownerAccountKey);
+  }
+
+  @Override
+  public void rejectNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
+    final TokenRejectRequest request =
+        TokenRejectRequest.of(tokenId, serialNumbers, ownerAccountId, ownerAccountKey);
+    client.executeTokenRejectTransaction(request);
   }
 
   @Override

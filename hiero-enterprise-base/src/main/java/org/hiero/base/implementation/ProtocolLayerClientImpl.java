@@ -39,6 +39,7 @@ import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
 import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenRejectTransaction;
 import com.hedera.hashgraph.sdk.TokenRevokeKycTransaction;
 import com.hedera.hashgraph.sdk.TokenUnfreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateNftsTransaction;
@@ -123,6 +124,8 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRejectRequest;
+import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
@@ -975,6 +978,26 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenCancelAirdropResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute token cancel airdrop transaction", e);
+    }
+  }
+
+  @Override
+  public TokenRejectResult executeTokenRejectTransaction(@NonNull final TokenRejectRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenRejectTransaction transaction =
+          new TokenRejectTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setOwnerId(request.owner())
+              .setNftIds(request.serials().stream().map(request.tokenId()::nft).toList());
+      sign(transaction, request.ownerKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_REJECT);
+      return new TokenRejectResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token reject transaction", e);
     }
   }
 
