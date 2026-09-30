@@ -24,6 +24,7 @@ import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.HookStoreTransaction;
 import com.hedera.hashgraph.sdk.NftId;
+import com.hedera.hashgraph.sdk.PendingAirdropId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.Query;
@@ -31,6 +32,7 @@ import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TokenAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenBurnTransaction;
+import com.hedera.hashgraph.sdk.TokenCancelAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
@@ -107,6 +109,8 @@ import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
+import org.hiero.base.protocol.data.TokenCancelAirdropRequest;
+import org.hiero.base.protocol.data.TokenCancelAirdropResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
@@ -946,6 +950,31 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenAirdropResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute token airdrop transaction", e);
+    }
+  }
+
+  @Override
+  public TokenCancelAirdropResult executeTokenCancelAirdropTransaction(
+      @NonNull final TokenCancelAirdropRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenCancelAirdropTransaction transaction =
+          new TokenCancelAirdropTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+      request
+          .serialToReceiver()
+          .forEach(
+              (serial, receiver) ->
+                  transaction.addPendingAirdrop(
+                      new PendingAirdropId(
+                          request.sender(), receiver, request.tokenId().nft(serial))));
+      sign(transaction, request.senderKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CANCEL_AIRDROP);
+      return new TokenCancelAirdropResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token cancel airdrop transaction", e);
     }
   }
 

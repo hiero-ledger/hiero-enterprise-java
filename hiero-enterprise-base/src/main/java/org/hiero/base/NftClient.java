@@ -1243,6 +1243,118 @@ public interface NftClient {
   }
 
   /**
+   * Cancels a pending NFT airdrop. The sender of the pending airdrop must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the pending NFT airdrop
+   * @param fromAccountId the ID of the account that airdropped the NFT (sender)
+   * @param fromAccountKey the private key of the sender account
+   * @param toAccountId the ID of the account that was to receive the NFT (receiver)
+   * @throws HieroException if the pending airdrop could not be canceled
+   */
+  void cancelAirdropNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey,
+      @NonNull AccountId toAccountId)
+      throws HieroException;
+
+  /**
+   * Cancels a pending NFT airdrop. The sender of the pending airdrop must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the pending NFT airdrop
+   * @param fromAccount the account that airdropped the NFT (sender)
+   * @param toAccountId the ID of the account that was to receive the NFT (receiver)
+   * @throws HieroException if the pending airdrop could not be canceled
+   */
+  default void cancelAirdropNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull Account fromAccount,
+      @NonNull AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    cancelAirdropNft(
+        tokenId, serialNumber, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+  }
+
+  /**
+   * Cancels pending NFT airdrops to a single receiver. The sender must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the pending NFT airdrops
+   * @param fromAccountId the ID of the account that airdropped the NFTs (sender)
+   * @param fromAccountKey the private key of the sender account
+   * @param toAccountId the ID of the account that was to receive the NFTs (receiver)
+   * @throws HieroException if the pending airdrops could not be canceled
+   */
+  void cancelAirdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey,
+      @NonNull AccountId toAccountId)
+      throws HieroException;
+
+  /**
+   * Cancels pending NFT airdrops to a single receiver. The sender must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the pending NFT airdrops
+   * @param fromAccount the account that airdropped the NFTs (sender)
+   * @param toAccountId the ID of the account that was to receive the NFTs (receiver)
+   * @throws HieroException if the pending airdrops could not be canceled
+   */
+  default void cancelAirdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull Account fromAccount,
+      @NonNull AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    cancelAirdropNfts(
+        tokenId, serialNumbers, fromAccount.accountId(), fromAccount.privateKey(), toAccountId);
+  }
+
+  /**
+   * Cancels pending NFT airdrops to one or more receivers. Each map entry identifies a pending
+   * airdrop by serial and the intended receiver. The sender must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumberToAccountId map of NFT serial number to receiving account ID
+   * @param fromAccountId the ID of the account that airdropped the NFTs (sender)
+   * @param fromAccountKey the private key of the sender account
+   * @throws HieroException if the pending airdrops could not be canceled
+   */
+  void cancelAirdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull AccountId fromAccountId,
+      @NonNull PrivateKey fromAccountKey)
+      throws HieroException;
+
+  /**
+   * Cancels pending NFT airdrops to one or more receivers. Each map entry identifies a pending
+   * airdrop by serial and the intended receiver. The sender must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumberToAccountId map of NFT serial number to receiving account ID
+   * @param fromAccount the account that airdropped the NFTs (sender)
+   * @throws HieroException if the pending airdrops could not be canceled
+   */
+  default void cancelAirdropNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull Account fromAccount)
+      throws HieroException {
+    Objects.requireNonNull(fromAccount, "fromAccount must not be null");
+    cancelAirdropNfts(
+        tokenId, serialNumberToAccountId, fromAccount.accountId(), fromAccount.privateKey());
+  }
+
+  /**
    * Updates an NFT type (token class) name and symbol. The operator account key is used as the
    * admin key. The NFT type must have been created with that key as admin (the default for {@link
    * #createNftType} when the operator is the treasury).

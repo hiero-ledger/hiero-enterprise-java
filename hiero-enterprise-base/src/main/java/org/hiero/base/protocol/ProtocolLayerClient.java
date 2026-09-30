@@ -46,6 +46,8 @@ import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenAssociateResult;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
+import org.hiero.base.protocol.data.TokenCancelAirdropRequest;
+import org.hiero.base.protocol.data.TokenCancelAirdropResult;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
@@ -388,6 +390,17 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenAirdropResult executeTokenAirdropTransaction(
       @NonNull final TokenAirdropRequest request) throws HieroException;
+
+  /**
+   * Executes a token cancel airdrop transaction for pending NFT airdrops. The sender of each
+   * pending airdrop must sign the transaction.
+   *
+   * @param request the request containing the pending NFT airdrops to cancel
+   * @return the result of the token cancel airdrop transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenCancelAirdropResult executeTokenCancelAirdropTransaction(
+      @NonNull final TokenCancelAirdropRequest request) throws HieroException;
 
   /**
    * Executes an HBAR transfer transaction.

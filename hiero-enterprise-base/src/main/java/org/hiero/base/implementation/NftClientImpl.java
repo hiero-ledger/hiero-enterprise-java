@@ -18,6 +18,7 @@ import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
 import org.hiero.base.protocol.data.TokenBurnResult;
+import org.hiero.base.protocol.data.TokenCancelAirdropRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
@@ -416,6 +417,54 @@ public class NftClientImpl implements NftClient {
     final TokenAirdropRequest request =
         TokenAirdropRequest.of(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
     client.executeTokenAirdropTransaction(request);
+  }
+
+  @Override
+  public void cancelAirdropNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    cancelAirdropNfts(tokenId, List.of(serialNumber), fromAccountId, fromAccountKey, toAccountId);
+  }
+
+  @Override
+  public void cancelAirdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    if (serialNumbers.isEmpty()) {
+      throw new IllegalArgumentException("serials must not be empty");
+    }
+    final Map<Long, AccountId> serialNumberToAccountId = new LinkedHashMap<>();
+    for (final Long serialNumber : serialNumbers) {
+      serialNumberToAccountId.put(serialNumber, toAccountId);
+    }
+    cancelAirdropNfts(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+  }
+
+  @Override
+  public void cancelAirdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumberToAccountId, "serialNumberToAccountId must not be null");
+    Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+    Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+    final TokenCancelAirdropRequest request =
+        TokenCancelAirdropRequest.of(
+            tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+    client.executeTokenCancelAirdropTransaction(request);
   }
 
   @Override
