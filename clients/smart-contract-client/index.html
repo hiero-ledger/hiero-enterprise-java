@@ -880,6 +880,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#delete-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Delete Contract
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#call-contract-function" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1508,6 +1519,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#delete-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Delete Contract
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#call-contract-function" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1715,6 +1737,38 @@ The configured operator account is used as the transaction payer and must have s
 <td style="text-align: left;">Creates a smart contract using a bytecode file path with a custom maximum transaction fee and gas limit.</td>
 </tr>
 <tr>
+<td style="text-align: left;"><code>createContract(String fileId, String adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using bytecode stored in a file ID string and sets the specified private key as the contract admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(FileId fileId, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using an existing bytecode file and sets the specified private key as the contract admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(byte[] contents, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using bytecode contents and sets the specified private key as the contract admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(Path pathToBin, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using a bytecode file path and sets the specified private key as the contract admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(String fileId, Hbar maxTransactionFee, int gas, String adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using bytecode stored in a file ID string with a custom maximum transaction fee, gas limit, and admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(FileId fileId, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using an existing bytecode file with a custom maximum transaction fee, gas limit, and admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(byte[] contents, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using bytecode contents with a custom maximum transaction fee, gas limit, and admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createContract(Path pathToBin, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</code></td>
+<td style="text-align: left;">Creates a smart contract using a bytecode file path with a custom maximum transaction fee, gas limit, and admin key.</td>
+</tr>
+<tr>
 <td style="text-align: left;"><code>callContractFunction(String contractId, String functionName, ContractParam&lt;?&gt;... params)</code></td>
 <td style="text-align: left;">Executes a contract function using a contract ID string.</td>
 </tr>
@@ -1731,11 +1785,24 @@ The configured operator account is used as the transaction payer and must have s
 <td style="text-align: left;">Executes a smart contract function using a contract ID with a custom maximum transaction fee and gas limit.</td>
 </tr>
 <tr>
-<td style="text-align: left;">---</td>
-<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>deleteContract(String contractId, String adminKey)</code></td>
+<td style="text-align: left;">Marks the specified smart contract as deleted using the specified DER-encoded private key as the admin key. The remaining balance is transfer to operator account.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteContract(ContractId contractId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Marks the specified smart contract as deleted using the specified private key as the admin key. The remaining balance is transfer to operator account.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteContract(ContractId contractId, ContractId toContractId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Marks the specified smart contract as deleted using the specified private key as the admin key and transfers its remaining balance to another contract.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>deleteContract(ContractId contractId, AccountId toAccountId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Marks the specified smart contract as deleted using the specified private key as the admin key and transfers its remaining balance to an account.</td>
 </tr>
 </tbody>
 </table>
+<hr />
 <h2 id="create-contract">Create Contract<a class="headerlink" href="#create-contract" title="Permanent link">&para;</a></h2>
 <p>Deploys a smart contract to the Hiero network.</p>
 <div class="language-java highlight"><span class="filename">createContract(FileId fileId, ContractParam&lt;?&gt;... constructorParams)</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span>
@@ -1783,18 +1850,91 @@ The configured operator account is used as the transaction payer and must have s
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>A contract can be deployed with an admin key by using the <code>createContract</code> overloads that accept a <code>PrivateKey</code>. The admin key can be used to authorize administrative operations on the contract, for deleting the contract.</p>
+</div>
+<div class="language-java highlight"><span class="filename">createContract(FileId fileId, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">fromStringDER</span><span class="p">(</span><span class="s">&quot;...&quot;</span><span class="p">);</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">createContract</span><span class="p">(</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="n">fileId</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">        </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">createContract(FileId fileId, Hbar maxTransactionFee, int gas, PrivateKey adminKey, ContractParam&lt;?&gt;... constructorParams)</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">FileId</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">FileId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">fromStringDER</span><span class="p">(</span><span class="s">&quot;...&quot;</span><span class="p">);</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">createContract</span><span class="p">(</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="n">fileId</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">        </span><span class="mi">10_000_000</span><span class="p">,</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">        </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="delete-contract">Delete Contract<a class="headerlink" href="#delete-contract" title="Permanent link">&para;</a></h2>
+<p>Marks a smart contract as deleted on the Hiero network.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Deleting a smart contract marks the contract as deleted, but does not remove its bytecode
+from the network. </p>
+<p>Subsequent function calls to the deleted contract may complete without
+an error, but will not return any data produced by the called function.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The remaining balance of the deleted contract can optionally be transferred to another contract or account.</p>
+</div>
+<div class="language-java highlight"><span class="filename">deleteContract(ContractId contractId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">fromStringDER</span><span class="p">(</span><span class="s">&quot;...&quot;</span><span class="p">);</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">smartContractClient</span><span class="p">.</span><span class="na">deleteContract</span><span class="p">(</span><span class="n">contractId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">deleteContract(ContractId contractId, ContractId toContractId)</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">toContractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">fromStringDER</span><span class="p">(</span><span class="s">&quot;...&quot;</span><span class="p">);</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">smartContractClient</span><span class="p">.</span><span class="na">deleteContract</span><span class="p">(</span><span class="n">contractId</span><span class="p">,</span><span class="w"> </span><span class="n">toContractId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">deleteContract(ContractId contractId, AccountId toAccountId)</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">toAccountId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1001&quot;</span><span class="p">);</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">fromStringDER</span><span class="p">(</span><span class="s">&quot;...&quot;</span><span class="p">);</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">smartContractClient</span><span class="p">.</span><span class="na">deleteContract</span><span class="p">(</span><span class="n">contractId</span><span class="p">,</span><span class="w"> </span><span class="n">toAccountId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+</span></code></pre></div>
 <hr />
 <h2 id="call-contract-function">Call Contract Function<a class="headerlink" href="#call-contract-function" title="Permanent link">&para;</a></h2>
 <p>Executes a function on an existing smart contract.</p>
-<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -1803,17 +1943,17 @@ The configured operator account is used as the transaction payer and must have s
  default gas limit. You can also override these values by using the overload
  that accepts <code>maxTransactionFee</code> and <code>gas</code>.</p>
 </div>
-<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="mi">10_000_000</span><span class="p">,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">callContractFunction(ContractId contractId, String functionName, Hbar maxTransactionFee, int gas, ContractParam&lt;?&gt;... params)</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">ContractId</span><span class="w"> </span><span class="n">contractId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">ContractId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">ContractCallResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">smartContractClient</span><span class="p">.</span><span class="na">callContractFunction</span><span class="p">(</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">        </span><span class="n">contractId</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">        </span><span class="s">&quot;getValue&quot;</span><span class="p">,</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">        </span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">        </span><span class="mi">10_000_000</span><span class="p">,</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">        </span><span class="n">ContractParam</span><span class="p">.</span><span class="na">string</span><span class="p">(</span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">)</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
