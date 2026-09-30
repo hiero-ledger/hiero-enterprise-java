@@ -57,7 +57,7 @@ public interface FungibleTokenClient {
     Objects.requireNonNull(name, "name must not be null");
     Objects.requireNonNull(symbol, "symbol must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
-    return createToken(name, symbol, PrivateKey.fromString(supplyKey));
+    return createToken(name, symbol, PrivateKey.fromStringDER(supplyKey));
   }
 
   /**
@@ -99,7 +99,10 @@ public interface FungibleTokenClient {
     Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
     Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
     return createToken(
-        name, symbol, AccountId.fromString(treasuryAccountId), PrivateKey.fromString(treasuryKey));
+        name,
+        symbol,
+        AccountId.fromString(treasuryAccountId),
+        PrivateKey.fromStringDER(treasuryKey));
   }
 
   /**
@@ -168,8 +171,8 @@ public interface FungibleTokenClient {
         name,
         symbol,
         AccountId.fromString(treasuryAccountId),
-        PrivateKey.fromString(treasuryKey),
-        PrivateKey.fromString(supplyKey));
+        PrivateKey.fromStringDER(treasuryKey),
+        PrivateKey.fromStringDER(supplyKey));
   }
 
   /**
@@ -223,7 +226,7 @@ public interface FungibleTokenClient {
         symbol,
         treasuryAccount.accountId(),
         treasuryAccount.privateKey(),
-        PrivateKey.fromString(supplyKey));
+        PrivateKey.fromStringDER(supplyKey));
   }
 
   /**
@@ -251,7 +254,7 @@ public interface FungibleTokenClient {
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
     Objects.requireNonNull(accountKey, "accountKey must not be null");
-    associateToken(tokenId, AccountId.fromString(accountId), PrivateKey.fromString(accountKey));
+    associateToken(tokenId, AccountId.fromString(accountId), PrivateKey.fromStringDER(accountKey));
   }
 
   /**
@@ -322,7 +325,7 @@ public interface FungibleTokenClient {
     dissociateToken(
         TokenId.fromString(tokenId),
         AccountId.fromString(accountId),
-        PrivateKey.fromString(accountKey));
+        PrivateKey.fromStringDER(accountKey));
   }
   ;
 
@@ -414,7 +417,7 @@ public interface FungibleTokenClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
-    return mintToken(TokenId.fromString(tokenId), PrivateKey.fromString(supplyKey), amount);
+    return mintToken(TokenId.fromString(tokenId), PrivateKey.fromStringDER(supplyKey), amount);
   }
 
   /**
@@ -452,7 +455,7 @@ public interface FungibleTokenClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(supplyKey, "supplyKey must not be null");
-    return burnToken(tokenId, amount, PrivateKey.fromString(supplyKey));
+    return burnToken(tokenId, amount, PrivateKey.fromStringDER(supplyKey));
   }
 
   /**
@@ -542,7 +545,7 @@ public interface FungibleTokenClient {
     transferToken(
         tokenId,
         AccountId.fromString(fromAccountId),
-        PrivateKey.fromString(fromAccountKey),
+        PrivateKey.fromStringDER(fromAccountKey),
         AccountId.fromString(toAccountId),
         amount);
   }

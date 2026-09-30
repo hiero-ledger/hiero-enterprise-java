@@ -265,7 +265,7 @@ public interface AccountClient {
     }
     transferHbar(
         AccountId.fromString(fromAccountId),
-        PrivateKey.fromString(fromAccountKey),
+        PrivateKey.fromStringDER(fromAccountKey),
         AccountId.fromString(toAccountId),
         Hbar.from(amountInHbar));
   }

@@ -232,7 +232,7 @@ public interface TopicClient {
       throws HieroException {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(adminKey, "adminKey cannot be null");
-    deleteTopic(TopicId.fromString(topicId), PrivateKey.fromString(adminKey));
+    deleteTopic(TopicId.fromString(topicId), PrivateKey.fromStringDER(adminKey));
   }
   ;
 
@@ -309,7 +309,7 @@ public interface TopicClient {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(submitKey, "submitKey cannot be null");
     Objects.requireNonNull(message, "message cannot be null");
-    submitMessage(TopicId.fromString(topicId), PrivateKey.fromString(submitKey), message);
+    submitMessage(TopicId.fromString(topicId), PrivateKey.fromStringDER(submitKey), message);
   }
   ;
 
@@ -338,7 +338,7 @@ public interface TopicClient {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     Objects.requireNonNull(submitKey, "submitKey cannot be null");
     Objects.requireNonNull(message, "message cannot be null");
-    submitMessage(TopicId.fromString(topicId), PrivateKey.fromString(submitKey), message);
+    submitMessage(TopicId.fromString(topicId), PrivateKey.fromStringDER(submitKey), message);
   }
   ;
 }
