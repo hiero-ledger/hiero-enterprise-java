@@ -1060,6 +1060,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cancel-airdrop-nft" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Cancel Airdrop NFT
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-nft-type" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1728,6 +1739,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cancel-airdrop-nft" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Cancel Airdrop NFT
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-nft-type" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1908,7 +1930,7 @@
 
 
 <h1 id="nft-client">NFT Client<a class="headerlink" href="#nft-client" title="Permanent link">&para;</a></h1>
-<p><code>NftClient</code> provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, updating NFT metadata and types, and deleting NFT types.</p>
+<p><code>NftClient</code> provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, canceling pending NFT airdrops, updating NFT metadata and types, and deleting NFT types.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>NFT operations that submit transactions to the Hiero network require HBAR to pay transaction fees.<br />
@@ -2199,6 +2221,30 @@ The configured operator account is used as the transaction payer and must have a
 <tr>
 <td style="text-align: left;"><code>airdropNfts(TokenId tokenId, Map&lt;Long, AccountId&gt; serialNumberToAccountId, Account fromAccount)</code></td>
 <td style="text-align: left;">Airdrops NFTs to one or more receivers using an account object as sender.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cancelAirdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)</code></td>
+<td style="text-align: left;">Cancels a pending NFT airdrop. The sender must sign.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cancelAirdropNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)</code></td>
+<td style="text-align: left;">Cancels a pending NFT airdrop using an account object as sender.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cancelAirdropNfts(TokenId tokenId, List&lt;Long&gt; serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)</code></td>
+<td style="text-align: left;">Cancels pending NFT airdrops to a single receiver.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cancelAirdropNfts(TokenId tokenId, List&lt;Long&gt; serialNumbers, Account fromAccount, AccountId toAccountId)</code></td>
+<td style="text-align: left;">Cancels pending NFT airdrops to a single receiver using an account object as sender.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cancelAirdropNfts(TokenId tokenId, Map&lt;Long, AccountId&gt; serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)</code></td>
+<td style="text-align: left;">Cancels pending NFT airdrops (serial → receiver map).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cancelAirdropNfts(TokenId tokenId, Map&lt;Long, AccountId&gt; serialNumberToAccountId, Account fromAccount)</code></td>
+<td style="text-align: left;">Cancels pending NFT airdrops using an account object as sender.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>updateNftType(TokenId tokenId, String name, String symbol)</code></td>
@@ -2552,15 +2598,50 @@ The operator account key is used as the KYC key when no custom key is provided. 
 </span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="p">);</span>
 </span></code></pre></div>
 <hr />
+<h2 id="cancel-airdrop-nft">Cancel Airdrop NFT<a class="headerlink" href="#cancel-airdrop-nft" title="Permanent link">&para;</a></h2>
+<p>Cancels one or more pending NFT airdrops using <code>TokenCancelAirdropTransaction</code>. Each cancellation is identified by the NFT type, serial number, sender (the account that initiated the airdrop), and receiver (the account that was to receive the NFT). The sender must sign the transaction. Hedera limits a single cancel transaction to at most 10 pending airdrop IDs (see <a href="https://docs.hedera.com/native/tokens/cancel">Cancel a token</a>).</p>
+<div class="language-java highlight"><span class="filename">cancelAirdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1001&quot;</span><span class="p">);</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">receiver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1002&quot;</span><span class="p">);</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">cancelAirdropNft</span><span class="p">(</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">    </span><span class="mi">1L</span><span class="p">,</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span><span class="n">sender</span><span class="p">,</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">(),</span>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">    </span><span class="n">receiver</span>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">cancelAirdropNfts(TokenId tokenId, List&lt;Long&gt; serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)</span><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serialNumbers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="mi">2L</span><span class="p">);</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">cancelAirdropNfts</span><span class="p">(</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">    </span><span class="n">serialNumbers</span><span class="p">,</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="n">sender</span><span class="p">,</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">(),</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">    </span><span class="n">receiver</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">cancelAirdropNfts(TokenId tokenId, Map&lt;Long, AccountId&gt; serialNumberToAccountId, AccountId fromAccountId, PrivateKey fromAccountKey)</span><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">alice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1002&quot;</span><span class="p">);</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">bob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1003&quot;</span><span class="p">);</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="p">,</span><span class="w"> </span><span class="n">AccountId</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serialNumberToAccountId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="n">alice</span><span class="p">,</span><span class="w"> </span><span class="mi">2L</span><span class="p">,</span><span class="w"> </span><span class="n">bob</span><span class="p">);</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">cancelAirdropNfts</span><span class="p">(</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">    </span><span class="n">serialNumberToAccountId</span><span class="p">,</span>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="w">    </span><span class="n">sender</span><span class="p">,</span>
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">    </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">()</span>
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<hr />
 <h2 id="update-nft-type">Update NFT Type<a class="headerlink" href="#update-nft-type" title="Permanent link">&para;</a></h2>
 <p>Updates properties of an NFT type (token class), such as name and symbol. Requires the admin key set at creation (by default the treasury key). Fields that are not changed are left as-is on the network.</p>
-<div class="language-java highlight"><span class="filename">updateNftType(TokenId tokenId, String name, String symbol)</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Updated Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UDNFT&quot;</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateNftType(TokenId tokenId, String name, String symbol)</span><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Updated Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UDNFT&quot;</span><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Updated Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UDNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Updated Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UDNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -2569,26 +2650,26 @@ The operator account key is used as the KYC key when no custom key is provided. 
 <hr />
 <h2 id="update-nft-metadata">Update NFT Metadata<a class="headerlink" href="#update-nft-metadata" title="Permanent link">&para;</a></h2>
 <p>Updates the metadata of one or more NFT serials (at most 10 per call). Metadata is limited to 100 bytes. Requires the token metadata key, or the supply key while the NFT is still held by the treasury (<a href="https://hips.hedera.com/hip/hip-850">HIP-850</a>).</p>
-<div class="language-java highlight"><span class="filename">updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)</span><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kt">long</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNft</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
-</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftMetadata</span><span class="p">(</span>
-</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
-</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">        </span><span class="n">serial</span><span class="p">,</span>
-</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
-</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)</span><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="kt">long</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNft</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftMetadata</span><span class="p">(</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">        </span><span class="n">serial</span><span class="p">,</span>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
+</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateNftsMetadata(TokenId tokenId, List&lt;Long&gt; serialNumbers, PrivateKey metadataKey, byte[] metadata)</span><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">metadataKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">supplierKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="n">metadataKey</span><span class="p">);</span>
-</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNfts</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>
-</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftsMetadata</span><span class="p">(</span>
-</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
-</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">        </span><span class="n">serials</span><span class="p">,</span>
-</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">        </span><span class="n">metadataKey</span><span class="p">,</span>
-</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
-</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateNftsMetadata(TokenId tokenId, List&lt;Long&gt; serialNumbers, PrivateKey metadataKey, byte[] metadata)</span><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">metadataKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">supplierKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="n">metadataKey</span><span class="p">);</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNfts</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftsMetadata</span><span class="p">(</span>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="w">        </span><span class="n">serials</span><span class="p">,</span>
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="w">        </span><span class="n">metadataKey</span><span class="p">,</span>
+</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
+</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -2597,13 +2678,13 @@ The operator account key is used as the KYC key when no custom key is provided. 
 <hr />
 <h2 id="delete-nft-type">Delete NFT Type<a class="headerlink" href="#delete-nft-type" title="Permanent link">&para;</a></h2>
 <p>Deletes an NFT type (token class). You cannot delete a specific NFT serial; burn all serials first, then delete the type. Requires the admin key set at creation (by default the treasury key).</p>
-<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId)</span><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId)</span><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
