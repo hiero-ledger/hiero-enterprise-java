@@ -304,6 +304,69 @@ public class NftClientTests {
   }
 
   @Test
+  void rejectNft() throws Exception {
+    // given
+    final Account treasuryAccount = accountClient.createAccount(1);
+    final TokenId tokenId = nftClient.createNftType("Test NFT", "TST", treasuryAccount);
+    final Account userAccount = accountClient.createAccount(1);
+    final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
+    nftClient.associateNft(tokenId, userAccount);
+    final long serial = nftClient.mintNft(tokenId, treasuryAccount.privateKey(), metadata);
+    nftClient.transferNft(tokenId, serial, treasuryAccount, userAccount.accountId());
+
+    // then
+    Assertions.assertDoesNotThrow(() -> nftClient.rejectNft(tokenId, serial, userAccount));
+    Assertions.assertDoesNotThrow(
+        () -> nftClient.transferNft(tokenId, serial, treasuryAccount, userAccount.accountId()));
+  }
+
+  @Test
+  void rejectAirdroppedNfts() throws Exception {
+    // given
+    final Account treasuryAccount = accountClient.createAccount(1);
+    final TokenId tokenId = nftClient.createNftType("Test NFT", "TST", treasuryAccount);
+    final Account userAccount = accountClient.createAccount(1);
+    final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+    final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
+    nftClient.associateNft(tokenId, userAccount);
+    final List<Long> serials =
+        nftClient.mintNfts(tokenId, treasuryAccount.privateKey(), metadata1, metadata2);
+    nftClient.airdropNfts(tokenId, serials, treasuryAccount, userAccount.accountId());
+
+    // then
+    Assertions.assertDoesNotThrow(() -> nftClient.rejectNfts(tokenId, serials, userAccount));
+  }
+
+  @Test
+  void rejectNftThrowsExceptionIfNotOwner() throws Exception {
+    // given
+    final Account treasuryAccount = accountClient.createAccount(1);
+    final TokenId tokenId = nftClient.createNftType("Test NFT", "TST", treasuryAccount);
+    final Account userAccount = accountClient.createAccount(1);
+    final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
+    nftClient.associateNft(tokenId, userAccount);
+    final long serial = nftClient.mintNft(tokenId, treasuryAccount.privateKey(), metadata);
+
+    // then
+    Assertions.assertThrows(
+        HieroException.class, () -> nftClient.rejectNft(tokenId, serial, userAccount));
+    Assertions.assertThrows(
+        HieroException.class, () -> nftClient.rejectNfts(tokenId, List.of(serial), userAccount));
+  }
+
+  @Test
+  void rejectNftNullParam() {
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClient.rejectNft(null, 1L, (Account) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClient.rejectNft(null, 1L, null, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClient.rejectNfts(null, null, (Account) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClient.rejectNfts(null, null, null, null));
+  }
+
+  @Test
   void burnNft() throws HieroException {
     final String name = "Test NFT";
     final String symbol = "TST";

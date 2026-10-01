@@ -60,6 +60,8 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRejectRequest;
+import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycResult;
 import org.hiero.base.protocol.data.TokenTransferRequest;
@@ -401,6 +403,17 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenCancelAirdropResult executeTokenCancelAirdropTransaction(
       @NonNull final TokenCancelAirdropRequest request) throws HieroException;
+
+  /**
+   * Executes a token reject transaction for NFTs. The rejected NFTs are returned to the treasury of
+   * the NFT type without charging custom fees.
+   *
+   * @param request the request containing the details of the NFT reject transaction
+   * @return the result of the token reject transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenRejectResult executeTokenRejectTransaction(
+      @NonNull final TokenRejectRequest request) throws HieroException;
 
   /**
    * Executes an HBAR transfer transaction.

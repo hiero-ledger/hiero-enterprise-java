@@ -1355,6 +1355,75 @@ public interface NftClient {
   }
 
   /**
+   * Rejects an NFT, for example an unwanted airdrop, by returning it to the treasury of the NFT
+   * type. No custom fees are charged. The owner stays associated with the NFT type. Rejection fails
+   * if the NFT type is paused or the owner is frozen for it.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param ownerAccountId the ID of the account that holds the NFT
+   * @param ownerAccountKey the private key of the account that holds the NFT
+   * @throws HieroException if the NFT could not be rejected
+   */
+  void rejectNft(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey)
+      throws HieroException;
+
+  /**
+   * Rejects an NFT, for example an unwanted airdrop, by returning it to the treasury of the NFT
+   * type. No custom fees are charged. The owner stays associated with the NFT type. Rejection fails
+   * if the NFT type is paused or the owner is frozen for it.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param ownerAccount the account that holds the NFT
+   * @throws HieroException if the NFT could not be rejected
+   */
+  default void rejectNft(@NonNull TokenId tokenId, long serialNumber, @NonNull Account ownerAccount)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    rejectNft(tokenId, serialNumber, ownerAccount.accountId(), ownerAccount.privateKey());
+  }
+
+  /**
+   * Rejects NFTs, for example unwanted airdrops, by returning them to the treasury of the NFT type.
+   * No custom fees are charged. The owner stays associated with the NFT type. Rejection fails if
+   * the NFT type is paused or the owner is frozen for it. At most 10 NFTs can be rejected at once.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param ownerAccountId the ID of the account that holds the NFTs
+   * @param ownerAccountKey the private key of the account that holds the NFTs
+   * @throws HieroException if the NFTs could not be rejected
+   */
+  void rejectNfts(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey)
+      throws HieroException;
+
+  /**
+   * Rejects NFTs, for example unwanted airdrops, by returning them to the treasury of the NFT type.
+   * No custom fees are charged. The owner stays associated with the NFT type. Rejection fails if
+   * the NFT type is paused or the owner is frozen for it. At most 10 NFTs can be rejected at once.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param ownerAccount the account that holds the NFTs
+   * @throws HieroException if the NFTs could not be rejected
+   */
+  default void rejectNfts(
+      @NonNull TokenId tokenId, @NonNull List<Long> serialNumbers, @NonNull Account ownerAccount)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    rejectNfts(tokenId, serialNumbers, ownerAccount.accountId(), ownerAccount.privateKey());
+  }
+
+  /**
    * Updates an NFT type (token class) name and symbol. The operator account key is used as the
    * admin key. The NFT type must have been created with that key as admin (the default for {@link
    * #createNftType} when the operator is the treasury).
