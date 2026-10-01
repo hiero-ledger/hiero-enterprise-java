@@ -59,11 +59,16 @@ boolean matches =
 
     This method can only be used after the contract has been successfully verified.
 
+!!! note
+    
+    The `fileName` parameter must contain only the contract file name (for example, `MyContract.sol`).
+    Do not include the full file path or directory.
+
 ---
 
 ## Verify Contract Using Source Code
 
-Verifies a contract using Solidity source code and optional metadata.
+Verifies a contract using Solidity source code and metadata.
 
 ```java title="verify(ContractId contractId, String contractName, String contractSource, String contractMetadata)"
 ContractId contractId =
@@ -81,18 +86,6 @@ contract Counter {
 }
 """;
 
-ContractVerificationState state =
-    contractVerificationClient.verify(
-        contractId,
-        "Counter",
-        source,
-        null
-    );
-```
-
-If metadata is available from the Solidity compilation process, it can be supplied as the fourth parameter.
-
-```java title="verify(ContractId contractId, String contractName, String contractSource, String contractMetadata)"
 String metadata =
     Files.readString(
         Path.of("metadata.json")

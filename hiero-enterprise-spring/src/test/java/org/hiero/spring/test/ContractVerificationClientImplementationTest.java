@@ -51,7 +51,7 @@ class ContractVerificationClientImplementationTest {
     // when
     final ContractVerificationState state =
         verificationClient.verify(contractId, contractName, contractSource, contractMetadata);
-
+    verificationClient.checkVerification(contractId, "HelloWorld.sol", contractSource);
     // then
     Assertions.assertEquals(ContractVerificationState.FULL, state);
   }
