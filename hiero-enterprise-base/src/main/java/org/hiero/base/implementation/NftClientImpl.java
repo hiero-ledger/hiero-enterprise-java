@@ -14,6 +14,7 @@ import org.hiero.base.HieroException;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -492,6 +493,54 @@ public class NftClientImpl implements NftClient {
     final TokenRejectRequest request =
         TokenRejectRequest.of(tokenId, serialNumbers, ownerAccountId, ownerAccountKey);
     client.executeTokenRejectTransaction(request);
+  }
+
+  @Override
+  public void approveNftAllowance(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    approveNftAllowances(
+        tokenId, List.of(serialNumber), ownerAccountId, ownerAccountKey, spenderAccountId);
+  }
+
+  @Override
+  public void approveNftAllowances(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    final NftAllowanceApproveRequest request =
+        NftAllowanceApproveRequest.of(
+            ownerAccountId, spenderAccountId, tokenId, serialNumbers, ownerAccountKey);
+    client.executeNftAllowanceApproveTransaction(request);
+  }
+
+  @Override
+  public void approveNftAllowanceAllSerials(
+      @NonNull final TokenId tokenId,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    final NftAllowanceApproveRequest request =
+        NftAllowanceApproveRequest.forAllSerials(
+            ownerAccountId, spenderAccountId, tokenId, ownerAccountKey);
+    client.executeNftAllowanceApproveTransaction(request);
   }
 
   @Override

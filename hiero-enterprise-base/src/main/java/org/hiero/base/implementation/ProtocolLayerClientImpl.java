@@ -102,6 +102,8 @@ import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
+import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
+import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
@@ -1045,6 +1047,33 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new HbarAllowanceApproveResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute HBAR allowance approve transaction", e);
+    }
+  }
+
+  @Override
+  public NftAllowanceApproveResult executeNftAllowanceApproveTransaction(
+      @NonNull final NftAllowanceApproveRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final AccountAllowanceApproveTransaction transaction =
+          new AccountAllowanceApproveTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration());
+      if (request.approveForAll()) {
+        transaction.approveTokenNftAllowanceAllSerials(
+            request.tokenId(), request.owner(), request.spender());
+      } else {
+        for (final Long serialNumber : request.serialNumbers()) {
+          transaction.approveTokenNftAllowance(
+              new NftId(request.tokenId(), serialNumber), request.owner(), request.spender());
+        }
+      }
+      sign(transaction, request.ownerKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.ALLOWANCE_APPROVAL);
+      return new NftAllowanceApproveResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute NFT allowance approve transaction", e);
     }
   }
 

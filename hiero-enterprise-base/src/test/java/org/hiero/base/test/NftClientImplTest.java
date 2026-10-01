@@ -17,6 +17,8 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
+import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -1976,5 +1978,145 @@ public class NftClientImplTest {
         .thenThrow(new HieroException("delete failed"));
 
     Assertions.assertThrows(HieroException.class, () -> nftClientImpl.deleteNftType(tokenId));
+  }
+
+  @Test
+  void testApproveNftAllowance() throws HieroException {
+    final NftAllowanceApproveResult result = Mockito.mock(NftAllowanceApproveResult.class);
+    final ArgumentCaptor<NftAllowanceApproveRequest> captor =
+        ArgumentCaptor.forClass(NftAllowanceApproveRequest.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final long serialNumber = 1L;
+    final AccountId ownerAccount = AccountId.fromString("1.2.3");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+    final AccountId spenderAccount = AccountId.fromString("4.5.6");
+
+    when(protocolLayerClient.executeNftAllowanceApproveTransaction(
+            any(NftAllowanceApproveRequest.class)))
+        .thenReturn(result);
+    nftClientImpl.approveNftAllowance(
+        tokenId, serialNumber, ownerAccount, ownerAccountKey, spenderAccount);
+
+    verify(protocolLayerClient, times(1)).executeNftAllowanceApproveTransaction(captor.capture());
+
+    final NftAllowanceApproveRequest request = captor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(List.of(serialNumber), request.serialNumbers());
+    Assertions.assertEquals(ownerAccount, request.owner());
+    Assertions.assertEquals(ownerAccountKey, request.ownerKey());
+    Assertions.assertEquals(spenderAccount, request.spender());
+    Assertions.assertFalse(request.approveForAll());
+  }
+
+  @Test
+  void testApproveNftAllowances() throws HieroException {
+    final NftAllowanceApproveResult result = Mockito.mock(NftAllowanceApproveResult.class);
+    final ArgumentCaptor<NftAllowanceApproveRequest> captor =
+        ArgumentCaptor.forClass(NftAllowanceApproveRequest.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<Long> serialNumbers = List.of(1L, 2L);
+    final Account ownerAccount =
+        Account.of(AccountId.fromString("1.2.3"), PrivateKey.generateECDSA());
+    final AccountId spenderAccount = AccountId.fromString("4.5.6");
+
+    when(protocolLayerClient.executeNftAllowanceApproveTransaction(
+            any(NftAllowanceApproveRequest.class)))
+        .thenReturn(result);
+    nftClientImpl.approveNftAllowances(tokenId, serialNumbers, ownerAccount, spenderAccount);
+
+    verify(protocolLayerClient, times(1)).executeNftAllowanceApproveTransaction(captor.capture());
+
+    final NftAllowanceApproveRequest request = captor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(serialNumbers, request.serialNumbers());
+    Assertions.assertEquals(ownerAccount.accountId(), request.owner());
+    Assertions.assertEquals(ownerAccount.privateKey(), request.ownerKey());
+    Assertions.assertEquals(spenderAccount, request.spender());
+    Assertions.assertFalse(request.approveForAll());
+  }
+
+  @Test
+  void testApproveNftAllowanceAllSerials() throws HieroException {
+    final NftAllowanceApproveResult result = Mockito.mock(NftAllowanceApproveResult.class);
+    final ArgumentCaptor<NftAllowanceApproveRequest> captor =
+        ArgumentCaptor.forClass(NftAllowanceApproveRequest.class);
+
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final Account ownerAccount =
+        Account.of(AccountId.fromString("1.2.3"), PrivateKey.generateECDSA());
+    final AccountId spenderAccount = AccountId.fromString("4.5.6");
+
+    when(protocolLayerClient.executeNftAllowanceApproveTransaction(
+            any(NftAllowanceApproveRequest.class)))
+        .thenReturn(result);
+    nftClientImpl.approveNftAllowanceAllSerials(tokenId, ownerAccount, spenderAccount);
+
+    verify(protocolLayerClient, times(1)).executeNftAllowanceApproveTransaction(captor.capture());
+
+    final NftAllowanceApproveRequest request = captor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(List.of(), request.serialNumbers());
+    Assertions.assertEquals(ownerAccount.accountId(), request.owner());
+    Assertions.assertEquals(ownerAccount.privateKey(), request.ownerKey());
+    Assertions.assertEquals(spenderAccount, request.spender());
+    Assertions.assertTrue(request.approveForAll());
+  }
+
+  @Test
+  void testApproveNftAllowanceThrowsForInvalidInput() {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId ownerAccount = AccountId.fromString("1.2.3");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+    final AccountId spenderAccount = AccountId.fromString("4.5.6");
+
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.approveNftAllowance(null, 1L, ownerAccount, ownerAccountKey, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.approveNftAllowance(tokenId, 1L, (Account) null, spenderAccount));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            nftClientImpl.approveNftAllowances(
+                tokenId, null, ownerAccount, ownerAccountKey, spenderAccount));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.approveNftAllowanceAllSerials(tokenId, (Account) null, spenderAccount));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            nftClientImpl.approveNftAllowances(
+                tokenId, List.of(), ownerAccount, ownerAccountKey, spenderAccount));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            nftClientImpl.approveNftAllowance(
+                tokenId, 1L, ownerAccount, ownerAccountKey, ownerAccount));
+  }
+
+  @Test
+  void testApproveNftAllowanceThrowsHieroException() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final AccountId ownerAccount = AccountId.fromString("1.2.3");
+    final PrivateKey ownerAccountKey = PrivateKey.generateECDSA();
+    final AccountId spenderAccount = AccountId.fromString("4.5.6");
+
+    when(protocolLayerClient.executeNftAllowanceApproveTransaction(
+            any(NftAllowanceApproveRequest.class)))
+        .thenThrow(new HieroException("approve failed"));
+
+    Assertions.assertThrows(
+        HieroException.class,
+        () ->
+            nftClientImpl.approveNftAllowance(
+                tokenId, 1L, ownerAccount, ownerAccountKey, spenderAccount));
+    Assertions.assertThrows(
+        HieroException.class,
+        () ->
+            nftClientImpl.approveNftAllowanceAllSerials(
+                tokenId, ownerAccount, ownerAccountKey, spenderAccount));
   }
 }

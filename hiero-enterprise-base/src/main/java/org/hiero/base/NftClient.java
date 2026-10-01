@@ -1424,6 +1424,130 @@ public interface NftClient {
   }
 
   /**
+   * Approves an NFT allowance so a spender can transfer the given NFT on behalf of the owner. The
+   * owner account must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param ownerAccountId the ID of the account that owns the NFT
+   * @param ownerAccountKey the private key of the account that owns the NFT
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFT
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveNftAllowance(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException;
+
+  /**
+   * Approves an NFT allowance so a spender can transfer the given NFT on behalf of the owner. The
+   * owner account must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumber the serial number of the NFT
+   * @param ownerAccount the account that owns the NFT
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFT
+   * @throws HieroException if the allowance could not be approved
+   */
+  default void approveNftAllowance(
+      @NonNull TokenId tokenId,
+      long serialNumber,
+      @NonNull Account ownerAccount,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    approveNftAllowance(
+        tokenId,
+        serialNumber,
+        ownerAccount.accountId(),
+        ownerAccount.privateKey(),
+        spenderAccountId);
+  }
+
+  /**
+   * Approves an NFT allowance so a spender can transfer the given NFTs on behalf of the owner. The
+   * owner account must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param ownerAccountId the ID of the account that owns the NFTs
+   * @param ownerAccountKey the private key of the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveNftAllowances(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException;
+
+  /**
+   * Approves an NFT allowance so a spender can transfer the given NFTs on behalf of the owner. The
+   * owner account must sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param serialNumbers the serial numbers of the NFTs
+   * @param ownerAccount the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowance could not be approved
+   */
+  default void approveNftAllowances(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull Account ownerAccount,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    approveNftAllowances(
+        tokenId,
+        serialNumbers,
+        ownerAccount.accountId(),
+        ownerAccount.privateKey(),
+        spenderAccountId);
+  }
+
+  /**
+   * Approves an NFT allowance for all serials of an NFT type, including serials the owner receives
+   * in the future, so a spender can transfer them on behalf of the owner. The owner account must
+   * sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param ownerAccountId the ID of the account that owns the NFTs
+   * @param ownerAccountKey the private key of the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowance could not be approved
+   */
+  void approveNftAllowanceAllSerials(
+      @NonNull TokenId tokenId,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException;
+
+  /**
+   * Approves an NFT allowance for all serials of an NFT type, including serials the owner receives
+   * in the future, so a spender can transfer them on behalf of the owner. The owner account must
+   * sign the transaction.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param ownerAccount the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowance could not be approved
+   */
+  default void approveNftAllowanceAllSerials(
+      @NonNull TokenId tokenId, @NonNull Account ownerAccount, @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    approveNftAllowanceAllSerials(
+        tokenId, ownerAccount.accountId(), ownerAccount.privateKey(), spenderAccountId);
+  }
+
+  /**
    * Updates an NFT type (token class) name and symbol. The operator account key is used as the
    * admin key. The NFT type must have been created with that key as admin (the default for {@link
    * #createNftType} when the operator is the treasury).

@@ -38,6 +38,8 @@ import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
+import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
+import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
@@ -434,6 +436,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull HbarAllowanceApproveResult executeHbarAllowanceApproveTransaction(
       @NonNull final HbarAllowanceApproveRequest request) throws HieroException;
+
+  /**
+   * Executes an NFT allowance approve transaction.
+   *
+   * @param request the request containing the details of the NFT allowance approve transaction
+   * @return the result of the NFT allowance approve transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull NftAllowanceApproveResult executeNftAllowanceApproveTransaction(
+      @NonNull final NftAllowanceApproveRequest request) throws HieroException;
 
   /**
    * Executes an NFT allowance delete transaction.

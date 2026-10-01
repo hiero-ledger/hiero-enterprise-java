@@ -65,6 +65,8 @@ import org.hiero.base.protocol.data.HbarTransferRequest;
 import org.hiero.base.protocol.data.HbarTransferResult;
 import org.hiero.base.protocol.data.HookStoreRequest;
 import org.hiero.base.protocol.data.HookStoreResult;
+import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
+import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
@@ -1339,6 +1341,18 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  public void testNftAllowanceApproveResultCreation() {
+    final TransactionId transactionId = TransactionId.generate(AccountId.fromString("0.0.12345"));
+    final Status status = Status.SUCCESS;
+
+    Assertions.assertDoesNotThrow(() -> new NftAllowanceApproveResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new NftAllowanceApproveResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new NftAllowanceApproveResult(transactionId, null));
+  }
+
+  @Test
   public void testNftAllowanceDeleteResultCreation() {
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
     final Status status = Status.SUCCESS;
@@ -2076,6 +2090,97 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () -> HbarAllowanceApproveRequest.of(owner, spender, Hbar.from(-1), ownerKey));
+  }
+
+  @Test
+  void testNftAllowanceApproveRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final AccountId owner = AccountId.fromString("0.0.5678");
+    final AccountId spender = AccountId.fromString("0.0.9876");
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final List<Long> serialNumbers = List.of(1L, 2L);
+    final PrivateKey ownerKey = PrivateKey.generateECDSA();
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new NftAllowanceApproveRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                owner,
+                spender,
+                tokenId,
+                serialNumbers,
+                false,
+                ownerKey));
+    Assertions.assertDoesNotThrow(
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey));
+    Assertions.assertDoesNotThrow(
+        () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey));
+
+    Assertions.assertEquals(
+        List.of(),
+        NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey)
+            .serialNumbers());
+    Assertions.assertTrue(
+        NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey)
+            .approveForAll());
+    Assertions.assertFalse(
+        NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey)
+            .approveForAll());
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.of(owner, owner, tokenId, serialNumbers, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, List.of(), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, List.of(-1L), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new NftAllowanceApproveRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                owner,
+                spender,
+                tokenId,
+                serialNumbers,
+                true,
+                ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new NftAllowanceApproveRequest(
+                maxTransactionFee,
+                Duration.ZERO,
+                owner,
+                spender,
+                tokenId,
+                serialNumbers,
+                false,
+                ownerKey));
+
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.of(null, spender, tokenId, serialNumbers, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.of(owner, null, tokenId, serialNumbers, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, null, serialNumbers, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, null, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, null));
   }
 
   @Test
