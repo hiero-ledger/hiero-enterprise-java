@@ -1,6 +1,6 @@
 # NFT Client
 
-`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, canceling pending NFT airdrops, rejecting unwanted NFTs, updating NFT metadata and types, and deleting NFT types.
+`NftClient` provides APIs for managing Hiero non-fungible tokens (NFTs), including NFT type creation, account association and dissociation, minting, burning, wiping, transferring and airdropping NFTs between accounts, canceling pending NFT airdrops, rejecting unwanted NFTs, approving NFT allowances for spender accounts, updating NFT metadata and types, and deleting NFT types.
 
 !!! note
 
@@ -92,6 +92,12 @@
 | `rejectNft(TokenId tokenId, long serialNumber, Account ownerAccount)` | Rejects an NFT using an account object as owner. |
 | `rejectNfts(TokenId tokenId, List<Long> serialNumbers, AccountId ownerAccountId, PrivateKey ownerAccountKey)` | Rejects up to 10 NFTs and returns them to the treasury. |
 | `rejectNfts(TokenId tokenId, List<Long> serialNumbers, Account ownerAccount)` | Rejects up to 10 NFTs using an account object as owner. |
+| `approveNftAllowance(TokenId tokenId, long serialNumber, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender to transfer a single NFT on behalf of the owner. The owner must sign. |
+| `approveNftAllowance(TokenId tokenId, long serialNumber, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for a single NFT using an account object as owner. |
+| `approveNftAllowances(TokenId tokenId, List<Long> serialNumbers, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender for several NFT serials of one NFT type. |
+| `approveNftAllowances(TokenId tokenId, List<Long> serialNumbers, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for several NFT serials using an account object as owner. |
+| `approveNftAllowanceAllSerials(TokenId tokenId, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender for all serials of an NFT type, including serials received later. |
+| `approveNftAllowanceAllSerials(TokenId tokenId, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for all serials of an NFT type using an account object as owner. |
 | `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
@@ -558,6 +564,39 @@ List<Long> serialNumbers = List.of(1L, 2L);
 
 nftClient.rejectNfts(tokenId, serialNumbers, owner);
 ```
+
+---
+
+## Approve NFT Allowance
+
+Approves an allowance so a spender account can transfer NFTs on behalf of the owner, using `AccountAllowanceApproveTransaction`. The owner must sign the transaction. An allowance can be granted for a single serial, for a list of serials, or for all serials of an NFT type (including serials the owner receives later). See [Approve an allowance](https://docs.hedera.com/native/accounts/allowances) for the network semantics.
+
+```java title="approveNftAllowance(TokenId tokenId, long serialNumber, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)"
+AccountId owner = AccountId.fromString("0.0.1001");
+AccountId spender = AccountId.fromString("0.0.1002");
+
+nftClient.approveNftAllowance(
+    tokenId,
+    1L,
+    owner,
+    PrivateKey.generateED25519(),
+    spender
+);
+```
+
+```java title="approveNftAllowances(TokenId tokenId, List<Long> serialNumbers, Account ownerAccount, AccountId spenderAccountId)"
+List<Long> serialNumbers = List.of(1L, 2L);
+
+nftClient.approveNftAllowances(tokenId, serialNumbers, ownerAccount, spender);
+```
+
+```java title="approveNftAllowanceAllSerials(TokenId tokenId, Account ownerAccount, AccountId spenderAccountId)"
+nftClient.approveNftAllowanceAllSerials(tokenId, ownerAccount, spender);
+```
+
+!!! info
+
+    Use `AccountClient.deleteNftAllowance(...)` to remove an allowance that was granted for a specific serial.
 
 ---
 
