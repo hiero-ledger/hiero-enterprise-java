@@ -37,6 +37,13 @@ public interface HieroConfig {
   @NonNull Set<String> getMirrorNodeAddresses();
 
   /**
+   * Returns the mirror node gRPC address.
+   *
+   * @return the mirror node gRPC address
+   */
+  @NonNull Optional<String> getMirrorNodeGrpcAddress();
+
+  /**
    * Returns the consensus nodes.
    *
    * @return the consensus nodes
@@ -97,9 +104,9 @@ public interface HieroConfig {
           getConsensusNodes().stream()
               .collect(Collectors.toMap(n -> n.getAddress(), n -> n.getAccountId()));
       final Client client = Client.forNetwork(nodes);
-      final List<String> mirrorNodeAddresses =
-          getMirrorNodeAddresses().stream().collect(Collectors.toList());
+      final List<String> mirrorNodeAddresses = getMirrorNodeGrpcAddress().stream().toList();
       client.setMirrorNetwork(mirrorNodeAddresses);
+      System.out.println(mirrorNodeAddresses);
       client.setOperator(getOperatorAccount().accountId(), getOperatorAccount().privateKey());
       getRequestTimeout().ifPresent(client::setRequestTimeout);
       return client;
