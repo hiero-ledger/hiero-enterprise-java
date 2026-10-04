@@ -2,6 +2,7 @@ package org.hiero.spring.implementation;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,9 +39,17 @@ public class ContractVerificationClientImplementation implements ContractVerific
   private final RestClient restClient;
 
   public ContractVerificationClientImplementation(@NonNull final HieroConfig hieroConfig) {
-    this.hieroConfig = Objects.requireNonNull(hieroConfig, "hieroConfig must not be null");
+    this(hieroConfig, RestClient.builder());
+  }
+
+  public ContractVerificationClientImplementation(
+      @NonNull final HieroConfig hieroConfig, final RestClient.@NonNull Builder restClientBuilder) {
+    Objects.requireNonNull(hieroConfig, "hieroConfig must not be null");
+    Objects.requireNonNull(restClientBuilder, "restClient must not be null");
+
+    this.hieroConfig = hieroConfig;
+    this.restClient = restClientBuilder.build();
     objectMapper = new ObjectMapper();
-    restClient = RestClient.create();
   }
 
   @NonNull
@@ -97,22 +106,26 @@ public class ContractVerificationClientImplementation implements ContractVerific
       throw new IllegalArgumentException("metadata.json must be present in files");
     }
 
-    final ContractVerificationState state = checkVerification(contractId);
+    final Map<String, String> sources = new HashMap<>(files);
+    final String metadataJson = sources.remove("metadata.json");
 
+    if (metadataJson == null || metadataJson.isBlank()) {
+      throw new IllegalArgumentException("metadata.json must not be empty");
+    }
+
+    final ContractVerificationState state = checkVerification(contractId);
     if (state != ContractVerificationState.NONE) {
       throw new IllegalStateException("Contract is already verified");
     }
 
+    final Map<String, Object> metadata;
     try {
-      final Map<String, String> sources = new HashMap<>(files);
-      final String metadataJson = sources.remove("metadata.json");
+      metadata = objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
+    } catch (JsonProcessingException e) {
+      throw new HieroException("Invalid metadata.json", e);
+    }
 
-      if (metadataJson == null || metadataJson.isBlank()) {
-        throw new IllegalArgumentException("metadata.json must not be empty");
-      }
-
-      final Map<String, Object> metadata =
-          objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
+    try {
       final VerifyRequest verifyRequest = new VerifyRequest(sources, metadata);
 
       final String uri =
@@ -176,7 +189,9 @@ public class ContractVerificationClientImplementation implements ContractVerific
       }
 
       final JsonNode rootNode = objectMapper.readTree(resultBody);
-      final String matchStatus = rootNode.get("match").asText(null);
+      final JsonNode matchNode = rootNode.get("match");
+
+      final String matchStatus = matchNode != null ? matchNode.asText() : null;
       return resolveVerificationState(matchStatus);
     } catch (Exception e) {
       throw new HieroException("Error verification step", e);
@@ -218,9 +233,10 @@ public class ContractVerificationClientImplementation implements ContractVerific
       }
 
       final JsonNode rootNode = objectMapper.readTree(resultBody);
+      final JsonNode matchNode = rootNode.get("match");
+      final String matchStatus = matchNode != null ? matchNode.asText() : null;
 
-      final ContractVerificationState state =
-          resolveVerificationState(rootNode.get("match").asText(null));
+      final ContractVerificationState state = resolveVerificationState(matchStatus);
       if (state != ContractVerificationState.FULL && state != ContractVerificationState.PARTIAL) {
         throw new IllegalStateException("Contract is not verified");
       }
@@ -230,7 +246,7 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
       return !contentNode.isMissingNode() && fileContent.equals(contentNode.asText());
     } catch (Exception e) {
-      throw new HieroException("Error verification step", e);
+      throw new HieroException("Error checking verification step", e);
     }
   }
 
@@ -262,8 +278,14 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
         if (rootNode.hasNonNull("error")) {
           final JsonNode errorNode = rootNode.get("error");
-          final String errorCode = errorNode.get("customCode").asText("unknown");
-          final String errorMessage = errorNode.get("message").asText("Unknown error");
+          final String errorCode =
+              errorNode.get("customCode") != null
+                  ? errorNode.get("customCode").asText()
+                  : "unknown";
+          final String errorMessage =
+              errorNode.get("message") != null
+                  ? errorNode.get("message").asText()
+                  : "Unknown error";
 
           throw new HieroException(
               "Contract verification failed with code: "
@@ -276,7 +298,8 @@ public class ContractVerificationClientImplementation implements ContractVerific
           return ContractVerificationState.NONE;
         }
 
-        final String matchStatus = rootNode.get("contract").get("match").asText(null);
+        final JsonNode matchNode = rootNode.get("contract").get("match");
+        final String matchStatus = matchNode != null ? matchNode.asText() : null;
         return resolveVerificationState(matchStatus);
       }
 
