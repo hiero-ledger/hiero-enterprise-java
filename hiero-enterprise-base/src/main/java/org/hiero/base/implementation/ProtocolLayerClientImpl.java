@@ -1059,15 +1059,22 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
           new AccountAllowanceApproveTransaction()
               .setMaxTransactionFee(request.maxTransactionFee())
               .setTransactionValidDuration(request.transactionValidDuration());
-      if (request.approveForAll()) {
-        transaction.approveTokenNftAllowanceAllSerials(
-            request.tokenId(), request.owner(), request.spender());
-      } else {
-        for (final Long serialNumber : request.serialNumbers()) {
-          transaction.approveTokenNftAllowance(
-              new NftId(request.tokenId(), serialNumber), request.owner(), request.spender());
-        }
-      }
+      request
+          .serialNumbers()
+          .forEach(
+              (tokenId, serialNumbers) ->
+                  serialNumbers.forEach(
+                      serialNumber ->
+                          transaction.approveTokenNftAllowance(
+                              new NftId(tokenId, serialNumber),
+                              request.owner(),
+                              request.spender())));
+      request
+          .allSerialsTokenIds()
+          .forEach(
+              tokenId ->
+                  transaction.approveTokenNftAllowanceAllSerials(
+                      tokenId, request.owner(), request.spender()));
       sign(transaction, request.ownerKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.ALLOWANCE_APPROVAL);

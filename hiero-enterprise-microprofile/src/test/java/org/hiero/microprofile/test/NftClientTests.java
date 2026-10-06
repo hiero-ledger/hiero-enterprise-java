@@ -7,6 +7,8 @@ import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.AccountClient;
@@ -144,6 +146,44 @@ public class NftClientTests {
         () ->
             nftClient.approveNftAllowanceAllSerials(
                 tokenId, ownerAccount, spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowancesForMultipleNftTypes() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId1 = nftClient.createNftType("Test NFT 1", "TST1", ownerAccount);
+    final TokenId tokenId2 = nftClient.createNftType("Test NFT 2", "TST2", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+    final byte[][] metadata =
+        IntStream.range(0, 10)
+            .mapToObj(i -> ("https://example.com/metadata" + i).getBytes(StandardCharsets.UTF_8))
+            .toArray(byte[][]::new);
+    final List<Long> serials1 = nftClient.mintNfts(tokenId1, ownerAccount.privateKey(), metadata);
+    final List<Long> serials2 = nftClient.mintNfts(tokenId2, ownerAccount.privateKey(), metadata);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowances(
+                Map.of(tokenId1, serials1, tokenId2, serials2),
+                ownerAccount,
+                spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowanceAllSerialsForMultipleNftTypes() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId1 = nftClient.createNftType("Test NFT 1", "TST1", ownerAccount);
+    final TokenId tokenId2 = nftClient.createNftType("Test NFT 2", "TST2", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowanceAllSerials(
+                List.of(tokenId1, tokenId2), ownerAccount, spenderAccount.accountId()));
   }
 
   @Test

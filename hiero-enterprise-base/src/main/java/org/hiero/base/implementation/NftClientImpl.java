@@ -517,12 +517,24 @@ public class NftClientImpl implements NftClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    approveNftAllowances(
+        Map.of(tokenId, serialNumbers), ownerAccountId, ownerAccountKey, spenderAccountId);
+  }
+
+  @Override
+  public void approveNftAllowances(
+      @NonNull final Map<TokenId, List<Long>> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
     Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
     Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
     Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
     final NftAllowanceApproveRequest request =
         NftAllowanceApproveRequest.of(
-            ownerAccountId, spenderAccountId, tokenId, serialNumbers, ownerAccountKey);
+            ownerAccountId, spenderAccountId, serialNumbers, ownerAccountKey);
     client.executeNftAllowanceApproveTransaction(request);
   }
 
@@ -534,12 +546,24 @@ public class NftClientImpl implements NftClient {
       @NonNull final AccountId spenderAccountId)
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
+    approveNftAllowanceAllSerials(
+        List.of(tokenId), ownerAccountId, ownerAccountKey, spenderAccountId);
+  }
+
+  @Override
+  public void approveNftAllowanceAllSerials(
+      @NonNull final List<TokenId> tokenIds,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenIds, "tokenIds must not be null");
     Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
     Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
     Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
     final NftAllowanceApproveRequest request =
         NftAllowanceApproveRequest.forAllSerials(
-            ownerAccountId, spenderAccountId, tokenId, ownerAccountKey);
+            ownerAccountId, spenderAccountId, tokenIds, ownerAccountKey);
     client.executeNftAllowanceApproveTransaction(request);
   }
 

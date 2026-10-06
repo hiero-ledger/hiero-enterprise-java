@@ -96,8 +96,12 @@
 | `approveNftAllowance(TokenId tokenId, long serialNumber, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for a single NFT using an account object as owner. |
 | `approveNftAllowances(TokenId tokenId, List<Long> serialNumbers, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender for several NFT serials of one NFT type. |
 | `approveNftAllowances(TokenId tokenId, List<Long> serialNumbers, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for several NFT serials using an account object as owner. |
+| `approveNftAllowances(Map<TokenId, List<Long>> serialNumbers, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender for NFT serials of several NFT types in one transaction (max 20 serials in total). |
+| `approveNftAllowances(Map<TokenId, List<Long>> serialNumbers, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for NFT serials of several NFT types using an account object as owner. |
 | `approveNftAllowanceAllSerials(TokenId tokenId, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender for all serials of an NFT type, including serials received later. |
 | `approveNftAllowanceAllSerials(TokenId tokenId, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for all serials of an NFT type using an account object as owner. |
+| `approveNftAllowanceAllSerials(List<TokenId> tokenIds, AccountId ownerAccountId, PrivateKey ownerAccountKey, AccountId spenderAccountId)` | Approves a spender for all serials of several NFT types in one transaction (max 20 NFT types). |
+| `approveNftAllowanceAllSerials(List<TokenId> tokenIds, Account ownerAccount, AccountId spenderAccountId)` | Approves a spender for all serials of several NFT types using an account object as owner. |
 | `updateNftType(TokenId tokenId, String name, String symbol)` | Updates an NFT type name and symbol using the operator account as admin key. |
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
@@ -590,9 +594,26 @@ List<Long> serialNumbers = List.of(1L, 2L);
 nftClient.approveNftAllowances(tokenId, serialNumbers, ownerAccount, spender);
 ```
 
+```java title="approveNftAllowances(Map<TokenId, List<Long>> serialNumbers, Account ownerAccount, AccountId spenderAccountId)"
+Map<TokenId, List<Long>> serialNumbers = Map.of(
+    tokenId, List.of(1L, 2L),
+    otherTokenId, List.of(5L)
+);
+
+nftClient.approveNftAllowances(serialNumbers, ownerAccount, spender);
+```
+
 ```java title="approveNftAllowanceAllSerials(TokenId tokenId, Account ownerAccount, AccountId spenderAccountId)"
 nftClient.approveNftAllowanceAllSerials(tokenId, ownerAccount, spender);
 ```
+
+```java title="approveNftAllowanceAllSerials(List<TokenId> tokenIds, Account ownerAccount, AccountId spenderAccountId)"
+nftClient.approveNftAllowanceAllSerials(List.of(tokenId, otherTokenId), ownerAccount, spender);
+```
+
+!!! note
+
+    A single transaction can contain at most 20 allowances. Each serial number counts as one allowance, and each NFT type approved for all serials counts as one allowance. Requests with more than 20 throw an `IllegalArgumentException`. The default max transaction fee for these requests is 100 HBAR, because approving many allowances costs more than the default fee.
 
 !!! info
 

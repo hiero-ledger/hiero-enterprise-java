@@ -1469,7 +1469,7 @@ public interface NftClient {
 
   /**
    * Approves an NFT allowance so a spender can transfer the given NFTs on behalf of the owner. The
-   * owner account must sign the transaction.
+   * owner account must sign the transaction. At most 20 serial numbers can be approved.
    *
    * @param tokenId the ID of the NFT type
    * @param serialNumbers the serial numbers of the NFTs
@@ -1488,7 +1488,7 @@ public interface NftClient {
 
   /**
    * Approves an NFT allowance so a spender can transfer the given NFTs on behalf of the owner. The
-   * owner account must sign the transaction.
+   * owner account must sign the transaction. At most 20 serial numbers can be approved.
    *
    * @param tokenId the ID of the NFT type
    * @param serialNumbers the serial numbers of the NFTs
@@ -1509,6 +1509,44 @@ public interface NftClient {
         ownerAccount.accountId(),
         ownerAccount.privateKey(),
         spenderAccountId);
+  }
+
+  /**
+   * Approves NFT allowances for NFTs of one or more NFT types in a single transaction so a spender
+   * can transfer them on behalf of the owner. The owner account must sign the transaction. At most
+   * 20 serial numbers can be approved in total.
+   *
+   * @param serialNumbers the serial numbers of the NFTs, grouped by the ID of their NFT type
+   * @param ownerAccountId the ID of the account that owns the NFTs
+   * @param ownerAccountKey the private key of the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowances could not be approved
+   */
+  void approveNftAllowances(
+      @NonNull Map<TokenId, List<Long>> serialNumbers,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException;
+
+  /**
+   * Approves NFT allowances for NFTs of one or more NFT types in a single transaction so a spender
+   * can transfer them on behalf of the owner. The owner account must sign the transaction. At most
+   * 20 serial numbers can be approved in total.
+   *
+   * @param serialNumbers the serial numbers of the NFTs, grouped by the ID of their NFT type
+   * @param ownerAccount the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowances could not be approved
+   */
+  default void approveNftAllowances(
+      @NonNull Map<TokenId, List<Long>> serialNumbers,
+      @NonNull Account ownerAccount,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    approveNftAllowances(
+        serialNumbers, ownerAccount.accountId(), ownerAccount.privateKey(), spenderAccountId);
   }
 
   /**
@@ -1545,6 +1583,44 @@ public interface NftClient {
     Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
     approveNftAllowanceAllSerials(
         tokenId, ownerAccount.accountId(), ownerAccount.privateKey(), spenderAccountId);
+  }
+
+  /**
+   * Approves NFT allowances for all serials of one or more NFT types in a single transaction,
+   * including serials the owner receives in the future, so a spender can transfer them on behalf of
+   * the owner. The owner account must sign the transaction. At most 20 NFT types can be approved.
+   *
+   * @param tokenIds the IDs of the NFT types
+   * @param ownerAccountId the ID of the account that owns the NFTs
+   * @param ownerAccountKey the private key of the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowances could not be approved
+   */
+  void approveNftAllowanceAllSerials(
+      @NonNull List<TokenId> tokenIds,
+      @NonNull AccountId ownerAccountId,
+      @NonNull PrivateKey ownerAccountKey,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException;
+
+  /**
+   * Approves NFT allowances for all serials of one or more NFT types in a single transaction,
+   * including serials the owner receives in the future, so a spender can transfer them on behalf of
+   * the owner. The owner account must sign the transaction. At most 20 NFT types can be approved.
+   *
+   * @param tokenIds the IDs of the NFT types
+   * @param ownerAccount the account that owns the NFTs
+   * @param spenderAccountId the ID of the account that is authorized to spend the NFTs
+   * @throws HieroException if the allowances could not be approved
+   */
+  default void approveNftAllowanceAllSerials(
+      @NonNull List<TokenId> tokenIds,
+      @NonNull Account ownerAccount,
+      @NonNull AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(ownerAccount, "ownerAccount must not be null");
+    approveNftAllowanceAllSerials(
+        tokenIds, ownerAccount.accountId(), ownerAccount.privateKey(), spenderAccountId);
   }
 
   /**

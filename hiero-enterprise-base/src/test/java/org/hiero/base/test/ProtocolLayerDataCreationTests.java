@@ -2099,8 +2099,13 @@ public class ProtocolLayerDataCreationTests {
     final AccountId owner = AccountId.fromString("0.0.5678");
     final AccountId spender = AccountId.fromString("0.0.9876");
     final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final TokenId otherTokenId = TokenId.fromString("0.0.12346");
     final List<Long> serialNumbers = List.of(1L, 2L);
     final PrivateKey ownerKey = PrivateKey.generateECDSA();
+    final List<Long> maxSerials = LongStream.rangeClosed(1, 20).boxed().toList();
+    final List<Long> tooManySerials = LongStream.rangeClosed(1, 21).boxed().toList();
+    final List<TokenId> tooManyTokenIds =
+        LongStream.rangeClosed(1, 21).mapToObj(num -> new TokenId(0, 0, num)).toList();
 
     Assertions.assertDoesNotThrow(
         () ->
@@ -2109,25 +2114,41 @@ public class ProtocolLayerDataCreationTests {
                 transactionValidDuration,
                 owner,
                 spender,
-                tokenId,
-                serialNumbers,
-                false,
+                Map.of(tokenId, serialNumbers),
+                Set.of(otherTokenId),
                 ownerKey));
     Assertions.assertDoesNotThrow(
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey));
     Assertions.assertDoesNotThrow(
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, maxSerials, ownerKey));
+    Assertions.assertDoesNotThrow(
+        () ->
+            NftAllowanceApproveRequest.of(
+                owner,
+                spender,
+                Map.of(tokenId, serialNumbers, otherTokenId, List.of(3L)),
+                ownerKey));
+    Assertions.assertDoesNotThrow(
         () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey));
+    Assertions.assertDoesNotThrow(
+        () ->
+            NftAllowanceApproveRequest.forAllSerials(
+                owner, spender, List.of(tokenId, otherTokenId), ownerKey));
 
+    final NftAllowanceApproveRequest serialsRequest =
+        NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey);
+    Assertions.assertEquals(Map.of(tokenId, serialNumbers), serialsRequest.serialNumbers());
+    Assertions.assertEquals(Set.of(), serialsRequest.allSerialsTokenIds());
     Assertions.assertEquals(
-        List.of(),
-        NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey)
-            .serialNumbers());
-    Assertions.assertTrue(
-        NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey)
-            .approveForAll());
-    Assertions.assertFalse(
-        NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey)
-            .approveForAll());
+        NftAllowanceApproveRequest.DEFAULT_ALLOWANCE_MAX_TRANSACTION_FEE,
+        serialsRequest.maxTransactionFee());
+    final NftAllowanceApproveRequest allSerialsRequest =
+        NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey);
+    Assertions.assertEquals(Map.of(), allSerialsRequest.serialNumbers());
+    Assertions.assertEquals(Set.of(tokenId), allSerialsRequest.allSerialsTokenIds());
+    Assertions.assertEquals(
+        NftAllowanceApproveRequest.DEFAULT_ALLOWANCE_MAX_TRANSACTION_FEE,
+        allSerialsRequest.maxTransactionFee());
 
     Assertions.assertThrows(
         IllegalArgumentException.class,
@@ -2140,15 +2161,47 @@ public class ProtocolLayerDataCreationTests {
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, List.of(-1L), ownerKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, tooManySerials, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftAllowanceApproveRequest.of(
+                owner, spender, Map.of(tokenId, maxSerials, otherTokenId, List.of(21L)), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, Map.of(), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, List.of(), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftAllowanceApproveRequest.forAllSerials(
+                owner, spender, List.of(tokenId, tokenId), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, tooManyTokenIds, ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
         () ->
             new NftAllowanceApproveRequest(
                 maxTransactionFee,
                 transactionValidDuration,
                 owner,
                 spender,
-                tokenId,
-                serialNumbers,
-                true,
+                Map.of(tokenId, serialNumbers),
+                Set.of(tokenId),
+                ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new NftAllowanceApproveRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                owner,
+                spender,
+                Map.of(tokenId, maxSerials),
+                Set.of(otherTokenId),
                 ownerKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
@@ -2158,9 +2211,8 @@ public class ProtocolLayerDataCreationTests {
                 Duration.ZERO,
                 owner,
                 spender,
-                tokenId,
-                serialNumbers,
-                false,
+                Map.of(tokenId, serialNumbers),
+                Set.of(),
                 ownerKey));
 
     Assertions.assertThrows(
@@ -2171,7 +2223,8 @@ public class ProtocolLayerDataCreationTests {
         () -> NftAllowanceApproveRequest.of(owner, null, tokenId, serialNumbers, ownerKey));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> NftAllowanceApproveRequest.of(owner, spender, null, serialNumbers, ownerKey));
+        () ->
+            NftAllowanceApproveRequest.of(owner, spender, (TokenId) null, serialNumbers, ownerKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, null, ownerKey));
@@ -2180,7 +2233,20 @@ public class ProtocolLayerDataCreationTests {
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, null));
     Assertions.assertThrows(
         NullPointerException.class,
+        () ->
+            NftAllowanceApproveRequest.of(
+                owner, spender, (Map<TokenId, List<Long>>) null, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
         () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, (TokenId) null, ownerKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            NftAllowanceApproveRequest.forAllSerials(
+                owner, spender, (List<TokenId>) null, ownerKey));
   }
 
   @Test
