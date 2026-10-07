@@ -3,8 +3,6 @@ package org.hiero.base.implementation;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
 import com.hedera.hashgraph.sdk.AccountAllowanceDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountBalance;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -23,6 +21,8 @@ import com.hedera.hashgraph.sdk.FileInfo;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.HookStoreTransaction;
+import com.hedera.hashgraph.sdk.MirrorNodeAccountBalance;
+import com.hedera.hashgraph.sdk.MirrorNodeAccountBalanceQuery;
 import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PendingAirdropId;
 import com.hedera.hashgraph.sdk.PrivateKey;
@@ -180,13 +180,16 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
   @Override
   public AccountBalanceResponse executeAccountBalanceQuery(
       @NonNull final AccountBalanceRequest request) throws HieroException {
-    final AccountBalanceQuery query =
-        new AccountBalanceQuery()
-            .setAccountId(request.accountId())
-            .setQueryPayment(request.queryPayment())
-            .setMaxQueryPayment(request.maxQueryPayment());
-    final AccountBalance balance = executeQueryAndWait(query);
-    return new AccountBalanceResponse(balance.hbars);
+    final MirrorNodeAccountBalanceQuery query =
+        new MirrorNodeAccountBalanceQuery().setAccountId(request.accountId());
+
+    try {
+      log.debug("Sending MirrorNodeAccountBalance query");
+      final MirrorNodeAccountBalance balance = query.execute(hieroContext.getClient());
+      return new AccountBalanceResponse(balance.hbars);
+    } catch (Exception e) {
+      throw new HieroException("Failed to execute query", e);
+    }
   }
 
   @Override
