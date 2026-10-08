@@ -15,6 +15,7 @@ import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
+import org.hiero.base.protocol.data.NftApprovedTransferRequest;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
@@ -372,6 +373,50 @@ public class NftClientImpl implements NftClient {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, serialNumber, fromAccountId, toAccountId, fromAccountKey);
     client.executeTransferTransaction(request);
+  }
+
+  @Override
+  public void transferApprovedNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final AccountId spenderAccountId,
+      @NonNull final PrivateKey spenderAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    transferApprovedNfts(
+        tokenId,
+        List.of(serialNumber),
+        ownerAccountId,
+        spenderAccountId,
+        spenderAccountKey,
+        toAccountId);
+  }
+
+  @Override
+  public void transferApprovedNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final AccountId spenderAccountId,
+      @NonNull final PrivateKey spenderAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    Objects.requireNonNull(spenderAccountKey, "spenderAccountKey must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    final NftApprovedTransferRequest request =
+        NftApprovedTransferRequest.of(
+            tokenId,
+            serialNumbers,
+            ownerAccountId,
+            spenderAccountId,
+            spenderAccountKey,
+            toAccountId);
+    client.executeNftApprovedTransferTransaction(request);
   }
 
   @Override

@@ -69,6 +69,7 @@ import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
 import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
+import org.hiero.base.protocol.data.NftApprovedTransferRequest;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -2013,6 +2014,93 @@ public class ProtocolLayerDataCreationTests {
         () ->
             TokenRejectRequest.of(
                 tokenId, LongStream.rangeClosed(1, 11).boxed().toList(), owner, ownerKey));
+  }
+
+  @Test
+  void testNftApprovedTransferRequestCreation() {
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.1234");
+    final List<Long> serials = List.of(1L, 2L);
+    final AccountId owner = AccountId.fromString("0.0.5678");
+    final AccountId spender = AccountId.fromString("0.0.6789");
+    final PrivateKey spenderKey = PrivateKey.generateECDSA();
+    final AccountId receiver = AccountId.fromString("0.0.9876");
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            new NftApprovedTransferRequest(
+                maxTransactionFee,
+                transactionValidDuration,
+                tokenId,
+                serials,
+                owner,
+                spender,
+                spenderKey,
+                receiver));
+    Assertions.assertDoesNotThrow(
+        () -> NftApprovedTransferRequest.of(tokenId, 1L, owner, spender, spenderKey, receiver));
+    Assertions.assertDoesNotThrow(
+        () ->
+            NftApprovedTransferRequest.of(tokenId, serials, owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new NftApprovedTransferRequest(
+                null,
+                transactionValidDuration,
+                tokenId,
+                serials,
+                owner,
+                spender,
+                spenderKey,
+                receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new NftApprovedTransferRequest(
+                maxTransactionFee, null, tokenId, serials, owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftApprovedTransferRequest.of(null, serials, owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                tokenId, (List<Long>) null, owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftApprovedTransferRequest.of(tokenId, serials, null, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftApprovedTransferRequest.of(tokenId, serials, owner, null, spenderKey, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftApprovedTransferRequest.of(tokenId, serials, owner, spender, null, receiver));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftApprovedTransferRequest.of(tokenId, serials, owner, spender, spenderKey, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                tokenId, Arrays.asList(1L, null), owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                tokenId, List.of(), owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftApprovedTransferRequest.of(tokenId, 0L, owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftApprovedTransferRequest.of(tokenId, -1L, owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                tokenId, List.of(1L, 1L), owner, spender, spenderKey, receiver));
   }
 
   @Test
