@@ -38,7 +38,9 @@ public class TopicClientTest {
 
   @Test
   void testSubscribeTopic() throws Exception {
-    final String msg = "Hello Hiero";
+    final String msg1 = "Hello Hiero First";
+    final String msg2 = "Hello Hiero Second";
+
     final List<String> messages = new ArrayList<>();
     final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
@@ -50,13 +52,20 @@ public class TopicClientTest {
               messages.add(new String(message.contents));
             });
 
-    topicClient.submitMessage(topicId, msg);
+    Thread.sleep(2000); // Wait to ensure that topic get subscribe
+
+    topicClient.submitMessage(topicId, msg1);
     hieroTestUtils.waitForMirrorNodeRecords();
-    Thread.sleep(20000); // Make sure to wait after message get recorded in mirrornode
+    Thread.sleep(2000); // Additional wait after message get recorded in mirrornode
+
+    topicClient.submitMessage(topicId, msg2);
+    hieroTestUtils.waitForMirrorNodeRecords();
+    Thread.sleep(2000); // Additional wait after message get recorded in mirrornode
 
     Assertions.assertNotNull(handler);
-    Assertions.assertEquals(1, messages.size());
-    Assertions.assertEquals(msg, messages.getFirst());
+    Assertions.assertEquals(2, messages.size());
+    Assertions.assertEquals(msg1, messages.get(0));
+    Assertions.assertEquals(msg2, messages.get(1));
     handler.unsubscribe();
   }
 
@@ -77,16 +86,19 @@ public class TopicClientTest {
             },
             limit);
 
-    topicClient.submitMessage(topicId, msg);
-    hieroTestUtils.waitForMirrorNodeRecords();
-    Thread.sleep(20000); // Make sure to wait after message get recorded in mirrornode
+    Thread.sleep(2000); // Wait to ensure that topic get subscribe
 
     topicClient.submitMessage(topicId, msg);
     hieroTestUtils.waitForMirrorNodeRecords();
-    Thread.sleep(20000); // Make sure to wait after message get recorded in mirrornode
+    Thread.sleep(2000); // Additional wait after message get recorded in mirrornode
+
+    topicClient.submitMessage(topicId, "Second Message");
+    hieroTestUtils.waitForMirrorNodeRecords();
+    Thread.sleep(2000); // Additional wait after message get recorded in mirrornode
 
     Assertions.assertNotNull(handler);
     Assertions.assertEquals(limit, messages.size());
+    Assertions.assertEquals(msg, messages.getFirst());
     handler.unsubscribe();
   }
 
