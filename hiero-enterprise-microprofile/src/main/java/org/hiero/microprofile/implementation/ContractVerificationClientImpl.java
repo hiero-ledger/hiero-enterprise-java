@@ -200,8 +200,11 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
         return false;
       }
 
+      System.out.println(source);
+
       final String content = source.getString("content", null);
-      return Objects.equals(content, fileContent);
+      System.out.println(content);
+      return content != null && content.equals(fileContent);
 
     } catch (Exception e) {
       throw new HieroException("Error checking verified source file", e);

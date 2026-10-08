@@ -1,35 +1,43 @@
-package org.hiero.spring.test;
+package org.hiero.microprofile.test;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import io.helidon.microprofile.tests.junit5.AddBean;
+import io.helidon.microprofile.tests.junit5.Configuration;
+import io.helidon.microprofile.tests.junit5.HelidonTest;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.SmartContractClient;
-import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.base.verification.ContractVerificationState;
+import org.hiero.microprofile.ClientProvider;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = HieroTestConfig.class)
-class ContractVerificationClientTest {
+@HelidonTest
+@AddBean(ClientProvider.class)
+@Configuration(useExisting = true)
+public class ContractVerificationClientTest {
+  @Inject private SmartContractClient smartContractClient;
 
-  @Autowired private HieroConfig hieroConfig;
+  @Inject private ContractVerificationClient verificationClient;
 
-  @Autowired private SmartContractClient smartContractClient;
-
-  @Autowired private ContractVerificationClient verificationClient;
+  @BeforeAll
+  static void setup() {
+    final Config build =
+        ConfigProviderResolver.instance().getBuilder().withSources(new TestConfigSource()).build();
+    ConfigProviderResolver.instance()
+        .registerConfig(build, Thread.currentThread().getContextClassLoader());
+  }
 
   private Path getResource(String resource) {
     return Path.of(ContractVerificationClientTest.class.getResource(resource).getPath());
-  }
-
-  private boolean isNotSupportedChain() {
-    return hieroConfig.chainId().isEmpty();
   }
 
   @Test
