@@ -5,7 +5,9 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.NftClient;
@@ -444,5 +446,133 @@ public class NftClientTests {
 
     Assertions.assertThrows(NullPointerException.class, () -> nftClient.burnNfts(null, null));
     Assertions.assertThrows(NullPointerException.class, () -> nftClient.burnNfts(null, null, null));
+  }
+
+  @Test
+  void approveNftAllowance() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId = nftClient.createNftType("Test NFT", "TST", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+    final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
+    final long serial = nftClient.mintNft(tokenId, ownerAccount.privateKey(), metadata);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowance(
+                tokenId, serial, ownerAccount, spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowances() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId = nftClient.createNftType("Test NFT", "TST", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+    final byte[] metadata1 = "https://example.com/metadata1".getBytes(StandardCharsets.UTF_8);
+    final byte[] metadata2 = "https://example.com/metadata2".getBytes(StandardCharsets.UTF_8);
+    final List<Long> serials =
+        nftClient.mintNfts(tokenId, ownerAccount.privateKey(), metadata1, metadata2);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowances(
+                tokenId, serials, ownerAccount, spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowanceAllSerials() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId = nftClient.createNftType("Test NFT", "TST", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowanceAllSerials(
+                tokenId, ownerAccount, spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowancesForMultipleNftTypes() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId1 = nftClient.createNftType("Test NFT 1", "TST1", ownerAccount);
+    final TokenId tokenId2 = nftClient.createNftType("Test NFT 2", "TST2", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+    final byte[][] metadata =
+        IntStream.range(0, 10)
+            .mapToObj(i -> ("https://example.com/metadata" + i).getBytes(StandardCharsets.UTF_8))
+            .toArray(byte[][]::new);
+    final List<Long> serials1 = nftClient.mintNfts(tokenId1, ownerAccount.privateKey(), metadata);
+    final List<Long> serials2 = nftClient.mintNfts(tokenId2, ownerAccount.privateKey(), metadata);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowances(
+                Map.of(tokenId1, serials1, tokenId2, serials2),
+                ownerAccount,
+                spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowanceAllSerialsForMultipleNftTypes() throws Exception {
+    // given
+    final Account ownerAccount = accountClient.createAccount(1);
+    final TokenId tokenId1 = nftClient.createNftType("Test NFT 1", "TST1", ownerAccount);
+    final TokenId tokenId2 = nftClient.createNftType("Test NFT 2", "TST2", ownerAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.approveNftAllowanceAllSerials(
+                List.of(tokenId1, tokenId2), ownerAccount, spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowanceThrowsExceptionForInvalidTokenId() throws Exception {
+    // given
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final Account ownerAccount = accountClient.createAccount(1);
+    final Account spenderAccount = accountClient.createAccount(1);
+
+    // then
+    Assertions.assertThrows(
+        HieroException.class,
+        () -> nftClient.approveNftAllowance(tokenId, 1L, ownerAccount, spenderAccount.accountId()));
+    Assertions.assertThrows(
+        HieroException.class,
+        () ->
+            nftClient.approveNftAllowanceAllSerials(
+                tokenId, ownerAccount, spenderAccount.accountId()));
+  }
+
+  @Test
+  void approveNftAllowanceInvalidParam() throws Exception {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final Account ownerAccount = accountClient.createAccount(1);
+
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClient.approveNftAllowance(tokenId, 1L, (Account) null, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClient.approveNftAllowances(tokenId, null, (Account) null, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClient.approveNftAllowanceAllSerials(tokenId, (Account) null, null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            nftClient.approveNftAllowances(
+                tokenId, List.of(), ownerAccount, ownerAccount.accountId()));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> nftClient.approveNftAllowance(tokenId, 1L, ownerAccount, ownerAccount.accountId()));
   }
 }
