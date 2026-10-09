@@ -6,6 +6,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonReaderFactory;
+import jakarta.json.stream.JsonParsingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -35,9 +36,16 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
   private final Client webClient;
 
   public ContractVerificationClientImpl(@NonNull final HieroConfig hieroConfig) {
-    this.hieroConfig = Objects.requireNonNull(hieroConfig, "hieroConfig must not be null");
+    this(hieroConfig, ClientBuilder.newBuilder().build());
+  }
+
+  public ContractVerificationClientImpl(
+      @NonNull final HieroConfig hieroConfig, @NonNull Client webClient) {
+    Objects.requireNonNull(hieroConfig, "hieroConfig must not be null");
+    Objects.requireNonNull(webClient, "webClient must not be null");
+    this.hieroConfig = hieroConfig;
+    this.webClient = webClient;
     jsonReaderFactory = Json.createReaderFactory(Map.of());
-    webClient = ClientBuilder.newBuilder().build();
   }
 
   private String getChainId() throws HieroException {
@@ -66,12 +74,6 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       throw new IllegalArgumentException("metadata.json must be present in files");
     }
 
-    final ContractVerificationState state = checkVerification(contractId);
-
-    if (state != ContractVerificationState.NONE) {
-      throw new IllegalStateException("Contract is already verified");
-    }
-
     final Map<String, String> sourceFiles = new HashMap<>(files);
     final String metadataJson = sourceFiles.remove("metadata.json");
 
@@ -79,10 +81,22 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
       throw new IllegalArgumentException("metadata.json must not be empty");
     }
 
-    final JsonObject metadata = parseJsonObject(metadataJson);
+    final JsonObject metadata;
+
+    try {
+      metadata = parseJsonObject(metadataJson);
+    } catch (JsonParsingException e) {
+      throw new IllegalArgumentException("Invalid metadata.json", e);
+    }
+
     final JsonObjectBuilder sources = Json.createObjectBuilder();
     for (Map.Entry<String, String> entry : sourceFiles.entrySet()) {
       sources.add(entry.getKey(), entry.getValue());
+    }
+
+    final ContractVerificationState state = checkVerification(contractId);
+    if (state != ContractVerificationState.NONE) {
+      throw new IllegalStateException("Contract is already verified");
     }
 
     final JsonObject requestBody =
@@ -132,7 +146,7 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
         CONTRACT_VERIFICATION_URL + "/contract/" + getChainId() + "/0x" + contractId.toEvmAddress();
 
     try (Response response = webClient.target(uri).request(MediaType.APPLICATION_JSON).get()) {
-      if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+      if (response.getStatusInfo().getStatusCode() == Response.Status.NOT_FOUND.getStatusCode()) {
         return ContractVerificationState.NONE;
       }
 

@@ -113,16 +113,16 @@ public class ContractVerificationClientImplementation implements ContractVerific
       throw new IllegalArgumentException("metadata.json must not be empty");
     }
 
-    final ContractVerificationState state = checkVerification(contractId);
-    if (state != ContractVerificationState.NONE) {
-      throw new IllegalStateException("Contract is already verified");
-    }
-
     final Map<String, Object> metadata;
     try {
       metadata = objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
     } catch (JsonProcessingException e) {
-      throw new HieroException("Invalid metadata.json", e);
+      throw new IllegalArgumentException("Invalid metadata.json", e);
+    }
+
+    final ContractVerificationState state = checkVerification(contractId);
+    if (state != ContractVerificationState.NONE) {
+      throw new IllegalStateException("Contract is already verified");
     }
 
     try {
