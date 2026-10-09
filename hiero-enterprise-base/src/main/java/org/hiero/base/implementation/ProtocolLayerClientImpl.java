@@ -51,6 +51,7 @@ import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
@@ -106,6 +107,8 @@ import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
 import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
+import org.hiero.base.protocol.data.NftApprovedTransferRequest;
+import org.hiero.base.protocol.data.NftApprovedTransferResult;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -939,6 +942,32 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenTransferResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute transfer nft transaction", e);
+    }
+  }
+
+  @Override
+  public NftApprovedTransferResult executeNftApprovedTransferTransaction(
+      @NonNull final NftApprovedTransferRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      // The network treats the transaction payer as the spender of an approved transfer.
+      final TransferTransaction transaction =
+          new TransferTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTransactionId(TransactionId.generate(request.spender()));
+      request
+          .serials()
+          .forEach(
+              serial ->
+                  transaction.addApprovedNftTransfer(
+                      request.tokenId().nft(serial), request.owner(), request.receiver()));
+      sign(transaction, request.spenderKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);
+      return new NftApprovedTransferResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute approved NFT transfer transaction", e);
     }
   }
 

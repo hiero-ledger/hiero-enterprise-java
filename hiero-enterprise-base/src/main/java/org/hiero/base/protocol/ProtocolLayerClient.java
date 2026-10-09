@@ -42,6 +42,8 @@ import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
 import org.hiero.base.protocol.data.NftAllowanceApproveResult;
 import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
 import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
+import org.hiero.base.protocol.data.NftApprovedTransferRequest;
+import org.hiero.base.protocol.data.NftApprovedTransferResult;
 import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAirdropResult;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
@@ -383,6 +385,18 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenTransferResult executeTransferTransaction(
       @NonNull final TokenTransferRequest request) throws HieroException;
+
+  /**
+   * Executes an approved transfer transaction for NFTs. The spender transfers NFTs on behalf of the
+   * owner based on a previously granted allowance. The spender pays the transaction fee and must
+   * sign the transaction.
+   *
+   * @param request the request containing the details of the approved NFT transfer transaction
+   * @return the result of the approved NFT transfer transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull NftApprovedTransferResult executeNftApprovedTransferTransaction(
+      @NonNull final NftApprovedTransferRequest request) throws HieroException;
 
   /**
    * Executes a token airdrop transaction for NFTs. The request may target a single receiver or map
