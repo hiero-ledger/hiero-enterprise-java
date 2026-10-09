@@ -1,65 +1,63 @@
-package org.hiero.spring.test;
+package org.hiero.microprofile.test;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.hiero.base.HieroException;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationState;
-import org.hiero.spring.implementation.ContractVerificationClientImplementation;
+import org.hiero.microprofile.implementation.ContractVerificationClientImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestClient;
+import org.mockito.Mockito;
 
-public class ContractVerificationClientImplementationTest {
+public class ContractVerificationClientImplTest {
   private final String BASE_URL = "https://sourcify.dev/server/v2";
   private final long CHAIN_ID = 259L;
 
-  private MockRestServiceServer server;
-  private ContractVerificationClientImplementation client;
+  private HieroConfig hieroConfig;
+  private Client webclient;
+
+  private ContractVerificationClientImpl client;
 
   @BeforeEach
-  void setUp() {
-    final RestClient.Builder builder = RestClient.builder();
-    final HieroConfig config = mock(HieroConfig.class);
-    when(config.chainId()).thenReturn(Optional.of(CHAIN_ID));
+  void setup() {
+    hieroConfig = Mockito.mock(HieroConfig.class);
+    webclient = Mockito.mock(Client.class);
+    when(hieroConfig.chainId()).thenReturn(Optional.of(CHAIN_ID));
 
-    server = MockRestServiceServer.bindTo(builder).build();
-    client = new ContractVerificationClientImplementation(config, builder);
+    client = new ContractVerificationClientImpl(hieroConfig, webclient);
   }
 
   // Test Constructor
 
   @Test
   void testConstructorThrowsExceptionForNullParams() {
-    final HieroConfig config = mock(HieroConfig.class);
-    final RestClient.Builder builder = RestClient.builder();
-
     Assertions.assertAll(
         () ->
             Assertions.assertThrows(
-                NullPointerException.class,
-                () -> new ContractVerificationClientImplementation(null)),
+                NullPointerException.class, () -> new ContractVerificationClientImpl(null)),
         () ->
             Assertions.assertThrows(
                 NullPointerException.class,
-                () -> new ContractVerificationClientImplementation(null, builder)),
+                () -> new ContractVerificationClientImpl(null, webclient)),
         () ->
             Assertions.assertThrows(
                 NullPointerException.class,
-                () -> new ContractVerificationClientImplementation(config, null)));
+                () -> new ContractVerificationClientImpl(hieroConfig, null)));
   }
 
   // Test verify Contract
@@ -116,9 +114,9 @@ public class ContractVerificationClientImplementationTest {
     final ContractId contractId = ContractId.fromString("0.0.101");
     final Map<String, String> files =
         Map.of("Hello.sol", "contract Hello {}", "metadata.json", "no-json-metadata");
+
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> client.verify(contractId, "Hello", files));
-    server.verify();
   }
 
   @Test
@@ -134,9 +132,11 @@ public class ContractVerificationClientImplementationTest {
     final Map<String, String> files =
         Map.of("Hello.sol", "contract Hello {}", "metadata.json", metadata);
 
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": "exact_match"
         }
@@ -144,7 +144,8 @@ public class ContractVerificationClientImplementationTest {
 
     Assertions.assertThrows(
         IllegalStateException.class, () -> client.verify(contractId, "Hello", files));
-    server.verify();
+
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
@@ -161,33 +162,41 @@ public class ContractVerificationClientImplementationTest {
     final Map<String, String> files =
         Map.of("metadata.json", metadata, "Hello.sol", "contract Hello {}");
 
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks1 =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": null
         }
       """);
 
-    expectPost(
-        verifyMetadataUrl(contractId),
-        """
+    final Mocks mocks2 =
+        mockPost(
+            verifyMetadataUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "verificationId": "verification-123"
         }
       """);
 
-    expectGet(
+    // job still running
+    mockGet(
         verificationJobUrl("verification-123"),
+        Response.Status.OK,
         """
         {
           "isJobCompleted": false
         }
       """);
 
-    expectGet(
-        verificationJobUrl("verification-123"),
-        """
+    final Mocks mocks3 =
+        mockGet(
+            verificationJobUrl("verification-123"),
+            Response.Status.OK,
+            """
         {
           "isJobCompleted": true,
           "contract": {
@@ -199,7 +208,9 @@ public class ContractVerificationClientImplementationTest {
     final ContractVerificationState result = client.verify(contractId, "Hello", files);
 
     Assertions.assertEquals(ContractVerificationState.FULL, result);
-    server.verify();
+    verifyMocks(mocks1, contractUrl(contractId), "get");
+    verifyMocks(mocks2, verifyMetadataUrl(contractId), "post");
+    verifyMocks(mocks3, verificationJobUrl("verification-123"), "get");
   }
 
   @Test
@@ -216,26 +227,32 @@ public class ContractVerificationClientImplementationTest {
     final Map<String, String> files =
         Map.of("metadata.json", metadata, "Hello.sol", "contract Hello {}");
 
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks1 =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": null
         }
       """);
 
-    expectPost(
-        verifyMetadataUrl(contractId),
-        """
+    final Mocks mocks2 =
+        mockPost(
+            verifyMetadataUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "verificationId": "verification-123"
         }
       """);
 
     // Poll response
-    expectGet(
-        verificationJobUrl("verification-123"),
-        """
+    final Mocks mocks3 =
+        mockGet(
+            verificationJobUrl("verification-123"),
+            Response.Status.OK,
+            """
         {
           "isJobCompleted": true,
           "error": {
@@ -246,7 +263,9 @@ public class ContractVerificationClientImplementationTest {
       """);
 
     Assertions.assertThrows(HieroException.class, () -> client.verify(contractId, "Hello", files));
-    server.verify();
+    verifyMocks(mocks1, contractUrl(contractId), "get");
+    verifyMocks(mocks2, verifyMetadataUrl(contractId), "post");
+    verifyMocks(mocks3, verificationJobUrl("verification-123"), "get");
   }
 
   // Test Check Verification State
@@ -259,9 +278,11 @@ public class ContractVerificationClientImplementationTest {
   @Test
   void testCheckVerificationReturnsFullForExactMatch() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": "exact_match"
         }
@@ -270,15 +291,17 @@ public class ContractVerificationClientImplementationTest {
     final ContractVerificationState result = client.checkVerification(contractId);
 
     Assertions.assertEquals(ContractVerificationState.FULL, result);
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
   void testCheckVerificationReturnsPartialForMatch() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": "match"
         }
@@ -287,15 +310,17 @@ public class ContractVerificationClientImplementationTest {
     final ContractVerificationState result = client.checkVerification(contractId);
 
     Assertions.assertEquals(ContractVerificationState.PARTIAL, result);
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
   void testCheckVerificationReturnsNoneForNullMatch() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": null
         }
@@ -304,15 +329,17 @@ public class ContractVerificationClientImplementationTest {
     final ContractVerificationState result = client.checkVerification(contractId);
 
     Assertions.assertEquals(ContractVerificationState.NONE, result);
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
   void testCheckVerificationReturnsNoneForUnknownMatch() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.OK,
+            """
         {
           "match": "unknown"
         }
@@ -321,36 +348,36 @@ public class ContractVerificationClientImplementationTest {
     final ContractVerificationState result = client.checkVerification(contractId);
 
     Assertions.assertEquals(ContractVerificationState.NONE, result);
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
   void testCheckVerificationReturnsNoneForNotFound() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        HttpStatus.NOT_FOUND,
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.NOT_FOUND,
+            """
        {
-          "match": null,
-          "creationMatch": null,
-          "runtimeMatch": null
+          "match": null
        }
     """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
     Assertions.assertEquals(ContractVerificationState.NONE, result);
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
   void testCheckVerificationFor4xxResponse() {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        HttpStatus.BAD_REQUEST,
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.BAD_REQUEST,
+            """
         {
            "customCode": "unsupported_chain",
            "message": "The chain with chainId 9429413 is not supported",
@@ -359,16 +386,17 @@ public class ContractVerificationClientImplementationTest {
       """);
 
     Assertions.assertThrows(HieroException.class, () -> client.checkVerification(contractId));
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   @Test
   void testCheckVerificationFor5xxResponse() {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrl(contractId),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrl(contractId),
+            Response.Status.INTERNAL_SERVER_ERROR,
+            """
         {
           "customCode": "internal_error",
           "message": "Something went wrong",
@@ -377,7 +405,7 @@ public class ContractVerificationClientImplementationTest {
       """);
 
     Assertions.assertThrows(HieroException.class, () -> client.checkVerification(contractId));
-    server.verify();
+    verifyMocks(mocks, contractUrl(contractId), "get");
   }
 
   // Test Check Verification with File Content
@@ -407,9 +435,11 @@ public class ContractVerificationClientImplementationTest {
   @Test
   void testCheckFileContentExceptionIfContractIsNotVerified() {
     final ContractId contractId = ContractId.fromString("0.0.101");
-    expectGet(
-        contractUrlWithFiles(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrlWithFiles(contractId),
+            Response.Status.OK,
+            """
         {
           "match": null
         }
@@ -417,24 +447,26 @@ public class ContractVerificationClientImplementationTest {
     Assertions.assertThrows(
         HieroException.class,
         () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
-    server.verify();
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 
   @Test
   void testCheckFileContentReturnFalseForBlankResponse() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.101");
-    expectGet(contractUrlWithFiles(contractId), "");
+    final Mocks mocks = mockGet(contractUrlWithFiles(contractId), Response.Status.OK, "");
     final boolean result = client.checkVerification(contractId, "Hello.sol", "contract Hello {}");
     Assertions.assertFalse(result);
-    server.verify();
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 
   @Test
   void testCheckFileContentReturnTrueIfContentMatch() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.101");
-    expectGet(
-        contractUrlWithFiles(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrlWithFiles(contractId),
+            Response.Status.OK,
+            """
        {
         "match": "exact_match",
         "sources": {
@@ -444,15 +476,17 @@ public class ContractVerificationClientImplementationTest {
     """);
     final boolean result = client.checkVerification(contractId, "Hello.sol", "contract Hello {}");
     Assertions.assertTrue(result);
-    server.verify();
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 
   @Test
   void testCheckFileContentReturnFalseIfContentUnMatch() throws HieroException {
     final ContractId contractId = ContractId.fromString("0.0.101");
-    expectGet(
-        contractUrlWithFiles(contractId),
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrlWithFiles(contractId),
+            Response.Status.OK,
+            """
        {
         "match": "exact_match",
         "sources": {
@@ -463,16 +497,17 @@ public class ContractVerificationClientImplementationTest {
     final boolean result =
         client.checkVerification(contractId, "Hello.sol", "contract MyContract {}");
     Assertions.assertFalse(result);
-    server.verify();
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 
   @Test
   void testCheckFileContentFor4xxResponse() {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrlWithFiles(contractId),
-        HttpStatus.BAD_REQUEST,
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrlWithFiles(contractId),
+            Response.Status.BAD_REQUEST,
+            """
         {
            "customCode": "unsupported_chain",
            "message": "The chain with chainId 9429413 is not supported",
@@ -483,16 +518,17 @@ public class ContractVerificationClientImplementationTest {
     Assertions.assertThrows(
         HieroException.class,
         () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
-    server.verify();
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 
   @Test
   void testCheckFileContentFor5xxResponse() {
     final ContractId contractId = ContractId.fromString("0.0.123");
-    expectGet(
-        contractUrlWithFiles(contractId),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        """
+    final Mocks mocks =
+        mockGet(
+            contractUrlWithFiles(contractId),
+            Response.Status.INTERNAL_SERVER_ERROR,
+            """
         {
           "customCode": "internal_error",
           "message": "Something went wrong",
@@ -503,7 +539,7 @@ public class ContractVerificationClientImplementationTest {
     Assertions.assertThrows(
         HieroException.class,
         () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
-    server.verify();
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 
   // Helpers
@@ -529,26 +565,51 @@ public class ContractVerificationClientImplementationTest {
     return BASE_URL + "/verify/" + verificationId;
   }
 
-  private void expectGet(final String expectedUrl, final String response) {
-    expectGet(expectedUrl, HttpStatus.OK, response);
+  private record Mocks(WebTarget target, Invocation.Builder request, Response response) {}
+
+  private Mocks mockGet(final String url, final Response.Status status, final String responseBody) {
+    final WebTarget target = mock(WebTarget.class);
+    final Invocation.Builder request = mock(Invocation.Builder.class);
+    final Response response = mock(Response.class);
+
+    when(webclient.target(url)).thenReturn(target);
+    when(target.request(MediaType.APPLICATION_JSON)).thenReturn(request);
+    when(request.get()).thenReturn(response);
+    when(response.getStatusInfo()).thenReturn(status);
+    when(response.readEntity(String.class)).thenReturn(responseBody);
+
+    return new Mocks(target, request, response);
   }
 
-  private void expectGet(final String expectedUrl, final HttpStatus status, final String response) {
-    server
-        .expect(requestTo(expectedUrl))
-        .andExpect(method(HttpMethod.GET))
-        .andRespond(withStatus(status).contentType(MediaType.APPLICATION_JSON).body(response));
+  private Mocks mockPost(
+      final String url, final Response.Status status, final String responseBody) {
+    final WebTarget target = mock(WebTarget.class);
+    final Invocation.Builder request = mock(Invocation.Builder.class);
+    final Response response = mock(Response.class);
+
+    when(webclient.target(url)).thenReturn(target);
+    when(target.request(MediaType.APPLICATION_JSON)).thenReturn(request);
+    when(request.post(any(Entity.class))).thenReturn(response);
+    when(response.getStatusInfo()).thenReturn(status);
+    when(response.readEntity(String.class)).thenReturn(responseBody);
+
+    return new Mocks(target, request, response);
   }
 
-  private void expectPost(final String expectedUrl, final String response) {
-    expectPost(expectedUrl, HttpStatus.OK, response);
-  }
+  private void verifyMocks(
+      final Mocks mocks, final String expectedUrl, final String expectedMethod) {
 
-  private void expectPost(
-      final String expectedUrl, final HttpStatus status, final String response) {
-    server
-        .expect(requestTo(expectedUrl))
-        .andExpect(method(HttpMethod.POST))
-        .andRespond(withStatus(status).contentType(MediaType.APPLICATION_JSON).body(response));
+    verify(webclient).target(expectedUrl);
+    verify(mocks.target()).request(MediaType.APPLICATION_JSON);
+
+    // response.getStatusInfo() may be called multiple times.
+    // response.readEntity(String.class) may be skipped when the contract
+    // verification status is not found.
+
+    switch (expectedMethod.toUpperCase()) {
+      case "POST" -> verify(mocks.request()).post(any(Entity.class));
+      case "GET" -> verify(mocks.request()).get();
+      default -> throw new IllegalArgumentException("Unsupported HTTP method: " + expectedMethod);
+    }
   }
 }

@@ -43,6 +43,7 @@ import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,6 +59,17 @@ import org.springframework.web.context.annotation.ApplicationScope;
 public class HieroAutoConfiguration {
 
   private static final Logger log = LoggerFactory.getLogger(HieroAutoConfiguration.class);
+
+  /**
+   * Resolves a {@link RestClient.Builder} instance from the provided {@link ObjectProvider}.
+   *
+   * @param provider the {@link ObjectProvider} used to look for {@link RestClient.Builder}
+   * @return a new instantiated {@link RestClient.Builder}
+   */
+  private RestClient.Builder getRestClientBuilder(
+      final ObjectProvider<RestClient.Builder> provider) {
+    return provider.getIfAvailable(RestClient::builder).clone();
+  }
 
   @Bean
   @ApplicationScope
@@ -131,7 +143,9 @@ public class HieroAutoConfiguration {
       havingValue = "true",
       matchIfMissing = true)
   MirrorNodeClient mirrorNodeClient(
-      final HieroContext hieroContext, final HieroProperties properties) {
+      final HieroContext hieroContext,
+      final HieroProperties properties,
+      final ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
     final String mirrorNodeEndpoint;
     final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
     if (mirrorNetwork.isEmpty()) {
@@ -165,7 +179,8 @@ public class HieroAutoConfiguration {
       throw new IllegalArgumentException(
           "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
     }
-    RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
+    final RestClient.Builder builder =
+        getRestClientBuilder(restClientBuilderProvider).baseUrl(baseUri);
     Optional<String> mirrorNodeJavaRest =
         Optional.ofNullable(properties.getNetwork().getMirrorNodeJavaRest())
             .filter(s -> !s.isBlank());
@@ -243,8 +258,11 @@ public class HieroAutoConfiguration {
   }
 
   @Bean
-  ContractVerificationClient contractVerificationClient(final HieroConfig hieroConfig) {
-    return new ContractVerificationClientImplementation(hieroConfig);
+  ContractVerificationClient contractVerificationClient(
+      final HieroConfig hieroConfig,
+      final ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+    final RestClient.Builder builder = getRestClientBuilder(restClientBuilderProvider);
+    return new ContractVerificationClientImplementation(hieroConfig, builder);
   }
 
   @Bean
