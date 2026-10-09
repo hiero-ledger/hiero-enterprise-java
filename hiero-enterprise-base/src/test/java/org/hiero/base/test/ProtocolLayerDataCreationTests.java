@@ -2161,6 +2161,9 @@ public class ProtocolLayerDataCreationTests {
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, List.of(-1L), ownerKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
+        () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, List.of(0L), ownerKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, tooManySerials, ownerKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,

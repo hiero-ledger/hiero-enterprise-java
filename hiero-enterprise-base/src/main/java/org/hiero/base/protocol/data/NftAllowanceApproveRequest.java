@@ -66,8 +66,8 @@ public record NftAllowanceApproveRequest(
           if (serialsCopy.isEmpty()) {
             throw new IllegalArgumentException("serialNumbers must not be empty");
           }
-          if (serialsCopy.stream().anyMatch(serialNumber -> serialNumber < 0)) {
-            throw new IllegalArgumentException("nft serial must be non-negative");
+          if (serialsCopy.stream().anyMatch(serialNumber -> serialNumber <= 0)) {
+            throw new IllegalArgumentException("serial must be positive");
           }
           serialNumbersCopy.put(tokenId, serialsCopy);
         });
