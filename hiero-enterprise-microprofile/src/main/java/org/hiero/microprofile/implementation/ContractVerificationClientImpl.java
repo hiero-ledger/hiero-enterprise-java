@@ -184,8 +184,9 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
             + "?fields=sources";
 
     try (Response response = webClient.target(uri).request(MediaType.APPLICATION_JSON).get()) {
-      if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-        return false;
+      // 404 Response means the contract is not verified on the sourcify.
+      if (response.getStatusInfo().getStatusCode() == Response.Status.NOT_FOUND.getStatusCode()) {
+        throw new IllegalStateException("Contract is not verified");
       }
 
       if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {

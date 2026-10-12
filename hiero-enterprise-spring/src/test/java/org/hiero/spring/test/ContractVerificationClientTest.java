@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.ContractId;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.hiero.base.HieroException;
 import org.hiero.base.SmartContractClient;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
@@ -86,6 +87,16 @@ class ContractVerificationClientTest {
   @DisabledIf(
       value = "isNotSupportedChain",
       disabledReason = "Verification is currently not supported for custom chains")
+  void testCheckContractIsVerifiedForContractNotExists() throws HieroException {
+    final ContractId contractId = ContractId.fromString("0.0.9999999999");
+    final ContractVerificationState result = verificationClient.checkVerification(contractId);
+    Assertions.assertEquals(ContractVerificationState.NONE, result);
+  }
+
+  @Test
+  @DisabledIf(
+      value = "isNotSupportedChain",
+      disabledReason = "Verification is currently not supported for custom chains")
   void testCheckContractContentVerification() throws Exception {
     final Path binPath = getResource("/HelloWorld.bin");
     final ContractId contractId = smartContractClient.createContract(binPath);
@@ -155,5 +166,20 @@ class ContractVerificationClientTest {
 
     // then
     Assertions.assertFalse(result);
+  }
+
+  @Test
+  @DisabledIf(
+      value = "isNotSupportedChain",
+      disabledReason = "Verification is currently not supported for custom chains")
+  void testCheckContractContentForContractNotExists() throws Exception {
+    final ContractId contractId = ContractId.fromString("0.0.9999999999");
+    final String filename = "Hello.sol";
+    final Path solPath = getResource("/HelloWorld.sol");
+    final String contractSource = Files.readString(solPath, StandardCharsets.UTF_8);
+
+    Assertions.assertThrows(
+        IllegalStateException.class,
+        () -> verificationClient.checkVerification(contractId, filename, contractSource));
   }
 }

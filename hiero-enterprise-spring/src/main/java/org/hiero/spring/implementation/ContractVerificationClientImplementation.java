@@ -224,7 +224,11 @@ public class ContractVerificationClientImplementation implements ContractVerific
               .uri(uri)
               .accept(APPLICATION_JSON)
               .retrieve()
-              .onStatus(status -> status.value() == 404, (request, response) -> {})
+              .onStatus(
+                  status -> status.value() == 404,
+                  (request, response) -> {
+                    throw new IllegalStateException("Contract is not verified");
+                  })
               .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
               .onStatus(HttpStatusCode::is5xxServerError, this::handleError)
               .body(String.class);

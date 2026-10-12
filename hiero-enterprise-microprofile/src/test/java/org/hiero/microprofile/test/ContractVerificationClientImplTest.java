@@ -365,7 +365,6 @@ public class ContractVerificationClientImplTest {
     """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
-
     Assertions.assertEquals(ContractVerificationState.NONE, result);
     verifyMocks(mocks, contractUrl(contractId), "get");
   }
@@ -497,6 +496,27 @@ public class ContractVerificationClientImplTest {
     final boolean result =
         client.checkVerification(contractId, "Hello.sol", "contract MyContract {}");
     Assertions.assertFalse(result);
+    verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
+  }
+
+  @Test
+  void testCheckFileContentFor404Response() {
+    final ContractId contractId = ContractId.fromString("0.0.123");
+    final Mocks mocks =
+        mockGet(
+            contractUrlWithFiles(contractId),
+            Response.Status.NOT_FOUND,
+            """
+           {
+          "match": null,
+          "creationMatch": null,
+          "runtimeMatch": null
+          }
+          """);
+
+    Assertions.assertThrows(
+        IllegalStateException.class,
+        () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
     verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }
 

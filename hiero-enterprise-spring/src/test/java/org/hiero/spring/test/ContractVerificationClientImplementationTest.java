@@ -467,6 +467,26 @@ public class ContractVerificationClientImplementationTest {
   }
 
   @Test
+  void testCheckFileContentFor404Response() {
+    final ContractId contractId = ContractId.fromString("0.0.123");
+    expectGet(
+        contractUrlWithFiles(contractId),
+        HttpStatus.NOT_FOUND,
+        """
+           {
+          "match": null,
+          "creationMatch": null,
+          "runtimeMatch": null
+          }
+          """);
+
+    Assertions.assertThrows(
+        IllegalStateException.class,
+        () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
+    server.verify();
+  }
+
+  @Test
   void testCheckFileContentFor4xxResponse() {
     final ContractId contractId = ContractId.fromString("0.0.123");
     expectGet(
