@@ -9,7 +9,6 @@ import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.base.verification.ContractVerificationState;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,6 @@ class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
   @DisabledIf(
       value = "isNotSupportedChain",
       disabledReason = "Verification is currently not supported for custom chains")
@@ -57,7 +55,6 @@ class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
   @DisabledIf(
       value = "isNotSupportedChain",
       disabledReason = "Verification is currently not supported for custom chains")
@@ -86,7 +83,6 @@ class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
   @DisabledIf(
       value = "isNotSupportedChain",
       disabledReason = "Verification is currently not supported for custom chains")
@@ -112,7 +108,6 @@ class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
   @DisabledIf(
       value = "isNotSupportedChain",
       disabledReason = "Verification is currently not supported for custom chains")
@@ -138,7 +133,6 @@ class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
   @DisabledIf(
       value = "isNotSupportedChain",
       disabledReason = "Verification is currently not supported for custom chains")

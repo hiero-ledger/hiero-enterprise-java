@@ -445,7 +445,7 @@ public class ContractVerificationClientImplTest {
         }
         """);
     Assertions.assertThrows(
-        HieroException.class,
+        IllegalStateException.class,
         () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
     verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
   }

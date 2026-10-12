@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import org.hiero.base.HieroException;
@@ -241,10 +242,19 @@ public class ContractVerificationClientImplementation implements ContractVerific
         throw new IllegalStateException("Contract is not verified");
       }
 
-      final JsonNode contentNode =
-          rootNode.path("sources").path("contracts/" + fileName).path("content");
+      final JsonNode sources = rootNode.path("sources");
+      final Iterator<String> paths = sources.fieldNames();
 
-      return !contentNode.isMissingNode() && fileContent.equals(contentNode.asText());
+      while (paths.hasNext()) {
+        final String path = paths.next();
+        if (path.equals(fileName) || path.endsWith("/" + fileName)) {
+          return fileContent.equals(sources.path(path).path("content").asText());
+        }
+      }
+
+      return false;
+    } catch (IllegalStateException e) {
+      throw e;
     } catch (Exception e) {
       throw new HieroException("Error checking verification step", e);
     }
@@ -305,6 +315,10 @@ public class ContractVerificationClientImplementation implements ContractVerific
 
       throw new HieroException(
           "Timed out waiting for contract verification job: " + verificationId);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new HieroException(
+          "Interrupted while waiting for verification job: " + verificationId, e);
     } catch (Exception e) {
       throw new HieroException("Error checking contract verification status: " + verificationId, e);
     }

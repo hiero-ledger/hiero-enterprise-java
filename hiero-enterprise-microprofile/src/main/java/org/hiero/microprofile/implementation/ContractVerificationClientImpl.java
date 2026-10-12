@@ -1,11 +1,7 @@
 package org.hiero.microprofile.implementation;
 
 import com.hedera.hashgraph.sdk.ContractId;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonReader;
-import jakarta.json.JsonReaderFactory;
+import jakarta.json.*;
 import jakarta.json.stream.JsonParsingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -209,17 +205,16 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
         return false;
       }
 
-      final JsonObject source = sources.getJsonObject("contracts/" + fileName);
-      if (source == null) {
-        return false;
+      for (final Map.Entry<String, JsonValue> entry : sources.entrySet()) {
+        final String path = entry.getKey();
+        if (path.equals(fileName) || path.endsWith("/" + fileName)) {
+          return fileContent.equals(entry.getValue().asJsonObject().getString("content", null));
+        }
       }
 
-      System.out.println(source);
-
-      final String content = source.getString("content", null);
-      System.out.println(content);
-      return content != null && content.equals(fileContent);
-
+      return false;
+    } catch (IllegalStateException e) {
+      throw e;
     } catch (Exception e) {
       throw new HieroException("Error checking verified source file", e);
     }
@@ -271,6 +266,10 @@ public class ContractVerificationClientImpl implements ContractVerificationClien
 
       throw new HieroException(
           "Timed out waiting for contract verification job: " + verificationId);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new HieroException(
+          "Interrupted while waiting for verification job: " + verificationId, e);
     } catch (Exception e) {
       throw new HieroException("Error checking contract verification status: " + verificationId, e);
     }

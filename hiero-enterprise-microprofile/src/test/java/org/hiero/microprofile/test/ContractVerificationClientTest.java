@@ -11,14 +11,11 @@ import java.nio.file.Path;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.SmartContractClient;
+import org.hiero.base.config.HieroConfig;
 import org.hiero.base.verification.ContractVerificationClient;
 import org.hiero.base.verification.ContractVerificationState;
 import org.hiero.microprofile.ClientProvider;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIf;
+import org.junit.jupiter.api.*;
 
 @HelidonTest
 @AddBean(ClientProvider.class)
@@ -27,6 +24,8 @@ public class ContractVerificationClientTest {
   @Inject private SmartContractClient smartContractClient;
 
   @Inject private ContractVerificationClient verificationClient;
+
+  @Inject private HieroConfig hieroConfig;
 
   @BeforeAll
   static void setup() {
@@ -40,12 +39,16 @@ public class ContractVerificationClientTest {
     return Path.of(ContractVerificationClientTest.class.getResource(resource).getPath());
   }
 
+  private boolean isNotSupportedChain() {
+    return hieroConfig.chainId().isEmpty();
+  }
+
   @Test
-  @Disabled
-  @DisabledIf(
-      value = "isNotSupportedChain",
-      disabledReason = "Verification is currently not supported for custom chains")
   void testContractVerification() throws Exception {
+    Assumptions.assumeFalse(
+        hieroConfig.chainId().isEmpty(),
+        "Verification is currently not supported for custom chains");
+
     final Path binPath = getResource("/HelloWorld.bin");
     final ContractId contractId = smartContractClient.createContract(binPath);
 
@@ -65,11 +68,11 @@ public class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
-  @DisabledIf(
-      value = "isNotSupportedChain",
-      disabledReason = "Verification is currently not supported for custom chains")
   void testCheckIfContractIsVerified() throws Exception {
+    Assumptions.assumeFalse(
+        hieroConfig.chainId().isEmpty(),
+        "Verification is currently not supported for custom chains");
+
     final Path binPath = getResource("/HelloWorld.bin");
     final ContractId contractId = smartContractClient.createContract(binPath);
 
@@ -94,11 +97,11 @@ public class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
-  @DisabledIf(
-      value = "isNotSupportedChain",
-      disabledReason = "Verification is currently not supported for custom chains")
   void testCheckContractContentVerification() throws Exception {
+    Assumptions.assumeFalse(
+        hieroConfig.chainId().isEmpty(),
+        "Verification is currently not supported for custom chains");
+
     final Path binPath = getResource("/HelloWorld.bin");
     final ContractId contractId = smartContractClient.createContract(binPath);
 
@@ -120,11 +123,11 @@ public class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
-  @DisabledIf(
-      value = "isNotSupportedChain",
-      disabledReason = "Verification is currently not supported for custom chains")
   void testCheckContractContentVerificationNotMatch() throws Exception {
+    Assumptions.assumeFalse(
+        hieroConfig.chainId().isEmpty(),
+        "Verification is currently not supported for custom chains");
+
     final Path binPath = getResource("/HelloWorld.bin");
     final ContractId contractId = smartContractClient.createContract(binPath);
 
@@ -146,11 +149,11 @@ public class ContractVerificationClientTest {
   }
 
   @Test
-  @Disabled
-  @DisabledIf(
-      value = "isNotSupportedChain",
-      disabledReason = "Verification is currently not supported for custom chains")
   void testCheckContractContentVerificationWhenFilenameNotPresent() throws Exception {
+    Assumptions.assumeFalse(
+        hieroConfig.chainId().isEmpty(),
+        "Verification is currently not supported for custom chains");
+
     final Path binPath = getResource("/HelloWorld.bin");
     final ContractId contractId = smartContractClient.createContract(binPath);
 
