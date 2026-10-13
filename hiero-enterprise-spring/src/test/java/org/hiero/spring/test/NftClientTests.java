@@ -418,6 +418,38 @@ public class NftClientTests {
   }
 
   @Test
+  void transferApprovedNftsWithMultipleNftTypes() throws Exception {
+    // given
+    final Account treasuryAccount = accountClient.createAccount(1);
+    final TokenId tokenId1 = nftClient.createNftType("Test NFT 1", "TST1", treasuryAccount);
+    final TokenId tokenId2 = nftClient.createNftType("Test NFT 2", "TST2", treasuryAccount);
+    final Account spenderAccount = accountClient.createAccount(1);
+    final Account receiverAccount1 = accountClient.createAccount(1);
+    final Account receiverAccount2 = accountClient.createAccount(1);
+    final byte[] metadata = "https://example.com/metadata".getBytes(StandardCharsets.UTF_8);
+    nftClient.associateNft(tokenId1, receiverAccount1);
+    nftClient.associateNft(tokenId2, receiverAccount2);
+    final long serial1 = nftClient.mintNft(tokenId1, treasuryAccount.privateKey(), metadata);
+    final long serial2 = nftClient.mintNft(tokenId2, treasuryAccount.privateKey(), metadata);
+    nftClient.approveNftAllowances(
+        Map.of(tokenId1, List.of(serial1), tokenId2, List.of(serial2)),
+        treasuryAccount,
+        spenderAccount.accountId());
+
+    // then
+    Assertions.assertDoesNotThrow(
+        () ->
+            nftClient.transferApprovedNfts(
+                Map.of(
+                    tokenId1,
+                    Map.of(serial1, receiverAccount1.accountId()),
+                    tokenId2,
+                    Map.of(serial2, receiverAccount2.accountId())),
+                treasuryAccount.accountId(),
+                spenderAccount));
+  }
+
+  @Test
   void transferApprovedNftThrowsExceptionWithoutAllowance() throws Exception {
     // given
     final Account treasuryAccount = accountClient.createAccount(1);
@@ -454,6 +486,11 @@ public class NftClientTests {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> nftClient.transferApprovedNfts(null, null, null, (AccountId) null, null, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> nftClient.transferApprovedNfts(null, null, null, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClient.transferApprovedNfts(null, null, (Account) null));
   }
 
   @Test

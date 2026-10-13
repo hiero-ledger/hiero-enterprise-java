@@ -80,6 +80,8 @@
 | `transferApprovedNft(TokenId tokenId, long serialNumber, AccountId ownerAccountId, Account spenderAccount, AccountId toAccountId)` | Transfers an NFT on behalf of its owner using an account object as spender. |
 | `transferApprovedNfts(TokenId tokenId, List<Long> serialNumbers, AccountId ownerAccountId, AccountId spenderAccountId, PrivateKey spenderAccountKey, AccountId toAccountId)` | Transfers multiple NFTs on behalf of their owner using a spender allowance. |
 | `transferApprovedNfts(TokenId tokenId, List<Long> serialNumbers, AccountId ownerAccountId, Account spenderAccount, AccountId toAccountId)` | Transfers multiple NFTs on behalf of their owner using an account object as spender. |
+| `transferApprovedNfts(Map<TokenId, Map<Long, AccountId>> nftTransfers, AccountId ownerAccountId, AccountId spenderAccountId, PrivateKey spenderAccountKey)` | Transfers NFTs of multiple NFT types on behalf of their owner, each to its own receiver. |
+| `transferApprovedNfts(Map<TokenId, Map<Long, AccountId>> nftTransfers, AccountId ownerAccountId, Account spenderAccount)` | Transfers NFTs of multiple NFT types on behalf of their owner using an account object as spender. |
 | `airdropNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops an NFT between accounts. May become pending if the receiver lacks auto-association slots. |
 | `airdropNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Airdrops an NFT using an account object as sender. |
 | `airdropNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Airdrops multiple NFTs to a single receiver. |
@@ -465,7 +467,7 @@ receiver
 
 ## Transfer Approved NFT
 
-Transfers one or more NFTs on behalf of their owner using an approved `TransferTransaction`. The owner must first grant the spender an allowance for the NFTs (`AccountAllowanceApproveTransaction`). The spender is the payer of the transaction and must sign it; the owner does not need to sign (see [Transfer tokens](https://docs.hedera.com/native/tokens/transfer)).
+Transfers one or more NFTs on behalf of their owner using an approved `TransferTransaction`. The owner must first grant the spender an allowance for the NFTs (`AccountAllowanceApproveTransaction`). The spender is the payer of the transaction and must sign it; the owner does not need to sign (see [Transfer tokens](https://docs.hedera.com/native/tokens/transfer)). Hedera limits a single transfer transaction to at most 10 NFT transfers.
 
 ```java title="transferApprovedNft(TokenId tokenId, long serialNumber, AccountId ownerAccountId, AccountId spenderAccountId, PrivateKey spenderAccountKey, AccountId toAccountId)"
 AccountId owner = AccountId.fromString("0.0.1001");
@@ -487,6 +489,17 @@ Account spender = accountClient.createAccount();
 List<Long> serialNumbers = List.of(1L, 2L);
 
 nftClient.transferApprovedNfts(tokenId, serialNumbers, owner, spender, receiver);
+```
+
+NFTs of multiple NFT types can be transferred to different receivers in a single transaction:
+
+```java title="transferApprovedNfts(Map<TokenId, Map<Long, AccountId>> nftTransfers, AccountId ownerAccountId, Account spenderAccount)"
+Map<TokenId, Map<Long, AccountId>> nftTransfers =
+    Map.of(
+        tokenId1, Map.of(1L, receiver1, 2L, receiver2),
+        tokenId2, Map.of(1L, receiver2));
+
+nftClient.transferApprovedNfts(nftTransfers, owner, spender);
 ```
 
 ---

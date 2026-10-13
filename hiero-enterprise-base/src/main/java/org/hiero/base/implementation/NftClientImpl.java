@@ -420,6 +420,23 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
+  public void transferApprovedNfts(
+      @NonNull final Map<TokenId, Map<Long, AccountId>> nftTransfers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final AccountId spenderAccountId,
+      @NonNull final PrivateKey spenderAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(nftTransfers, "nftTransfers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    Objects.requireNonNull(spenderAccountKey, "spenderAccountKey must not be null");
+    final NftApprovedTransferRequest request =
+        NftApprovedTransferRequest.of(
+            nftTransfers, ownerAccountId, spenderAccountId, spenderAccountKey);
+    client.executeNftApprovedTransferTransaction(request);
+  }
+
+  @Override
   public void airdropNft(
       @NonNull final TokenId tokenId,
       final long serialNumber,

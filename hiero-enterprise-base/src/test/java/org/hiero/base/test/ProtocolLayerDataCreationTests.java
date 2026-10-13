@@ -2026,40 +2026,35 @@ public class ProtocolLayerDataCreationTests {
     final AccountId spender = AccountId.fromString("0.0.6789");
     final PrivateKey spenderKey = PrivateKey.generateECDSA();
     final AccountId receiver = AccountId.fromString("0.0.9876");
+    final Map<TokenId, Map<Long, AccountId>> nftTransfers =
+        Map.of(tokenId, Map.of(1L, receiver, 2L, receiver));
 
     Assertions.assertDoesNotThrow(
         () ->
             new NftApprovedTransferRequest(
                 maxTransactionFee,
                 transactionValidDuration,
-                tokenId,
-                serials,
+                nftTransfers,
                 owner,
                 spender,
-                spenderKey,
-                receiver));
+                spenderKey));
     Assertions.assertDoesNotThrow(
         () -> NftApprovedTransferRequest.of(tokenId, 1L, owner, spender, spenderKey, receiver));
     Assertions.assertDoesNotThrow(
         () ->
             NftApprovedTransferRequest.of(tokenId, serials, owner, spender, spenderKey, receiver));
+    Assertions.assertDoesNotThrow(
+        () -> NftApprovedTransferRequest.of(nftTransfers, owner, spender, spenderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new NftApprovedTransferRequest(
-                null,
-                transactionValidDuration,
-                tokenId,
-                serials,
-                owner,
-                spender,
-                spenderKey,
-                receiver));
+                null, transactionValidDuration, nftTransfers, owner, spender, spenderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
             new NftApprovedTransferRequest(
-                maxTransactionFee, null, tokenId, serials, owner, spender, spenderKey, receiver));
+                maxTransactionFee, null, nftTransfers, owner, spender, spenderKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () -> NftApprovedTransferRequest.of(null, serials, owner, spender, spenderKey, receiver));
@@ -2101,6 +2096,79 @@ public class ProtocolLayerDataCreationTests {
         () ->
             NftApprovedTransferRequest.of(
                 tokenId, List.of(1L, 1L), owner, spender, spenderKey, receiver));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                tokenId,
+                LongStream.rangeClosed(1, 11).boxed().toList(),
+                owner,
+                spender,
+                spenderKey,
+                receiver));
+  }
+
+  @Test
+  void testNftApprovedTransferRequestCreationWithMultipleNftTypes() {
+    final TokenId tokenId1 = TokenId.fromString("0.0.1234");
+    final TokenId tokenId2 = TokenId.fromString("0.0.1235");
+    final AccountId owner = AccountId.fromString("0.0.5678");
+    final AccountId spender = AccountId.fromString("0.0.6789");
+    final PrivateKey spenderKey = PrivateKey.generateECDSA();
+    final AccountId receiver1 = AccountId.fromString("0.0.9876");
+    final AccountId receiver2 = AccountId.fromString("0.0.9877");
+
+    final NftApprovedTransferRequest request =
+        NftApprovedTransferRequest.of(
+            Map.of(tokenId1, Map.of(1L, receiver1, 2L, receiver2), tokenId2, Map.of(1L, receiver2)),
+            owner,
+            spender,
+            spenderKey);
+    Assertions.assertEquals(
+        Map.of(tokenId1, Map.of(1L, receiver1, 2L, receiver2), tokenId2, Map.of(1L, receiver2)),
+        request.nftTransfers());
+
+    final Map<Long, AccountId> fiveTransfers = new LinkedHashMap<>();
+    final Map<Long, AccountId> sixTransfers = new LinkedHashMap<>();
+    LongStream.rangeClosed(1, 5).forEach(serial -> fiveTransfers.put(serial, receiver1));
+    LongStream.rangeClosed(1, 6).forEach(serial -> sixTransfers.put(serial, receiver1));
+    Assertions.assertDoesNotThrow(
+        () ->
+            NftApprovedTransferRequest.of(
+                Map.of(tokenId1, fiveTransfers, tokenId2, fiveTransfers),
+                owner,
+                spender,
+                spenderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                Map.of(tokenId1, fiveTransfers, tokenId2, sixTransfers),
+                owner,
+                spender,
+                spenderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> NftApprovedTransferRequest.of(Map.of(), owner, spender, spenderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftApprovedTransferRequest.of(Map.of(tokenId1, Map.of()), owner, spender, spenderKey));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                Map.of(tokenId1, Map.of(0L, receiver1)), owner, spender, spenderKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> NftApprovedTransferRequest.of(null, owner, spender, spenderKey));
+    final Map<Long, AccountId> nullReceiver = new LinkedHashMap<>();
+    nullReceiver.put(1L, null);
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            NftApprovedTransferRequest.of(
+                Map.of(tokenId1, nullReceiver), owner, spender, spenderKey));
   }
 
   @Test

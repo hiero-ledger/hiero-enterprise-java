@@ -957,11 +957,13 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTransactionValidDuration(request.transactionValidDuration())
               .setTransactionId(TransactionId.generate(request.spender()));
       request
-          .serials()
+          .nftTransfers()
           .forEach(
-              serial ->
-                  transaction.addApprovedNftTransfer(
-                      request.tokenId().nft(serial), request.owner(), request.receiver()));
+              (tokenId, serialToReceiver) ->
+                  serialToReceiver.forEach(
+                      (serial, receiver) ->
+                          transaction.addApprovedNftTransfer(
+                              tokenId.nft(serial), request.owner(), receiver)));
       sign(transaction, request.spenderKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);

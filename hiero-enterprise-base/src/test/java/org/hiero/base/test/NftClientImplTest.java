@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -934,12 +935,11 @@ public class NftClientImplTest {
         .executeNftApprovedTransferTransaction(nftApprovedTransferCaptor.capture());
 
     final NftApprovedTransferRequest request = nftApprovedTransferCaptor.getValue();
-    Assertions.assertEquals(tokenId, request.tokenId());
-    Assertions.assertEquals(List.of(serialNumber), request.serials());
+    Assertions.assertEquals(
+        Map.of(tokenId, Map.of(serialNumber, toAccountId)), request.nftTransfers());
     Assertions.assertEquals(ownerAccountId, request.owner());
     Assertions.assertEquals(spenderAccountId, request.spender());
     Assertions.assertEquals(spenderAccountKey, request.spenderKey());
-    Assertions.assertEquals(toAccountId, request.receiver());
   }
 
   @Test
@@ -965,12 +965,11 @@ public class NftClientImplTest {
         .executeNftApprovedTransferTransaction(nftApprovedTransferCaptor.capture());
 
     final NftApprovedTransferRequest request = nftApprovedTransferCaptor.getValue();
-    Assertions.assertEquals(tokenId, request.tokenId());
-    Assertions.assertEquals(List.of(serialNumber), request.serials());
+    Assertions.assertEquals(
+        Map.of(tokenId, Map.of(serialNumber, toAccountId)), request.nftTransfers());
     Assertions.assertEquals(ownerAccountId, request.owner());
     Assertions.assertEquals(spenderAccountId, request.spender());
     Assertions.assertEquals(spenderAccountKey, request.spenderKey());
-    Assertions.assertEquals(toAccountId, request.receiver());
   }
 
   @Test
@@ -994,12 +993,11 @@ public class NftClientImplTest {
         .executeNftApprovedTransferTransaction(nftApprovedTransferCaptor.capture());
 
     final NftApprovedTransferRequest request = nftApprovedTransferCaptor.getValue();
-    Assertions.assertEquals(tokenId, request.tokenId());
-    Assertions.assertEquals(serialNumbers, request.serials());
+    Assertions.assertEquals(
+        Map.of(tokenId, Map.of(1L, toAccountId, 2L, toAccountId)), request.nftTransfers());
     Assertions.assertEquals(ownerAccountId, request.owner());
     Assertions.assertEquals(spenderAccountId, request.spender());
     Assertions.assertEquals(spenderAccountKey, request.spenderKey());
-    Assertions.assertEquals(toAccountId, request.receiver());
   }
 
   @Test
@@ -1025,9 +1023,109 @@ public class NftClientImplTest {
         .executeNftApprovedTransferTransaction(nftApprovedTransferCaptor.capture());
 
     final NftApprovedTransferRequest request = nftApprovedTransferCaptor.getValue();
-    Assertions.assertEquals(serialNumbers, request.serials());
+    Assertions.assertEquals(
+        Map.of(tokenId, Map.of(1L, toAccountId, 2L, toAccountId)), request.nftTransfers());
     Assertions.assertEquals(spenderAccountId, request.spender());
     Assertions.assertEquals(spenderAccountKey, request.spenderKey());
+  }
+
+  @Test
+  void testTransferApprovedNftsWithMultipleNftTypes() throws HieroException {
+    final NftApprovedTransferResult result = Mockito.mock(NftApprovedTransferResult.class);
+
+    final TokenId tokenId1 = TokenId.fromString("1.2.3");
+    final TokenId tokenId2 = TokenId.fromString("1.2.4");
+    final AccountId ownerAccountId = AccountId.fromString("0.0.1001");
+    final AccountId spenderAccountId = AccountId.fromString("0.0.1002");
+    final PrivateKey spenderAccountKey = PrivateKey.generateECDSA();
+    final AccountId toAccountId1 = AccountId.fromString("0.0.1003");
+    final AccountId toAccountId2 = AccountId.fromString("0.0.1004");
+    final Map<TokenId, Map<Long, AccountId>> nftTransfers =
+        Map.of(
+            tokenId1,
+            Map.of(1L, toAccountId1, 2L, toAccountId2),
+            tokenId2,
+            Map.of(1L, toAccountId2));
+
+    when(protocolLayerClient.executeNftApprovedTransferTransaction(
+            any(NftApprovedTransferRequest.class)))
+        .thenReturn(result);
+    nftClientImpl.transferApprovedNfts(
+        nftTransfers, ownerAccountId, spenderAccountId, spenderAccountKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeNftApprovedTransferTransaction(nftApprovedTransferCaptor.capture());
+
+    final NftApprovedTransferRequest request = nftApprovedTransferCaptor.getValue();
+    Assertions.assertEquals(nftTransfers, request.nftTransfers());
+    Assertions.assertEquals(ownerAccountId, request.owner());
+    Assertions.assertEquals(spenderAccountId, request.spender());
+    Assertions.assertEquals(spenderAccountKey, request.spenderKey());
+  }
+
+  @Test
+  void testTransferApprovedNftsWithMultipleNftTypesAndAccount() throws HieroException {
+    final NftApprovedTransferResult result = Mockito.mock(NftApprovedTransferResult.class);
+
+    final TokenId tokenId1 = TokenId.fromString("1.2.3");
+    final TokenId tokenId2 = TokenId.fromString("1.2.4");
+    final AccountId ownerAccountId = AccountId.fromString("0.0.1001");
+    final AccountId spenderAccountId = AccountId.fromString("0.0.1002");
+    final PrivateKey spenderAccountKey = PrivateKey.generateECDSA();
+    final Account spenderAccount =
+        new Account(spenderAccountId, spenderAccountKey.getPublicKey(), spenderAccountKey);
+    final AccountId toAccountId = AccountId.fromString("0.0.1003");
+    final Map<TokenId, Map<Long, AccountId>> nftTransfers =
+        Map.of(tokenId1, Map.of(1L, toAccountId), tokenId2, Map.of(1L, toAccountId));
+
+    when(protocolLayerClient.executeNftApprovedTransferTransaction(
+            any(NftApprovedTransferRequest.class)))
+        .thenReturn(result);
+    nftClientImpl.transferApprovedNfts(nftTransfers, ownerAccountId, spenderAccount);
+
+    verify(protocolLayerClient, times(1))
+        .executeNftApprovedTransferTransaction(nftApprovedTransferCaptor.capture());
+
+    final NftApprovedTransferRequest request = nftApprovedTransferCaptor.getValue();
+    Assertions.assertEquals(nftTransfers, request.nftTransfers());
+    Assertions.assertEquals(spenderAccountId, request.spender());
+    Assertions.assertEquals(spenderAccountKey, request.spenderKey());
+  }
+
+  @Test
+  void testTransferApprovedNftsThrowsExceptionForTooManyNfts() {
+    final TokenId tokenId1 = TokenId.fromString("1.2.3");
+    final TokenId tokenId2 = TokenId.fromString("1.2.4");
+    final AccountId ownerAccountId = AccountId.fromString("0.0.1001");
+    final AccountId spenderAccountId = AccountId.fromString("0.0.1002");
+    final PrivateKey spenderAccountKey = PrivateKey.generateECDSA();
+    final AccountId toAccountId = AccountId.fromString("0.0.1003");
+    final Map<Long, AccountId> sixTransfers = new HashMap<>();
+    LongStream.rangeClosed(1, 6).forEach(serial -> sixTransfers.put(serial, toAccountId));
+
+    final IllegalArgumentException e1 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                nftClientImpl.transferApprovedNfts(
+                    tokenId1,
+                    LongStream.rangeClosed(1, 11).boxed().toList(),
+                    ownerAccountId,
+                    spenderAccountId,
+                    spenderAccountKey,
+                    toAccountId));
+    Assertions.assertEquals("must not contain more than 10 NFT transfers", e1.getMessage());
+
+    final IllegalArgumentException e2 =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                nftClientImpl.transferApprovedNfts(
+                    Map.of(tokenId1, sixTransfers, tokenId2, sixTransfers),
+                    ownerAccountId,
+                    spenderAccountId,
+                    spenderAccountKey));
+    Assertions.assertEquals("must not contain more than 10 NFT transfers", e2.getMessage());
   }
 
   @Test
@@ -1145,6 +1243,16 @@ public class NftClientImplTest {
         () ->
             nftClientImpl.transferApprovedNfts(
                 tokenId, List.of(1L), ownerAccountId, (Account) null, toAccountId));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            nftClientImpl.transferApprovedNfts(
+                null, ownerAccountId, spenderAccountId, spenderAccountKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            nftClientImpl.transferApprovedNfts(
+                Map.of(tokenId, Map.of(1L, toAccountId)), ownerAccountId, (Account) null));
   }
 
   @Test
