@@ -5,6 +5,9 @@ import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMI
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFixedFee;
+import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
 import com.hedera.hashgraph.sdk.EvmHookStorageUpdate;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -22,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,6 +87,8 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
@@ -2565,6 +2571,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
@@ -2578,6 +2585,23 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 PrivateKey.generateECDSA()));
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final TokenCreateRequest withFeeScheduleKey =
+        TokenCreateRequest.of(
+            name,
+            symbol,
+            treasuryAccountId,
+            treasuryKey,
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            supplyKey,
+            null,
+            null,
+            null,
+            null,
+            feeScheduleKey);
+    Assertions.assertEquals(feeScheduleKey, withFeeScheduleKey.feeScheduleKey());
+    Assertions.assertNull(
+        TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey).feeScheduleKey());
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2591,6 +2615,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
@@ -2611,6 +2636,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2625,6 +2651,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
@@ -2645,6 +2672,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2662,6 +2690,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2676,6 +2705,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
@@ -2721,6 +2751,102 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertThrows(NullPointerException.class, () -> new TokenDeleteResult(null, status));
     Assertions.assertThrows(
         NullPointerException.class, () -> new TokenDeleteResult(transactionId, null));
+  }
+
+  @Test
+  void testTokenFeeScheduleUpdateRequestCreation() {
+    // Given
+    final Hbar maxTransactionFee = Hbar.fromTinybars(1000);
+    final Duration transactionValidDuration = Duration.ofSeconds(120);
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final List<CustomFee> customFees =
+        List.of(
+            new CustomRoyaltyFee()
+                .setNumerator(1)
+                .setDenominator(10)
+                .setFeeCollectorAccountId(AccountId.fromString("0.0.1001")));
+
+    // Then
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TokenFeeScheduleUpdateRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, customFees, feeScheduleKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenFeeScheduleUpdateRequest.of(tokenId, customFees, feeScheduleKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenFeeScheduleUpdateRequest.of("0.0.12345", customFees, feeScheduleKey));
+    Assertions.assertDoesNotThrow(
+        () -> TokenFeeScheduleUpdateRequest.of(tokenId, List.of(), feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFeeScheduleUpdateRequest(
+                null, transactionValidDuration, tokenId, customFees, feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFeeScheduleUpdateRequest(
+                maxTransactionFee, null, tokenId, customFees, feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFeeScheduleUpdateRequest(
+                maxTransactionFee, transactionValidDuration, null, customFees, feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFeeScheduleUpdateRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, null, feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TokenFeeScheduleUpdateRequest(
+                maxTransactionFee, transactionValidDuration, tokenId, customFees, null));
+  }
+
+  @Test
+  void testTokenFeeScheduleUpdateRequestRejectsTooManyFees() {
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final List<CustomFee> tooManyFees =
+        LongStream.rangeClosed(1, TokenFeeScheduleUpdateRequest.MAX_CUSTOM_FEES + 1)
+            .<CustomFee>mapToObj(amount -> new CustomFixedFee().setHbarAmount(Hbar.from(amount)))
+            .toList();
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TokenFeeScheduleUpdateRequest.of(tokenId, tooManyFees, feeScheduleKey));
+  }
+
+  @Test
+  void testTokenFeeScheduleUpdateRequestCopiesFees() {
+    final TokenId tokenId = TokenId.fromString("0.0.12345");
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final List<CustomFee> customFees = new ArrayList<>();
+    customFees.add(new CustomFixedFee().setHbarAmount(Hbar.from(1)));
+
+    final TokenFeeScheduleUpdateRequest request =
+        TokenFeeScheduleUpdateRequest.of(tokenId, customFees, feeScheduleKey);
+    customFees.add(new CustomFixedFee().setHbarAmount(Hbar.from(2)));
+
+    Assertions.assertEquals(1, request.customFees().size());
+    Assertions.assertThrows(
+        UnsupportedOperationException.class, () -> request.customFees().add(new CustomFixedFee()));
+  }
+
+  @Test
+  void testTokenFeeScheduleUpdateResultCreation() {
+    // Given
+    final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
+    final Status status = Status.SUCCESS;
+
+    // Then
+    Assertions.assertDoesNotThrow(() -> new TokenFeeScheduleUpdateResult(transactionId, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenFeeScheduleUpdateResult(null, status));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> new TokenFeeScheduleUpdateResult(transactionId, null));
   }
 
   @Test

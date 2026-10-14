@@ -1,6 +1,8 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFractionalFee;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -25,6 +27,7 @@ import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
@@ -150,6 +153,41 @@ public class NftClientImpl implements NftClient {
       @Nullable final PrivateKey metadataKey,
       @Nullable final PrivateKey kycKey)
       throws HieroException {
+    return createNftType(
+        name, symbol, treasuryAccountId, treasuryKey, supplierKey, metadataKey, kycKey, null);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey,
+      @Nullable final PrivateKey feeScheduleKey)
+      throws HieroException {
+    return createNftType(
+        name,
+        symbol,
+        operationalAccount.accountId(),
+        operationalAccount.privateKey(),
+        supplierKey,
+        metadataKey,
+        kycKey,
+        feeScheduleKey);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey,
+      @Nullable final PrivateKey feeScheduleKey)
+      throws HieroException {
     final TokenCreateRequest request =
         TokenCreateRequest.of(
             name,
@@ -161,7 +199,8 @@ public class NftClientImpl implements NftClient {
             metadataKey,
             null,
             null,
-            kycKey);
+            kycKey,
+            feeScheduleKey);
     final TokenCreateResult tokenCreateResult = client.executeTokenCreateTransaction(request);
     return tokenCreateResult.tokenId();
   }
@@ -648,6 +687,30 @@ public class NftClientImpl implements NftClient {
     Objects.requireNonNull(adminKey, "adminKey must not be null");
     final TokenUpdateRequest request = TokenUpdateRequest.of(tokenId, adminKey, name, symbol);
     client.executeTokenUpdateTransaction(request);
+  }
+
+  @Override
+  public void updateNftFeeSchedule(
+      @NonNull final TokenId tokenId, @NonNull final List<CustomFee> customFees)
+      throws HieroException {
+    updateNftFeeSchedule(tokenId, customFees, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void updateNftFeeSchedule(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<CustomFee> customFees,
+      @NonNull final PrivateKey feeScheduleKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(customFees, "customFees must not be null");
+    Objects.requireNonNull(feeScheduleKey, "feeScheduleKey must not be null");
+    if (customFees.stream().anyMatch(CustomFractionalFee.class::isInstance)) {
+      throw new IllegalArgumentException("Fractional fees are not supported for NFT types");
+    }
+    final TokenFeeScheduleUpdateRequest request =
+        TokenFeeScheduleUpdateRequest.of(tokenId, customFees, feeScheduleKey);
+    client.executeTokenFeeScheduleUpdateTransaction(request);
   }
 
   @Override

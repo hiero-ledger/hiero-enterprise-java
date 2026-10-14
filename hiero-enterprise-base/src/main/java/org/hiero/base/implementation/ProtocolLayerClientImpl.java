@@ -36,6 +36,7 @@ import com.hedera.hashgraph.sdk.TokenCancelAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
+import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
 import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
@@ -123,6 +124,8 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
@@ -647,6 +650,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (request.kycKey() != null) {
         transaction.setKycKey(request.kycKey());
       }
+      if (request.feeScheduleKey() != null) {
+        transaction.setFeeScheduleKey(request.feeScheduleKey());
+      }
       sign(transaction, request.treasuryKey(), request.supplyKey(), request.adminKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);
@@ -697,6 +703,27 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenUpdateResult(receipt.transactionId, receipt.status);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute update token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenFeeScheduleUpdateResult executeTokenFeeScheduleUpdateTransaction(
+      @NonNull final TokenFeeScheduleUpdateRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenFeeScheduleUpdateTransaction transaction =
+          new TokenFeeScheduleUpdateTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId())
+              .setCustomFees(request.customFees());
+      sign(transaction, request.feeScheduleKey());
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(
+              transaction, TransactionType.TOKEN_FEE_SCHEDULE_UPDATE);
+      return new TokenFeeScheduleUpdateResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute token fee schedule update transaction", e);
     }
   }
 
