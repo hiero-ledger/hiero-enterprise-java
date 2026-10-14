@@ -7,6 +7,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFixedFee;
+import com.hedera.hashgraph.sdk.CustomFractionalFee;
+import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TokenId;
@@ -37,6 +42,8 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
@@ -380,6 +387,73 @@ public class NftClientImplTest {
 
     Assertions.assertEquals(kycKey, tokenCreateRequest.kycKey());
     Assertions.assertNull(tokenCreateRequest.metadataKey());
+    Assertions.assertNull(tokenCreateRequest.feeScheduleKey());
+    Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
+    Assertions.assertEquals(tokenId, result);
+  }
+
+  @Test
+  void testCreateNftWithFeeScheduleKey() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
+
+    final String name = "TOKEN";
+    final String symbol = "NFT";
+    final PrivateKey supplierKey = PrivateKey.generateECDSA();
+    final PrivateKey treasuryKey = PrivateKey.generateECDSA();
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final AccountId accountId = AccountId.fromString("1.2.3");
+
+    when(protocolLayerClient.executeTokenCreateTransaction(any(TokenCreateRequest.class)))
+        .thenReturn(tokenCreateResult);
+    when(tokenCreateResult.tokenId()).thenReturn(tokenId);
+
+    final TokenId result =
+        nftClientImpl.createNftType(
+            name, symbol, accountId, treasuryKey, supplierKey, null, null, feeScheduleKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenCreateTransaction(tokenRequestCaptor.capture());
+
+    TokenCreateRequest tokenCreateRequest = tokenRequestCaptor.getValue();
+
+    Assertions.assertEquals(feeScheduleKey, tokenCreateRequest.feeScheduleKey());
+    Assertions.assertNull(tokenCreateRequest.kycKey());
+    Assertions.assertNull(tokenCreateRequest.metadataKey());
+    Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
+    Assertions.assertEquals(accountId, tokenCreateRequest.treasuryAccountId());
+    Assertions.assertEquals(tokenId, result);
+  }
+
+  @Test
+  void testCreateNftWithSupplierAndFeeScheduleKey() throws HieroException {
+    final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final AccountId accountId = AccountId.fromString("1.2.3");
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final TokenCreateResult tokenCreateResult = Mockito.mock(TokenCreateResult.class);
+
+    final String name = "TOKEN";
+    final String symbol = "NFT";
+    final PrivateKey supplierKey = PrivateKey.generateECDSA();
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+
+    when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(operationalAccount.accountId()).thenReturn(accountId);
+    when(protocolLayerClient.executeTokenCreateTransaction(any(TokenCreateRequest.class)))
+        .thenReturn(tokenCreateResult);
+    when(tokenCreateResult.tokenId()).thenReturn(tokenId);
+
+    final TokenId result =
+        nftClientImpl.createNftType(name, symbol, supplierKey, null, null, feeScheduleKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenCreateTransaction(tokenRequestCaptor.capture());
+
+    TokenCreateRequest tokenCreateRequest = tokenRequestCaptor.getValue();
+
+    Assertions.assertEquals(feeScheduleKey, tokenCreateRequest.feeScheduleKey());
+    Assertions.assertEquals(accountId, tokenCreateRequest.treasuryAccountId());
+    Assertions.assertEquals(privateKey, tokenCreateRequest.treasuryKey());
     Assertions.assertEquals(supplierKey, tokenCreateRequest.supplyKey());
     Assertions.assertEquals(tokenId, result);
   }
@@ -2325,6 +2399,126 @@ public class NftClientImplTest {
         .thenThrow(new HieroException("delete failed"));
 
     Assertions.assertThrows(HieroException.class, () -> nftClientImpl.deleteNftType(tokenId));
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleWithOperatorKey() throws HieroException {
+    final PrivateKey privateKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<CustomFee> customFees =
+        List.of(
+            new CustomRoyaltyFee()
+                .setNumerator(1)
+                .setDenominator(10)
+                .setFeeCollectorAccountId(AccountId.fromString("0.0.1001")));
+    final TokenFeeScheduleUpdateResult feeScheduleUpdateResult =
+        Mockito.mock(TokenFeeScheduleUpdateResult.class);
+    final ArgumentCaptor<TokenFeeScheduleUpdateRequest> captor =
+        ArgumentCaptor.forClass(TokenFeeScheduleUpdateRequest.class);
+
+    when(operationalAccount.privateKey()).thenReturn(privateKey);
+    when(protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(
+            any(TokenFeeScheduleUpdateRequest.class)))
+        .thenReturn(feeScheduleUpdateResult);
+
+    nftClientImpl.updateNftFeeSchedule(tokenId, customFees);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenFeeScheduleUpdateTransaction(captor.capture());
+    final TokenFeeScheduleUpdateRequest request = captor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(customFees, request.customFees());
+    Assertions.assertEquals(privateKey, request.feeScheduleKey());
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleWithCustomKey() throws HieroException {
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<CustomFee> customFees =
+        List.of(
+            new CustomFixedFee()
+                .setHbarAmount(Hbar.from(1))
+                .setFeeCollectorAccountId(AccountId.fromString("0.0.1001")));
+    final ArgumentCaptor<TokenFeeScheduleUpdateRequest> captor =
+        ArgumentCaptor.forClass(TokenFeeScheduleUpdateRequest.class);
+
+    when(protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(
+            any(TokenFeeScheduleUpdateRequest.class)))
+        .thenReturn(Mockito.mock(TokenFeeScheduleUpdateResult.class));
+
+    nftClientImpl.updateNftFeeSchedule(tokenId, customFees, feeScheduleKey);
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenFeeScheduleUpdateTransaction(captor.capture());
+    final TokenFeeScheduleUpdateRequest request = captor.getValue();
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(customFees, request.customFees());
+    Assertions.assertEquals(feeScheduleKey, request.feeScheduleKey());
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleWithStringParams() throws HieroException {
+    final PrivateKey feeScheduleKey = PrivateKey.generateED25519();
+    final ArgumentCaptor<TokenFeeScheduleUpdateRequest> captor =
+        ArgumentCaptor.forClass(TokenFeeScheduleUpdateRequest.class);
+
+    when(protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(
+            any(TokenFeeScheduleUpdateRequest.class)))
+        .thenReturn(Mockito.mock(TokenFeeScheduleUpdateResult.class));
+
+    nftClientImpl.updateNftFeeSchedule("1.2.3", List.of(), feeScheduleKey.toStringDER());
+
+    verify(protocolLayerClient, times(1))
+        .executeTokenFeeScheduleUpdateTransaction(captor.capture());
+    final TokenFeeScheduleUpdateRequest request = captor.getValue();
+    Assertions.assertEquals(TokenId.fromString("1.2.3"), request.tokenId());
+    Assertions.assertEquals(List.of(), request.customFees());
+    Assertions.assertEquals(feeScheduleKey.toStringDER(), request.feeScheduleKey().toStringDER());
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleThrowsForNull() {
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<CustomFee> customFees = List.of();
+
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftFeeSchedule((TokenId) null, customFees, feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftFeeSchedule(tokenId, null, feeScheduleKey));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftFeeSchedule(tokenId, customFees, (PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> nftClientImpl.updateNftFeeSchedule((String) null, customFees));
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleRejectsFractionalFee() {
+    final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    final List<CustomFee> customFees =
+        List.of(new CustomFractionalFee().setNumerator(1).setDenominator(10));
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> nftClientImpl.updateNftFeeSchedule(tokenId, customFees, feeScheduleKey));
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleThrowsHieroException() throws HieroException {
+    final TokenId tokenId = TokenId.fromString("1.2.3");
+    when(operationalAccount.privateKey()).thenReturn(PrivateKey.generateECDSA());
+    when(protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(
+            any(TokenFeeScheduleUpdateRequest.class)))
+        .thenThrow(new HieroException("fee schedule update failed"));
+
+    Assertions.assertThrows(
+        HieroException.class, () -> nftClientImpl.updateNftFeeSchedule(tokenId, List.of()));
   }
 
   @Test

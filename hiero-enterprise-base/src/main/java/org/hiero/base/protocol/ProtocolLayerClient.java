@@ -58,6 +58,8 @@ import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
 import org.hiero.base.protocol.data.TokenDissociateResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
@@ -275,6 +277,16 @@ public interface ProtocolLayerClient {
    */
   @NonNull TokenUpdateResult executeTokenUpdateTransaction(
       @NonNull final TokenUpdateRequest request) throws HieroException;
+
+  /**
+   * Executes a token fee schedule update transaction.
+   *
+   * @param request the request containing the details of the token fee schedule update transaction
+   * @return the result of the token fee schedule update transaction
+   * @throws HieroException if the transaction could not be executed
+   */
+  @NonNull TokenFeeScheduleUpdateResult executeTokenFeeScheduleUpdateTransaction(
+      @NonNull final TokenFeeScheduleUpdateRequest request) throws HieroException;
 
   /**
    * Executes a token update NFTs transaction (updates metadata for NFT serials).

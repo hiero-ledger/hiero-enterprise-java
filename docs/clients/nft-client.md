@@ -30,6 +30,10 @@
 | `createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey)` | Creates an NFT type with optional metadata and KYC keys. |
 | `createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey, String metadataKey, String kycKey)` | Creates an NFT type with optional metadata and KYC keys as strings. |
 | `createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey)` | Creates an NFT type using an existing treasury account with optional metadata and KYC keys. |
+| `createNftType(String name, String symbol, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey, PrivateKey feeScheduleKey)` | Creates an NFT type with optional metadata, KYC, and fee schedule keys; operator is treasury. |
+| `createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey, PrivateKey feeScheduleKey)` | Creates an NFT type with optional metadata, KYC, and fee schedule keys. |
+| `createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey, String metadataKey, String kycKey, String feeScheduleKey)` | Creates an NFT type with optional metadata, KYC, and fee schedule keys as strings. |
+| `createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey, PrivateKey feeScheduleKey)` | Creates an NFT type using an existing treasury account with optional metadata, KYC, and fee schedule keys. |
 | `associateNft(TokenId tokenId, AccountId accountId, PrivateKey accountKey)` | Associates an account with an NFT type. |
 | `associateNft(String tokenId, String accountId, String accountKey)` | Associates an account with an NFT type using string identifiers. |
 | `associateNft(TokenId tokenId, Account account)` | Associates an account object with an NFT type. |
@@ -112,6 +116,10 @@
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
 | `updateNftType(String tokenId, String name, String symbol, String adminKey)` | Updates an NFT type using string token ID and admin key. |
+| `updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees)` | Replaces the custom fee schedule of an NFT type using the operator account as fee schedule key. |
+| `updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees, PrivateKey feeScheduleKey)` | Replaces the custom fee schedule of an NFT type using a custom fee schedule key. |
+| `updateNftFeeSchedule(String tokenId, List<CustomFee> customFees)` | Replaces the custom fee schedule using a token ID string and the operator fee schedule key. |
+| `updateNftFeeSchedule(String tokenId, List<CustomFee> customFees, String feeScheduleKey)` | Replaces the custom fee schedule using string token ID and fee schedule key. |
 | `updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)` | Updates metadata for a single NFT using the operator key. |
 | `updateNftMetadata(TokenId tokenId, long serialNumber, PrivateKey metadataKey, byte[] metadata)` | Updates metadata for a single NFT using a custom metadata (or supply) key. |
 | `updateNftsMetadata(TokenId tokenId, List<Long> serialNumbers, byte[] metadata)` | Updates metadata for up to 10 NFT serials using the operator key. |
@@ -685,6 +693,49 @@ nftClient.updateNftType(tokenId, "Updated Demo NFT", "UDNFT", adminKey);
 !!! info
 
     Provide `adminKey` when the NFT type was created with a custom treasury whose key differs from the configured operator account key.
+
+---
+
+## Update NFT Fee Schedule
+
+Replaces the custom fees (royalty and fixed fees) charged when NFTs of a type are transferred. The given list replaces the whole fee schedule; pass an empty list to remove all custom fees. At most 10 custom fees are allowed. NFT types do not support fractional fees.
+
+The NFT type must have been created with a fee schedule key, and the update must be signed with that key.
+
+```java title="createNftType(..., PrivateKey feeScheduleKey)"
+PrivateKey supplierKey = PrivateKey.generateED25519();
+PrivateKey feeScheduleKey = PrivateKey.generateED25519();
+
+TokenId tokenId = nftClient.createNftType(
+    "Royalty NFT",
+    "RNFT",
+    supplierKey,
+    null,
+    null,
+    feeScheduleKey
+);
+```
+
+```java title="updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees, PrivateKey feeScheduleKey)"
+AccountId collector = AccountId.fromString("0.0.1001");
+
+CustomRoyaltyFee royaltyFee = new CustomRoyaltyFee()
+    .setNumerator(5)
+    .setDenominator(100)
+    .setFallbackFee(new CustomFixedFee().setHbarAmount(Hbar.from(1)))
+    .setFeeCollectorAccountId(collector);
+
+nftClient.updateNftFeeSchedule(tokenId, List.of(royaltyFee), feeScheduleKey);
+```
+
+```java title="updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees)"
+// Removes all custom fees, signing with the operator account key
+nftClient.updateNftFeeSchedule(tokenId, List.of());
+```
+
+!!! info
+
+    `CustomFee`, `CustomFixedFee`, and `CustomRoyaltyFee` are the Hiero SDK types from `com.hedera.hashgraph.sdk`. Removing fees from an NFT type that has none fails with `CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES`.
 
 ---
 

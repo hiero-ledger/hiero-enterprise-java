@@ -1,11 +1,15 @@
 package org.hiero.base.test;
 
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFixedFee;
+import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
 import java.util.List;
+import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
 import org.hiero.base.protocol.ProtocolLayerClient;
@@ -17,6 +21,8 @@ import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
 import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDeleteResult;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateResult;
 import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenFreezeResult;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
@@ -221,6 +227,77 @@ public class ProtocolLayerClientTokenTests {
     Assertions.assertNotNull(revokeKycResult);
     Assertions.assertNotNull(revokeKycResult.transactionId());
     Assertions.assertEquals(Status.SUCCESS, revokeKycResult.status());
+  }
+
+  @Test
+  void testUpdateNftFeeSchedule() throws Exception {
+    // given — create NFT type with fee schedule key
+    final Account operator = hieroTestContext.getOperatorAccount();
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "Fee NFT",
+            "FEE",
+            operator.accountId(),
+            operator.privateKey(),
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            operator.privateKey(),
+            null,
+            null,
+            null,
+            null,
+            operator.privateKey());
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    final List<CustomFee> customFees =
+        List.of(
+            new CustomRoyaltyFee()
+                .setNumerator(1)
+                .setDenominator(10)
+                .setFallbackFee(new CustomFixedFee().setHbarAmount(Hbar.from(1)))
+                .setFeeCollectorAccountId(operator.accountId()),
+            new CustomFixedFee()
+                .setHbarAmount(Hbar.from(1))
+                .setFeeCollectorAccountId(operator.accountId()));
+
+    // when — set fees, then remove them again
+    final TokenFeeScheduleUpdateResult updateResult =
+        protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(
+            TokenFeeScheduleUpdateRequest.of(tokenId, customFees, operator.privateKey()));
+    final TokenFeeScheduleUpdateResult clearResult =
+        protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(
+            TokenFeeScheduleUpdateRequest.of(tokenId, List.of(), operator.privateKey()));
+
+    // then
+    Assertions.assertNotNull(updateResult);
+    Assertions.assertNotNull(updateResult.transactionId());
+    Assertions.assertEquals(Status.SUCCESS, updateResult.status());
+    Assertions.assertNotNull(clearResult);
+    Assertions.assertEquals(Status.SUCCESS, clearResult.status());
+  }
+
+  @Test
+  void testUpdateNftFeeScheduleWithoutFeeScheduleKeyFails() throws Exception {
+    // given — NFT type created without a fee schedule key
+    final TokenCreateRequest tokenCreateRequest =
+        TokenCreateRequest.of(
+            "NoFeeKey NFT",
+            "NFK",
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            hieroTestContext.getOperatorAccount());
+    final TokenId tokenId =
+        protocolLayerClient.executeTokenCreateTransaction(tokenCreateRequest).tokenId();
+
+    final TokenFeeScheduleUpdateRequest request =
+        TokenFeeScheduleUpdateRequest.of(
+            tokenId,
+            List.of(new CustomFixedFee().setHbarAmount(Hbar.from(1))),
+            hieroTestContext.getOperatorAccount().privateKey());
+
+    // then
+    Assertions.assertThrows(
+        HieroException.class,
+        () -> protocolLayerClient.executeTokenFeeScheduleUpdateTransaction(request));
   }
 
   @Test

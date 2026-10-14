@@ -1,6 +1,7 @@
 package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import java.util.List;
@@ -405,6 +406,129 @@ public interface NftClient {
         supplierKey,
         metadataKey,
         kycKey);
+  }
+
+  /**
+   * Create a new NFT type with optional metadata, KYC, and fee schedule keys. The operator account
+   * is used as treasury. A fee schedule key is required to update the custom fees of the NFT type
+   * later (see {@link #updateNftFeeSchedule}).
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @param feeScheduleKey the private key authorized to update the custom fee schedule, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull PrivateKey supplierKey,
+      @Nullable PrivateKey metadataKey,
+      @Nullable PrivateKey kycKey,
+      @Nullable PrivateKey feeScheduleKey)
+      throws HieroException;
+
+  /**
+   * Create a new NFT type with optional metadata, KYC, and fee schedule keys. A fee schedule key is
+   * required to update the custom fees of the NFT type later (see {@link #updateNftFeeSchedule}).
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccountId the ID of the treasury account
+   * @param treasuryKey the private key of the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @param feeScheduleKey the private key authorized to update the custom fee schedule, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull AccountId treasuryAccountId,
+      @NonNull PrivateKey treasuryKey,
+      @NonNull PrivateKey supplierKey,
+      @Nullable PrivateKey metadataKey,
+      @Nullable PrivateKey kycKey,
+      @Nullable PrivateKey feeScheduleKey)
+      throws HieroException;
+
+  /**
+   * Create a new NFT type with optional metadata, KYC, and fee schedule keys.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccountId the ID of the treasury account
+   * @param treasuryKey the private key of the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @param feeScheduleKey the private key authorized to update the custom fee schedule, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull
+  default TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull String treasuryAccountId,
+      @NonNull String treasuryKey,
+      @NonNull String supplierKey,
+      @Nullable String metadataKey,
+      @Nullable String kycKey,
+      @Nullable String feeScheduleKey)
+      throws HieroException {
+    Objects.requireNonNull(treasuryAccountId, "treasuryAccountId must not be null");
+    Objects.requireNonNull(treasuryKey, "treasuryKey must not be null");
+    Objects.requireNonNull(supplierKey, "supplierKey must not be null");
+    return createNftType(
+        name,
+        symbol,
+        AccountId.fromString(treasuryAccountId),
+        PrivateKey.fromStringDER(treasuryKey),
+        PrivateKey.fromStringDER(supplierKey),
+        metadataKey == null ? null : PrivateKey.fromStringDER(metadataKey),
+        kycKey == null ? null : PrivateKey.fromStringDER(kycKey),
+        feeScheduleKey == null ? null : PrivateKey.fromStringDER(feeScheduleKey));
+  }
+
+  /**
+   * Create a new NFT type with optional metadata, KYC, and fee schedule keys.
+   *
+   * @param name the name of the NFT type
+   * @param symbol the symbol of the NFT type
+   * @param treasuryAccount the treasury account
+   * @param supplierKey the private key of the supplier account
+   * @param metadataKey the private key authorized to update NFT serial metadata, or null
+   * @param kycKey the private key authorized to grant or revoke KYC, or null
+   * @param feeScheduleKey the private key authorized to update the custom fee schedule, or null
+   * @return the ID of the new NFT type
+   * @throws HieroException if the NFT type could not be created
+   */
+  @NonNull
+  default TokenId createNftType(
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull Account treasuryAccount,
+      @NonNull PrivateKey supplierKey,
+      @Nullable PrivateKey metadataKey,
+      @Nullable PrivateKey kycKey,
+      @Nullable PrivateKey feeScheduleKey)
+      throws HieroException {
+    Objects.requireNonNull(treasuryAccount, "treasuryAccount must not be null");
+    return createNftType(
+        name,
+        symbol,
+        treasuryAccount.accountId(),
+        treasuryAccount.privateKey(),
+        supplierKey,
+        metadataKey,
+        kycKey,
+        feeScheduleKey);
   }
 
   /**
@@ -1830,6 +1954,67 @@ public interface NftClient {
       throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     updateNftType(TokenId.fromString(tokenId), name, symbol);
+  }
+
+  /**
+   * Updates the custom fee schedule of an NFT type. The given fees replace the current fee
+   * schedule; an empty list removes all custom fees. The operator account key is used as the fee
+   * schedule key. The NFT type must have been created with that key as fee schedule key. NFT types
+   * support fixed and royalty fees only; fractional fees are rejected.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param customFees the new custom fees (at most 10)
+   * @throws HieroException if the fee schedule could not be updated
+   */
+  void updateNftFeeSchedule(@NonNull TokenId tokenId, @NonNull List<CustomFee> customFees)
+      throws HieroException;
+
+  /**
+   * Updates the custom fee schedule of an NFT type. The given fees replace the current fee
+   * schedule; an empty list removes all custom fees. Must be signed by the fee schedule key that
+   * was set when the NFT type was created. NFT types support fixed and royalty fees only;
+   * fractional fees are rejected.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param customFees the new custom fees (at most 10)
+   * @param feeScheduleKey the fee schedule private key of the NFT type
+   * @throws HieroException if the fee schedule could not be updated
+   */
+  void updateNftFeeSchedule(
+      @NonNull TokenId tokenId,
+      @NonNull List<CustomFee> customFees,
+      @NonNull PrivateKey feeScheduleKey)
+      throws HieroException;
+
+  /**
+   * Updates the custom fee schedule of an NFT type.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param customFees the new custom fees (at most 10)
+   * @param feeScheduleKey the fee schedule private key of the NFT type
+   * @throws HieroException if the fee schedule could not be updated
+   */
+  default void updateNftFeeSchedule(
+      @NonNull String tokenId, @NonNull List<CustomFee> customFees, @NonNull String feeScheduleKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(feeScheduleKey, "feeScheduleKey must not be null");
+    updateNftFeeSchedule(
+        TokenId.fromString(tokenId), customFees, PrivateKey.fromStringDER(feeScheduleKey));
+  }
+
+  /**
+   * Updates the custom fee schedule of an NFT type. The operator account key is used as the fee
+   * schedule key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param customFees the new custom fees (at most 10)
+   * @throws HieroException if the fee schedule could not be updated
+   */
+  default void updateNftFeeSchedule(@NonNull String tokenId, @NonNull List<CustomFee> customFees)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    updateNftFeeSchedule(TokenId.fromString(tokenId), customFees);
   }
 
   /**
