@@ -13,12 +13,17 @@ import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
 import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
+import org.hiero.base.data.CryptoAllowance;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.NftMetadata;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenAirdrop;
+import org.hiero.base.data.TokenAllowance;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
 import org.hiero.base.implementation.AbstractMirrorNodeClient;
@@ -161,6 +166,72 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   }
 
   @Override
+  public @NonNull Page<CryptoAllowance> queryCryptoAllowances(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/allowances/crypto";
+    final Function<JsonNode, List<CryptoAllowance>> dataExtractionFunction =
+        node -> jsonConverter.toCryptoAllowances(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<TokenAllowance> queryTokenAllowances(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/allowances/tokens";
+    final Function<JsonNode, List<TokenAllowance>> dataExtractionFunction =
+        node -> jsonConverter.toTokenAllowances(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<NftAllowance> queryNftAllowances(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/allowances/nfts";
+    final Function<JsonNode, List<NftAllowance>> dataExtractionFunction =
+        node -> jsonConverter.toNftAllowances(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<StakingReward> queryStakingRewards(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/rewards";
+    final Function<JsonNode, List<StakingReward>> dataExtractionFunction =
+        node -> jsonConverter.toStakingRewards(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<TokenAirdrop> queryOutstandingAirdrops(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/airdrops/outstanding";
+    final Function<JsonNode, List<TokenAirdrop>> dataExtractionFunction =
+        node -> jsonConverter.toTokenAirdrops(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<TokenAirdrop> queryPendingAirdrops(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/accounts/" + accountId + "/airdrops/pending";
+    final Function<JsonNode, List<TokenAirdrop>> dataExtractionFunction =
+        node -> jsonConverter.toTokenAirdrops(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
   public @NonNull Page<Balance> queryTokenBalances(TokenId tokenId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     final String path = "/api/v1/tokens/" + tokenId + "/balances";
@@ -223,7 +294,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   @Override
   public @NonNull Optional<Node> queryNetworkNodeById(long nodeId) throws HieroException {
 
-    final String path = "/api/v1/network/nodes?node.id=" + nodeId;
+    final String path = "/api/v1/network/nodes?node.id=eq:" + nodeId;
 
     final Function<JsonNode, List<Node>> dataExtractionFunction =
         node -> jsonConverter.toNodes(node);
