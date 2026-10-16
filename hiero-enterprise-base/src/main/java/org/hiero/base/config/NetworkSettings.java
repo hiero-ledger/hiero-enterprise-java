@@ -38,6 +38,13 @@ public interface NetworkSettings {
   @NonNull Set<String> getMirrorNodeAddresses();
 
   /**
+   * Returns the mirror node gRPC address.
+   *
+   * @return the mirror node gRPC address
+   */
+  @NonNull Optional<String> getMirrorNodeGrpcAddress();
+
+  /**
    * Returns the consensus nodes.
    *
    * @return the consensus nodes
