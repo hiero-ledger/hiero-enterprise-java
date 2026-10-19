@@ -116,9 +116,9 @@
 | `updateNftType(TokenId tokenId, String name, String symbol, PrivateKey adminKey)` | Updates an NFT type name and symbol using a custom admin key. |
 | `updateNftType(String tokenId, String name, String symbol)` | Updates an NFT type using a token ID string and the operator admin key. |
 | `updateNftType(String tokenId, String name, String symbol, String adminKey)` | Updates an NFT type using string token ID and admin key. |
-| `updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees)` | Replaces the custom fee schedule of an NFT type using the operator account as fee schedule key. |
+| `updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees)` | Replaces the custom fee schedule of an NFT type using the operator account key; the NFT type must have been created with the operator key as fee schedule key. |
 | `updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees, PrivateKey feeScheduleKey)` | Replaces the custom fee schedule of an NFT type using a custom fee schedule key. |
-| `updateNftFeeSchedule(String tokenId, List<CustomFee> customFees)` | Replaces the custom fee schedule using a token ID string and the operator fee schedule key. |
+| `updateNftFeeSchedule(String tokenId, List<CustomFee> customFees)` | Replaces the custom fee schedule using a token ID string and the operator account key; the NFT type must have been created with the operator key as fee schedule key. |
 | `updateNftFeeSchedule(String tokenId, List<CustomFee> customFees, String feeScheduleKey)` | Replaces the custom fee schedule using string token ID and fee schedule key. |
 | `updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)` | Updates metadata for a single NFT using the operator key. |
 | `updateNftMetadata(TokenId tokenId, long serialNumber, PrivateKey metadataKey, byte[] metadata)` | Updates metadata for a single NFT using a custom metadata (or supply) key. |
@@ -729,9 +729,19 @@ nftClient.updateNftFeeSchedule(tokenId, List.of(royaltyFee), feeScheduleKey);
 ```
 
 ```java title="updateNftFeeSchedule(TokenId tokenId, List<CustomFee> customFees)"
-// Removes all custom fees, signing with the operator account key
+// The operator key must have been passed as feeScheduleKey at creation
+PrivateKey operatorKey = hieroContext.getOperatorAccount().privateKey();
+TokenId tokenId = nftClient.createNftType("Royalty NFT", "RNFT", operatorKey, null, null, operatorKey);
+
+nftClient.updateNftFeeSchedule(tokenId, List.of(royaltyFee));
+
+// Removes all custom fees
 nftClient.updateNftFeeSchedule(tokenId, List.of());
 ```
+
+!!! warning
+
+    The overloads without a `feeScheduleKey` parameter sign with the operator account key. They only succeed if the operator key was passed as `feeScheduleKey` when the NFT type was created. Unlike the admin key, no fee schedule key is set by default: NFT types created with the other `createNftType` overloads have no fee schedule key, so their fees can never be updated. For NFT types with a different fee schedule key, pass that key explicitly.
 
 !!! info
 

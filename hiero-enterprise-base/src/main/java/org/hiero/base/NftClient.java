@@ -1958,9 +1958,14 @@ public interface NftClient {
 
   /**
    * Updates the custom fee schedule of an NFT type. The given fees replace the current fee
-   * schedule; an empty list removes all custom fees. The operator account key is used as the fee
-   * schedule key. The NFT type must have been created with that key as fee schedule key. NFT types
-   * support fixed and royalty fees only; fractional fees are rejected.
+   * schedule; an empty list removes all custom fees. NFT types support fixed and royalty fees only;
+   * fractional fees are rejected.
+   *
+   * <p>This overload signs with the operator account key, so it only succeeds if the operator key
+   * was explicitly passed as {@code feeScheduleKey} when the NFT type was created. Unlike the admin
+   * key, no fee schedule key is set by default: NFT types created without one can never have their
+   * fee schedule updated, and NFT types with a different fee schedule key must use {@link
+   * #updateNftFeeSchedule(TokenId, List, PrivateKey)}.
    *
    * @param tokenId the ID of the NFT type
    * @param customFees the new custom fees (at most 10)
@@ -2005,7 +2010,8 @@ public interface NftClient {
 
   /**
    * Updates the custom fee schedule of an NFT type. The operator account key is used as the fee
-   * schedule key.
+   * schedule key, so this only succeeds if the operator key was passed as {@code feeScheduleKey}
+   * when the NFT type was created (see {@link #updateNftFeeSchedule(TokenId, List)}).
    *
    * @param tokenId the ID of the NFT type
    * @param customFees the new custom fees (at most 10)
