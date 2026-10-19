@@ -2448,7 +2448,7 @@ The configured operator account is used as the transaction payer and must have a
 </tr>
 <tr>
 <td style="text-align: left;"><code>updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees)</code></td>
-<td style="text-align: left;">Replaces the custom fee schedule of an NFT type using the operator account as fee schedule key.</td>
+<td style="text-align: left;">Replaces the custom fee schedule of an NFT type using the operator account key; the NFT type must have been created with the operator key as fee schedule key.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees, PrivateKey feeScheduleKey)</code></td>
@@ -2456,7 +2456,7 @@ The configured operator account is used as the transaction payer and must have a
 </tr>
 <tr>
 <td style="text-align: left;"><code>updateNftFeeSchedule(String tokenId, List&lt;CustomFee&gt; customFees)</code></td>
-<td style="text-align: left;">Replaces the custom fee schedule using a token ID string and the operator fee schedule key.</td>
+<td style="text-align: left;">Replaces the custom fee schedule using a token ID string and the operator account key; the NFT type must have been created with the operator key as fee schedule key.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>updateNftFeeSchedule(String tokenId, List&lt;CustomFee&gt; customFees, String feeScheduleKey)</code></td>
@@ -2956,9 +2956,19 @@ The operator account key is used as the KYC key when no custom key is provided. 
 </span><span id="__span-41-8"><a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a>
 </span><span id="__span-41-9"><a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">royaltyFee</span><span class="p">),</span><span class="w"> </span><span class="n">feeScheduleKey</span><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees)</span><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="c1">// Removes all custom fees, signing with the operator account key</span>
-</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">());</span>
+<div class="language-java highlight"><span class="filename">updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees)</span><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="c1">// The operator key must have been passed as feeScheduleKey at creation</span>
+</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">operatorKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hieroContext</span><span class="p">.</span><span class="na">getOperatorAccount</span><span class="p">().</span><span class="na">privateKey</span><span class="p">();</span>
+</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Royalty NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;RNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operatorKey</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">operatorKey</span><span class="p">);</span>
+</span><span id="__span-42-4"><a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>
+</span><span id="__span-42-5"><a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">royaltyFee</span><span class="p">));</span>
+</span><span id="__span-42-6"><a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>
+</span><span id="__span-42-7"><a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a><span class="c1">// Removes all custom fees</span>
+</span><span id="__span-42-8"><a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">());</span>
 </span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The overloads without a <code>feeScheduleKey</code> parameter sign with the operator account key. They only succeed if the operator key was passed as <code>feeScheduleKey</code> when the NFT type was created. Unlike the admin key, no fee schedule key is set by default: NFT types created with the other <code>createNftType</code> overloads have no fee schedule key, so their fees can never be updated. For NFT types with a different fee schedule key, pass that key explicitly.</p>
+</div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p><code>CustomFee</code>, <code>CustomFixedFee</code>, and <code>CustomRoyaltyFee</code> are the Hiero SDK types from <code>com.hedera.hashgraph.sdk</code>. Removing fees from an NFT type that has none fails with <code>CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES</code>.</p>
