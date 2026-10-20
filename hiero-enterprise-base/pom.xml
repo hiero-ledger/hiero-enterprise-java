@@ -46,6 +46,11 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>org.web3j</groupId>
+      <artifactId>core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
