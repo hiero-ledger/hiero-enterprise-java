@@ -1115,6 +1115,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-nft-fee-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Update NFT Fee Schedule
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-nft-metadata" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1827,6 +1838,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-nft-fee-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Update NFT Fee Schedule
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-nft-metadata" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2079,6 +2101,22 @@ The configured operator account is used as the transaction payer and must have a
 <tr>
 <td style="text-align: left;"><code>createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey)</code></td>
 <td style="text-align: left;">Creates an NFT type using an existing treasury account with optional metadata and KYC keys.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createNftType(String name, String symbol, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey, PrivateKey feeScheduleKey)</code></td>
+<td style="text-align: left;">Creates an NFT type with optional metadata, KYC, and fee schedule keys; operator is treasury.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createNftType(String name, String symbol, AccountId treasuryAccountId, PrivateKey treasuryKey, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey, PrivateKey feeScheduleKey)</code></td>
+<td style="text-align: left;">Creates an NFT type with optional metadata, KYC, and fee schedule keys.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createNftType(String name, String symbol, String treasuryAccountId, String treasuryKey, String supplierKey, String metadataKey, String kycKey, String feeScheduleKey)</code></td>
+<td style="text-align: left;">Creates an NFT type with optional metadata, KYC, and fee schedule keys as strings.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createNftType(String name, String symbol, Account treasuryAccount, PrivateKey supplierKey, PrivateKey metadataKey, PrivateKey kycKey, PrivateKey feeScheduleKey)</code></td>
+<td style="text-align: left;">Creates an NFT type using an existing treasury account with optional metadata, KYC, and fee schedule keys.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>associateNft(TokenId tokenId, AccountId accountId, PrivateKey accountKey)</code></td>
@@ -2407,6 +2445,22 @@ The configured operator account is used as the transaction payer and must have a
 <tr>
 <td style="text-align: left;"><code>updateNftType(String tokenId, String name, String symbol, String adminKey)</code></td>
 <td style="text-align: left;">Updates an NFT type using string token ID and admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees)</code></td>
+<td style="text-align: left;">Replaces the custom fee schedule of an NFT type using the operator account key; the NFT type must have been created with the operator key as fee schedule key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees, PrivateKey feeScheduleKey)</code></td>
+<td style="text-align: left;">Replaces the custom fee schedule of an NFT type using a custom fee schedule key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateNftFeeSchedule(String tokenId, List&lt;CustomFee&gt; customFees)</code></td>
+<td style="text-align: left;">Replaces the custom fee schedule using a token ID string and the operator account key; the NFT type must have been created with the operator key as fee schedule key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateNftFeeSchedule(String tokenId, List&lt;CustomFee&gt; customFees, String feeScheduleKey)</code></td>
+<td style="text-align: left;">Replaces the custom fee schedule using string token ID and fee schedule key.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)</code></td>
@@ -2877,28 +2931,71 @@ The operator account key is used as the KYC key when no custom key is provided. 
 <p>Provide <code>adminKey</code> when the NFT type was created with a custom treasury whose key differs from the configured operator account key.</p>
 </div>
 <hr />
+<h2 id="update-nft-fee-schedule">Update NFT Fee Schedule<a class="headerlink" href="#update-nft-fee-schedule" title="Permanent link">&para;</a></h2>
+<p>Replaces the custom fees (royalty and fixed fees) charged when NFTs of a type are transferred. The given list replaces the whole fee schedule; pass an empty list to remove all custom fees. At most 10 custom fees are allowed. NFT types do not support fractional fees.</p>
+<p>The NFT type must have been created with a fee schedule key, and the update must be signed with that key.</p>
+<div class="language-java highlight"><span class="filename">createNftType(..., PrivateKey feeScheduleKey)</span><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">supplierKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">feeScheduleKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span>
+</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">    </span><span class="s">&quot;Royalty NFT&quot;</span><span class="p">,</span>
+</span><span id="__span-40-6"><a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="w">    </span><span class="s">&quot;RNFT&quot;</span><span class="p">,</span>
+</span><span id="__span-40-7"><a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="w">    </span><span class="n">supplierKey</span><span class="p">,</span>
+</span><span id="__span-40-8"><a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-40-9"><a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-40-10"><a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="w">    </span><span class="n">feeScheduleKey</span>
+</span><span id="__span-40-11"><a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees, PrivateKey feeScheduleKey)</span><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">AccountId</span><span class="w"> </span><span class="n">collector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AccountId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1001&quot;</span><span class="p">);</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>
+</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="n">CustomRoyaltyFee</span><span class="w"> </span><span class="n">royaltyFee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CustomRoyaltyFee</span><span class="p">()</span>
+</span><span id="__span-41-4"><a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="w">    </span><span class="p">.</span><span class="na">setNumerator</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span><span id="__span-41-5"><a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">    </span><span class="p">.</span><span class="na">setDenominator</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</span><span id="__span-41-6"><a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="w">    </span><span class="p">.</span><span class="na">setFallbackFee</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">CustomFixedFee</span><span class="p">().</span><span class="na">setHbarAmount</span><span class="p">(</span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+</span><span id="__span-41-7"><a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">    </span><span class="p">.</span><span class="na">setFeeCollectorAccountId</span><span class="p">(</span><span class="n">collector</span><span class="p">);</span>
+</span><span id="__span-41-8"><a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a>
+</span><span id="__span-41-9"><a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">royaltyFee</span><span class="p">),</span><span class="w"> </span><span class="n">feeScheduleKey</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">updateNftFeeSchedule(TokenId tokenId, List&lt;CustomFee&gt; customFees)</span><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="c1">// The operator key must have been passed as feeScheduleKey at creation</span>
+</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">operatorKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hieroContext</span><span class="p">.</span><span class="na">getOperatorAccount</span><span class="p">().</span><span class="na">privateKey</span><span class="p">();</span>
+</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Royalty NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;RNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">operatorKey</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">operatorKey</span><span class="p">);</span>
+</span><span id="__span-42-4"><a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>
+</span><span id="__span-42-5"><a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">royaltyFee</span><span class="p">));</span>
+</span><span id="__span-42-6"><a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>
+</span><span id="__span-42-7"><a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a><span class="c1">// Removes all custom fees</span>
+</span><span id="__span-42-8"><a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftFeeSchedule</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">());</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The overloads without a <code>feeScheduleKey</code> parameter sign with the operator account key. They only succeed if the operator key was passed as <code>feeScheduleKey</code> when the NFT type was created. Unlike the admin key, no fee schedule key is set by default: NFT types created with the other <code>createNftType</code> overloads have no fee schedule key, so their fees can never be updated. For NFT types with a different fee schedule key, pass that key explicitly.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><code>CustomFee</code>, <code>CustomFixedFee</code>, and <code>CustomRoyaltyFee</code> are the Hiero SDK types from <code>com.hedera.hashgraph.sdk</code>. Removing fees from an NFT type that has none fails with <code>CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES</code>.</p>
+</div>
+<hr />
 <h2 id="update-nft-metadata">Update NFT Metadata<a class="headerlink" href="#update-nft-metadata" title="Permanent link">&para;</a></h2>
 <p>Updates the metadata of one or more NFT serials (at most 10 per call). Metadata is limited to 100 bytes. Requires the token metadata key, or the supply key while the NFT is still held by the treasury (<a href="https://hips.hedera.com/hip/hip-850">HIP-850</a>).</p>
-<div class="language-java highlight"><span class="filename">updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)</span><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
-</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="kt">long</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNft</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
-</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>
-</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftMetadata</span><span class="p">(</span>
-</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
-</span><span id="__span-40-6"><a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="w">        </span><span class="n">serial</span><span class="p">,</span>
-</span><span id="__span-40-7"><a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
-</span><span id="__span-40-8"><a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateNftMetadata(TokenId tokenId, long serialNumber, byte[] metadata)</span><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
+</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="kt">long</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNft</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>
+</span><span id="__span-43-4"><a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftMetadata</span><span class="p">(</span>
+</span><span id="__span-43-5"><a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-43-6"><a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="w">        </span><span class="n">serial</span><span class="p">,</span>
+</span><span id="__span-43-7"><a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
+</span><span id="__span-43-8"><a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateNftsMetadata(TokenId tokenId, List&lt;Long&gt; serialNumbers, PrivateKey metadataKey, byte[] metadata)</span><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">metadataKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">supplierKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="n">metadataKey</span><span class="p">);</span>
-</span><span id="__span-41-4"><a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNfts</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
-</span><span id="__span-41-5"><a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>
-</span><span id="__span-41-6"><a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftsMetadata</span><span class="p">(</span>
-</span><span id="__span-41-7"><a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
-</span><span id="__span-41-8"><a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a><span class="w">        </span><span class="n">serials</span><span class="p">,</span>
-</span><span id="__span-41-9"><a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="w">        </span><span class="n">metadataKey</span><span class="p">,</span>
-</span><span id="__span-41-10"><a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
-</span><span id="__span-41-11"><a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateNftsMetadata(TokenId tokenId, List&lt;Long&gt; serialNumbers, PrivateKey metadataKey, byte[] metadata)</span><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">metadataKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">supplierKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="n">metadataKey</span><span class="p">);</span>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">serials</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">mintNfts</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">supplierKey</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;https://example.com/old&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>
+</span><span id="__span-44-6"><a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">updateNftsMetadata</span><span class="p">(</span>
+</span><span id="__span-44-7"><a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-44-8"><a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a><span class="w">        </span><span class="n">serials</span><span class="p">,</span>
+</span><span id="__span-44-9"><a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a><span class="w">        </span><span class="n">metadataKey</span><span class="p">,</span>
+</span><span id="__span-44-10"><a id="__codelineno-44-10" name="__codelineno-44-10" href="#__codelineno-44-10"></a><span class="w">    </span><span class="s">&quot;https://example.com/new&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
+</span><span id="__span-44-11"><a id="__codelineno-44-11" name="__codelineno-44-11" href="#__codelineno-44-11"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -2907,13 +3004,13 @@ The operator account key is used as the KYC key when no custom key is provided. 
 <hr />
 <h2 id="delete-nft-type">Delete NFT Type<a class="headerlink" href="#delete-nft-type" title="Permanent link">&para;</a></h2>
 <p>Deletes an NFT type (token class). You cannot delete a specific NFT serial; burn all serials first, then delete the type. Requires the admin key set at creation (by default the treasury key).</p>
-<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId)</span><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
-</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>
-</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId)</span><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nftClient</span><span class="p">.</span><span class="na">createNftType</span><span class="p">(</span><span class="s">&quot;Demo NFT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DNFT&quot;</span><span class="p">);</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>
-</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">deleteNftType(TokenId tokenId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">adminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>
+</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="n">nftClient</span><span class="p">.</span><span class="na">deleteNftType</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span><span class="w"> </span><span class="n">adminKey</span><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
