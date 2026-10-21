@@ -3,12 +3,11 @@ package org.hiero.base.event;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.AbiTypes;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Bool;
-import org.web3j.abi.datatypes.Utf8String;
-import org.web3j.abi.datatypes.generated.Bytes32;
-import org.web3j.abi.datatypes.generated.Int256;
-import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.DynamicBytes;
+import org.web3j.abi.datatypes.Type;
 
 /**
  * Wrapper for Web3j {@link TypeReference} for create smart contract event params.
@@ -16,70 +15,92 @@ import org.web3j.abi.datatypes.generated.Uint256;
  * @param typeReference the {@link TypeReference} representing the event params (ABI types, and
  *     index flag)
  */
-public record EventParam(TypeReference<?> typeReference) {
-    public EventParam {
-        Objects.requireNonNull(typeReference, "typeReference must not be null");
+public record EventParam(@NonNull TypeReference<?> typeReference) {
+  public EventParam {
+    Objects.requireNonNull(typeReference, "typeReference must not be null");
+  }
+
+  /**
+   * Check whether param declared is indexed.
+   *
+   * @return {@code true} if this param is declared {@code indexed} in the event
+   */
+  public boolean isIndexed() {
+    return typeReference.isIndexed();
+  }
+
+  /**
+   * Creates a param from any Web3j ABI type class.
+   *
+   * @param type web3j ABI type class
+   * @param indexed state whether the type is indexed
+   * @return new instance of {@link EventParam}
+   */
+  public static @NonNull EventParam of(@NonNull Class<? extends Type> type, boolean indexed) {
+    Objects.requireNonNull(type, "type must not be null");
+    return new EventParam(TypeReference.create(type, indexed));
+  }
+
+  /**
+   * Creates a param from a solidity type name.
+   *
+   * @param solidityType solidity type name, e.g. {@code "uint128"}, {@code "bytes4"}
+   * @param indexed state whether the type is indexed
+   * @return new instance of {@link EventParam}
+   * @throws IllegalArgumentException if the type is not valid solidity type
+   */
+  public static @NonNull EventParam of(@NonNull String solidityType, boolean indexed) {
+    Objects.requireNonNull(solidityType, "solidityType must not be null");
+    try {
+      return of(AbiTypes.getType(solidityType), indexed);
+    } catch (UnsupportedOperationException e) {
+      throw new IllegalArgumentException("Invalid Solidity type: " + solidityType, e);
+    }
+  }
+
+  // Uint
+
+  public static @NonNull EventParam uintN(int bits, boolean indexed) {
+    return of("uint" + requireBits(bits), indexed);
+  }
+
+  // Int
+
+  public static @NonNull EventParam intN(int bits, boolean indexed) {
+    return of("int" + requireBits(bits), indexed);
+  }
+
+  // Bytes
+
+  public static @NonNull EventParam bytesN(int size, boolean indexed) {
+    if (size < 1 || size > 32) {
+      throw new IllegalArgumentException("bytesN size must be in [1, 32], got " + size);
+    }
+    return of("bytes" + size, indexed);
+  }
+
+  public static @NonNull EventParam bytes(boolean indexed) {
+    return of(DynamicBytes.class, indexed);
+  }
+
+  // Bool
+
+  public static @NonNull EventParam bool(boolean indexed) {
+    return of(Bool.class, indexed);
+  }
+
+  // Address
+
+  public static @NonNull EventParam address(boolean indexed) {
+    return of(Address.class, indexed);
+  }
+
+  private static int requireBits(int bits) {
+    if ((bits < 8 || bits > 256) && bits % 8 != 0) {
+      throw new IllegalArgumentException(
+          "bit size must be a multiple of 8 of [8, 256], got " + bits);
     }
 
-    /**
-     * Creates address event param.
-     *
-     * @param indexed represent if parameter is an indexed param in event
-     * @return a new instance of {@code EventParam} for {@link Address}
-     */
-    public static @NonNull EventParam address(boolean indexed) {
-        return new EventParam(TypeReference.create(Address.class, indexed));
-    }
-
-    /**
-     * Creates string event param.
-     *
-     * @param indexed represent if parameter is an indexed param in event
-     * @return a new instance of {@code EventParam} for {@link Utf8String}
-     */
-    public static @NonNull EventParam string(boolean indexed) {
-        return new EventParam(TypeReference.create(Utf8String.class, indexed));
-    }
-
-    /**
-     * Creates bool event param.
-     *
-     * @param indexed represent if parameter is an indexed param in event
-     * @return a new instance of {@code EventParam} for {@link Bool}
-     */
-    public static @NonNull EventParam bool(boolean indexed) {
-        return new EventParam(TypeReference.create(Bool.class, indexed));
-    }
-
-    /**
-     * Creates bytes event param.
-     *
-     * @param indexed represent if parameter is an indexed param in event
-     * @return a new instance of {@code EventParam} for {@link Bytes32}
-     */
-    public static @NonNull EventParam bytes(boolean indexed) {
-        return new EventParam(TypeReference.create(Bytes32.class, indexed));
-    }
-
-    /**
-     * Creates uint256 event param.
-     *
-     * @param indexed represent if parameter is an indexed param in event
-     * @return a new instance of {@code EventParam} for {@link Uint256}
-     */
-    public static @NonNull EventParam uint256(boolean indexed) {
-        return new EventParam(TypeReference.create(Uint256.class, indexed));
-    }
-
-    /**
-     * Creates int256 event param.
-     *
-     * @param indexed represent if parameter is an indexed param in event
-     * @return a new instance of {@code EventParam} for {@link Int256}
-     */
-    public static @NonNull EventParam int256(boolean indexed) {
-        return new EventParam(TypeReference.create(Int256.class, indexed));
-    }
-
-    // TODO: Add remaining types...
+    return bits;
+  }
 }

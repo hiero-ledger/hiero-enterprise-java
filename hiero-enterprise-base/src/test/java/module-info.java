@@ -9,6 +9,7 @@ open module org.hiero.base.test {
   requires org.junit.jupiter.params;
   requires org.mockito;
   requires org.slf4j;
+  requires abi;
 
   provides NetworkSettingsProvider with
       SoloActionNetworkSettingsProvider;
