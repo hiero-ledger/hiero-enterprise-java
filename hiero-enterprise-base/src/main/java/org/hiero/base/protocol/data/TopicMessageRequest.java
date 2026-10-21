@@ -31,4 +31,24 @@ public record TopicMessageRequest(
       @NonNull TopicId topicId, @NonNull Consumer<TopicMessage> subscription) {
     return new TopicMessageRequest(topicId, subscription, null, null, NO_LIMIT, null, null);
   }
+
+  @NonNull
+  public static TopicMessageRequest of(
+      @NonNull TopicId topicId,
+      @NonNull Consumer<TopicMessage> subscription,
+      @Nullable Instant startTime,
+      @Nullable Instant endTime,
+      long limit) {
+    return new TopicMessageRequest(topicId, subscription, startTime, endTime, limit, null, null);
+  }
+
+  @Override
+  public Hbar queryPayment() {
+    return queryPayment;
+  }
+
+  @Override
+  public Hbar maxQueryPayment() {
+    return maxQueryPayment;
+  }
 }
