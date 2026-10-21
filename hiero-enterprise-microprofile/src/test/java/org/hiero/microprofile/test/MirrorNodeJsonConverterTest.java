@@ -15,6 +15,7 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
@@ -226,6 +227,33 @@ public class MirrorNodeJsonConverterTest {
   void shouldReturnEmptyNftOptional() {
     final JsonObject jsonObject = Json.createObjectBuilder().build();
     Assertions.assertTrue(jsonConverter.toNft(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldParseValidNftTransactionHistories() {
+    final JsonObject jsonObject = loadJson("nft-transaction-history.json");
+    final List<NftTransactionHistory> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toNftTransactionHistories(jsonObject));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+    Assertions.assertEquals(2, result.size());
+  }
+
+  @Test
+  void shouldReturnEmptyNftTransactionHistoryList() throws Exception {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toNftTransactionHistories(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenTransactionHistoryIsNotArray() throws Exception {
+    JsonObject jsonObject1 = parseJson("{\"transactions\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNftTransactionHistories(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"transactions\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toNftTransactionHistories(jsonObject2));
   }
 
   // Topics
