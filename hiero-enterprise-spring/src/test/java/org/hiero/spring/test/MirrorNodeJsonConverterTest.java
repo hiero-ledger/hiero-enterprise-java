@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
@@ -372,6 +374,48 @@ public class MirrorNodeJsonConverterTest {
     JsonNode node2 = mapper.readTree("{\"fees\": {}}");
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(node2));
+  }
+
+  // Balance
+  @Test
+  void shouldParseValidBalanceSnapshot() {
+    final JsonNode node = loadJson("balance.json");
+    final Optional<BalanceSnapshot> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toBalanceSnapshot(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isPresent());
+  }
+
+  @ParameterizedTest()
+  @MethodSource("emptyNodes")
+  void shouldReturnEmptyBalanceSnapshotOptional(JsonNode node) {
+    Assertions.assertTrue(jsonConverter.toBalanceSnapshot(node).isEmpty());
+  }
+
+  @Test
+  void shouldParseValidAccountBalance() {
+    final JsonNode node = loadJson("balance.json");
+    final List<AccountBalance> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toAccountBalances(node));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyAccountBalanceList() throws Exception {
+    JsonNode node = mapper.readTree("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toAccountBalances(node).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenAccountBalanceIsNotArray() throws Exception {
+    JsonNode node1 = mapper.readTree("{\"balances\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(node1));
+
+    JsonNode node2 = mapper.readTree("{\"balances\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(node2));
   }
 
   // Helper

@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
@@ -380,6 +382,48 @@ public class MirrorNodeJsonConverterTest {
     JsonObject jsonObject2 = parseJson("{\"fees\": {}}");
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> jsonConverter.toNetworkFees(jsonObject2));
+  }
+
+  // Balance
+  @Test
+  void shouldParseValidBalanceSnapshot() {
+    final JsonObject jsonObject = loadJson("balance.json");
+    final Optional<BalanceSnapshot> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toBalanceSnapshot(jsonObject));
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isPresent());
+  }
+
+  @Test
+  void shouldReturnEmptyBalanceSnapshotOptional() {
+    final JsonObject jsonObject = Json.createObjectBuilder().build();
+    Assertions.assertTrue(jsonConverter.toBalanceSnapshot(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldParseValidAccountBalance() {
+    final JsonObject jsonObject = loadJson("balance.json");
+    final List<AccountBalance> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toAccountBalances(jsonObject));
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyAccountBalanceList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toAccountBalances(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenAccountBalanceIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"balances\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"balances\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toAccountBalances(jsonObject2));
   }
 
   // Helpers
