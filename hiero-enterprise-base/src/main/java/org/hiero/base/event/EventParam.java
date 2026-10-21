@@ -8,6 +8,7 @@ import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Bool;
 import org.web3j.abi.datatypes.DynamicBytes;
 import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.Utf8String;
 
 /**
  * Wrapper for Web3j {@link TypeReference} for create smart contract event params.
@@ -477,6 +478,11 @@ public record EventParam(@NonNull TypeReference<?> typeReference) {
 
   public static @NonNull EventParam address(boolean indexed) {
     return of(Address.class, indexed);
+  }
+
+  // String
+  public static @NonNull EventParam string(boolean indexed) {
+    return of(Utf8String.class, indexed);
   }
 
   private static int requireBits(int bits) {
