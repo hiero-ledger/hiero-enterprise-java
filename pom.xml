@@ -59,6 +59,8 @@
     <bouncycastle.version>1.86</bouncycastle.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
     <okio.version>3.18.2</okio.version>
+    <picocli.version>4.7.7</picocli.version>
+    <web3j.version>6.0.0</web3j.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
@@ -259,7 +261,39 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.7.7</version>
+        <version>${picocli.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.web3j</groupId>
+        <artifactId>core</artifactId>
+        <version>${web3j.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.web3j</groupId>
+            <artifactId>crypto</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.web3j</groupId>
+            <artifactId>utils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>kms</artifactId>
+          </exclusion>
+          <exclusion>
+          <groupId>com.squareup.okhttp3</groupId>
+          <artifactId>okhttp</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>logging-interceptor</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
