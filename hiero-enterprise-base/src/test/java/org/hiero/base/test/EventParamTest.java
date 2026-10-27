@@ -1,5 +1,6 @@
 package org.hiero.base.test;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.stream.Stream;
 import org.hiero.base.event.EventParam;
 import org.junit.jupiter.api.Assertions;
@@ -8,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Bool;
 import org.web3j.abi.datatypes.DynamicBytes;
@@ -192,5 +194,140 @@ public class EventParamTest {
     Assertions.assertNotNull(result);
     Assertions.assertEquals(Bool.class, result.typeReference().getType());
     Assertions.assertEquals(indexed, result.isIndexed());
+  }
+
+  private static void assertDynamicArray(EventParam param, Class<? extends Type> clazz)
+      throws ClassNotFoundException {
+    Assertions.assertEquals(param.typeReference().getClassType().getSimpleName(), "DynamicArray");
+
+    final java.lang.reflect.Type refType = param.typeReference().getType();
+    Assertions.assertTrue(refType instanceof ParameterizedType);
+
+    final ParameterizedType paramType = (ParameterizedType) refType;
+    final java.lang.reflect.Type[] actualTypeArguments = paramType.getActualTypeArguments();
+
+    // Assert there is exactly one argument
+    Assertions.assertEquals(1, actualTypeArguments.length);
+    Assertions.assertEquals(clazz, actualTypeArguments[0]);
+  }
+
+  static Stream<Arguments> dynamicArrayTypes() {
+    return Stream.of(
+        Arguments.of("uint256[]", Uint256.class),
+        Arguments.of("int256[]", Int256.class),
+        Arguments.of("string[]", Utf8String.class),
+        Arguments.of("address[]", Address.class),
+        Arguments.of("bool[]", Bool.class));
+  }
+
+  @ParameterizedTest(name = "array(type = {0})")
+  @MethodSource("dynamicArrayTypes")
+  void testArrayOfForDynamicTypes(String type, Class<? extends Type> clazz)
+      throws ClassNotFoundException {
+    final EventParam result = EventParam.arrayOf(type, false);
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isIndexed());
+    assertDynamicArray(result, clazz);
+  }
+
+  static Stream<Arguments> dynamicArray() {
+    return Stream.of(
+        Arguments.of(EventParam.uint256(false), Uint256.class),
+        Arguments.of(EventParam.int16(false), Int16.class),
+        Arguments.of(EventParam.string(false), Utf8String.class),
+        Arguments.of(EventParam.address(false), Address.class),
+        Arguments.of(EventParam.bool(false), Bool.class));
+  }
+
+  @ParameterizedTest(name = "array(type = {0})")
+  @MethodSource("dynamicArray")
+  void testCreateDynamicArray(EventParam eventParam, Class<? extends Type> clazz)
+      throws ClassNotFoundException {
+    final EventParam result = EventParam.array(eventParam, false);
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isIndexed());
+    assertDynamicArray(result, clazz);
+  }
+
+  private static void assertFixedArray(EventParam param, int length, Class<? extends Type> clazz)
+      throws ClassNotFoundException {
+    String typeClass = "StaticArray";
+    if (length <= 32) {
+      typeClass += length;
+    }
+
+    Assertions.assertTrue(param.typeReference() instanceof TypeReference.StaticArrayTypeReference);
+
+    final TypeReference.StaticArrayTypeReference<?> staticRef =
+        (TypeReference.StaticArrayTypeReference<?>) param.typeReference();
+    Assertions.assertEquals(length, staticRef.getSize());
+    Assertions.assertEquals(typeClass, param.typeReference().getClassType().getSimpleName());
+
+    final java.lang.reflect.Type refType = param.typeReference().getType();
+    Assertions.assertTrue(refType instanceof ParameterizedType);
+
+    final ParameterizedType paramType = (ParameterizedType) refType;
+    final java.lang.reflect.Type[] actualTypeArguments = paramType.getActualTypeArguments();
+    Assertions.assertEquals(clazz, actualTypeArguments[0]);
+  }
+
+  static Stream<Arguments> fixedArrayTypes() {
+    return Stream.of(
+        Arguments.of("uint256[10]", 10, Uint256.class),
+        Arguments.of("int256[1]", 1, Int256.class),
+        Arguments.of("string[4]", 4, Utf8String.class),
+        Arguments.of("address[32]", 32, Address.class),
+        Arguments.of("bool[30]", 30, Bool.class));
+  }
+
+  @ParameterizedTest(name = "array(type = {0})")
+  @MethodSource("fixedArrayTypes")
+  void testArrayOfForFixedTypes(String type, int length, Class<? extends Type> clazz)
+      throws ClassNotFoundException {
+    final EventParam result = EventParam.arrayOf(type, false);
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isIndexed());
+    assertFixedArray(result, length, clazz);
+  }
+
+  static Stream<Arguments> fixedArray() {
+    return Stream.of(
+        Arguments.of(EventParam.uint256(false), 10, Uint256.class),
+        Arguments.of(EventParam.int16(false), 1, Int16.class),
+        Arguments.of(EventParam.string(false), 32, Utf8String.class),
+        Arguments.of(EventParam.address(false), 12, Address.class),
+        Arguments.of(EventParam.bool(false), 3, Bool.class));
+  }
+
+  @ParameterizedTest(name = "array(type = {0})")
+  @MethodSource("fixedArray")
+  void testCreateFixedArray(EventParam eventParam, int length, Class<? extends Type> clazz)
+      throws ClassNotFoundException {
+    final EventParam result = EventParam.array(eventParam, length, false);
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isIndexed());
+    assertFixedArray(result, length, clazz);
+  }
+
+  @Test
+  void testArrayOfForFixedTypesLengthGreaterThan32() throws ClassNotFoundException {
+    final EventParam result = EventParam.arrayOf("uint256[33]", false);
+    Assertions.assertNotNull(result);
+    Assertions.assertFalse(result.isIndexed());
+    assertFixedArray(result, 33, Uint256.class);
+  }
+
+  @ParameterizedTest(name = "array(length = {0})")
+  @ValueSource(ints = {-1, 0})
+  void testCreateFixedArrayForInvalidLength(int length) {
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> EventParam.array(EventParam.int24(false), length, false));
+  }
+
+  @ParameterizedTest(name = "address(type = {0})")
+  @ValueSource(strings = {"invalid[]", "uint256[-1]", "uint256{}", "string()"})
+  void testArrayOfForInvalidType(String type) {
+    Assertions.assertThrows(IllegalArgumentException.class, () -> EventParam.arrayOf(type, false));
   }
 }

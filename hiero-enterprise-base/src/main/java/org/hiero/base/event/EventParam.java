@@ -1110,6 +1110,55 @@ public record EventParam(@NonNull TypeReference<?> typeReference) {
     return of(Utf8String.class, indexed);
   }
 
+  // Arrays
+
+  /**
+   * Creates a dynamic array param, e.g. {@code uint256[]}.
+   *
+   * @param element {@link EventParam} for which the array is to created
+   * @param indexed state whether the type is indexed
+   * @return new instance of {@link EventParam}
+   */
+  public static @NonNull EventParam array(@NonNull EventParam element, boolean indexed) {
+    Objects.requireNonNull(element, "element must not be null");
+    return arrayOf(element.typeReference().getType().getTypeName() + "[]", indexed);
+  }
+
+  /**
+   * Creates a fixed-size array param, e.g. {@code uint256[3]}.
+   *
+   * @param element {@link EventParam} for which the array is to created
+   * @param length size of array
+   * @param indexed state whether the type is indexed
+   * @return new instance of {@link EventParam}
+   * @throws IllegalArgumentException if the length is invalid
+   */
+  public static @NonNull EventParam array(
+      @NonNull EventParam element, int length, boolean indexed) {
+    Objects.requireNonNull(element, "element must not be null");
+    if (length < 1) {
+      throw new IllegalArgumentException("lenght must be a positive number");
+    }
+    return arrayOf(element.typeReference().getType().getTypeName() + "[" + length + "]", indexed);
+  }
+
+  /**
+   * Creates array param using solidity type, e.g. {@code uint256[3], uint256[]}.
+   *
+   * @param solidityType solidity type of the elements
+   * @param indexed state whether the type is indexed
+   * @return new instance of {@link EventParam}
+   * @throws IllegalArgumentException if the solidity type is invalid
+   */
+  public static EventParam arrayOf(String solidityType, boolean indexed) {
+    Objects.requireNonNull(solidityType, "solidityType must not be null");
+    try {
+      return new EventParam(TypeReference.makeTypeReference(solidityType, indexed, false));
+    } catch (ClassNotFoundException | RuntimeException e) {
+      throw new IllegalArgumentException("Invalid Solidity type: " + solidityType, e);
+    }
+  }
+
   private static int requireBits(int bits) {
     if ((bits < 8 || bits > 256) && bits % 8 != 0) {
       throw new IllegalArgumentException(
