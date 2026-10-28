@@ -20,8 +20,10 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.ChunkInfo;
 import org.hiero.base.data.Contract;
@@ -42,6 +44,7 @@ import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
 import org.hiero.base.data.Token;
+import org.hiero.base.data.TokenBalance;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.TokenTransfer;
 import org.hiero.base.data.Topic;
@@ -521,6 +524,7 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     if (!node.has("balances")) {
       return List.of();
     }
+
     final JsonNode balancesNode = node.get("balances");
     if (!balancesNode.isArray()) {
       throw new IllegalArgumentException("TokenBalances node is not an array: " + balancesNode);
@@ -532,6 +536,78 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
         .filter(optional -> optional.isPresent())
         .map(optional -> optional.get())
         .toList();
+  }
+
+  @Override
+  public @NonNull Optional<BalanceSnapshot> toBalanceSnapshot(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new BalanceSnapshot(
+              node.hasNonNull("timestamp") ? parseInstant(node.get("timestamp").asText()) : null,
+              toAccountBalances(node)));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<AccountBalance> toAccountBalances(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("balances")) {
+      return List.of();
+    }
+    final JsonNode balancesNode = node.get("balances");
+    if (!balancesNode.isArray()) {
+      throw new IllegalArgumentException("Account balances node is not an array: " + balancesNode);
+    }
+    return jsonArrayToStream(balancesNode)
+        .map(this::toAccountBalance)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<AccountBalance> toAccountBalance(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(
+          new AccountBalance(
+              node.hasNonNull("account")
+                  ? AccountId.fromString(node.get("account").asText())
+                  : null,
+              node.get("balance").asLong(),
+              toTokenBalances(node)));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  private List<TokenBalance> toTokenBalances(@NonNull JsonNode node) {
+    if (!node.has("tokens") || node.get("tokens").isNull()) {
+      return List.of();
+    }
+    final JsonNode tokensNode = node.get("tokens");
+    if (!tokensNode.isArray()) {
+      throw new IllegalArgumentException("Token balances node is not an array: " + tokensNode);
+    }
+    return jsonArrayToStream(tokensNode).map(this::toTokenBalance).toList();
+  }
+
+  private TokenBalance toTokenBalance(@NonNull JsonNode node) {
+    try {
+      return new TokenBalance(
+          node.hasNonNull("token_id") ? TokenId.fromString(node.get("token_id").asText()) : null,
+          node.get("balance").asLong());
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
   }
 
   @Override
