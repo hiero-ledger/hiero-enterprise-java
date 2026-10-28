@@ -50,7 +50,7 @@
     <mockito.version>5.24.0</mockito.version>
     <slf4j.version>2.0.20</slf4j.version>
     <helidon.version>4.5.5</helidon.version>
-    <helidon.test.version>3.2.21</helidon.test.version>
+    <helidon.test.version>3.2.22</helidon.test.version>
     <jakarta.enterprise.version>3.0.1</jakarta.enterprise.version>
     <microprofile.version>7.1</microprofile.version>
     <quarkus.version>3.40.1.1</quarkus.version>
