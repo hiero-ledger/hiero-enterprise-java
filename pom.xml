@@ -38,9 +38,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <hedera.sdk-version>2.77.0</hedera.sdk-version>
-    <grpc.version>1.85.1</grpc.version>
+    <grpc.version>1.84.2</grpc.version>
     <spring.version>6.1.8</spring.version>
-    <spring.boot.version>4.1.2</spring.boot.version>
+    <spring.boot.version>4.1.1</spring.boot.version>
     <jersey.version>3.1.10</jersey.version>
     <jakarta-ws-rs.version>4.0.0</jakarta-ws-rs.version>
     <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
@@ -50,15 +50,17 @@
     <mockito.version>5.24.0</mockito.version>
     <slf4j.version>2.0.20</slf4j.version>
     <helidon.version>4.5.5</helidon.version>
-    <helidon.test.version>3.2.22</helidon.test.version>
+    <helidon.test.version>3.2.21</helidon.test.version>
     <jakarta.enterprise.version>3.0.1</jakarta.enterprise.version>
     <microprofile.version>7.1</microprofile.version>
-    <quarkus.version>3.40.1.1</quarkus.version>
+    <quarkus.version>3.40.1</quarkus.version>
     <guava.failureaccess.version>1.0.3</guava.failureaccess.version>
     <google.auto.version>1.1.1</google.auto.version>
     <bouncycastle.version>1.86</bouncycastle.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
     <okio.version>3.18.2</okio.version>
+    <picocli.version>4.7.7</picocli.version>
+    <web3j.version>6.0.0</web3j.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
@@ -70,7 +72,7 @@
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
     <cyclonedx-maven-plugin.version>2.9.3</cyclonedx-maven-plugin.version>
     <jreleaser-maven-plugin.version>1.26.0</jreleaser-maven-plugin.version>
-    <versions-maven-plugin.version>2.23.0</versions-maven-plugin.version>
+    <versions-maven-plugin.version>2.22.0</versions-maven-plugin.version>
     <spotless-maven-plugin.version>3.10.4</spotless-maven-plugin.version>
   </properties>
 
@@ -259,7 +261,39 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.7.7</version>
+        <version>${picocli.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.web3j</groupId>
+        <artifactId>core</artifactId>
+        <version>${web3j.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.web3j</groupId>
+            <artifactId>crypto</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.web3j</groupId>
+            <artifactId>utils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>kms</artifactId>
+          </exclusion>
+          <exclusion>
+          <groupId>com.squareup.okhttp3</groupId>
+          <artifactId>okhttp</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>logging-interceptor</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

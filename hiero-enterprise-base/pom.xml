@@ -81,5 +81,10 @@
       <artifactId>okio-jvm</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Source: https://mvnrepository.com/artifact/org.web3j/core -->
+    <dependency>
+        <groupId>org.web3j</groupId>
+        <artifactId>core</artifactId>
+    </dependency>
   </dependencies>
 </project>
