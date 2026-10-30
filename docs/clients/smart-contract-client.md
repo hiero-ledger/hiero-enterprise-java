@@ -134,7 +134,6 @@ ContractId contractId =
     );
 ```
 
-
 ---
 
 ## Delete Contract
@@ -185,6 +184,7 @@ PrivateKey adminKey = PrivateKey.fromStringDER("...");
 
 smartContractClient.deleteContract(contractId, toAccountId, adminKey);
 ```
+
 
 ---
 
