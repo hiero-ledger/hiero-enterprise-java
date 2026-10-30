@@ -8,6 +8,7 @@ module org.hiero.base {
   exports org.hiero.base.verification;
   exports org.hiero.base.data;
   exports org.hiero.base.config;
+  exports org.hiero.base.event;
   exports org.hiero.base.implementation to
       org.hiero.base.test;
   exports org.hiero.base.implementation.data to
@@ -27,4 +28,6 @@ module org.hiero.base {
   requires com.google.protobuf; // TODO: We should not have the need to use it
   requires static org.jspecify;
   requires com.google.auto.service;
+  requires abi;
+  requires tools.jackson.databind;
 }
