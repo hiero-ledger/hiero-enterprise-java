@@ -1226,6 +1226,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#find-nft-transaction-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Find NFT Transaction History
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1606,6 +1617,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#find-nft-transaction-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Find NFT Transaction History
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1817,6 +1839,14 @@
 <td style="text-align: left;"><code>findByOwnerAndTypeAndSerial(String owner, String tokenId, long serialNumber)</code></td>
 <td style="text-align: left;">Retrieves a specific NFT using string identifiers.</td>
 </tr>
+<tr>
+<td style="text-align: left;"><code>findTransactionHistory(TokenId tokenId, long serialNumber)</code></td>
+<td style="text-align: left;">Retreives list of transactions history for NFT using token ID and serialnumber.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>findTransactionHistory(String tokenId, long serialNumber)</code></td>
+<td style="text-align: left;">Retreives list of transactions history for NFT using token ID string and serialnumber.</td>
+</tr>
 </tbody>
 </table>
 <hr />
@@ -1882,6 +1912,16 @@
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">        </span><span class="mi">1</span>
 </span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="find-nft-transaction-history">Find NFT Transaction History<a class="headerlink" href="#find-nft-transaction-history" title="Permanent link">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">findTransactionHistory(TokenId tokenId, long serialNumber)</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">TokenId</span><span class="w"> </span><span class="n">tokenId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">TokenId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.5678&quot;</span><span class="p">);</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">NftTransactionHistory</span><span class="o">&gt;</span><span class="w"> </span><span class="n">transactionHistory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="n">nftRepository</span><span class="p">.</span><span class="na">findTransactionHistory</span><span class="p">(</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="n">tokenId</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">        </span><span class="mi">1</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
 
 
