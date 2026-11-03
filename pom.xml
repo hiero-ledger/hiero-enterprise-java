@@ -59,6 +59,7 @@
     <bouncycastle.version>1.86</bouncycastle.version>
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
     <okio.version>3.18.2</okio.version>
+    <guava.version>33.7.2-jre</guava.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
@@ -134,6 +135,11 @@
         <groupId>com.google.guava</groupId>
         <artifactId>failureaccess</artifactId>
         <version>${guava.failureaccess.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
