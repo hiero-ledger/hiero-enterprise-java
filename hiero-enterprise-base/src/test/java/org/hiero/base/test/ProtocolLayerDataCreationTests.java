@@ -579,18 +579,85 @@ public class ProtocolLayerDataCreationTests {
     final Duration validTransactionDuration = Duration.ofSeconds(120);
     final PrivateKey adminKey = PrivateKey.generateECDSA();
 
+    final AccountId autoRenewAccountId = AccountId.fromString("0.0.1234");
+    final PrivateKey autoRenewAccountKey = PrivateKey.generateECDSA();
+
     Assertions.assertDoesNotThrow(
         () ->
             new TopicCreateRequest(
-                validMaxTransactionFee, validTransactionDuration, adminKey, null, null));
+                validMaxTransactionFee,
+                validTransactionDuration,
+                adminKey,
+                null,
+                null,
+                null,
+                null,
+                null));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TopicCreateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null));
+    Assertions.assertDoesNotThrow(
+        () ->
+            new TopicCreateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                adminKey,
+                null,
+                null,
+                autoRenewAccountId,
+                autoRenewAccountKey,
+                Duration.ofDays(60)));
+    Assertions.assertDoesNotThrow(() -> TopicCreateRequest.immutable(null, "memo"));
+    // only the explicit immutable factory may omit the admin key
     Assertions.assertThrows(
-        NullPointerException.class, () -> new TopicCreateRequest(null, null, adminKey, null, null));
+        NullPointerException.class, () -> TopicCreateRequest.of((PrivateKey) null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> TopicCreateRequest.of(null, null, "memo"));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new TopicCreateRequest(null, validTransactionDuration, null, null, null));
+        () -> new TopicCreateRequest(null, null, adminKey, null, null, null, null, null));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new TopicCreateRequest(validMaxTransactionFee, null, null, null, null));
+        () ->
+            new TopicCreateRequest(
+                null, validTransactionDuration, null, null, null, null, null, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () ->
+            new TopicCreateRequest(
+                validMaxTransactionFee, null, null, null, null, null, null, null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TopicCreateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                adminKey,
+                null,
+                null,
+                null,
+                autoRenewAccountKey,
+                null));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TopicCreateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                adminKey,
+                null,
+                null,
+                null,
+                null,
+                Duration.ZERO));
   }
 
   @Test
@@ -601,7 +668,35 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicId topicId = TopicId.fromString("1.2.3");
 
+    Assertions.assertDoesNotThrow(() -> TopicUpdateRequest.of(topicId, adminKey, "memo"));
     Assertions.assertDoesNotThrow(
+        () -> TopicUpdateRequest.updateAutoRenewPeriod(topicId, adminKey, Duration.ofDays(60)));
+    Assertions.assertDoesNotThrow(
+        () ->
+            TopicUpdateRequest.updateAutoRenewAccount(
+                topicId,
+                adminKey,
+                Account.of(AccountId.fromString("0.0.1234"), PrivateKey.generateECDSA())));
+    Assertions.assertDoesNotThrow(() -> TopicUpdateRequest.clearAdminKey(topicId, adminKey));
+    Assertions.assertDoesNotThrow(() -> TopicUpdateRequest.clearSubmitKey(topicId, adminKey));
+    Assertions.assertDoesNotThrow(() -> TopicUpdateRequest.clearMemo(topicId, adminKey));
+    Assertions.assertDoesNotThrow(
+        () -> TopicUpdateRequest.clearAutoRenewAccount(topicId, adminKey));
+
+    // extending only the expiration time does not require the admin key
+    final TopicUpdateRequest expirationOnly =
+        TopicUpdateRequest.updateExpirationTime(topicId, Instant.now().plus(Duration.ofDays(91)));
+    Assertions.assertNull(expirationOnly.adminKey());
+
+    // every other change requires the admin key
+    Assertions.assertThrows(
+        NullPointerException.class, () -> TopicUpdateRequest.of(topicId, null, "memo"));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> TopicUpdateRequest.clearSubmitKey(topicId, null));
+
+    // a value cannot be set and cleared in the same request
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
         () ->
             new TopicUpdateRequest(
                 validMaxTransactionFee,
@@ -610,19 +705,97 @@ public class ProtocolLayerDataCreationTests {
                 adminKey,
                 null,
                 null,
-                null));
+                "memo",
+                null,
+                null,
+                null,
+                null,
+                false,
+                false,
+                true,
+                false));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TopicUpdateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                topicId,
+                adminKey,
+                PrivateKey.generateECDSA(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                true,
+                false,
+                false,
+                false));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> TopicUpdateRequest.updateAutoRenewPeriod(topicId, adminKey, Duration.ZERO));
+    // the network does not allow an auto renew account on a topic without an admin key
+    Assertions.assertTrue(
+        TopicUpdateRequest.clearAdminKey(topicId, adminKey).clearAutoRenewAccountId());
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new TopicUpdateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                topicId,
+                adminKey,
+                null,
+                null,
+                null,
+                AccountId.fromString("0.0.1234"),
+                null,
+                null,
+                null,
+                true,
+                false,
+                false,
+                false));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new TopicUpdateRequest(validMaxTransactionFee, null, null, null, null, null, null));
+        () ->
+            new TopicUpdateRequest(
+                validMaxTransactionFee,
+                validTransactionDuration,
+                null,
+                adminKey,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                false,
+                false,
+                false));
     Assertions.assertThrows(
         NullPointerException.class,
-        () -> new TopicUpdateRequest(null, validTransactionDuration, null, null, null, null, null));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> new TopicUpdateRequest(null, null, topicId, null, null, null, null));
-    Assertions.assertThrows(
-        NullPointerException.class,
-        () -> new TopicUpdateRequest(null, null, null, adminKey, null, null, null));
+        () ->
+            new TopicUpdateRequest(
+                null,
+                validTransactionDuration,
+                topicId,
+                adminKey,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                false,
+                false,
+                false));
   }
 
   @Test

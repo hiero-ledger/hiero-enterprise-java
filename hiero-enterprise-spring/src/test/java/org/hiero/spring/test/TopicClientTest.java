@@ -1,9 +1,14 @@
 package org.hiero.spring.test;
 
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
+import java.time.Duration;
+import java.time.Instant;
+import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
+import org.hiero.base.data.Account;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = HieroTestConfig.class)
 public class TopicClientTest {
   @Autowired private TopicClient topicClient;
+
+  @Autowired private AccountClient accountClient;
 
   @Test
   void testCreateTopic() throws HieroException {
@@ -197,5 +204,73 @@ public class TopicClientTest {
     final PrivateKey submitKey = PrivateKey.generateECDSA();
     Assertions.assertThrows(
         HieroException.class, () -> topicClient.submitMessage(topicId, submitKey, message));
+  }
+
+  @Test
+  void testCreateImmutableTopicCannotBeUpdatedOrDeleted() throws HieroException {
+    final TopicId topicId = topicClient.createImmutableTopic("Immutable topic");
+    Assertions.assertNotNull(topicId);
+
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateTopic(topicId, "Updated memo"));
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+    Assertions.assertDoesNotThrow(() -> topicClient.submitMessage(topicId, "Hello Hiero"));
+  }
+
+  @Test
+  void testCreateTopicWithAutoRenewSettings() throws HieroException {
+    final Account autoRenewAccount = accountClient.createAccount(Hbar.from(1));
+    final TopicId topicId =
+        topicClient.createTopic(
+            null, null, "Auto renew topic", autoRenewAccount, Duration.ofDays(60));
+    Assertions.assertNotNull(topicId);
+  }
+
+  @Test
+  void testUpdateAutoRenewAccountAndPeriod() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    final Account autoRenewAccount = accountClient.createAccount(Hbar.from(1));
+
+    Assertions.assertDoesNotThrow(
+        () -> topicClient.updateAutoRenewAccount(topicId, autoRenewAccount));
+    Assertions.assertDoesNotThrow(
+        () -> topicClient.updateAutoRenewPeriod(topicId, Duration.ofDays(60)));
+    Assertions.assertDoesNotThrow(() -> topicClient.clearAutoRenewAccount(topicId));
+  }
+
+  @Test
+  void testUpdateExpirationTimeOfImmutableTopic() throws HieroException {
+    final TopicId topicId = topicClient.createImmutableTopic();
+    final Instant expirationTime = Instant.now().plus(Duration.ofDays(91));
+    Assertions.assertDoesNotThrow(() -> topicClient.updateExpirationTime(topicId, expirationTime));
+  }
+
+  @Test
+  void testClearAdminKeyMakesTopicImmutable() throws HieroException {
+    final TopicId topicId = topicClient.createTopic("Hello Hiero");
+    Assertions.assertDoesNotThrow(() -> topicClient.clearAdminKey(topicId));
+
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateTopic(topicId, "Updated memo"));
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+  }
+
+  @Test
+  void testClearSubmitKeyMakesTopicPublic() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.submitMessage(topicId, message));
+
+    Assertions.assertDoesNotThrow(() -> topicClient.clearSubmitKey(topicId));
+
+    Assertions.assertDoesNotThrow(() -> topicClient.submitMessage(topicId, message));
+  }
+
+  @Test
+  void testClearTopicMemo() throws HieroException {
+    final TopicId topicId = topicClient.createTopic("Hello Hiero");
+    Assertions.assertDoesNotThrow(() -> topicClient.clearTopicMemo(topicId));
   }
 }
