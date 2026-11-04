@@ -2,6 +2,7 @@ package org.hiero.base.mirrornode;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
+import org.hiero.base.data.Schedule;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
@@ -543,4 +545,58 @@ public interface MirrorNodeClient {
    * @throws HieroException if an error occurs
    */
   @NonNull Optional<Node> queryNetworkNodeById(long nodeId) throws HieroException;
+
+  /**
+   * Queries all schedules.
+   *
+   * @return the schedules
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<Schedule> querySchedules() throws HieroException;
+
+  /**
+   * Queries the schedules that were created by an account.
+   *
+   * @param accountId the ID of the account that created the schedules
+   * @return the schedules created by the account
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Page<Schedule> querySchedulesByAccount(@NonNull AccountId accountId)
+      throws HieroException;
+
+  /**
+   * Queries the schedules that were created by an account.
+   *
+   * @param accountId the ID of the account that created the schedules
+   * @return the schedules created by the account
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Page<Schedule> querySchedulesByAccount(@NonNull String accountId) throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    return querySchedulesByAccount(AccountId.fromString(accountId));
+  }
+
+  /**
+   * Queries a schedule by its schedule ID.
+   *
+   * @param scheduleId the schedule ID
+   * @return the schedule, or empty if not found
+   * @throws HieroException if an error occurs
+   */
+  @NonNull Optional<Schedule> queryScheduleById(@NonNull ScheduleId scheduleId)
+      throws HieroException;
+
+  /**
+   * Queries a schedule by its schedule ID.
+   *
+   * @param scheduleId the schedule ID
+   * @return the schedule, or empty if not found
+   * @throws HieroException if an error occurs
+   */
+  @NonNull
+  default Optional<Schedule> queryScheduleById(@NonNull String scheduleId) throws HieroException {
+    Objects.requireNonNull(scheduleId, "scheduleId must not be null");
+    return queryScheduleById(ScheduleId.fromString(scheduleId));
+  }
 }

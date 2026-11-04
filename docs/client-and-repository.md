@@ -43,6 +43,7 @@ They are designed for querying ledger information such as accounts, transactions
 | [`ContractRepository`](repositories/contract-repository.md)       | Queries smart contract metadata, bytecode, and execution details. |
 | [`NetworkRepository`](repositories/network-repository.md)         | Queries network information and node configuration data. |
 | [`NftRepository`](repositories/nft-repository.md)                 | Queries NFT metadata, ownership, and transfer history. |
+| [`ScheduleRepository`](repositories/schedule-repository.md)       | Queries scheduled transactions, their signatures, and execution status. |
 | [`TokenRepository`](repositories/token-repository.md)             | Queries fungible token information and token relationships. |
 | [`TopicRepository`](repositories/topic-repository.md)             | Queries historical HCS topic messages and topic information. |
 | [`TransactionRepository`](repositories/transaction-repository.md) | Queries transaction records, status, timestamps, and execution details. |
