@@ -33,6 +33,7 @@ nav = [
                 { "ContractRepository" = "repositories/contract-repository.md" },
                 { "NetworkRepository" = "repositories/network-repository.md" },
                 { "NftRepository" = "repositories/nft-repository.md" },
+                { "ScheduleRepository" = "repositories/schedule-repository.md" },
                 { "TokenRepository" = "repositories/token-repository.md" },
                 { "TopicRepository" = "repositories/topic-repository.md" },
                 { "TransactionRepository" = "repositories/transaction-repository.md" }

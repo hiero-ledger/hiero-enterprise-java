@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -39,6 +40,8 @@ import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
+import org.hiero.base.data.Schedule;
+import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
@@ -1104,6 +1107,94 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
+  }
+
+  @Override
+  public @NonNull Optional<Schedule> toSchedule(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
+      return Optional.empty();
+    }
+
+    try {
+      final ScheduleId scheduleId = ScheduleId.fromString(node.get("schedule_id").asText());
+      final Key adminKey = node.hasNonNull("admin_key") ? parseKey(node.get("admin_key")) : null;
+      final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
+      final AccountId creatorAccountId =
+          AccountId.fromString(node.get("creator_account_id").asText());
+      final boolean deleted = node.hasNonNull("deleted") && node.get("deleted").asBoolean();
+      final Instant executedTimestamp =
+          node.hasNonNull("executed_timestamp")
+              ? parseInstant(node.get("executed_timestamp").asText())
+              : null;
+      final Instant expirationTime =
+          node.hasNonNull("expiration_time")
+              ? parseInstant(node.get("expiration_time").asText())
+              : null;
+      final String memo = node.hasNonNull("memo") ? node.get("memo").asText() : "";
+      final AccountId payerAccountId = AccountId.fromString(node.get("payer_account_id").asText());
+      final List<ScheduleSignature> signatures =
+          node.hasNonNull("signatures")
+              ? jsonArrayToStream(node.get("signatures")).map(n -> toScheduleSignature(n)).toList()
+              : List.of();
+      final byte[] transactionBody = decodeBase64(node.get("transaction_body").textValue());
+      final boolean waitForExpiry =
+          node.hasNonNull("wait_for_expiry") && node.get("wait_for_expiry").asBoolean();
+
+      return Optional.of(
+          new Schedule(
+              scheduleId,
+              adminKey,
+              consensusTimestamp,
+              creatorAccountId,
+              deleted,
+              executedTimestamp,
+              expirationTime,
+              memo,
+              payerAccountId,
+              signatures,
+              transactionBody,
+              waitForExpiry));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<Schedule> toSchedules(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("schedules")) {
+      return List.of();
+    }
+
+    final JsonNode schedules = node.get("schedules");
+    if (!schedules.isArray()) {
+      throw new IllegalArgumentException("Schedules node is not an array: " + schedules);
+    }
+
+    return jsonArrayToStream(schedules)
+        .map(n -> toSchedule(n))
+        .filter(o -> o.isPresent())
+        .map(o -> o.get())
+        .toList();
+  }
+
+  private @NonNull ScheduleSignature toScheduleSignature(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "node must not be null");
+    final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
+    final byte[] publicKeyPrefix = decodeBase64(node.get("public_key_prefix").textValue());
+    final byte[] signature = decodeBase64(node.get("signature").textValue());
+    final String type = node.get("type").asText();
+    return new ScheduleSignature(consensusTimestamp, publicKeyPrefix, signature, type);
+  }
+
+  /**
+   * Decodes a Base64 value of the mirror node. The MIME decoder is used because the mirror node
+   * breaks long values such as schedule signatures into lines.
+   */
+  private static byte[] decodeBase64(final @NonNull String base64) {
+    Objects.requireNonNull(base64, "base64 must not be null");
+    return Base64.getMimeDecoder().decode(base64);
   }
 
   @NonNull

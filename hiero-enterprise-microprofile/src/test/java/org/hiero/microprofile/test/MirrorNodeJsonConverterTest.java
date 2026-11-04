@@ -1,10 +1,17 @@
 package org.hiero.microprofile.test;
 
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ScheduleId;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.time.Instant;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import org.hiero.base.data.AccountInfo;
@@ -17,6 +24,8 @@ import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.Schedule;
+import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
@@ -254,6 +263,121 @@ public class MirrorNodeJsonConverterTest {
     JsonObject jsonObject2 = parseJson("{\"transactions\": {}}");
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> jsonConverter.toNftTransactionHistories(jsonObject2));
+  }
+
+  // Schedules
+  @Test
+  void shouldParseValidSchedule() throws Exception {
+    final JsonObject jsonObject = loadJson("schedule.json");
+    final Optional<Schedule> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toSchedule(jsonObject));
+    Assertions.assertTrue(result.isPresent());
+
+    final Schedule schedule = result.get();
+    final byte[] adminKeyBytes =
+        HexFormat.of().parseHex("4fafbd7db4965bd2c109b2864fec4840c0b180a2b54446660ce4511f09287692");
+    Assertions.assertEquals(ScheduleId.fromString("0.0.11296896"), schedule.scheduleId());
+    Assertions.assertArrayEquals(
+        adminKeyBytes,
+        Assertions.assertInstanceOf(PublicKey.class, schedule.adminKey()).toBytesRaw());
+    Assertions.assertEquals(
+        Instant.ofEpochSecond(1793726878L, 208132774L), schedule.consensusTimestamp());
+    Assertions.assertEquals(AccountId.fromString("0.0.4866188"), schedule.creatorAccountId());
+    Assertions.assertFalse(schedule.deleted());
+    Assertions.assertEquals(
+        Instant.ofEpochSecond(1793726884L, 28797492L), schedule.executedTimestamp());
+    Assertions.assertEquals(
+        Instant.ofEpochSecond(1793986077L, 786000000L), schedule.expirationTime());
+    Assertions.assertEquals("nodeStream automatic payments v1 29fc29ca586a5841", schedule.memo());
+    Assertions.assertEquals(AccountId.fromString("0.0.4866188"), schedule.payerAccountId());
+    Assertions.assertFalse(schedule.waitForExpiry());
+
+    final SchedulableTransactionBody body =
+        SchedulableTransactionBody.parseFrom(schedule.transactionBody());
+    Assertions.assertEquals(200_000_000L, body.getTransactionFee());
+    Assertions.assertEquals(schedule.memo(), body.getMemo());
+
+    Assertions.assertEquals(3, schedule.signatures().size());
+    final ScheduleSignature signature = schedule.signatures().get(0);
+    Assertions.assertEquals(
+        Instant.ofEpochSecond(1793726878L, 208132774L), signature.consensusTimestamp());
+    Assertions.assertArrayEquals(adminKeyBytes, signature.publicKeyPrefix());
+    // the recorded signature contains a line break inside its Base64 value
+    Assertions.assertEquals(64, signature.signature().length);
+    Assertions.assertEquals("ED25519", signature.type());
+  }
+
+  @Test
+  void shouldReturnEmptyScheduleOptional() {
+    final JsonObject jsonObject = Json.createObjectBuilder().build();
+    Assertions.assertTrue(jsonConverter.toSchedule(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldReturnEmptyScheduleOptionalForNotFoundResponse() {
+    final JsonObject jsonObject =
+        parseJson("{\"_status\": {\"messages\": [{\"message\": \"Not found\"}]}}");
+    Assertions.assertTrue(jsonConverter.toSchedule(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenScheduleTransactionBodyIsNull() {
+    final JsonObject jsonObject =
+        Json.createObjectBuilder(loadJson("schedule.json")).addNull("transaction_body").build();
+    Assertions.assertThrows(
+        IllegalStateException.class, () -> jsonConverter.toSchedule(jsonObject));
+  }
+
+  @Test
+  void shouldParseValidScheduleList() {
+    final JsonObject jsonObject = loadJson("schedule-list.json");
+    final List<Schedule> result =
+        Assertions.assertDoesNotThrow(() -> jsonConverter.toSchedules(jsonObject));
+    Assertions.assertEquals(3, result.size());
+
+    final Schedule waitingForExpiry = result.get(0);
+    Assertions.assertEquals(ScheduleId.fromString("0.0.11295061"), waitingForExpiry.scheduleId());
+    Assertions.assertEquals(ContractId.fromString("0.0.11294909"), waitingForExpiry.adminKey());
+    Assertions.assertEquals(
+        AccountId.fromString("0.0.11212783"), waitingForExpiry.creatorAccountId());
+    Assertions.assertEquals(
+        AccountId.fromString("0.0.11294909"), waitingForExpiry.payerAccountId());
+    Assertions.assertTrue(waitingForExpiry.waitForExpiry());
+    Assertions.assertTrue(waitingForExpiry.signatures().isEmpty());
+    Assertions.assertEquals(68, waitingForExpiry.transactionBody().length);
+
+    final Schedule deleted = result.get(1);
+    Assertions.assertEquals(ScheduleId.fromString("0.0.11296689"), deleted.scheduleId());
+    Assertions.assertTrue(deleted.deleted());
+    Assertions.assertNull(deleted.executedTimestamp());
+    Assertions.assertEquals(1, deleted.signatures().size());
+
+    final Schedule withoutAdminKey = result.get(2);
+    Assertions.assertEquals(ScheduleId.fromString("0.0.11297125"), withoutAdminKey.scheduleId());
+    Assertions.assertNull(withoutAdminKey.adminKey());
+    Assertions.assertNull(withoutAdminKey.expirationTime());
+    Assertions.assertEquals("", withoutAdminKey.memo());
+    Assertions.assertEquals(2, withoutAdminKey.signatures().size());
+    Assertions.assertEquals("ECDSA_SECP256K1", withoutAdminKey.signatures().get(0).type());
+    Assertions.assertEquals(33, withoutAdminKey.signatures().get(0).publicKeyPrefix().length);
+    Assertions.assertEquals(64, withoutAdminKey.signatures().get(0).signature().length);
+  }
+
+  @Test
+  void shouldReturnEmptyScheduleList() {
+    JsonObject jsonObject = parseJson("{\"unknow-field\": []}");
+    Assertions.assertTrue(jsonConverter.toSchedules(jsonObject).isEmpty());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenSchedulesIsNotArray() {
+    JsonObject jsonObject1 = parseJson("{\"schedules\": null}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toSchedules(jsonObject1));
+
+    JsonObject jsonObject2 = parseJson("{\"schedules\": {}}");
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> jsonConverter.toSchedules(jsonObject2));
   }
 
   // Topics
