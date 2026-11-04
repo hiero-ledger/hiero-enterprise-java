@@ -49,7 +49,6 @@ public class ProtocolLayerClientTests {
     // given
     final AccountBalanceRequest accountBalanceRequest =
         AccountBalanceRequest.of(hieroContext.getOperatorAccount().accountId());
-
     // when
     final AccountBalanceResponse accountBalanceResult =
         protocolLayerClient.executeAccountBalanceQuery(accountBalanceRequest);
@@ -58,7 +57,6 @@ public class ProtocolLayerClientTests {
     Assertions.assertNotNull(accountBalanceResult);
     Assertions.assertNotNull(accountBalanceResult.hbars());
     Assertions.assertTrue(accountBalanceResult.hbars().toTinybars() > 0);
-    System.out.println("Balance: " + accountBalanceResult.hbars().toString() + " HBARs");
   }
 
   @Test

@@ -29,7 +29,7 @@ public final class HederaMainnetSettings implements NetworkSettings {
 
   @Override
   public @NonNull Optional<String> getMirrorNodeRestUrl() {
-    return Optional.of("\thttps://testnet.mirrornode.hedera.com");
+    return Optional.of("https://testnet.mirrornode.hedera.com");
   }
 
   @Override
