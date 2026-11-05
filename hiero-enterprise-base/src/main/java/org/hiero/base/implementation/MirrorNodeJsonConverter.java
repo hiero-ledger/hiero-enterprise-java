@@ -2,8 +2,10 @@ package org.hiero.base.implementation;
 
 import java.util.List;
 import java.util.Optional;
+import org.hiero.base.data.AccountBalance;
 import org.hiero.base.data.AccountInfo;
 import org.hiero.base.data.Balance;
+import org.hiero.base.data.BalanceSnapshot;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Contract;
 import org.hiero.base.data.ExchangeRates;
@@ -30,6 +32,8 @@ public interface MirrorNodeJsonConverter<JSON> {
 
   @NonNull Optional<ExchangeRates> toExchangeRates(@NonNull JSON json);
 
+  @NonNull Optional<BalanceSnapshot> toBalanceSnapshot(@NonNull JSON json);
+
   @NonNull Optional<AccountInfo> toAccountInfo(@NonNull JSON jsonNode);
 
   @NonNull List<NetworkFee> toNetworkFees(@NonNull JSON json);
@@ -45,6 +49,8 @@ public interface MirrorNodeJsonConverter<JSON> {
   Optional<TokenInfo> toTokenInfo(JSON json);
 
   List<Balance> toBalances(JSON node);
+
+  @NonNull List<AccountBalance> toAccountBalances(@NonNull JSON json);
 
   List<Token> toTokens(JSON node);
 

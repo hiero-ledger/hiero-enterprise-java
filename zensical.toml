@@ -29,6 +29,7 @@ nav = [
             ]},
             { "Repositories" = [
                 { "AccountRepository" = "repositories/account-repository.md" },
+                { "BalanceRepository" = "repositories/balance-repository.md" },
                 { "BlockRepository" = "repositories/block-repository.md" },
                 { "ContractRepository" = "repositories/contract-repository.md" },
                 { "NetworkRepository" = "repositories/network-repository.md" },
