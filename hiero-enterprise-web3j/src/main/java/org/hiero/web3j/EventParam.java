@@ -1,4 +1,4 @@
-package org.hiero.base.event;
+package org.hiero.web3j;
 
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;

@@ -1,8 +1,7 @@
-package org.hiero.base.test;
+package org.hiero.web3j;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.stream.Stream;
-import org.hiero.base.event.EventParam;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
