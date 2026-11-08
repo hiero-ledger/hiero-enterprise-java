@@ -27,6 +27,7 @@ import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Schedule;
 import org.hiero.base.data.ScheduleSignature;
+import org.hiero.base.data.ScheduleSignatureType;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class MirrorNodeJsonConverterTest {
@@ -298,7 +300,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertArrayEquals(adminKeyBytes, signature.publicKeyPrefix());
     // the recorded signature contains a line break inside its Base64 value
     Assertions.assertEquals(64, signature.signature().length);
-    Assertions.assertEquals("ED25519", signature.type());
+    Assertions.assertEquals(ScheduleSignatureType.ED25519, signature.type());
   }
 
   @ParameterizedTest()
@@ -319,6 +321,51 @@ public class MirrorNodeJsonConverterTest {
     final ObjectNode node = (ObjectNode) loadJson("schedule.json");
     node.putNull("transaction_body");
     Assertions.assertThrows(IllegalStateException.class, () -> jsonConverter.toSchedule(node));
+  }
+
+  @Test
+  void shouldParseScheduleWithNullIdAndAccounts() {
+    final ObjectNode node = (ObjectNode) loadJson("schedule.json");
+    node.putNull("schedule_id");
+    node.putNull("creator_account_id");
+    node.putNull("payer_account_id");
+
+    final Schedule schedule = jsonConverter.toSchedule(node).orElseThrow();
+
+    Assertions.assertNull(schedule.scheduleId());
+    Assertions.assertNull(schedule.creatorAccountId());
+    Assertions.assertNull(schedule.payerAccountId());
+    Assertions.assertEquals(
+        Instant.ofEpochSecond(1793726878L, 208132774L), schedule.consensusTimestamp());
+    Assertions.assertEquals(3, schedule.signatures().size());
+  }
+
+  @ParameterizedTest
+  @EnumSource(ScheduleSignatureType.class)
+  void shouldParseScheduleSignatureType(ScheduleSignatureType type) {
+    final ObjectNode node = (ObjectNode) loadJson("schedule.json");
+    ((ObjectNode) node.get("signatures").get(0)).put("type", type.name());
+
+    final Schedule schedule = jsonConverter.toSchedule(node).orElseThrow();
+
+    Assertions.assertEquals(type, schedule.signatures().get(0).type());
+  }
+
+  @Test
+  void shouldParseUnknownOrMissingScheduleSignatureTypeAsUnknown() {
+    final ObjectNode node = (ObjectNode) loadJson("schedule.json");
+    ((ObjectNode) node.get("signatures").get(0)).put("type", "ED448");
+    ((ObjectNode) node.get("signatures").get(1)).putNull("type");
+    ((ObjectNode) node.get("signatures").get(2)).remove("type");
+
+    final Schedule schedule = jsonConverter.toSchedule(node).orElseThrow();
+
+    Assertions.assertEquals(
+        List.of(
+            ScheduleSignatureType.UNKNOWN,
+            ScheduleSignatureType.UNKNOWN,
+            ScheduleSignatureType.UNKNOWN),
+        schedule.signatures().stream().map(ScheduleSignature::type).toList());
   }
 
   @Test
@@ -351,7 +398,8 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertNull(withoutAdminKey.expirationTime());
     Assertions.assertEquals("", withoutAdminKey.memo());
     Assertions.assertEquals(2, withoutAdminKey.signatures().size());
-    Assertions.assertEquals("ECDSA_SECP256K1", withoutAdminKey.signatures().get(0).type());
+    Assertions.assertEquals(
+        ScheduleSignatureType.ECDSA_SECP256K1, withoutAdminKey.signatures().get(0).type());
     Assertions.assertEquals(33, withoutAdminKey.signatures().get(0).publicKeyPrefix().length);
     Assertions.assertEquals(64, withoutAdminKey.signatures().get(0).signature().length);
   }

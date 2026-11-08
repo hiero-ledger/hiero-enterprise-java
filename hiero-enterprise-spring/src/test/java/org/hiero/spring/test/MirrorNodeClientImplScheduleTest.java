@@ -72,7 +72,7 @@ class MirrorNodeClientImplScheduleTest {
   @Test
   void querySchedulesByAccountFiltersByAccountId() throws Exception {
     server
-        .expect(requestTo(BASE_URL + "/api/v1/schedules?account.id=0.0.11212783"))
+        .expect(requestTo(BASE_URL + "/api/v1/schedules?account.id=eq:0.0.11212783"))
         .andExpect(method(HttpMethod.GET))
         .andRespond(withSuccess(loadJson("schedule-list.json"), MediaType.APPLICATION_JSON));
 

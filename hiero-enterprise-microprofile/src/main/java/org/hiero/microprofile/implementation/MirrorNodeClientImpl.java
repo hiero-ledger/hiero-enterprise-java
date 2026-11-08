@@ -224,7 +224,7 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
   public @NonNull Page<Schedule> querySchedulesByAccount(@NonNull AccountId accountId)
       throws HieroException {
     Objects.requireNonNull(accountId, "accountId must not be null");
-    final String path = "/api/v1/schedules?account.id=" + accountId;
+    final String path = "/api/v1/schedules?account.id=eq:" + accountId;
     final Function<JsonObject, List<Schedule>> dataExtractionFunction =
         node -> jsonConverter.toSchedules(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);

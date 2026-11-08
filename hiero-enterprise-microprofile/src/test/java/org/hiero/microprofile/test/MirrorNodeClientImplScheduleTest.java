@@ -109,7 +109,7 @@ class MirrorNodeClientImplScheduleTest {
     assertEquals(3, page.getSize());
     assertEquals(AccountId.fromString("0.0.11212783"), page.getData().get(0).creatorAccountId());
     verify(webTarget).path(SCHEDULES_PATH);
-    verify(webTarget).queryParam("account.id", "0.0.11212783");
+    verify(webTarget).queryParam("account.id", "eq:0.0.11212783");
   }
 
   @Test

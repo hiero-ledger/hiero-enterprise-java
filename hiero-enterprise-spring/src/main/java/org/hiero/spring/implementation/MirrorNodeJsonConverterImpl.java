@@ -42,6 +42,7 @@ import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.Schedule;
 import org.hiero.base.data.ScheduleSignature;
+import org.hiero.base.data.ScheduleSignatureType;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
@@ -1117,11 +1118,16 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     }
 
     try {
-      final ScheduleId scheduleId = ScheduleId.fromString(node.get("schedule_id").asText());
+      final ScheduleId scheduleId =
+          node.hasNonNull("schedule_id")
+              ? ScheduleId.fromString(node.get("schedule_id").asText())
+              : null;
       final Key adminKey = node.hasNonNull("admin_key") ? parseKey(node.get("admin_key")) : null;
       final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
       final AccountId creatorAccountId =
-          AccountId.fromString(node.get("creator_account_id").asText());
+          node.hasNonNull("creator_account_id")
+              ? AccountId.fromString(node.get("creator_account_id").asText())
+              : null;
       final boolean deleted = node.hasNonNull("deleted") && node.get("deleted").asBoolean();
       final Instant executedTimestamp =
           node.hasNonNull("executed_timestamp")
@@ -1132,7 +1138,10 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
               ? parseInstant(node.get("expiration_time").asText())
               : null;
       final String memo = node.hasNonNull("memo") ? node.get("memo").asText() : "";
-      final AccountId payerAccountId = AccountId.fromString(node.get("payer_account_id").asText());
+      final AccountId payerAccountId =
+          node.hasNonNull("payer_account_id")
+              ? AccountId.fromString(node.get("payer_account_id").asText())
+              : null;
       final List<ScheduleSignature> signatures =
           node.hasNonNull("signatures")
               ? jsonArrayToStream(node.get("signatures")).map(n -> toScheduleSignature(n)).toList()
@@ -1184,7 +1193,8 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
     final byte[] publicKeyPrefix = decodeBase64(node.get("public_key_prefix").textValue());
     final byte[] signature = decodeBase64(node.get("signature").textValue());
-    final String type = node.get("type").asText();
+    final ScheduleSignatureType type =
+        ScheduleSignatureType.from(node.hasNonNull("type") ? node.get("type").asText() : null);
     return new ScheduleSignature(consensusTimestamp, publicKeyPrefix, signature, type);
   }
 

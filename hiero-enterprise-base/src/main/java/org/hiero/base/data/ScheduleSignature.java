@@ -10,14 +10,14 @@ import org.jspecify.annotations.NonNull;
  * @param consensusTimestamp the consensus timestamp of the transaction that added the signature
  * @param publicKeyPrefix the prefix of the public key that created the signature
  * @param signature the signature bytes
- * @param type the signature type as reported by the mirror node (for example {@code ED25519} or
- *     {@code ECDSA_SECP256K1})
+ * @param type the type of the signature, or {@link ScheduleSignatureType#UNKNOWN} if the mirror
+ *     node reports a type that is not known
  */
 public record ScheduleSignature(
     @NonNull Instant consensusTimestamp,
     @NonNull byte[] publicKeyPrefix,
     @NonNull byte[] signature,
-    @NonNull String type) {
+    @NonNull ScheduleSignatureType type) {
 
   public ScheduleSignature {
     Objects.requireNonNull(consensusTimestamp, "consensusTimestamp must not be null");
