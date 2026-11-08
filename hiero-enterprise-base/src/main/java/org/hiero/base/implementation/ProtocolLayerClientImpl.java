@@ -508,15 +508,23 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       final TopicCreateTransaction transaction =
           new TopicCreateTransaction()
               .setMaxTransactionFee(request.maxTransactionFee())
-              .setTransactionValidDuration(request.transactionValidDuration())
-              .setAdminKey(request.adminKey());
+              .setTransactionValidDuration(request.transactionValidDuration());
+      if (request.adminKey() != null) {
+        transaction.setAdminKey(request.adminKey());
+      }
       if (request.memo() != null) {
         transaction.setTopicMemo(request.memo());
       }
       if (request.submitKey() != null) {
         transaction.setSubmitKey(request.submitKey());
       }
-      sign(transaction, request.adminKey());
+      if (request.autoRenewAccountId() != null) {
+        transaction.setAutoRenewAccountId(request.autoRenewAccountId());
+      }
+      if (request.autoRenewPeriod() != null) {
+        transaction.setAutoRenewPeriod(request.autoRenewPeriod());
+      }
+      sign(transaction, request.adminKey(), request.autoRenewAccountKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_CREATE);
       return new TopicCreateResult(receipt.transactionId, receipt.status, receipt.topicId);
@@ -540,18 +548,35 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTopicId(request.topicId());
       if (request.memo() != null) {
         transaction.setTopicMemo(request.memo());
+      } else if (request.clearMemo()) {
+        transaction.clearTopicMemo();
       }
       if (request.submitKey() != null) {
         transaction.setSubmitKey(request.submitKey());
+      } else if (request.clearSubmitKey()) {
+        transaction.clearSubmitKey();
       }
       if (request.updatedAdminKey() != null) {
         transaction.setAdminKey(request.updatedAdminKey());
+      } else if (request.clearAdminKey()) {
+        transaction.clearAdminKey();
       }
-      if (request.updatedAdminKey() != null) {
-        sign(transaction, request.adminKey(), request.updatedAdminKey());
-      } else {
-        sign(transaction, request.adminKey());
+      if (request.autoRenewAccountId() != null) {
+        transaction.setAutoRenewAccountId(request.autoRenewAccountId());
+      } else if (request.clearAutoRenewAccountId()) {
+        transaction.clearAutoRenewAccountId();
       }
+      if (request.autoRenewPeriod() != null) {
+        transaction.setAutoRenewPeriod(request.autoRenewPeriod());
+      }
+      if (request.expirationTime() != null) {
+        transaction.setExpirationTime(request.expirationTime());
+      }
+      sign(
+          transaction,
+          request.adminKey(),
+          request.updatedAdminKey(),
+          request.autoRenewAccountKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOPIC_UPDATE);
       return new TopicUpdateResult(receipt.transactionId, receipt.status);
