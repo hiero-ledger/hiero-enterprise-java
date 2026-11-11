@@ -97,12 +97,10 @@ public class TransactionRepositoryTest {
 
     final List<TransactionInfo> data = page.getData();
     Assertions.assertFalse(data.isEmpty());
-    data.forEach(
-        tx ->
-            Assertions.assertTrue(
-                tx.transfers().stream()
-                    .anyMatch(
-                        (Transfer t) ->
-                            t.account().equals(account.accountId()) && t.amount() > 0L)));
+    data.forEach(tx ->
+        Assertions.assertTrue(
+            tx.transfers().stream()
+                .anyMatch(
+                    (Transfer t) -> t.account().equals(account.accountId()) && t.amount() > 0L)));
   }
 }

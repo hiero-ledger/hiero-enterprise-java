@@ -54,16 +54,15 @@ public class MicrometerSupportConfig {
       }
       final Timer timer = meterRegistry.timer(TIMER_NAME, tags);
       final Counter counter = meterRegistry.counter(COUNTER_NAME, tags);
-      return timer.record(
-          () -> {
-            try {
-              final TransactionRecord transactionRecord = handler.handle();
-              counter.increment();
-              return transactionRecord;
-            } catch (Exception e) {
-              throw new RuntimeException("Error in handling record interceptor", e);
-            }
-          });
+      return timer.record(() -> {
+        try {
+          final TransactionRecord transactionRecord = handler.handle();
+          counter.increment();
+          return transactionRecord;
+        } catch (Exception e) {
+          throw new RuntimeException("Error in handling record interceptor", e);
+        }
+      });
     };
   }
 }

@@ -22,10 +22,8 @@ public class NetworkSettingsBasedHieroConfig implements HieroConfig {
     Objects.requireNonNull(networkName, "networkName must not be null");
     this.networkSetting =
         NetworkSettings.forIdentifier(networkName)
-            .orElseThrow(
-                () ->
-                    new IllegalStateException(
-                        "Network settings for '" + networkName + "' not found"));
+            .orElseThrow(() ->
+                new IllegalStateException("Network settings for '" + networkName + "' not found"));
   }
 
   @Override

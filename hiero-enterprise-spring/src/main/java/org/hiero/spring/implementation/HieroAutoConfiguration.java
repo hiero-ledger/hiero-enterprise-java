@@ -166,7 +166,6 @@ public class HieroAutoConfiguration {
           "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
     }
     final RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
-    ;
     Optional<String> mirrorNodeJavaRest =
         Optional.ofNullable(properties.getNetwork().getMirrorNodeJavaRest())
             .filter(s -> !s.isBlank());

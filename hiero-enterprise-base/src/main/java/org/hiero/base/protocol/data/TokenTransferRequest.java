@@ -33,12 +33,11 @@ public record TokenTransferRequest(
       throw new IllegalArgumentException("either amount or serial must be provided");
     }
 
-    serials.forEach(
-        serial -> {
-          if (serial < 0) {
-            throw new IllegalArgumentException("serial must be positive");
-          }
-        });
+    serials.forEach(serial -> {
+      if (serial < 0) {
+        throw new IllegalArgumentException("serial must be positive");
+      }
+    });
   }
 
   public static TokenTransferRequest of(

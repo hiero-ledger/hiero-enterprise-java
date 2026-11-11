@@ -49,7 +49,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyAccountInfoOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toAccountInfo(node).isEmpty());
@@ -89,7 +89,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyBlockOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toBlock(node).isEmpty());
@@ -139,7 +139,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyContractOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toContract(node).isEmpty());
@@ -178,7 +178,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyTokenInfoOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toTokenInfo(node).isEmpty());
@@ -216,7 +216,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyNftOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toNft(node).isEmpty());
@@ -258,7 +258,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyTopicOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toTopic(node).isEmpty());
@@ -299,7 +299,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyTopicMessageOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toTopicMessage(node).isEmpty());
@@ -324,7 +324,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyTransactionInfoOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toTransactionInfo(node).isEmpty());
@@ -340,7 +340,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyNetworkSuppliesOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toNetworkSupplies(node).isEmpty());
@@ -355,7 +355,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyNetworkStakesOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toNetworkStake(node).isEmpty());
@@ -370,7 +370,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertTrue(result.isPresent());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyExchangeRatesOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toExchangeRates(node).isEmpty());
