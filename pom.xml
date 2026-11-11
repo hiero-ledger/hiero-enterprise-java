@@ -60,6 +60,8 @@
     <jboss-logging.version>3.6.3.Final</jboss-logging.version>
     <okio.version>3.18.2</okio.version>
     <guava.version>33.7.2-jre</guava.version>
+    <picocli.version>4.7.7</picocli.version>
+    <web3j.version>6.0.0</web3j.version>
     <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
@@ -265,12 +267,19 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.7.7</version>
+        <version>${picocli.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.web3j</groupId>
+        <artifactId>core</artifactId>
+        <version>${web3j.version}</version>
+        <scope>compile</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
+    <module>hiero-enterprise-web3j</module>
     <module>hiero-enterprise-base</module>
     <module>hiero-enterprise-test</module>
     <module>hiero-enterprise-spring</module>
