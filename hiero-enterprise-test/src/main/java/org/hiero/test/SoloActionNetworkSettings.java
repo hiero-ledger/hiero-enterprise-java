@@ -24,6 +24,11 @@ public class SoloActionNetworkSettings implements NetworkSettings {
   }
 
   @Override
+  public @NonNull Optional<String> getMirrorNodeGrpcAddress() {
+    return Optional.of("localhost:5600");
+  }
+
+  @Override
   public @NonNull Set<ConsensusNode> getConsensusNodes() {
     return Set.of(new ConsensusNode("127.0.0.1", "35211", "0.0.3"));
   }

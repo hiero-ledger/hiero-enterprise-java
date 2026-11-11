@@ -42,7 +42,8 @@ nav = [
         { "Utilities" = [
             { "ContractParam" = "utils/contract-param.md" },
             { "ContractCallResult" = "utils/contract-call-result.md" },
-            { "ContractVerificationClient" = "utils/contract-verification-client.md" }
+            { "ContractVerificationClient" = "utils/contract-verification-client.md" },
+            { "Subscription" = "utils/subscription.md" }
         ]}
     ]}
 ]

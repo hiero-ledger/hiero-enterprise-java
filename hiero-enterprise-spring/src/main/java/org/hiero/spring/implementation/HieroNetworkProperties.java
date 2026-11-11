@@ -28,6 +28,8 @@ public class HieroNetworkProperties {
    */
   private String mirrorNodeJavaRest;
 
+  private String mirrorNodeGrpcAddress;
+
   private Long requestTimeoutInMs;
 
   public String getName() {
@@ -52,6 +54,14 @@ public class HieroNetworkProperties {
 
   public void setMirrorNodeJavaRest(String mirrorNodeJavaRest) {
     this.mirrorNodeJavaRest = mirrorNodeJavaRest;
+  }
+
+  public String getMirrorNodeGrpcAddress() {
+    return mirrorNodeGrpcAddress;
+  }
+
+  public void setMirrorNodeGrpcAddress(String mirrorNodeGrpcAddress) {
+    this.mirrorNodeGrpcAddress = mirrorNodeGrpcAddress;
   }
 
   public List<HieroNode> getNodes() {
