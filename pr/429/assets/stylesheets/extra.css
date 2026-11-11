@@ -1,0 +1,65 @@
+@keyframes headerGlow {
+    0%,
+    100% {
+        box-shadow: 0 0 0 rgba(184, 26, 87, 0);
+    }
+
+    50% {
+        box-shadow: 0 8px 28px rgba(184, 26, 87, 0.2);
+    }
+}
+
+[data-md-color-scheme="default"] {
+    --md-accent-fg-color: #b81a57;
+    --md-accent-fg-color--transparent: rgba(184, 26, 87, 0.1);
+
+    --md-typeset-a-color: #a0124a;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-accent-fg-color: #b81a57;
+    --md-accent-fg-color--transparent: rgba(184, 26, 87, 0.2);
+
+    --md-typeset-a-color: #a0124a;
+}
+
+.md-header {
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid color-mix(in srgb, var(--md-default-fg-color--lightest) 35%, transparent);
+}
+
+.md-header__title {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.md-tabs {
+    border-bottom: 1px solid color-mix(in srgb, var(--md-default-fg-color--lightest) 25%, transparent);
+}
+
+.md-tabs__link {
+    transition: color 140ms ease, opacity 140ms ease;
+}
+
+.md-tabs__link:is(:hover, :focus-visible) {
+    opacity: 1;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+    border-radius: 10px;
+}
+
+.md-header__option {
+    transition: transform 120ms ease;
+}
+
+.md-header__option:is(:hover, :focus-within) {
+    transform: translateY(-1px);
+}
+
+@media (min-width: 76.25em) {
+    .md-header {
+        animation: headerGlow 2.8s ease-in-out infinite;
+    }
+}
