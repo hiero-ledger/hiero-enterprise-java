@@ -58,19 +58,18 @@ public record NftAllowanceApproveRequest(
       throw new IllegalArgumentException("owner and spender must be different accounts");
     }
     final Map<TokenId, List<Long>> serialNumbersCopy = new LinkedHashMap<>();
-    serialNumbers.forEach(
-        (tokenId, serials) -> {
-          Objects.requireNonNull(tokenId, "tokenId must not be null");
-          Objects.requireNonNull(serials, "serialNumbers must not be null");
-          final List<Long> serialsCopy = List.copyOf(serials);
-          if (serialsCopy.isEmpty()) {
-            throw new IllegalArgumentException("serialNumbers must not be empty");
-          }
-          if (serialsCopy.stream().anyMatch(serialNumber -> serialNumber <= 0)) {
-            throw new IllegalArgumentException("serial must be positive");
-          }
-          serialNumbersCopy.put(tokenId, serialsCopy);
-        });
+    serialNumbers.forEach((tokenId, serials) -> {
+      Objects.requireNonNull(tokenId, "tokenId must not be null");
+      Objects.requireNonNull(serials, "serialNumbers must not be null");
+      final List<Long> serialsCopy = List.copyOf(serials);
+      if (serialsCopy.isEmpty()) {
+        throw new IllegalArgumentException("serialNumbers must not be empty");
+      }
+      if (serialsCopy.stream().anyMatch(serialNumber -> serialNumber <= 0)) {
+        throw new IllegalArgumentException("serial must be positive");
+      }
+      serialNumbersCopy.put(tokenId, serialsCopy);
+    });
     serialNumbers = Map.copyOf(serialNumbersCopy);
     allSerialsTokenIds = Set.copyOf(allSerialsTokenIds);
     if (serialNumbers.isEmpty() && allSerialsTokenIds.isEmpty()) {

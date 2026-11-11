@@ -106,10 +106,9 @@ public class NftClientTests {
     final Account userAccount = accountClient.createAccount(1);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () -> {
-          nftClient.associateNft(tokenId, userAccount.accountId(), userAccount.privateKey());
-        });
+    Assertions.assertDoesNotThrow(() -> {
+      nftClient.associateNft(tokenId, userAccount.accountId(), userAccount.privateKey());
+    });
   }
 
   @Test
@@ -144,11 +143,10 @@ public class NftClientTests {
     final Account userAccount = accountClient.createAccount(1);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () -> {
-          nftClient.associateNft(
-              List.of(tokenId1, tokenId2), userAccount.accountId(), userAccount.privateKey());
-        });
+    Assertions.assertDoesNotThrow(() -> {
+      nftClient.associateNft(
+          List.of(tokenId1, tokenId2), userAccount.accountId(), userAccount.privateKey());
+    });
   }
 
   @Test
@@ -243,15 +241,14 @@ public class NftClientTests {
     final long serial = nftClient.mintNft(tokenId, treasuryAccount.privateKey(), metadata);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () -> {
-          nftClient.transferNft(
-              tokenId,
-              serial,
-              treasuryAccount.accountId(),
-              treasuryAccount.privateKey(),
-              userAccount.accountId());
-        });
+    Assertions.assertDoesNotThrow(() -> {
+      nftClient.transferNft(
+          tokenId,
+          serial,
+          treasuryAccount.accountId(),
+          treasuryAccount.privateKey(),
+          userAccount.accountId());
+    });
   }
 
   @Test
@@ -299,10 +296,9 @@ public class NftClientTests {
     final long serial = nftClient.mintNft(tokenId, supplierAccount.privateKey(), metadata);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () -> {
-          nftClient.transferNft(tokenId, serial, treasuryAccount, userAccount.accountId());
-        });
+    Assertions.assertDoesNotThrow(() -> {
+      nftClient.transferNft(tokenId, serial, treasuryAccount, userAccount.accountId());
+    });
   }
 
   @Test
@@ -381,15 +377,14 @@ public class NftClientTests {
     nftClient.approveNftAllowance(tokenId, serial, treasuryAccount, spenderAccount.accountId());
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.transferApprovedNft(
-                tokenId,
-                serial,
-                treasuryAccount.accountId(),
-                spenderAccount.accountId(),
-                spenderAccount.privateKey(),
-                receiverAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.transferApprovedNft(
+            tokenId,
+            serial,
+            treasuryAccount.accountId(),
+            spenderAccount.accountId(),
+            spenderAccount.privateKey(),
+            receiverAccount.accountId()));
   }
 
   @Test
@@ -407,14 +402,13 @@ public class NftClientTests {
     nftClient.approveNftAllowances(tokenId, serials, treasuryAccount, spenderAccount.accountId());
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.transferApprovedNfts(
-                tokenId,
-                serials,
-                treasuryAccount.accountId(),
-                spenderAccount,
-                receiverAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.transferApprovedNfts(
+            tokenId,
+            serials,
+            treasuryAccount.accountId(),
+            spenderAccount,
+            receiverAccount.accountId()));
   }
 
   @Test
@@ -437,16 +431,15 @@ public class NftClientTests {
         spenderAccount.accountId());
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.transferApprovedNfts(
-                Map.of(
-                    tokenId1,
-                    Map.of(serial1, receiverAccount1.accountId()),
-                    tokenId2,
-                    Map.of(serial2, receiverAccount2.accountId())),
-                treasuryAccount.accountId(),
-                spenderAccount));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.transferApprovedNfts(
+            Map.of(
+                tokenId1,
+                Map.of(serial1, receiverAccount1.accountId()),
+                tokenId2,
+                Map.of(serial2, receiverAccount2.accountId())),
+            treasuryAccount.accountId(),
+            spenderAccount));
   }
 
   @Test
@@ -583,10 +576,8 @@ public class NftClientTests {
     final long serial = nftClient.mintNft(tokenId, ownerAccount.privateKey(), metadata);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.approveNftAllowance(
-                tokenId, serial, ownerAccount, spenderAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.approveNftAllowance(tokenId, serial, ownerAccount, spenderAccount.accountId()));
   }
 
   @Test
@@ -601,10 +592,8 @@ public class NftClientTests {
         nftClient.mintNfts(tokenId, ownerAccount.privateKey(), metadata1, metadata2);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.approveNftAllowances(
-                tokenId, serials, ownerAccount, spenderAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.approveNftAllowances(tokenId, serials, ownerAccount, spenderAccount.accountId()));
   }
 
   @Test
@@ -615,10 +604,8 @@ public class NftClientTests {
     final Account spenderAccount = accountClient.createAccount(1);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.approveNftAllowanceAllSerials(
-                tokenId, ownerAccount, spenderAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.approveNftAllowanceAllSerials(tokenId, ownerAccount, spenderAccount.accountId()));
   }
 
   @Test
@@ -636,12 +623,11 @@ public class NftClientTests {
     final List<Long> serials2 = nftClient.mintNfts(tokenId2, ownerAccount.privateKey(), metadata);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.approveNftAllowances(
-                Map.of(tokenId1, serials1, tokenId2, serials2),
-                ownerAccount,
-                spenderAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.approveNftAllowances(
+            Map.of(tokenId1, serials1, tokenId2, serials2),
+            ownerAccount,
+            spenderAccount.accountId()));
   }
 
   @Test
@@ -653,10 +639,9 @@ public class NftClientTests {
     final Account spenderAccount = accountClient.createAccount(1);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            nftClient.approveNftAllowanceAllSerials(
-                List.of(tokenId1, tokenId2), ownerAccount, spenderAccount.accountId()));
+    Assertions.assertDoesNotThrow(() ->
+        nftClient.approveNftAllowanceAllSerials(
+            List.of(tokenId1, tokenId2), ownerAccount, spenderAccount.accountId()));
   }
 
   @Test

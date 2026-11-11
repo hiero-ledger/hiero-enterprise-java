@@ -137,10 +137,10 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": "exact_match"
-        }
-      """);
+              {
+                "match": "exact_match"
+              }
+            """);
 
     Assertions.assertThrows(
         IllegalStateException.class, () -> client.verify(contractId, "Hello", files));
@@ -167,43 +167,43 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": null
-        }
-      """);
+              {
+                "match": null
+              }
+            """);
 
     final Mocks mocks2 =
         mockPost(
             verifyMetadataUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "verificationId": "verification-123"
-        }
-      """);
+              {
+                "verificationId": "verification-123"
+              }
+            """);
 
     // job still running
     mockGet(
         verificationJobUrl("verification-123"),
         Response.Status.OK,
         """
-        {
-          "isJobCompleted": false
-        }
-      """);
+          {
+            "isJobCompleted": false
+          }
+        """);
 
     final Mocks mocks3 =
         mockGet(
             verificationJobUrl("verification-123"),
             Response.Status.OK,
             """
-        {
-          "isJobCompleted": true,
-          "contract": {
-            "match": "exact_match"
-          }
-        }
-      """);
+              {
+                "isJobCompleted": true,
+                "contract": {
+                  "match": "exact_match"
+                }
+              }
+            """);
 
     final ContractVerificationState result = client.verify(contractId, "Hello", files);
 
@@ -232,20 +232,20 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": null
-        }
-      """);
+              {
+                "match": null
+              }
+            """);
 
     final Mocks mocks2 =
         mockPost(
             verifyMetadataUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "verificationId": "verification-123"
-        }
-      """);
+              {
+                "verificationId": "verification-123"
+              }
+            """);
 
     // Poll response
     final Mocks mocks3 =
@@ -253,14 +253,14 @@ public class ContractVerificationClientImplTest {
             verificationJobUrl("verification-123"),
             Response.Status.OK,
             """
-        {
-          "isJobCompleted": true,
-          "error": {
-            "customCode": "INVALID_METADATA",
-            "message": "Metadata is invalid"
-          }
-        }
-      """);
+              {
+                "isJobCompleted": true,
+                "error": {
+                  "customCode": "INVALID_METADATA",
+                  "message": "Metadata is invalid"
+                }
+              }
+            """);
 
     Assertions.assertThrows(HieroException.class, () -> client.verify(contractId, "Hello", files));
     verifyMocks(mocks1, contractUrl(contractId), "get");
@@ -283,10 +283,10 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": "exact_match"
-        }
-      """);
+              {
+                "match": "exact_match"
+              }
+            """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -302,10 +302,10 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": "match"
-        }
-      """);
+              {
+                "match": "match"
+              }
+            """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -321,10 +321,10 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": null
-        }
-      """);
+              {
+                "match": null
+              }
+            """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -340,10 +340,10 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.OK,
             """
-        {
-          "match": "unknown"
-        }
-      """);
+              {
+                "match": "unknown"
+              }
+            """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -359,10 +359,10 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.NOT_FOUND,
             """
-       {
-          "match": null
-       }
-    """);
+               {
+                  "match": null
+               }
+            """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
     Assertions.assertEquals(ContractVerificationState.NONE, result);
@@ -377,12 +377,12 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.BAD_REQUEST,
             """
-        {
-           "customCode": "unsupported_chain",
-           "message": "The chain with chainId 9429413 is not supported",
-           "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+              {
+                 "customCode": "unsupported_chain",
+                 "message": "The chain with chainId 9429413 is not supported",
+                 "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+              }
+            """);
 
     Assertions.assertThrows(HieroException.class, () -> client.checkVerification(contractId));
     verifyMocks(mocks, contractUrl(contractId), "get");
@@ -396,12 +396,12 @@ public class ContractVerificationClientImplTest {
             contractUrl(contractId),
             Response.Status.INTERNAL_SERVER_ERROR,
             """
-        {
-          "customCode": "internal_error",
-          "message": "Something went wrong",
-          "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+              {
+                "customCode": "internal_error",
+                "message": "Something went wrong",
+                "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+              }
+            """);
 
     Assertions.assertThrows(HieroException.class, () -> client.checkVerification(contractId));
     verifyMocks(mocks, contractUrl(contractId), "get");
@@ -439,10 +439,10 @@ public class ContractVerificationClientImplTest {
             contractUrlWithFiles(contractId),
             Response.Status.OK,
             """
-        {
-          "match": null
-        }
-        """);
+            {
+              "match": null
+            }
+            """);
     Assertions.assertThrows(
         IllegalStateException.class,
         () -> client.checkVerification(contractId, "Hello.sol", "contract Hello {}"));
@@ -466,13 +466,13 @@ public class ContractVerificationClientImplTest {
             contractUrlWithFiles(contractId),
             Response.Status.OK,
             """
-       {
-        "match": "exact_match",
-        "sources": {
-          "contracts/Hello.sol": {"content": "contract Hello {}"}
-        }
-       }
-    """);
+               {
+                "match": "exact_match",
+                "sources": {
+                  "contracts/Hello.sol": {"content": "contract Hello {}"}
+                }
+               }
+            """);
     final boolean result = client.checkVerification(contractId, "Hello.sol", "contract Hello {}");
     Assertions.assertTrue(result);
     verifyMocks(mocks, contractUrlWithFiles(contractId), "get");
@@ -486,13 +486,13 @@ public class ContractVerificationClientImplTest {
             contractUrlWithFiles(contractId),
             Response.Status.OK,
             """
-       {
-        "match": "exact_match",
-        "sources": {
-          "contracts/Hello.sol": {"content": "contract Hello {}"}
-        }
-       }
-    """);
+               {
+                "match": "exact_match",
+                "sources": {
+                  "contracts/Hello.sol": {"content": "contract Hello {}"}
+                }
+               }
+            """);
     final boolean result =
         client.checkVerification(contractId, "Hello.sol", "contract MyContract {}");
     Assertions.assertFalse(result);
@@ -507,12 +507,12 @@ public class ContractVerificationClientImplTest {
             contractUrlWithFiles(contractId),
             Response.Status.NOT_FOUND,
             """
-           {
-          "match": null,
-          "creationMatch": null,
-          "runtimeMatch": null
-          }
-          """);
+             {
+            "match": null,
+            "creationMatch": null,
+            "runtimeMatch": null
+            }
+            """);
 
     Assertions.assertThrows(
         IllegalStateException.class,
@@ -528,12 +528,12 @@ public class ContractVerificationClientImplTest {
             contractUrlWithFiles(contractId),
             Response.Status.BAD_REQUEST,
             """
-        {
-           "customCode": "unsupported_chain",
-           "message": "The chain with chainId 9429413 is not supported",
-           "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+              {
+                 "customCode": "unsupported_chain",
+                 "message": "The chain with chainId 9429413 is not supported",
+                 "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+              }
+            """);
 
     Assertions.assertThrows(
         HieroException.class,
@@ -549,12 +549,12 @@ public class ContractVerificationClientImplTest {
             contractUrlWithFiles(contractId),
             Response.Status.INTERNAL_SERVER_ERROR,
             """
-        {
-          "customCode": "internal_error",
-          "message": "Something went wrong",
-          "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+              {
+                "customCode": "internal_error",
+                "message": "Something went wrong",
+                "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+              }
+            """);
 
     Assertions.assertThrows(
         HieroException.class,

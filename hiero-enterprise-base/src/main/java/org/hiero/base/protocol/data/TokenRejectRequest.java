@@ -46,16 +46,15 @@ public record TokenRejectRequest(
           "serials must not contain more than " + MAX_REJECTIONS + " entries");
     }
     final Set<Long> uniqueSerials = new HashSet<>();
-    serials.forEach(
-        serial -> {
-          Objects.requireNonNull(serial, "serial must not be null");
-          if (serial <= 0) {
-            throw new IllegalArgumentException("serial must be positive");
-          }
-          if (!uniqueSerials.add(serial)) {
-            throw new IllegalArgumentException("serials must not contain duplicates");
-          }
-        });
+    serials.forEach(serial -> {
+      Objects.requireNonNull(serial, "serial must not be null");
+      if (serial <= 0) {
+        throw new IllegalArgumentException("serial must be positive");
+      }
+      if (!uniqueSerials.add(serial)) {
+        throw new IllegalArgumentException("serials must not contain duplicates");
+      }
+    });
     serials = List.copyOf(serials);
   }
 

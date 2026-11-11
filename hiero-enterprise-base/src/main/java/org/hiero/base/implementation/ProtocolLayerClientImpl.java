@@ -951,12 +951,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (!request.serials().isEmpty()) {
         request
             .serials()
-            .forEach(
-                serial ->
-                    transaction.addNftTransfer(
-                        new NftId(request.tokenId(), serial),
-                        request.sender(),
-                        request.receiver()));
+            .forEach(serial ->
+                transaction.addNftTransfer(
+                    new NftId(request.tokenId(), serial), request.sender(), request.receiver()));
       } else if (request.amount() != null) {
         transaction.addTokenTransfer(request.tokenId(), request.sender(), request.amount() * -1);
         transaction.addTokenTransfer(request.tokenId(), request.receiver(), request.amount());
@@ -985,12 +982,10 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTransactionId(TransactionId.generate(request.spender()));
       request
           .nftTransfers()
-          .forEach(
-              (tokenId, serialToReceiver) ->
-                  serialToReceiver.forEach(
-                      (serial, receiver) ->
-                          transaction.addApprovedNftTransfer(
-                              tokenId.nft(serial), request.owner(), receiver)));
+          .forEach((tokenId, serialToReceiver) ->
+              serialToReceiver.forEach((serial, receiver) ->
+                  transaction.addApprovedNftTransfer(
+                      tokenId.nft(serial), request.owner(), receiver)));
       sign(transaction, request.spenderKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.CRYPTO_TRANSFER);
@@ -1011,10 +1006,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTransactionValidDuration(request.transactionValidDuration());
       request
           .serialToReceiver()
-          .forEach(
-              (serial, receiver) ->
-                  transaction.addNftTransfer(
-                      request.tokenId().nft(serial), request.sender(), receiver));
+          .forEach((serial, receiver) ->
+              transaction.addNftTransfer(
+                  request.tokenId().nft(serial), request.sender(), receiver));
       sign(transaction, request.senderKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_AIRDROP);
@@ -1035,11 +1029,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTransactionValidDuration(request.transactionValidDuration());
       request
           .serialToReceiver()
-          .forEach(
-              (serial, receiver) ->
-                  transaction.addPendingAirdrop(
-                      new PendingAirdropId(
-                          request.sender(), receiver, request.tokenId().nft(serial))));
+          .forEach((serial, receiver) ->
+              transaction.addPendingAirdrop(
+                  new PendingAirdropId(request.sender(), receiver, request.tokenId().nft(serial))));
       sign(transaction, request.senderKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CANCEL_AIRDROP);
@@ -1119,20 +1111,15 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
               .setTransactionValidDuration(request.transactionValidDuration());
       request
           .serialNumbers()
-          .forEach(
-              (tokenId, serialNumbers) ->
-                  serialNumbers.forEach(
-                      serialNumber ->
-                          transaction.approveTokenNftAllowance(
-                              new NftId(tokenId, serialNumber),
-                              request.owner(),
-                              request.spender())));
+          .forEach((tokenId, serialNumbers) ->
+              serialNumbers.forEach(serialNumber ->
+                  transaction.approveTokenNftAllowance(
+                      new NftId(tokenId, serialNumber), request.owner(), request.spender())));
       request
           .allSerialsTokenIds()
-          .forEach(
-              tokenId ->
-                  transaction.approveTokenNftAllowanceAllSerials(
-                      tokenId, request.owner(), request.spender()));
+          .forEach(tokenId ->
+              transaction.approveTokenNftAllowanceAllSerials(
+                  tokenId, request.owner(), request.spender()));
       sign(transaction, request.ownerKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.ALLOWANCE_APPROVAL);
@@ -1216,28 +1203,26 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
     try {
       log.debug("Sending transaction of type {}", transaction.getClass().getSimpleName());
       final TransactionResponse response = transaction.execute(hieroContext.getClient());
-      listeners.forEach(
-          listener -> {
-            try {
-              listener.transactionSubmitted(type, response.transactionId);
-            } catch (Exception e) {
-              log.error("Failed to notify listener", e);
-            }
-          });
+      listeners.forEach(listener -> {
+        try {
+          listener.transactionSubmitted(type, response.transactionId);
+        } catch (Exception e) {
+          log.error("Failed to notify listener", e);
+        }
+      });
       try {
         log.debug(
             "Waiting for receipt of transaction '{}' of type {}",
             response.transactionId,
             transaction.getClass().getSimpleName());
         final TransactionReceipt receipt = response.getReceipt(hieroContext.getClient());
-        listeners.forEach(
-            listener -> {
-              try {
-                listener.transactionHandled(type, response.transactionId, receipt.status);
-              } catch (Exception e) {
-                log.error("Failed to notify listener", e);
-              }
-            });
+        listeners.forEach(listener -> {
+          try {
+            listener.transactionHandled(type, response.transactionId, receipt.status);
+          } catch (Exception e) {
+            log.error("Failed to notify listener", e);
+          }
+        });
         return receipt;
       } catch (Exception e) {
         throw new HieroException(

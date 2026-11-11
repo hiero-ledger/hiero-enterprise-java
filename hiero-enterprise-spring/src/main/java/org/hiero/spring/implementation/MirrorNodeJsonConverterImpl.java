@@ -193,16 +193,15 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       throw new IllegalArgumentException("Fees node is not an array: " + feesNode);
     }
     return jsonArrayToStream(feesNode)
-        .map(
-            n -> {
-              try {
-                final long gas = n.get("gas").asLong();
-                final String transactionType = n.get("transaction_type").asText();
-                return new NetworkFee(gas, transactionType);
-              } catch (final Exception e) {
-                throw new JsonParseException(n, e);
-              }
-            })
+        .map(n -> {
+          try {
+            final long gas = n.get("gas").asLong();
+            final String transactionType = n.get("transaction_type").asText();
+            return new NetworkFee(gas, transactionType);
+          } catch (final Exception e) {
+            throw new JsonParseException(n, e);
+          }
+        })
         .toList();
   }
 
@@ -490,19 +489,18 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           StreamSupport.stream(
                   Spliterators.spliteratorUnknownSize(fixedFeeNode.iterator(), Spliterator.ORDERED),
                   false)
-              .map(
-                  n -> {
-                    final long amount = n.get("amount").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(n.get("denominating_token_id").asText())
-                            : null;
-                    return new FixedFee(amount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long amount = n.get("amount").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(n.get("denominating_token_id").asText())
+                        : null;
+                return new FixedFee(amount, accountId, tokenId);
+              })
               .toList();
     }
 
@@ -517,21 +515,19 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
                   Spliterators.spliteratorUnknownSize(
                       fractionalFeeNode.iterator(), Spliterator.ORDERED),
                   false)
-              .map(
-                  n -> {
-                    final long numeratorAmount = n.get("amount").get("numerator").asLong();
-                    final long denominatorAmount = n.get("amount").get("denominator").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(n.get("denominating_token_id").asText())
-                            : null;
-                    return new FractionalFee(
-                        numeratorAmount, denominatorAmount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long numeratorAmount = n.get("amount").get("numerator").asLong();
+                final long denominatorAmount = n.get("amount").get("denominator").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(n.get("denominating_token_id").asText())
+                        : null;
+                return new FractionalFee(numeratorAmount, denominatorAmount, accountId, tokenId);
+              })
               .toList();
     }
 
@@ -545,23 +541,22 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
                   Spliterators.spliteratorUnknownSize(
                       royaltyFeeNode.iterator(), Spliterator.ORDERED),
                   false)
-              .map(
-                  n -> {
-                    final long numeratorAmount = n.get("amount").get("numerator").asLong();
-                    final long denominatorAmount = n.get("amount").get("denominator").asLong();
-                    final long fallbackFeeAmount = n.get("fallback_fee").get("amount").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.get("fallback_fee").hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(
-                                n.get("fallback_fee").get("denominating_token_id").asText())
-                            : null;
-                    return new RoyaltyFee(
-                        numeratorAmount, denominatorAmount, fallbackFeeAmount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long numeratorAmount = n.get("amount").get("numerator").asLong();
+                final long denominatorAmount = n.get("amount").get("denominator").asLong();
+                final long fallbackFeeAmount = n.get("fallback_fee").get("amount").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.get("fallback_fee").hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(
+                            n.get("fallback_fee").get("denominating_token_id").asText())
+                        : null;
+                return new RoyaltyFee(
+                    numeratorAmount, denominatorAmount, fallbackFeeAmount, accountId, tokenId);
+              })
               .toList();
     }
 
@@ -641,19 +636,18 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
       final List<FixedFee> fixedFees =
           jsonArrayToStream(node.get("custom_fees").get("fixed_fees"))
-              .map(
-                  n -> {
-                    final long amount = n.get("amount").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(n.get("denominating_token_id").asText())
-                            : null;
-                    return new FixedFee(amount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long amount = n.get("amount").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(n.get("denominating_token_id").asText())
+                        : null;
+                return new FixedFee(amount, accountId, tokenId);
+              })
               .toList();
 
       final List<Key> feeExemptKeyList =

@@ -45,23 +45,21 @@ public record NftApprovedTransferRequest(
       throw new IllegalArgumentException("nftTransfers must not be empty");
     }
     final Map<TokenId, Map<Long, AccountId>> nftTransfersCopy = new LinkedHashMap<>();
-    nftTransfers.forEach(
-        (tokenId, serialToReceiver) -> {
-          Objects.requireNonNull(tokenId, "tokenId must not be null");
-          Objects.requireNonNull(serialToReceiver, "serialToReceiver must not be null");
-          if (serialToReceiver.isEmpty()) {
-            throw new IllegalArgumentException("serialToReceiver must not be empty");
-          }
-          serialToReceiver.forEach(
-              (serial, receiver) -> {
-                Objects.requireNonNull(serial, "serial must not be null");
-                Objects.requireNonNull(receiver, "receiver must not be null");
-                if (serial <= 0) {
-                  throw new IllegalArgumentException("serial must be positive");
-                }
-              });
-          nftTransfersCopy.put(tokenId, Map.copyOf(serialToReceiver));
-        });
+    nftTransfers.forEach((tokenId, serialToReceiver) -> {
+      Objects.requireNonNull(tokenId, "tokenId must not be null");
+      Objects.requireNonNull(serialToReceiver, "serialToReceiver must not be null");
+      if (serialToReceiver.isEmpty()) {
+        throw new IllegalArgumentException("serialToReceiver must not be empty");
+      }
+      serialToReceiver.forEach((serial, receiver) -> {
+        Objects.requireNonNull(serial, "serial must not be null");
+        Objects.requireNonNull(receiver, "receiver must not be null");
+        if (serial <= 0) {
+          throw new IllegalArgumentException("serial must be positive");
+        }
+      });
+      nftTransfersCopy.put(tokenId, Map.copyOf(serialToReceiver));
+    });
     final int transferCount = nftTransfersCopy.values().stream().mapToInt(Map::size).sum();
     if (transferCount > MAX_NFT_TRANSFERS) {
       throw new IllegalArgumentException(

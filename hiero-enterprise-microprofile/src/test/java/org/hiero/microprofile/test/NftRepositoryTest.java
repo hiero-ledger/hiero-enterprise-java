@@ -140,12 +140,11 @@ public class NftRepositoryTest {
       final byte[] metadata) {
     Assertions.assertTrue(
         nfts.stream()
-            .anyMatch(
-                nft ->
-                    tokenId.equals(nft.tokenId())
-                        && serial == nft.serial()
-                        && owner.equals(nft.owner())
-                        && Arrays.equals(metadata, nft.metadata())),
+            .anyMatch(nft ->
+                tokenId.equals(nft.tokenId())
+                    && serial == nft.serial()
+                    && owner.equals(nft.owner())
+                    && Arrays.equals(metadata, nft.metadata())),
         "Expected NFT " + tokenId + "/" + serial + " for owner " + owner);
   }
 
@@ -174,10 +173,9 @@ public class NftRepositoryTest {
     Assertions.assertNotNull(slice);
     Assertions.assertTrue(
         slice.getData().stream()
-            .anyMatch(
-                transfer ->
-                    TransactionType.CRYPTO_TRANSFER.equals(transfer.type())
-                        && adminAccountId.equals(transfer.senderAccountId())
-                        && newOwner.equals(transfer.receiverAccountId())));
+            .anyMatch(transfer ->
+                TransactionType.CRYPTO_TRANSFER.equals(transfer.type())
+                    && adminAccountId.equals(transfer.senderAccountId())
+                    && newOwner.equals(transfer.receiverAccountId())));
   }
 }

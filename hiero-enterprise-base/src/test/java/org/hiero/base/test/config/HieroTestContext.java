@@ -55,12 +55,11 @@ public class HieroTestContext implements HieroContext {
 
     final NetworkSettings networkSettings =
         NetworkSettings.forIdentifier(hieroNetwork)
-            .orElseThrow(
-                () ->
-                    new IllegalStateException(
-                        "ENV 'HEDERA_NETWORK' is set to '"
-                            + hieroNetwork
-                            + "' but no network settings are available for this network."));
+            .orElseThrow(() ->
+                new IllegalStateException(
+                    "ENV 'HEDERA_NETWORK' is set to '"
+                        + hieroNetwork
+                        + "' but no network settings are available for this network."));
 
     final Map<String, AccountId> nodes = new HashMap<>();
     networkSettings

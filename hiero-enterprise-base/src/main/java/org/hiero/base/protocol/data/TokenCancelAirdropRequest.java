@@ -48,14 +48,13 @@ public record TokenCancelAirdropRequest(
               + MAX_PENDING_AIRDROP_CANCELLATIONS
               + " entries");
     }
-    serialToReceiver.forEach(
-        (serial, receiver) -> {
-          Objects.requireNonNull(serial, "serial must not be null");
-          Objects.requireNonNull(receiver, "receiver must not be null");
-          if (serial <= 0) {
-            throw new IllegalArgumentException("serial must be positive");
-          }
-        });
+    serialToReceiver.forEach((serial, receiver) -> {
+      Objects.requireNonNull(serial, "serial must not be null");
+      Objects.requireNonNull(receiver, "receiver must not be null");
+      if (serial <= 0) {
+        throw new IllegalArgumentException("serial must be positive");
+      }
+    });
   }
 
   @NonNull

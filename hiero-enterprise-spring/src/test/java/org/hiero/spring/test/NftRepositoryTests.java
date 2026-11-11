@@ -440,10 +440,9 @@ public class NftRepositoryTests {
     Assertions.assertNotNull(result);
     Assertions.assertTrue(
         result.stream()
-            .anyMatch(
-                transfer ->
-                    TransactionType.CRYPTO_TRANSFER.equals(transfer.type())
-                        && adminAccountId.equals(transfer.senderAccountId())
-                        && newOwner.equals(transfer.receiverAccountId())));
+            .anyMatch(transfer ->
+                TransactionType.CRYPTO_TRANSFER.equals(transfer.type())
+                    && adminAccountId.equals(transfer.senderAccountId())
+                    && newOwner.equals(transfer.receiverAccountId())));
   }
 }
