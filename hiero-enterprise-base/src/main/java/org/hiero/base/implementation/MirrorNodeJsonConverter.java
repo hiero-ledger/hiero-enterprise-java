@@ -14,6 +14,7 @@ import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.Schedule;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
@@ -65,4 +66,8 @@ public interface MirrorNodeJsonConverter<JSON> {
   @NonNull List<Block> toBlocks(@NonNull JSON json);
 
   @NonNull List<Node> toNodes(@NonNull JSON json);
+
+  @NonNull Optional<Schedule> toSchedule(@NonNull JSON json);
+
+  @NonNull List<Schedule> toSchedules(@NonNull JSON json);
 }
