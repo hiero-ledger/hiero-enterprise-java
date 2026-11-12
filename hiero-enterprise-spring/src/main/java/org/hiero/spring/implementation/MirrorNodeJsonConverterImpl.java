@@ -45,7 +45,6 @@ import org.hiero.base.data.RoyaltyFee;
 import org.hiero.base.data.Schedule;
 import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.ScheduleSignatureType;
-import org.hiero.base.data.ServiceEndpoint;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
