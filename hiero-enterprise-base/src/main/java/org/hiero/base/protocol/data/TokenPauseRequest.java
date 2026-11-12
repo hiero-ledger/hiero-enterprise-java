@@ -22,7 +22,6 @@ public record TokenPauseRequest(
     @NonNull PrivateKey pauseKey)
     implements TransactionRequest {
 
-  @NonNull
   public TokenPauseRequest {
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration must not be null");
@@ -33,10 +32,9 @@ public record TokenPauseRequest(
   public static TokenPauseRequest of(
       @NonNull final TokenId tokenId, @NonNull final PrivateKey pauseKey) {
 
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    /*return of(TokenId.fromString(tokenId), pauseKey); - this line prevents project build*/
     return new TokenPauseRequest(
-        TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
-        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
-        tokenId,
-        pauseKey);
+        Hbar.fromTinybars(100_000_000), Duration.ofSeconds(120), tokenId, pauseKey);
   }
 }

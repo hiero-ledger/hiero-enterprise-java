@@ -33,10 +33,9 @@ public record TokenUnpauseRequest(
   public static TokenUnpauseRequest of(
       @NonNull final TokenId tokenId, @NonNull final PrivateKey pauseKey) {
 
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    /*return of(TokenId.fromString(tokenId), pauseKey); - this line prevents project build*/
     return new TokenUnpauseRequest(
-        TransactionRequest.DEFAULT_MAX_TRANSACTION_FEE,
-        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
-        tokenId,
-        pauseKey);
+        Hbar.fromTinybars(100_000_000), Duration.ofSeconds(120), tokenId, pauseKey);
   }
 }

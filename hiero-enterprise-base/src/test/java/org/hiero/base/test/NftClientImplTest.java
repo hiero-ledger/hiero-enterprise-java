@@ -50,6 +50,8 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
 import org.hiero.base.protocol.data.TokenRejectRequest;
 import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
@@ -58,6 +60,8 @@ import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -1536,6 +1540,9 @@ public class NftClientImplTest {
     final TokenId tokenId = TokenId.fromString("1.2.3");
     final PrivateKey pauseKey = PrivateKey.generateECDSA();
 
+    final ArgumentCaptor<TokenPauseRequest> pauseRequestCaptor =
+        ArgumentCaptor.forClass(TokenPauseRequest.class);
+
     when(operationalAccount.privateKey()).thenReturn(pauseKey);
 
     when(protocolLayerClient.executePauseTokenTransaction(any(TokenPauseRequest.class)))
@@ -1556,9 +1563,12 @@ public class NftClientImplTest {
     final TokenUnpauseResult result = Mockito.mock(TokenUnpauseResult.class);
 
     final TokenId tokenId = TokenId.fromString("1.2.3");
-    final PrivateKey unpauseKey = PrivateKey.generateECDSA();
+    final PrivateKey pauseKey = PrivateKey.generateECDSA();
 
-    when(operationalAccount.privateKey()).thenReturn(unpauseKey);
+    final ArgumentCaptor<TokenUnpauseRequest> unpauseRequestCaptor =
+        ArgumentCaptor.forClass(TokenUnpauseRequest.class);
+
+    when(operationalAccount.privateKey()).thenReturn(pauseKey);
 
     when(protocolLayerClient.executeUnpauseTokenTransaction(any(TokenUnpauseRequest.class)))
         .thenReturn(result);
@@ -1570,7 +1580,7 @@ public class NftClientImplTest {
     final TokenUnpauseRequest request = unpauseRequestCaptor.getValue();
 
     Assertions.assertEquals(tokenId, request.tokenId());
-    Assertions.assertEquals(unpauseKey, request.unpauseKey());
+    Assertions.assertEquals(pauseKey, request.pauseKey());
   }
 
   @Test

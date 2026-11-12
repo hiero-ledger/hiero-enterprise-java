@@ -1173,47 +1173,86 @@ public interface NftClient {
   }
 
   /**
-   * Pauses an NFT type.
+   * Pauses an NFT type. The operator account key is used as the pause key. A paused NFT type cannot
+   * be used in any transaction until it is unpaused.
    *
    * @param tokenId the ID of the NFT type
    * @throws HieroException if the NFT type could not be paused
    */
   void pauseNft(@NonNull TokenId tokenId) throws HieroException;
 
+  /**
+   * Pauses an NFT type. Must be signed by the token pause key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param pauseKey the pause key of the NFT type
+   * @throws HieroException if the NFT type could not be paused
+   */
   void pauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey) throws HieroException;
 
   /**
-   * Unpauses an NFT type.
+   * Unpauses an NFT type. The operator account key is used as the pause key.
    *
    * @param tokenId the ID of the NFT type
    * @throws HieroException if the NFT type could not be unpaused
    */
   void unpauseNft(@NonNull TokenId tokenId) throws HieroException;
 
+  /**
+   * Unpauses an NFT type. Must be signed by the token pause key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param pauseKey the pause key of the NFT type
+   * @throws HieroException if the NFT type could not be unpaused
+   */
   void unpauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey) throws HieroException;
 
+  /**
+   * Pauses an NFT type. The operator account key is used as the pause key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @throws HieroException if the NFT type could not be paused
+   */
   default void pauseNft(@NonNull String tokenId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     pauseNft(TokenId.fromString(tokenId));
   }
 
+  /**
+   * Pauses an NFT type. Must be signed by the token pause key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param pauseKey the pause key of the NFT type
+   * @throws HieroException if the NFT type could not be paused
+   */
   default void pauseNft(@NonNull String tokenId, @NonNull String pauseKey) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(pauseKey, "pauseKey must not be null");
-
-    pauseNft(TokenId.fromString(tokenId), PrivateKey.fromString(pauseKey));
+    pauseNft(TokenId.fromString(tokenId), PrivateKey.fromStringDER(pauseKey));
   }
 
+  /**
+   * Unpauses an NFT type. The operator account key is used as the pause key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @throws HieroException if the NFT type could not be unpaused
+   */
   default void unpauseNft(@NonNull String tokenId) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     unpauseNft(TokenId.fromString(tokenId));
   }
 
+  /**
+   * Unpauses an NFT type. Must be signed by the token pause key.
+   *
+   * @param tokenId the ID of the NFT type
+   * @param pauseKey the pause key of the NFT type
+   * @throws HieroException if the NFT type could not be unpaused
+   */
   default void unpauseNft(@NonNull String tokenId, @NonNull String pauseKey) throws HieroException {
     Objects.requireNonNull(tokenId, "tokenId must not be null");
     Objects.requireNonNull(pauseKey, "pauseKey must not be null");
-
-    unpauseNft(TokenId.fromString(tokenId), PrivateKey.fromString(pauseKey));
+    unpauseNft(TokenId.fromString(tokenId), PrivateKey.fromStringDER(pauseKey));
   }
 
   /**

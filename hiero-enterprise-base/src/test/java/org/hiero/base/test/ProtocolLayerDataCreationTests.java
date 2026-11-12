@@ -95,6 +95,7 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
 import org.hiero.base.protocol.data.TokenRejectRequest;
 import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
@@ -1461,12 +1462,12 @@ public class ProtocolLayerDataCreationTests {
   @Test
   void testTokenUnpauseRequest() {
     final TokenId tokenId = TokenId.fromString("0.0.123");
-    final PrivateKey unpauseKey = PrivateKey.generateED25519();
+    final PrivateKey pauseKey = PrivateKey.generateED25519();
 
-    final TokenUnpauseRequest request = TokenUnpauseRequest.of(tokenId, unpauseKey);
+    final TokenUnpauseRequest request = TokenUnpauseRequest.of(tokenId, pauseKey);
 
     Assertions.assertEquals(tokenId, request.tokenId());
-    Assertions.assertEquals(unpauseKey, request.unpauseKey());
+    Assertions.assertEquals(pauseKey, request.pauseKey());
   }
 
   @Test

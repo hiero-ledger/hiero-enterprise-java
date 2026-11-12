@@ -445,39 +445,31 @@ long totalSupply = nftClient.wipeNfts(
 
 ## Pause NFT
 
-Pauses an NFT type, preventing NFT transfers and other token operations while the type is paused. The pause key must sign the transaction. The NFT type must have a pause key configured.
-
-```java nftClient.pauseNft(tokenId);
-
-PrivateKey pauseKey = PrivateKey.generateED25519();
-
-nftClient.pauseNft(
-    tokenId,
-    pauseKey
-);
+Pauses an NFT type. While it is paused, the NFT type cannot be used in any transaction until it is unpaused. The pause key of the NFT type must sign.
+```java title="pauseNft(TokenId tokenId)"
+nftClient.pauseNft(tokenId);
 ```
-
+```java title="pauseNft(TokenId tokenId, PrivateKey pauseKey)"
+nftClient.pauseNft(tokenId, pauseKey);
+```
 !!! info
+    The NFT type must be created with a pause key. Without an explicit `pauseKey`, the operator account key is used.
 
-The pause key is configured when the NFT type is created or updated. When using the overload without an explicit pause key, the operator key is used to sign the transaction.
+---
 
 ## Unpause NFT
 
-Unpauses a paused NFT type, allowing NFT transfers and other token operations to resume. The pause key must sign the transaction. The NFT type must have a pause key configured.
-
-```java nftClient.unpauseNft(tokenId);
-
-PrivateKey pauseKey = PrivateKey.generateED25519();
-
-nftClient.unpauseNft(
-    tokenId,
-    pauseKey
-);
+Unpauses a paused NFT type so it can be used again. The pause key of the NFT type must sign.
+```java title="unpauseNft(TokenId tokenId)"
+nftClient.unpauseNft(tokenId);
 ```
-
+```java title="unpauseNft(TokenId tokenId, PrivateKey pauseKey)"
+nftClient.unpauseNft(tokenId, pauseKey);
+```
 !!! info
+    Use the same pause key that the NFT type was created with. Without an explicit `pauseKey`, the operator account key is used.
 
-The same pause key that is configured for the NFT type must be used to pause or unpause it. When using the overload without an explicit pause key, the operator key is used to sign the transaction.
+---
 
 ## Transfer NFT
 
