@@ -27,10 +27,10 @@ import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftAllowance;
 import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Page;
-import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.Schedule;
 import org.hiero.base.data.ScheduleSignature;
 import org.hiero.base.data.ScheduleSignatureType;
+import org.hiero.base.data.StakingReward;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenAirdrop;
 import org.hiero.base.data.TokenAllowance;
@@ -448,7 +448,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertEquals(ScheduleSignatureType.ED25519, signature.type());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyScheduleOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toSchedule(node).isEmpty());
