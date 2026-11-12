@@ -97,9 +97,8 @@ public class ScheduleRepositoryTest {
     Assertions.assertFalse(schedule.deleted());
     Assertions.assertTrue(
         schedule.signatures().stream()
-            .anyMatch(
-                signature ->
-                    Arrays.equals(creator.publicKey().toBytesRaw(), signature.publicKeyPrefix())));
+            .anyMatch(signature ->
+                Arrays.equals(creator.publicKey().toBytesRaw(), signature.publicKeyPrefix())));
     Assertions.assertTrue(
         SchedulableTransactionBody.parseFrom(schedule.transactionBody()).hasCryptoTransfer());
   }
