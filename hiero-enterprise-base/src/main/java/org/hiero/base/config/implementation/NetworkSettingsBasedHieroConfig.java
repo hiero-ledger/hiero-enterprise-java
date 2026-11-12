@@ -42,6 +42,11 @@ public class NetworkSettingsBasedHieroConfig implements HieroConfig {
   }
 
   @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return networkSetting.getMirrorNodeRestUrl();
+  }
+
+  @Override
   public @NonNull Set<ConsensusNode> getConsensusNodes() {
     return networkSetting.getConsensusNodes();
   }

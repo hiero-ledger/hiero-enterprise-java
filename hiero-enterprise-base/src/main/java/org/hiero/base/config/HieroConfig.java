@@ -30,11 +30,18 @@ public interface HieroConfig {
   @NonNull Optional<String> getNetworkName();
 
   /**
-   * Returns the mirror node addresses.
+   * Returns the mirror node gRPC addresses.
    *
-   * @return the mirror node addresses
+   * @return the mirror node gRPC addresses
    */
   @NonNull Set<String> getMirrorNodeAddresses();
+
+  /**
+   * Returns the mirror node rest url.
+   *
+   * @return the mirror node rest url
+   */
+  @NonNull Optional<String> getMirrorNodeRestUrl();
 
   /**
    * Returns the consensus nodes.
