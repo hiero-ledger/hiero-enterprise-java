@@ -303,7 +303,7 @@ public class MirrorNodeJsonConverterTest {
     Assertions.assertEquals(ScheduleSignatureType.ED25519, signature.type());
   }
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @MethodSource("emptyNodes")
   void shouldReturnEmptyScheduleOptional(JsonNode node) {
     Assertions.assertTrue(jsonConverter.toSchedule(node).isEmpty());

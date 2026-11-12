@@ -70,9 +70,34 @@ jobs:
           enable_jekyll: false
           keep_files: true
 
-  # PR preview: build and deploy to .../pr/<number>/
+  # Fork Repository PRs: read-only token, so just verify the docs build (no deploy, no comment)
+  build-check:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.x"
+
+      - name: Install Zensical
+        run: pip install --require-hashes -r docs/requirements.txt
+
+      - name: Build site
+        run: zensical build --clean -f zensical.toml
+
+
+  # Repository PRs preview: build and deploy to .../pr/<number>/
   deploy-preview:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: write
