@@ -40,9 +40,11 @@ import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
 import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenPauseTransaction;
 import com.hedera.hashgraph.sdk.TokenRejectTransaction;
 import com.hedera.hashgraph.sdk.TokenRevokeKycTransaction;
 import com.hedera.hashgraph.sdk.TokenUnfreezeTransaction;
+import com.hedera.hashgraph.sdk.TokenUnpauseTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateNftsTransaction;
 import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
 import com.hedera.hashgraph.sdk.TokenWipeTransaction;
@@ -132,6 +134,8 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
+import org.hiero.base.protocol.data.TokenPauseResult;
 import org.hiero.base.protocol.data.TokenRejectRequest;
 import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
@@ -140,6 +144,8 @@ import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
+import org.hiero.base.protocol.data.TokenUnpauseResult;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -890,6 +896,48 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       return new TokenBurnResult(receipt.transactionId, receipt.status, receipt.totalSupply);
     } catch (final Exception e) {
       throw new HieroException("Failed to execute burn token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenPauseResult executePauseTokenTransaction(@NonNull final TokenPauseRequest request)
+      throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenPauseTransaction transaction =
+          new TokenPauseTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId());
+
+      sign(transaction, request.pauseKey());
+
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_PAUSE);
+      return new TokenPauseResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute pause token transaction", e);
+    }
+  }
+
+  @Override
+  public TokenUnpauseResult executeUnpauseTokenTransaction(
+      @NonNull final TokenUnpauseRequest request) throws HieroException {
+    Objects.requireNonNull(request, "request must not be null");
+    try {
+      final TokenUnpauseTransaction transaction =
+          new TokenUnpauseTransaction()
+              .setMaxTransactionFee(request.maxTransactionFee())
+              .setTransactionValidDuration(request.transactionValidDuration())
+              .setTokenId(request.tokenId());
+
+      sign(transaction, request.pauseKey());
+
+      final TransactionReceipt receipt =
+          executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_UNPAUSE);
+      return new TokenUnpauseResult(receipt.transactionId, receipt.status);
+    } catch (final Exception e) {
+      throw new HieroException("Failed to execute unpause token transaction", e);
     }
   }
 

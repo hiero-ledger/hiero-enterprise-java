@@ -32,10 +32,12 @@ import org.hiero.base.protocol.data.TokenFreezeRequest;
 import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
 import org.hiero.base.protocol.data.TokenRejectRequest;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
 import org.hiero.base.protocol.data.TokenWipeRequest;
@@ -388,6 +390,38 @@ public class NftClientImpl implements NftClient {
         TokenWipeRequest.of(tokenId, accountId, serialNumbers, wipeKey);
     final TokenWipeResult result = client.executeWipeTokenTransaction(request);
     return result.totalSupply();
+  }
+
+  @Override
+  public void pauseNft(@NonNull TokenId tokenId) throws HieroException {
+    pauseNft(tokenId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void pauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey)
+      throws HieroException {
+
+    Objects.requireNonNull(tokenId, "tokenId must nor be null");
+    Objects.requireNonNull(pauseKey, "pauseKey must nor be null");
+
+    final TokenPauseRequest request = TokenPauseRequest.of(tokenId, pauseKey);
+
+    client.executePauseTokenTransaction(request);
+  }
+
+  @Override
+  public void unpauseNft(@NonNull TokenId tokenId) throws HieroException {
+    unpauseNft(tokenId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void unpauseNft(@NonNull TokenId tokenId, @NonNull PrivateKey pauseKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must nor be null");
+    Objects.requireNonNull(pauseKey, "pauseKey must nor be null");
+    final TokenUnpauseRequest request = TokenUnpauseRequest.of(tokenId, pauseKey);
+
+    client.executeUnpauseTokenTransaction(request);
   }
 
   @Override

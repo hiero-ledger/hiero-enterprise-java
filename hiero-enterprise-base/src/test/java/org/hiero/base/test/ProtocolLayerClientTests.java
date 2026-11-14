@@ -83,6 +83,10 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeWipeTokenTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executePauseTokenTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeUnpauseTokenTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeMintTokenTransaction(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTokenFreezeTransaction(null));
