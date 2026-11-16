@@ -11,8 +11,10 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
+import org.hiero.base.data.Schedule;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.data.Topic;
@@ -39,6 +41,8 @@ public interface MirrorNodeJsonConverter<JSON> {
 
   List<Nft> toNfts(@NonNull JSON json);
 
+  @NonNull List<NftTransactionHistory> toNftTransactionHistories(@NonNull JSON json);
+
   Optional<TokenInfo> toTokenInfo(JSON json);
 
   List<Balance> toBalances(JSON node);
@@ -62,4 +66,8 @@ public interface MirrorNodeJsonConverter<JSON> {
   @NonNull List<Block> toBlocks(@NonNull JSON json);
 
   @NonNull List<Node> toNodes(@NonNull JSON json);
+
+  @NonNull Optional<Schedule> toSchedule(@NonNull JSON json);
+
+  @NonNull List<Schedule> toSchedules(@NonNull JSON json);
 }

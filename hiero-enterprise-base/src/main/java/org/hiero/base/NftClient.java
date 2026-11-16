@@ -610,7 +610,6 @@ public interface NftClient {
     Objects.requireNonNull(account, "accountId must not be null");
     associateNft(tokenIds, account.accountId(), account.privateKey());
   }
-  ;
 
   /**
    * Dissociate an account with an NFT type.
@@ -643,7 +642,6 @@ public interface NftClient {
         AccountId.fromString(accountId),
         PrivateKey.fromStringDER(accountKey));
   }
-  ;
 
   /**
    * Dissociate an account with an NFT type.
@@ -657,7 +655,6 @@ public interface NftClient {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateNft(tokenId, account.accountId(), account.privateKey());
   }
-  ;
 
   /**
    * Dissociate an account with an NFT type.
@@ -683,7 +680,6 @@ public interface NftClient {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateNft(tokenIds, account.accountId(), account.privateKey());
   }
-  ;
 
   /**
    * Freezes an account for the given NFT type. The operator account key is used as the freeze key.

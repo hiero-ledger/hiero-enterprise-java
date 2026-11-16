@@ -1,0 +1,75 @@
+{
+  "schedules": [
+    {
+      "admin_key": {
+        "_type": "ProtobufEncoded",
+        "key": "0a0518bdb1b105"
+      },
+      "deleted": false,
+      "consensus_timestamp": "1793716166.729197465",
+      "creator_account_id": "0.0.11212783",
+      "executed_timestamp": "1793716224.064772348",
+      "expiration_time": "1793716224.000000000",
+      "memo": "",
+      "payer_account_id": "0.0.11294909",
+      "schedule_id": "0.0.11295061",
+      "signatures": [],
+      "transaction_body": "GkIKFiIUTcuSOv6wZk6euwE/0iNvePHWMIQQ4KcSIiS4UM33pFh5W0j89NMXLCsbxeTqJdiWbr+i6sGZkYUVlF/ZEhI=",
+      "wait_for_expiry": true
+    },
+    {
+      "admin_key": {
+        "_type": "ED25519",
+        "key": "9c8b38038fed70553c8bac225b3c83da8550d726bf5ef726f4c841603b01aadf"
+      },
+      "deleted": true,
+      "consensus_timestamp": "1793725690.872644277",
+      "creator_account_id": "0.0.11296675",
+      "executed_timestamp": null,
+      "expiration_time": "1793984890.453000000",
+      "memo": "nodeStream automatic payments v2 30f897d37ce117d3",
+      "payer_account_id": "0.0.11296675",
+      "schedule_id": "0.0.11296689",
+      "signatures": [
+        {
+          "consensus_timestamp": "1793725690.872644277",
+          "public_key_prefix": "nIs4A4/tcFU8i6wiWzyD2oVQ1ya/Xvcm9MhBYDsBqt8=",
+          "signature": "XomlVQRs5Gl1GdtNR9WD+6FjTDpvI7m7Pb8gk4CWRLsUoNMrHP0d2ajr6y8AmPJM6LPH2mzA4DgY\nG8L6cJ41Cg==",
+          "type": "ED25519"
+        }
+      ],
+      "transaction_body": "CICEr18SMW5vZGVTdHJlYW0gYXV0b21hdGljIHBheW1lbnRzIHYyIDMwZjg5N2QzN2NlMTE3ZDOqAhoKGAoFGKK/sQUSBRijv7EFGP//////////fw==",
+      "wait_for_expiry": false
+    },
+    {
+      "admin_key": null,
+      "deleted": false,
+      "consensus_timestamp": "1793728610.593746104",
+      "creator_account_id": "0.0.9268053",
+      "executed_timestamp": "1793728615.540288446",
+      "expiration_time": null,
+      "memo": "",
+      "payer_account_id": "0.0.9268053",
+      "schedule_id": "0.0.11297125",
+      "signatures": [
+        {
+          "consensus_timestamp": "1793728610.593746104",
+          "public_key_prefix": "A50TEDkDmVff4EKHPuA28mhk6Ad/e+exUIdJibWUpIRB",
+          "signature": "HmF3F/NuRKcU/vd//Crrl9KC6ABuUznxdqi17ZL5gzpTGqHvhqAfqa3t9jqry77F/dtUzXC42UZW\n+Q/IMvSNBA==",
+          "type": "ECDSA_SECP256K1"
+        },
+        {
+          "consensus_timestamp": "1793728615.540288445",
+          "public_key_prefix": "A1GhH3x3+j/1mgtjGb/aj8nBpz43IwE45V51XstynZxf",
+          "signature": "VzKcYg1QMb0tEZp0IfJ4jDLEcNg8ESFhaMVLSJxGhmg4BxclL8OUwKeMdLOcVJWIR6QcxlUMXM7e\nuZJ+tzgJKg==",
+          "type": "ECDSA_SECP256K1"
+        }
+      ],
+      "transaction_body": "CIDC1y8SJGNlNGY3ZDE0LTM0N2QtNDIxYS05NzNhLTk2MzEwNGRkMjY3NUo8CjoKHQoWIhTL/kvoPtKlTN9Cm4XDM2kl0U6d2BCA0coICgsKBRjM1bUEEICJegoMCgUYiem8BBD/2cQJ",
+      "wait_for_expiry": false
+    }
+  ],
+  "links": {
+    "next": "/api/v1/schedules?limit=3&schedule.id=gt:0.0.11297125"
+  }
+}

@@ -294,7 +294,6 @@ public interface FungibleTokenClient {
     Objects.requireNonNull(account, "accountId must not be null");
     associateToken(tokenIds, account.accountId(), account.privateKey());
   }
-  ;
 
   /**
    * Dissociate an account with token.
@@ -327,7 +326,6 @@ public interface FungibleTokenClient {
         AccountId.fromString(accountId),
         PrivateKey.fromStringDER(accountKey));
   }
-  ;
 
   /**
    * Dissociate an account with token.
@@ -341,7 +339,6 @@ public interface FungibleTokenClient {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateToken(tokenId, account.accountId(), account.privateKey());
   }
-  ;
 
   /**
    * Dissociate an account with token.
@@ -367,7 +364,6 @@ public interface FungibleTokenClient {
     Objects.requireNonNull(account, "accountId must not be null");
     dissociateToken(tokenIds, account.accountId(), account.privateKey());
   }
-  ;
 
   /**
    * Mint a Token.
