@@ -659,6 +659,9 @@ public class ProtocolLayerClientImpl implements ProtocolLayerClient {
       if (request.feeScheduleKey() != null) {
         transaction.setFeeScheduleKey(request.feeScheduleKey());
       }
+      if (request.pauseKey() != null) {
+        transaction.setPauseKey(request.pauseKey());
+      }
       sign(transaction, request.treasuryKey(), request.supplyKey(), request.adminKey());
       final TransactionReceipt receipt =
           executeTransactionAndWaitOnReceipt(transaction, TransactionType.TOKEN_CREATE);

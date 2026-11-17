@@ -24,6 +24,7 @@ public record TokenCreateRequest(
     @Nullable PrivateKey wipeKey,
     @Nullable PrivateKey freezeKey,
     @Nullable PrivateKey kycKey,
+    @Nullable PrivateKey pauseKey,
     @Nullable PrivateKey feeScheduleKey)
     implements TransactionRequest {
 
@@ -277,6 +278,48 @@ public record TokenCreateRequest(
         wipeKey,
         freezeKey,
         kycKey,
-        feeScheduleKey);
+        feeScheduleKey,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, wipe, freeze, KYC, fee schedule,
+   * and pause keys.
+   *
+   * @param wipeKey the wipe key; optional unless wiping from non-treasury accounts
+   * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
+   * @param kycKey the KYC key; required to grant or revoke KYC for the token
+   * @param feeScheduleKey the fee schedule key; required to update the token's custom fees
+   * @param pauseKey the pause key; required to pause or unpause the token
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey wipeKey,
+      @Nullable final PrivateKey freezeKey,
+      @Nullable final PrivateKey kycKey,
+      @Nullable final PrivateKey feeScheduleKey,
+      @Nullable final PrivateKey pauseKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        freezeKey,
+        kycKey,
+        feeScheduleKey,
+        pauseKey);
   }
 }
