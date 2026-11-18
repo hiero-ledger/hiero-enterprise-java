@@ -2596,6 +2596,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
@@ -2643,6 +2644,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2657,6 +2659,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
@@ -2679,6 +2682,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2693,6 +2697,7 @@ public class ProtocolLayerDataCreationTests {
                 tokenType,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
@@ -2715,6 +2720,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2729,6 +2735,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
