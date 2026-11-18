@@ -91,6 +91,7 @@ public record TokenCreateRequest(
         null,
         null,
         null,
+        null,
         null);
   }
 
@@ -111,6 +112,7 @@ public record TokenCreateRequest(
         tokenType,
         supplyKey,
         treasuryKey,
+        null,
         null,
         null,
         null,
@@ -137,6 +139,7 @@ public record TokenCreateRequest(
         supplyKey,
         treasuryKey,
         metadataKey,
+        null,
         null,
         null,
         null,
@@ -172,6 +175,7 @@ public record TokenCreateRequest(
         wipeKey,
         null,
         null,
+        null,
         null);
   }
 
@@ -204,6 +208,7 @@ public record TokenCreateRequest(
         metadataKey,
         wipeKey,
         freezeKey,
+        null,
         null,
         null);
   }
@@ -240,6 +245,7 @@ public record TokenCreateRequest(
         wipeKey,
         freezeKey,
         kycKey,
+        null,
         null);
   }
 
@@ -278,8 +284,8 @@ public record TokenCreateRequest(
         wipeKey,
         freezeKey,
         kycKey,
-        feeScheduleKey,
-        null);
+        null,
+        feeScheduleKey);
   }
 
   /**
@@ -319,7 +325,7 @@ public record TokenCreateRequest(
         wipeKey,
         freezeKey,
         kycKey,
-        feeScheduleKey,
-        pauseKey);
+        pauseKey,
+        feeScheduleKey);
   }
 }
