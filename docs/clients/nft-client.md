@@ -76,6 +76,8 @@
 | `wipeNft(TokenId tokenId, long serialNumber, AccountId accountId, PrivateKey wipeKey)` | Wipes a single NFT using a custom wipe key. Returns total supply. |
 | `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId)` | Wipes multiple NFTs from an account using the operator wipe key. Returns total supply. |
 | `wipeNfts(TokenId tokenId, Set<Long> serialNumbers, AccountId accountId, PrivateKey wipeKey)` | Wipes multiple NFTs using a custom wipe key. Returns total supply. |
+| `pauseNfts(TokenId tokenId, PrivateKey pauseKey)` | pauses the NFT's from an account using the pause key.
+| `unpauseNfts(TokenId tokenId, , PrivateKey pauseKey)` | unpauses the NFT's from an account using the pause key.
 | `transferNft(TokenId tokenId, long serialNumber, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers an NFT between accounts. |
 | `transferNft(TokenId tokenId, long serialNumber, Account fromAccount, AccountId toAccountId)` | Transfers an NFT using an account object as sender. |
 | `transferNfts(TokenId tokenId, List<Long> serialNumbers, AccountId fromAccountId, PrivateKey fromAccountKey, AccountId toAccountId)` | Transfers multiple NFTs between accounts. |
@@ -438,6 +440,34 @@ long totalSupply = nftClient.wipeNfts(
 !!! info
 
     Newly created NFT types use the admin (treasury) key as the wipe key when no wipe key is set explicitly, so the operator key can wipe when the operator is also the treasury/admin.
+
+---
+
+## Pause NFT
+
+Pauses an NFT type. While it is paused, the NFT type cannot be used in any transaction until it is unpaused. The pause key of the NFT type must sign.
+```java title="pauseNft(TokenId tokenId)"
+nftClient.pauseNft(tokenId);
+```
+```java title="pauseNft(TokenId tokenId, PrivateKey pauseKey)"
+nftClient.pauseNft(tokenId, pauseKey);
+```
+!!! info
+    The NFT type must be created with a pause key. Without an explicit `pauseKey`, the operator account key is used.
+
+---
+
+## Unpause NFT
+
+Unpauses a paused NFT type so it can be used again. The pause key of the NFT type must sign.
+```java title="unpauseNft(TokenId tokenId)"
+nftClient.unpauseNft(tokenId);
+```
+```java title="unpauseNft(TokenId tokenId, PrivateKey pauseKey)"
+nftClient.unpauseNft(tokenId, pauseKey);
+```
+!!! info
+    Use the same pause key that the NFT type was created with. Without an explicit `pauseKey`, the operator account key is used.
 
 ---
 

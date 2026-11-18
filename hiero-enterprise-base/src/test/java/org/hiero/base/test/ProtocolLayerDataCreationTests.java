@@ -95,6 +95,7 @@ import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenGrantKycResult;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenPauseRequest;
 import org.hiero.base.protocol.data.TokenRejectRequest;
 import org.hiero.base.protocol.data.TokenRejectResult;
 import org.hiero.base.protocol.data.TokenRevokeKycRequest;
@@ -103,6 +104,7 @@ import org.hiero.base.protocol.data.TokenTransferRequest;
 import org.hiero.base.protocol.data.TokenTransferResult;
 import org.hiero.base.protocol.data.TokenUnfreezeRequest;
 import org.hiero.base.protocol.data.TokenUnfreezeResult;
+import org.hiero.base.protocol.data.TokenUnpauseRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
 import org.hiero.base.protocol.data.TokenUpdateNftsResult;
 import org.hiero.base.protocol.data.TokenUpdateRequest;
@@ -1399,6 +1401,28 @@ public class ProtocolLayerDataCreationTests {
   }
 
   @Test
+  void testTokenPauseRequest() {
+    final TokenId tokenId = TokenId.fromString("0.0.123");
+    final PrivateKey pauseKey = PrivateKey.generateED25519();
+
+    final TokenPauseRequest request = TokenPauseRequest.of(tokenId, pauseKey);
+
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(pauseKey, request.pauseKey());
+  }
+
+  @Test
+  void testTokenUnpauseRequest() {
+    final TokenId tokenId = TokenId.fromString("0.0.123");
+    final PrivateKey pauseKey = PrivateKey.generateED25519();
+
+    final TokenUnpauseRequest request = TokenUnpauseRequest.of(tokenId, pauseKey);
+
+    Assertions.assertEquals(tokenId, request.tokenId());
+    Assertions.assertEquals(pauseKey, request.pauseKey());
+  }
+
+  @Test
   public void testTokenAssociateResultCreation() {
     // Given
     final TransactionId transactionId = TransactionId.generate(new AccountId(0, 0, 12345));
@@ -2484,9 +2508,12 @@ public class ProtocolLayerDataCreationTests {
             null,
             null,
             null,
+            null,
             null));
+
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
+
     Assertions.assertDoesNotThrow(() ->
         TokenCreateRequest.of(
             name,
@@ -2496,6 +2523,7 @@ public class ProtocolLayerDataCreationTests {
             tokenType,
             supplyKey,
             PrivateKey.generateECDSA()));
+
     final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
     final TokenCreateRequest withFeeScheduleKey =
         TokenCreateRequest.of(
@@ -2510,9 +2538,12 @@ public class ProtocolLayerDataCreationTests {
             null,
             null,
             feeScheduleKey);
+
     Assertions.assertEquals(feeScheduleKey, withFeeScheduleKey.feeScheduleKey());
+
     Assertions.assertNull(
         TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey).feeScheduleKey());
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2530,7 +2561,9 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2548,7 +2581,9 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2566,7 +2601,9 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2584,7 +2621,9 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2602,7 +2641,9 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null,
+                null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2616,6 +2657,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 supplyKey,
                 treasuryKey,
+                null,
                 null,
                 null,
                 null,
