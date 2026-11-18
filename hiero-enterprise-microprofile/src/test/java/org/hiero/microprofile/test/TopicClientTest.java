@@ -1,0 +1,293 @@
+package org.hiero.microprofile.test;
+
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TopicId;
+import io.helidon.microprofile.tests.junit5.AddBean;
+import io.helidon.microprofile.tests.junit5.Configuration;
+import io.helidon.microprofile.tests.junit5.HelidonTest;
+import jakarta.inject.Inject;
+import java.time.Duration;
+import java.time.Instant;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
+import org.hiero.base.AccountClient;
+import org.hiero.base.HieroException;
+import org.hiero.base.TopicClient;
+import org.hiero.base.data.Account;
+import org.hiero.microprofile.ClientProvider;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+@HelidonTest
+@AddBean(ClientProvider.class)
+@Configuration(useExisting = true)
+public class TopicClientTest {
+
+  @BeforeAll
+  static void setup() {
+    final Config build =
+        ConfigProviderResolver.instance().getBuilder().withSources(new TestConfigSource()).build();
+    ConfigProviderResolver.instance()
+        .registerConfig(build, Thread.currentThread().getContextClassLoader());
+  }
+
+  @Inject private TopicClient topicClient;
+
+  @Inject private AccountClient accountClient;
+
+  @Test
+  void testCreateTopic() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    Assertions.assertNotNull(topicId);
+  }
+
+  @Test
+  void testCreatePrivateTopic() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+    Assertions.assertNotNull(topicId);
+  }
+
+  @Test
+  void testDeleteTopic() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    Assertions.assertDoesNotThrow(() -> topicClient.deleteTopic(topicId));
+  }
+
+  @Test
+  void testDeleteTopicThrowExceptionFroInvalidId() {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+  }
+
+  @Test
+  void testDeleteTopicForGivenAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createTopic(adminKey);
+    Assertions.assertDoesNotThrow(() -> topicClient.deleteTopic(topicId, adminKey));
+  }
+
+  @Test
+  void testDeleteTopicThrowExceptionForDifferentAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createTopic(adminKey);
+
+    // operatorAccount privateKey will use as adminKey by default
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+  }
+
+  @Test
+  void testUpdateTopic() throws HieroException {
+    final TopicId topicId = topicClient.createTopic("Hello Hiero");
+    final String updatedMemo = "Updated Hello Hiero";
+    Assertions.assertDoesNotThrow(() -> topicClient.updateTopic(topicId, updatedMemo));
+  }
+
+  @Test
+  void testUpdateTopicThrowExceptionFroInvalidId() {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final String updatedMemo = "Updated Hello Hiero";
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateTopic(topicId, updatedMemo));
+  }
+
+  @Test
+  void testUpdateTopicForGivenAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createTopic(adminKey, "Hello Hiero");
+    final String updatedMemo = "Updated Hello Hiero";
+    Assertions.assertDoesNotThrow(() -> topicClient.updateTopic(topicId, adminKey, updatedMemo));
+  }
+
+  @Test
+  void testUpdateTopicThrowExceptionForDifferentAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createTopic(adminKey, "Hello Hiero");
+    final String updatedMemo = "Updated Hello Hiero";
+
+    // operatorAccount privateKey will use as adminKey by default
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateTopic(topicId, updatedMemo));
+  }
+
+  @Test
+  void testUpdateAdminKey() throws HieroException {
+    final PrivateKey updatedAdminKey = PrivateKey.generateECDSA();
+
+    // operatorAccount privateKey will use as adminKey by default
+    final TopicId topicId = topicClient.createTopic();
+    Assertions.assertDoesNotThrow(() -> topicClient.updateAdminKey(topicId, updatedAdminKey));
+
+    // to verify if adminKey is updated
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+    Assertions.assertDoesNotThrow(() -> topicClient.deleteTopic(topicId, updatedAdminKey));
+  }
+
+  @Test
+  void testUpdateAdminKeyThrowExceptionFroInvalidId() {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final PrivateKey updatedAdminKey = PrivateKey.generateECDSA();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateAdminKey(topicId, updatedAdminKey));
+  }
+
+  @Test
+  void testUpdateSubmitKey() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+
+    final PrivateKey updatedSubmitKey = PrivateKey.generateECDSA();
+    Assertions.assertDoesNotThrow(() -> topicClient.updateSubmitKey(topicId, updatedSubmitKey));
+
+    // to verify if submitKey is updated
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.submitMessage(topicId, submitKey, message));
+    Assertions.assertDoesNotThrow(
+        () -> topicClient.submitMessage(topicId, updatedSubmitKey, message));
+  }
+
+  @Test
+  void testUpdateSubmitKeyForPublicTopic() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+
+    final PrivateKey updatedSubmitKey = PrivateKey.generateECDSA();
+    Assertions.assertDoesNotThrow(() -> topicClient.updateSubmitKey(topicId, updatedSubmitKey));
+
+    // to verify if submitKey is updated
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.submitMessage(topicId, message));
+    Assertions.assertDoesNotThrow(
+        () -> topicClient.submitMessage(topicId, updatedSubmitKey, message));
+  }
+
+  @Test
+  void testUpdateSubmitKeyThrowExceptionFroInvalidId() {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateSubmitKey(topicId, submitKey));
+  }
+
+  @Test
+  void testSubmitMessage() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertDoesNotThrow(() -> topicClient.submitMessage(topicId, message));
+  }
+
+  @Test
+  void testSubmitMessageGreaterThanMaxLength() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    final byte[] message = new byte[1025];
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> topicClient.submitMessage(topicId, message));
+  }
+
+  @Test
+  void testSubmitMessageToPrivateTopic() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertDoesNotThrow(() -> topicClient.submitMessage(topicId, submitKey, message));
+  }
+
+  @Test
+  void testSubmitMessageToPrivateTopicThrowExceptionIfSubmitKeyMissing() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.submitMessage(topicId, message));
+  }
+
+  @Test
+  void testSubmitMessageToPrivateTopicThrowExceptionForInvalidSubmitKey() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertThrows(
+        HieroException.class,
+        () -> topicClient.submitMessage(topicId, PrivateKey.generateECDSA(), message));
+  }
+
+  @Test
+  void testSubmitMessageThrowExceptionFroInvalidId() {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final byte[] message = "Hello Hiero".getBytes();
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.submitMessage(topicId, submitKey, message));
+  }
+
+  @Test
+  void testCreateImmutableTopicCannotBeUpdatedOrDeleted() throws HieroException {
+    final TopicId topicId = topicClient.createImmutableTopic("Immutable topic");
+    Assertions.assertNotNull(topicId);
+
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateTopic(topicId, "Updated memo"));
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+    Assertions.assertDoesNotThrow(() -> topicClient.submitMessage(topicId, "Hello Hiero"));
+  }
+
+  @Test
+  void testCreateTopicWithAutoRenewSettings() throws HieroException {
+    final Account autoRenewAccount = accountClient.createAccount(Hbar.from(1));
+    final TopicId topicId =
+        topicClient.createTopic(
+            null, null, "Auto renew topic", autoRenewAccount, Duration.ofDays(60));
+    Assertions.assertNotNull(topicId);
+  }
+
+  @Test
+  void testUpdateAutoRenewAccountAndPeriod() throws HieroException {
+    final TopicId topicId = topicClient.createTopic();
+    final Account autoRenewAccount = accountClient.createAccount(Hbar.from(1));
+
+    Assertions.assertDoesNotThrow(
+        () -> topicClient.updateAutoRenewAccount(topicId, autoRenewAccount));
+    Assertions.assertDoesNotThrow(
+        () -> topicClient.updateAutoRenewPeriod(topicId, Duration.ofDays(60)));
+    Assertions.assertDoesNotThrow(() -> topicClient.clearAutoRenewAccount(topicId));
+  }
+
+  @Test
+  void testUpdateExpirationTimeOfImmutableTopic() throws HieroException {
+    final TopicId topicId = topicClient.createImmutableTopic();
+    final Instant expirationTime = Instant.now().plus(Duration.ofDays(91));
+    Assertions.assertDoesNotThrow(() -> topicClient.updateExpirationTime(topicId, expirationTime));
+  }
+
+  @Test
+  void testClearAdminKeyMakesTopicImmutable() throws HieroException {
+    final TopicId topicId = topicClient.createTopic("Hello Hiero");
+    Assertions.assertDoesNotThrow(() -> topicClient.clearAdminKey(topicId));
+
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.updateTopic(topicId, "Updated memo"));
+    Assertions.assertThrows(HieroException.class, () -> topicClient.deleteTopic(topicId));
+  }
+
+  @Test
+  void testClearSubmitKeyMakesTopicPublic() throws HieroException {
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final TopicId topicId = topicClient.createPrivateTopic(submitKey);
+    final byte[] message = "Hello Hiero".getBytes();
+    Assertions.assertThrows(
+        HieroException.class, () -> topicClient.submitMessage(topicId, message));
+
+    Assertions.assertDoesNotThrow(() -> topicClient.clearSubmitKey(topicId));
+
+    Assertions.assertDoesNotThrow(() -> topicClient.submitMessage(topicId, message));
+  }
+
+  @Test
+  void testClearTopicMemo() throws HieroException {
+    final TopicId topicId = topicClient.createTopic("Hello Hiero");
+    Assertions.assertDoesNotThrow(() -> topicClient.clearTopicMemo(topicId));
+  }
+}
