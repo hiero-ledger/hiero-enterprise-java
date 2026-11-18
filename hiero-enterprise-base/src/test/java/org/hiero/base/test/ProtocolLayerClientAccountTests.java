@@ -42,6 +42,9 @@ public class ProtocolLayerClientAccountTests {
         protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
     final AccountId accountId = accountCreateResult.newAccount().accountId();
 
+    // wait for mirrornode to record transaction
+    Thread.sleep(5000);
+
     // when
     final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
     final AccountBalanceResponse accountBalanceResponse =
@@ -60,6 +63,9 @@ public class ProtocolLayerClientAccountTests {
     final AccountCreateResult accountCreateResult =
         protocolLayerClient.executeAccountCreateTransaction(accountCreateRequest);
     final AccountId accountId = accountCreateResult.newAccount().accountId();
+
+    // wait for mirrornode to record transaction
+    Thread.sleep(5000);
 
     // when
     final AccountBalanceRequest accountBalanceRequest = AccountBalanceRequest.of(accountId);
