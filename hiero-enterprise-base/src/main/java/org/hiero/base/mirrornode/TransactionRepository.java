@@ -64,7 +64,6 @@ public interface TransactionRepository {
     Objects.requireNonNull(type, "type must not be null");
     return findByAccountAndType(AccountId.fromString(accountId), type);
   }
-  ;
 
   /**
    * Find all transactions associated with a specific account and has specific transaction result.
@@ -92,7 +91,6 @@ public interface TransactionRepository {
     Objects.requireNonNull(result, "result must not be null");
     return findByAccountAndResult(AccountId.fromString(accountId), result);
   }
-  ;
 
   /**
    * Find all transactions associated with a specific account and has specific transaction
@@ -122,7 +120,6 @@ public interface TransactionRepository {
     Objects.requireNonNull(type, "type must not be null");
     return findByAccountAndModification(AccountId.fromString(accountId), type);
   }
-  ;
 
   /**
    * Find a specific transaction by its ID.

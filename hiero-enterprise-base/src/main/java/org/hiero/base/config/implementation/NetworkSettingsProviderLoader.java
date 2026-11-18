@@ -28,34 +28,30 @@ public final class NetworkSettingsProviderLoader {
     ServiceLoader<NetworkSettingsProvider> loader =
         ServiceLoader.load(NetworkSettingsProvider.class);
     loader.stream()
-        .forEach(
-            provider -> {
-              final NetworkSettingsProvider networkSettingsProvider = provider.get();
-              logger.info(
-                  "Loading network settings from provider: {}", networkSettingsProvider.getName());
-              final Set<NetworkSettings> networkSettingsFromProvider =
-                  networkSettingsProvider.createNetworkSettings();
-              logger.debug(
-                  "Loaded {} network settings from provider {}",
-                  networkSettingsFromProvider.size(),
-                  networkSettingsProvider.getName());
-              networkSettingsFromProvider.forEach(
-                  setting -> {
-                    if (loaded.stream()
-                        .anyMatch(
-                            existing ->
-                                Objects.equals(
-                                    existing.getNetworkIdentifier(),
-                                    setting.getNetworkIdentifier()))) {
-                      throw new IllegalStateException(
-                          "Network settings with identifier "
-                              + setting.getNetworkIdentifier()
-                              + " already loaded");
-                    } else {
-                      loaded.add(setting);
-                    }
-                  });
-            });
+        .forEach(provider -> {
+          final NetworkSettingsProvider networkSettingsProvider = provider.get();
+          logger.info(
+              "Loading network settings from provider: {}", networkSettingsProvider.getName());
+          final Set<NetworkSettings> networkSettingsFromProvider =
+              networkSettingsProvider.createNetworkSettings();
+          logger.debug(
+              "Loaded {} network settings from provider {}",
+              networkSettingsFromProvider.size(),
+              networkSettingsProvider.getName());
+          networkSettingsFromProvider.forEach(setting -> {
+            if (loaded.stream()
+                .anyMatch(existing ->
+                    Objects.equals(
+                        existing.getNetworkIdentifier(), setting.getNetworkIdentifier()))) {
+              throw new IllegalStateException(
+                  "Network settings with identifier "
+                      + setting.getNetworkIdentifier()
+                      + " already loaded");
+            } else {
+              loaded.add(setting);
+            }
+          });
+        });
     this.settings = Collections.unmodifiableSet(loaded);
   }
 

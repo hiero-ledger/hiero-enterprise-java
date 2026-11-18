@@ -55,18 +55,17 @@ public class HieroNetworkConfiguration {
         .map(n -> n.split(","))
         .map(n -> Stream.of(n))
         .orElse(Stream.empty())
-        .map(
-            n -> {
-              // 172.234.134.4:8080:0.0.3
-              final String[] split = n.split(":");
-              if (split.length != 3) {
-                throw new IllegalStateException("Can not parse node for '" + n + "'");
-              }
-              final String ip = split[0];
-              final String port = split[1];
-              final String account = split[2];
-              return new ConsensusNode(ip, port, account);
-            })
+        .map(n -> {
+          // 172.234.134.4:8080:0.0.3
+          final String[] split = n.split(":");
+          if (split.length != 3) {
+            throw new IllegalStateException("Can not parse node for '" + n + "'");
+          }
+          final String ip = split[0];
+          final String port = split[1];
+          final String account = split[2];
+          return new ConsensusNode(ip, port, account);
+        })
         .collect(Collectors.toUnmodifiableSet());
   }
 }

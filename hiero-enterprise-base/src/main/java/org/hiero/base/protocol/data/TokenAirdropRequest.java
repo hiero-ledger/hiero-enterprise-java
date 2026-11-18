@@ -47,14 +47,13 @@ public record TokenAirdropRequest(
       throw new IllegalArgumentException(
           "serialToReceiver must not contain more than " + MAX_NFT_TRANSFERS + " entries");
     }
-    serialToReceiver.forEach(
-        (serial, receiver) -> {
-          Objects.requireNonNull(serial, "serial must not be null");
-          Objects.requireNonNull(receiver, "receiver must not be null");
-          if (serial <= 0) {
-            throw new IllegalArgumentException("serial must be positive");
-          }
-        });
+    serialToReceiver.forEach((serial, receiver) -> {
+      Objects.requireNonNull(serial, "serial must not be null");
+      Objects.requireNonNull(receiver, "receiver must not be null");
+      if (serial <= 0) {
+        throw new IllegalArgumentException("serial must be positive");
+      }
+    });
   }
 
   @NonNull

@@ -31,13 +31,12 @@ public record TokenMintRequest(
     if (amount != null && amount <= 0) {
       throw new IllegalArgumentException("amount must be greater than 0");
     }
-    metadata.forEach(
-        m -> {
-          if (m.length > MAX_METADATA_SIZE) {
-            throw new IllegalArgumentException(
-                "each metadata entry must be less than " + MAX_METADATA_SIZE + " bytes");
-          }
-        });
+    metadata.forEach(m -> {
+      if (m.length > MAX_METADATA_SIZE) {
+        throw new IllegalArgumentException(
+            "each metadata entry must be less than " + MAX_METADATA_SIZE + " bytes");
+      }
+    });
   }
 
   public static TokenMintRequest of(

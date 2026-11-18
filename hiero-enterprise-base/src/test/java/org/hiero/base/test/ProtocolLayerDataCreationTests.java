@@ -184,24 +184,23 @@ public class ProtocolLayerDataCreationTests {
     final Duration autoRenewPeriod = Duration.ofDays(90);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountInfoResponse(
-                accountId,
-                "0000000000000000000000000000000000003039",
-                false,
-                privateKey.getPublicKey(),
-                Hbar.from(10),
-                false,
-                expirationTime,
-                autoRenewPeriod,
-                "memo",
-                0L,
-                0,
-                null,
-                null,
-                0L,
-                null));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountInfoResponse(
+            accountId,
+            "0000000000000000000000000000000000003039",
+            false,
+            privateKey.getPublicKey(),
+            Hbar.from(10),
+            false,
+            expirationTime,
+            autoRenewPeriod,
+            "memo",
+            0L,
+            0,
+            null,
+            null,
+            0L,
+            null));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -259,24 +258,23 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 0L,
                 null));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountInfoResponse(
-                accountId,
-                "0000000000000000000000000000000000003039",
-                false,
-                privateKey.getPublicKey(),
-                Hbar.from(10),
-                false,
-                expirationTime,
-                autoRenewPeriod,
-                "memo",
-                0L,
-                -1,
-                null,
-                null,
-                0L,
-                null));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountInfoResponse(
+            accountId,
+            "0000000000000000000000000000000000003039",
+            false,
+            privateKey.getPublicKey(),
+            Hbar.from(10),
+            false,
+            expirationTime,
+            autoRenewPeriod,
+            "memo",
+            0L,
+            -1,
+            null,
+            null,
+            0L,
+            null));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -308,10 +306,9 @@ public class ProtocolLayerDataCreationTests {
     // then
     Assertions.assertDoesNotThrow(() -> AccountCreateRequest.of());
     Assertions.assertDoesNotThrow(() -> AccountCreateRequest.of(initialBalance));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountCreateRequest(
-                Hbar.fromTinybars(1000), transactionValidDuration, initialBalance));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountCreateRequest(
+            Hbar.fromTinybars(1000), transactionValidDuration, initialBalance));
     Assertions.assertThrows(NullPointerException.class, () -> AccountCreateRequest.of(null));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -355,15 +352,9 @@ public class ProtocolLayerDataCreationTests {
     final Hbar transactionFee = Hbar.fromTinybars(1000);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountCreateResult(
-                transactionId,
-                status,
-                transactionHash,
-                consensusTimestamp,
-                transactionFee,
-                account));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountCreateResult(
+            transactionId, status, transactionHash, consensusTimestamp, transactionFee, account));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -419,13 +410,11 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete));
     Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete, transferFundsToAccount));
     Assertions.assertDoesNotThrow(() -> AccountDeleteRequest.of(toDelete, null));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountDeleteRequest(
-                maxTransactionFee, transactionValidDuration, toDelete, transferFundsToAccount));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountDeleteRequest(maxTransactionFee, transactionValidDuration, toDelete, null));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountDeleteRequest(
+            maxTransactionFee, transactionValidDuration, toDelete, transferFundsToAccount));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountDeleteRequest(maxTransactionFee, transactionValidDuration, toDelete, null));
     Assertions.assertThrows(NullPointerException.class, () -> AccountDeleteRequest.of(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> AccountDeleteRequest.of(null, transferFundsToAccount));
@@ -474,10 +463,9 @@ public class ProtocolLayerDataCreationTests {
     final Instant consensusTimestamp = Instant.now();
     final Hbar transactionFee = Hbar.fromTinybars(1000);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountDeleteResult(
-                transactionId, status, transactionHash, consensusTimestamp, transactionFee));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountDeleteResult(
+            transactionId, status, transactionHash, consensusTimestamp, transactionFee));
     Assertions.assertDoesNotThrow(
         () -> new AccountDeleteResult(transactionId, status, transactionHash, null, null));
     Assertions.assertThrows(
@@ -509,18 +497,14 @@ public class ProtocolLayerDataCreationTests {
         () -> AccountUpdateRequest.updateKey(toUpdate, updatedPrivateKey));
     Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.updateMemo(toUpdate, memo));
     Assertions.assertDoesNotThrow(() -> AccountUpdateRequest.of(toUpdate, updatedPrivateKey, memo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountUpdateRequest(
-                maxTransactionFee, transactionValidDuration, toUpdate, updatedPrivateKey, null));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountUpdateRequest(
-                maxTransactionFee, transactionValidDuration, toUpdate, null, memo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new AccountUpdateRequest(
-                maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountUpdateRequest(
+            maxTransactionFee, transactionValidDuration, toUpdate, updatedPrivateKey, null));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountUpdateRequest(
+            maxTransactionFee, transactionValidDuration, toUpdate, null, memo));
+    Assertions.assertDoesNotThrow(() ->
+        new AccountUpdateRequest(maxTransactionFee, transactionValidDuration, toUpdate, null, " "));
     Assertions.assertThrows(
         NullPointerException.class, () -> AccountUpdateRequest.updateKey(null, updatedPrivateKey));
     Assertions.assertThrows(
@@ -581,10 +565,9 @@ public class ProtocolLayerDataCreationTests {
     final Duration validTransactionDuration = Duration.ofSeconds(120);
     final PrivateKey adminKey = PrivateKey.generateECDSA();
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TopicCreateRequest(
-                validMaxTransactionFee, validTransactionDuration, adminKey, null, null));
+    Assertions.assertDoesNotThrow(() ->
+        new TopicCreateRequest(
+            validMaxTransactionFee, validTransactionDuration, adminKey, null, null));
     Assertions.assertThrows(
         NullPointerException.class, () -> new TopicCreateRequest(null, null, adminKey, null, null));
     Assertions.assertThrows(
@@ -603,16 +586,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey adminKey = PrivateKey.generateECDSA();
     final TopicId topicId = TopicId.fromString("1.2.3");
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TopicUpdateRequest(
-                validMaxTransactionFee,
-                validTransactionDuration,
-                topicId,
-                adminKey,
-                null,
-                null,
-                null));
+    Assertions.assertDoesNotThrow(() ->
+        new TopicUpdateRequest(
+            validMaxTransactionFee, validTransactionDuration, topicId, adminKey, null, null, null));
     Assertions.assertThrows(
         NullPointerException.class,
         () -> new TopicUpdateRequest(validMaxTransactionFee, null, null, null, null, null, null));
@@ -641,33 +617,27 @@ public class ProtocolLayerDataCreationTests {
 
     Assertions.assertDoesNotThrow(
         () -> ContractCallRequest.of(contractIdString, functionName, maxTransactionFee, gas));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCallRequest.of(
-                contractIdString, functionName, maxTransactionFee, gas, contractParam));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCallRequest.of(
-                contractIdString, functionName, maxTransactionFee, gas, constructorParams));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCallRequest.of(
+            contractIdString, functionName, maxTransactionFee, gas, contractParam));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCallRequest.of(
+            contractIdString, functionName, maxTransactionFee, gas, constructorParams));
     Assertions.assertDoesNotThrow(
         () -> ContractCallRequest.of(contractId, functionName, maxTransactionFee, gas));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCallRequest.of(
-                contractId, functionName, maxTransactionFee, gas, contractParam));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCallRequest.of(
-                contractId, functionName, maxTransactionFee, gas, constructorParams));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractCallRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                contractId,
-                functionName,
-                gas,
-                constructorParams));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCallRequest.of(contractId, functionName, maxTransactionFee, gas, contractParam));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCallRequest.of(
+            contractId, functionName, maxTransactionFee, gas, constructorParams));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractCallRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            contractId,
+            functionName,
+            gas,
+            constructorParams));
 
     Assertions.assertThrows(
         NullPointerException.class,
@@ -841,15 +811,14 @@ public class ProtocolLayerDataCreationTests {
         constructor.newInstance(contractFunctionResultProto);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractCallResult(
-                transactionId,
-                status,
-                transactionHash,
-                consensusTimestamp,
-                transactionFee,
-                contractFunctionResult));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractCallResult(
+            transactionId,
+            status,
+            transactionHash,
+            consensusTimestamp,
+            transactionFee,
+            contractFunctionResult));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -932,31 +901,21 @@ public class ProtocolLayerDataCreationTests {
     // then
     Assertions.assertDoesNotThrow(
         () -> ContractCreateRequest.of(fileIdString, maxTransactionFee, gas, adminKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCreateRequest.of(
-                fileIdString, maxTransactionFee, gas, adminKey, contractParam));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCreateRequest.of(
-                fileIdString, maxTransactionFee, gas, adminKey, constructorParams));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCreateRequest.of(fileIdString, maxTransactionFee, gas, adminKey, contractParam));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCreateRequest.of(
+            fileIdString, maxTransactionFee, gas, adminKey, constructorParams));
     Assertions.assertDoesNotThrow(
         () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey));
     Assertions.assertDoesNotThrow(
         () -> ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey, contractParam));
-    Assertions.assertDoesNotThrow(
-        () ->
-            ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey, constructorParams));
+    Assertions.assertDoesNotThrow(() ->
+        ContractCreateRequest.of(fileId, maxTransactionFee, gas, adminKey, constructorParams));
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractCreateRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                fileId,
-                gas,
-                adminKey,
-                constructorParams));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractCreateRequest(
+            maxTransactionFee, transactionValidDuration, fileId, gas, adminKey, constructorParams));
     Assertions.assertThrows(
         NullPointerException.class,
         () -> ContractCreateRequest.of((String) null, maxTransactionFee, gas, adminKey));
@@ -1088,37 +1047,33 @@ public class ProtocolLayerDataCreationTests {
     // then
     Assertions.assertDoesNotThrow(
         () -> ContractDeleteRequest.of(contractId, transferFeeToContractId, adminKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                contractId,
-                transferFeeToContractId,
-                transferFeeToAccountId,
-                adminKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                contractId,
-                null,
-                transferFeeToAccountId,
-                adminKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                contractId,
-                transferFeeToContractId,
-                null,
-                adminKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new ContractDeleteRequest(
-                maxTransactionFee, transactionValidDuration, contractId, null, null, adminKey));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractDeleteRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            contractId,
+            transferFeeToContractId,
+            transferFeeToAccountId,
+            adminKey));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractDeleteRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            contractId,
+            null,
+            transferFeeToAccountId,
+            adminKey));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractDeleteRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            contractId,
+            transferFeeToContractId,
+            null,
+            adminKey));
+    Assertions.assertDoesNotThrow(() ->
+        new ContractDeleteRequest(
+            maxTransactionFee, transactionValidDuration, contractId, null, null, adminKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () -> ContractDeleteRequest.of(null, transferFeeToContractId, adminKey));
@@ -1234,14 +1189,11 @@ public class ProtocolLayerDataCreationTests {
     // then
     Assertions.assertDoesNotThrow(() -> FileAppendRequest.of(fileIdString, contents));
     Assertions.assertDoesNotThrow(() -> FileAppendRequest.of(fileId, contents));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, contents, fileMemo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileAppendRequest(
-                maxTransactionFee, transactionValidDuration, fileId, contents, null));
+    Assertions.assertDoesNotThrow(() ->
+        new FileAppendRequest(
+            maxTransactionFee, transactionValidDuration, fileId, contents, fileMemo));
+    Assertions.assertDoesNotThrow(() ->
+        new FileAppendRequest(maxTransactionFee, transactionValidDuration, fileId, contents, null));
     Assertions.assertThrows(
         NullPointerException.class, () -> FileAppendRequest.of((String) null, contents));
     Assertions.assertThrows(
@@ -1651,28 +1603,26 @@ public class ProtocolLayerDataCreationTests {
     final Long amount = 1l;
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenTransferRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                emptySerials,
-                amount,
-                sender,
-                receiver,
-                senderKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenTransferRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                serials,
-                null,
-                sender,
-                receiver,
-                senderKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenTransferRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            tokenId,
+            emptySerials,
+            amount,
+            sender,
+            receiver,
+            senderKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenTransferRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            tokenId,
+            serials,
+            null,
+            sender,
+            receiver,
+            senderKey));
     Assertions.assertDoesNotThrow(
         () -> TokenTransferRequest.of(tokenId, 1L, sender, receiver, senderKey));
     Assertions.assertThrows(
@@ -1802,15 +1752,14 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey senderKey = PrivateKey.generateECDSA();
     final Map<Long, AccountId> serialToReceiver = Map.of(1L, receiver, 2L, receiver2);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenAirdropRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                serialToReceiver,
-                sender,
-                senderKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenAirdropRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            tokenId,
+            serialToReceiver,
+            sender,
+            senderKey));
     Assertions.assertDoesNotThrow(
         () -> TokenAirdropRequest.of(tokenId, 1L, sender, receiver, senderKey));
     Assertions.assertDoesNotThrow(
@@ -1918,15 +1867,14 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey senderKey = PrivateKey.generateECDSA();
     final Map<Long, AccountId> serialToReceiver = Map.of(1L, receiver, 2L, receiver2);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenCancelAirdropRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                serialToReceiver,
-                sender,
-                senderKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenCancelAirdropRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            tokenId,
+            serialToReceiver,
+            sender,
+            senderKey));
     Assertions.assertDoesNotThrow(
         () -> TokenCancelAirdropRequest.of(tokenId, 1L, sender, receiver, senderKey));
     Assertions.assertDoesNotThrow(
@@ -1981,16 +1929,14 @@ public class ProtocolLayerDataCreationTests {
     final AccountId owner = AccountId.fromString("0.0.5678");
     final PrivateKey ownerKey = PrivateKey.generateECDSA();
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenRejectRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, serials, owner, ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenRejectRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, serials, owner, ownerKey));
     Assertions.assertDoesNotThrow(() -> TokenRejectRequest.of(tokenId, 1L, owner, ownerKey));
     Assertions.assertDoesNotThrow(() -> TokenRejectRequest.of(tokenId, serials, owner, ownerKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            TokenRejectRequest.of(
-                tokenId, LongStream.rangeClosed(1, 10).boxed().toList(), owner, ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        TokenRejectRequest.of(
+            tokenId, LongStream.rangeClosed(1, 10).boxed().toList(), owner, ownerKey));
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2059,20 +2005,13 @@ public class ProtocolLayerDataCreationTests {
     final Map<TokenId, Map<Long, AccountId>> nftTransfers =
         Map.of(tokenId, Map.of(1L, receiver, 2L, receiver));
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new NftApprovedTransferRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                nftTransfers,
-                owner,
-                spender,
-                spenderKey));
+    Assertions.assertDoesNotThrow(() ->
+        new NftApprovedTransferRequest(
+            maxTransactionFee, transactionValidDuration, nftTransfers, owner, spender, spenderKey));
     Assertions.assertDoesNotThrow(
         () -> NftApprovedTransferRequest.of(tokenId, 1L, owner, spender, spenderKey, receiver));
-    Assertions.assertDoesNotThrow(
-        () ->
-            NftApprovedTransferRequest.of(tokenId, serials, owner, spender, spenderKey, receiver));
+    Assertions.assertDoesNotThrow(() ->
+        NftApprovedTransferRequest.of(tokenId, serials, owner, spender, spenderKey, receiver));
     Assertions.assertDoesNotThrow(
         () -> NftApprovedTransferRequest.of(nftTransfers, owner, spender, spenderKey));
     Assertions.assertThrows(
@@ -2162,13 +2101,9 @@ public class ProtocolLayerDataCreationTests {
     final Map<Long, AccountId> sixTransfers = new LinkedHashMap<>();
     LongStream.rangeClosed(1, 5).forEach(serial -> fiveTransfers.put(serial, receiver1));
     LongStream.rangeClosed(1, 6).forEach(serial -> sixTransfers.put(serial, receiver1));
-    Assertions.assertDoesNotThrow(
-        () ->
-            NftApprovedTransferRequest.of(
-                Map.of(tokenId1, fiveTransfers, tokenId2, fiveTransfers),
-                owner,
-                spender,
-                spenderKey));
+    Assertions.assertDoesNotThrow(() ->
+        NftApprovedTransferRequest.of(
+            Map.of(tokenId1, fiveTransfers, tokenId2, fiveTransfers), owner, spender, spenderKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -2210,10 +2145,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey senderKey = PrivateKey.generateECDSA();
     final Hbar amount = Hbar.from(1);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new HbarTransferRequest(
-                maxTransactionFee, transactionValidDuration, sender, receiver, amount, senderKey));
+    Assertions.assertDoesNotThrow(() ->
+        new HbarTransferRequest(
+            maxTransactionFee, transactionValidDuration, sender, receiver, amount, senderKey));
     Assertions.assertDoesNotThrow(
         () -> HbarTransferRequest.of(sender, receiver, amount, senderKey));
     Assertions.assertThrows(
@@ -2262,10 +2196,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey ownerKey = PrivateKey.generateECDSA();
     final Hbar amount = Hbar.from(1);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new HbarAllowanceApproveRequest(
-                maxTransactionFee, transactionValidDuration, owner, spender, amount, ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        new HbarAllowanceApproveRequest(
+            maxTransactionFee, transactionValidDuration, owner, spender, amount, ownerKey));
     Assertions.assertDoesNotThrow(
         () -> HbarAllowanceApproveRequest.of(owner, spender, amount, ownerKey));
     Assertions.assertDoesNotThrow(
@@ -2293,33 +2226,27 @@ public class ProtocolLayerDataCreationTests {
     final List<TokenId> tooManyTokenIds =
         LongStream.rangeClosed(1, 21).mapToObj(num -> new TokenId(0, 0, num)).toList();
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new NftAllowanceApproveRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                owner,
-                spender,
-                Map.of(tokenId, serialNumbers),
-                Set.of(otherTokenId),
-                ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        new NftAllowanceApproveRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            owner,
+            spender,
+            Map.of(tokenId, serialNumbers),
+            Set.of(otherTokenId),
+            ownerKey));
     Assertions.assertDoesNotThrow(
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey));
     Assertions.assertDoesNotThrow(
         () -> NftAllowanceApproveRequest.of(owner, spender, tokenId, maxSerials, ownerKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            NftAllowanceApproveRequest.of(
-                owner,
-                spender,
-                Map.of(tokenId, serialNumbers, otherTokenId, List.of(3L)),
-                ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        NftAllowanceApproveRequest.of(
+            owner, spender, Map.of(tokenId, serialNumbers, otherTokenId, List.of(3L)), ownerKey));
     Assertions.assertDoesNotThrow(
         () -> NftAllowanceApproveRequest.forAllSerials(owner, spender, tokenId, ownerKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            NftAllowanceApproveRequest.forAllSerials(
-                owner, spender, List.of(tokenId, otherTokenId), ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        NftAllowanceApproveRequest.forAllSerials(
+            owner, spender, List.of(tokenId, otherTokenId), ownerKey));
 
     final NftAllowanceApproveRequest serialsRequest =
         NftAllowanceApproveRequest.of(owner, spender, tokenId, serialNumbers, ownerKey);
@@ -2446,10 +2373,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey ownerKey = PrivateKey.generateECDSA();
     final NftId nftId = new NftId(TokenId.fromString("0.0.12345"), 1L);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new NftAllowanceDeleteRequest(
-                maxTransactionFee, transactionValidDuration, owner, nftId, ownerKey));
+    Assertions.assertDoesNotThrow(() ->
+        new NftAllowanceDeleteRequest(
+            maxTransactionFee, transactionValidDuration, owner, nftId, ownerKey));
     Assertions.assertDoesNotThrow(() -> NftAllowanceDeleteRequest.of(owner, nftId, ownerKey));
     Assertions.assertThrows(
         IllegalArgumentException.class,
@@ -2491,33 +2417,20 @@ public class ProtocolLayerDataCreationTests {
     final byte[] largeMetadata = new byte[101];
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenMintRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                supplyKey,
-                amount,
-                validMetadata));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenMintRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                supplyKey,
-                null,
-                validMetadata));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenMintRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                supplyKey,
-                amount,
-                List.of()));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenMintRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            tokenId,
+            supplyKey,
+            amount,
+            validMetadata));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenMintRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, validMetadata));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenMintRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, List.of()));
     Assertions.assertDoesNotThrow(() -> TokenMintRequest.of(tokenId, supplyKey, "valid metadata"));
     Assertions.assertDoesNotThrow(() -> TokenMintRequest.of(tokenId, supplyKey, amount));
     Assertions.assertThrows(
@@ -2580,36 +2493,37 @@ public class ProtocolLayerDataCreationTests {
     final TokenType tokenType = TokenType.FUNGIBLE_COMMON;
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenCreateRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                name,
-                symbol,
-                treasuryAccountId,
-                treasuryKey,
-                tokenType,
-                supplyKey,
-                treasuryKey,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenCreateRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            name,
+            symbol,
+            treasuryAccountId,
+            treasuryKey,
+            tokenType,
+            supplyKey,
+            treasuryKey,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
+
     Assertions.assertDoesNotThrow(
         () -> TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey));
-    Assertions.assertDoesNotThrow(
-        () ->
-            TokenCreateRequest.of(
-                name,
-                symbol,
-                treasuryAccountId,
-                treasuryKey,
-                tokenType,
-                supplyKey,
-                PrivateKey.generateECDSA()));
+
+    Assertions.assertDoesNotThrow(() ->
+        TokenCreateRequest.of(
+            name,
+            symbol,
+            treasuryAccountId,
+            treasuryKey,
+            tokenType,
+            supplyKey,
+            PrivateKey.generateECDSA()));
+
     final PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
     final TokenCreateRequest withFeeScheduleKey =
         TokenCreateRequest.of(
@@ -2624,9 +2538,12 @@ public class ProtocolLayerDataCreationTests {
             null,
             null,
             feeScheduleKey);
+
     Assertions.assertEquals(feeScheduleKey, withFeeScheduleKey.feeScheduleKey());
+
     Assertions.assertNull(
         TokenCreateRequest.of(name, symbol, treasuryAccountId, treasuryKey).feeScheduleKey());
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2646,6 +2563,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2665,6 +2583,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2684,6 +2603,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2703,6 +2623,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2722,6 +2643,7 @@ public class ProtocolLayerDataCreationTests {
                 null,
                 null,
                 null));
+
     Assertions.assertThrows(
         NullPointerException.class,
         () ->
@@ -2752,10 +2674,8 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey supplyKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenDeleteRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, supplyKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenDeleteRequest(maxTransactionFee, transactionValidDuration, tokenId, supplyKey));
     Assertions.assertDoesNotThrow(() -> TokenDeleteRequest.of(tokenId, supplyKey));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -2799,10 +2719,9 @@ public class ProtocolLayerDataCreationTests {
                 .setFeeCollectorAccountId(AccountId.fromString("0.0.1001")));
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenFeeScheduleUpdateRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, customFees, feeScheduleKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenFeeScheduleUpdateRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, customFees, feeScheduleKey));
     Assertions.assertDoesNotThrow(
         () -> TokenFeeScheduleUpdateRequest.of(tokenId, customFees, feeScheduleKey));
     Assertions.assertDoesNotThrow(
@@ -2891,10 +2810,9 @@ public class ProtocolLayerDataCreationTests {
     final String tooLongSymbol =
         IntStream.range(0, 101).mapToObj(i -> "a").reduce("", (a, b) -> a + b);
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenUpdateRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, adminKey, name, symbol));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenUpdateRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, adminKey, name, symbol));
     Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of(tokenId, adminKey, name, symbol));
     Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of(tokenId, adminKey, name, null));
     Assertions.assertDoesNotThrow(() -> TokenUpdateRequest.of(tokenId, adminKey, null, symbol));
@@ -2945,15 +2863,9 @@ public class ProtocolLayerDataCreationTests {
     final byte[] metadata = "updated".getBytes(StandardCharsets.UTF_8);
     final byte[] largeMetadata = new byte[101];
 
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenUpdateNftsRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenId,
-                serials,
-                metadata,
-                metadataKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenUpdateNftsRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, serials, metadata, metadataKey));
     Assertions.assertDoesNotThrow(
         () -> TokenUpdateNftsRequest.of(tokenId, serials, metadata, metadataKey));
     Assertions.assertDoesNotThrow(
@@ -3033,10 +2945,9 @@ public class ProtocolLayerDataCreationTests {
     final Set<Long> serials = Set.of(1L, 2L, 3L);
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenBurnRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, serials));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenBurnRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, serials));
     Assertions.assertDoesNotThrow(() -> TokenBurnRequest.of(tokenId, 1L, supplyKey));
     Assertions.assertDoesNotThrow(() -> TokenBurnRequest.of(tokenId, serials, supplyKey));
     Assertions.assertThrows(
@@ -3057,14 +2968,12 @@ public class ProtocolLayerDataCreationTests {
         () ->
             new TokenBurnRequest(
                 maxTransactionFee, transactionValidDuration, tokenId, null, amount, serials));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenBurnRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, serials));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenBurnRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, null));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenBurnRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, supplyKey, null, serials));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenBurnRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, supplyKey, amount, null));
   }
 
   @Test
@@ -3078,10 +2987,9 @@ public class ProtocolLayerDataCreationTests {
     final Set<Long> serials = Set.of(1L, 2L, 3L);
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenWipeRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, accountId, serials, wipeKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenWipeRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, accountId, serials, wipeKey));
     Assertions.assertDoesNotThrow(() -> TokenWipeRequest.of(tokenId, accountId, 1L, wipeKey));
     Assertions.assertDoesNotThrow(() -> TokenWipeRequest.of(tokenId, accountId, serials, wipeKey));
     Assertions.assertThrows(
@@ -3145,14 +3053,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey accountPrivateKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenAssociateRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenIds,
-                accountId,
-                accountPrivateKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenAssociateRequest(
+            maxTransactionFee, transactionValidDuration, tokenIds, accountId, accountPrivateKey));
     Assertions.assertDoesNotThrow(
         () -> TokenAssociateRequest.of(tokenId, accountId, accountPrivateKey));
     Assertions.assertDoesNotThrow(
@@ -3185,14 +3088,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey accountPrivateKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenDissociateRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                tokenIds,
-                accountId,
-                accountPrivateKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenDissociateRequest(
+            maxTransactionFee, transactionValidDuration, tokenIds, accountId, accountPrivateKey));
     Assertions.assertDoesNotThrow(
         () -> TokenDissociateRequest.of(tokenIds, accountId, accountPrivateKey));
     Assertions.assertDoesNotThrow(
@@ -3224,10 +3122,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey freezeKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenFreezeRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, accountId, freezeKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenFreezeRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, accountId, freezeKey));
     Assertions.assertDoesNotThrow(() -> TokenFreezeRequest.of(tokenId, accountId, freezeKey));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -3263,10 +3160,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey freezeKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenUnfreezeRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, accountId, freezeKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenUnfreezeRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, accountId, freezeKey));
     Assertions.assertDoesNotThrow(() -> TokenUnfreezeRequest.of(tokenId, accountId, freezeKey));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -3303,10 +3199,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey kycKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenGrantKycRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, accountId, kycKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenGrantKycRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, accountId, kycKey));
     Assertions.assertDoesNotThrow(() -> TokenGrantKycRequest.of(tokenId, accountId, kycKey));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -3341,10 +3236,9 @@ public class ProtocolLayerDataCreationTests {
     final PrivateKey kycKey = PrivateKey.generateECDSA();
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TokenRevokeKycRequest(
-                maxTransactionFee, transactionValidDuration, tokenId, accountId, kycKey));
+    Assertions.assertDoesNotThrow(() ->
+        new TokenRevokeKycRequest(
+            maxTransactionFee, transactionValidDuration, tokenId, accountId, kycKey));
     Assertions.assertDoesNotThrow(() -> TokenRevokeKycRequest.of(tokenId, accountId, kycKey));
     Assertions.assertThrows(
         NullPointerException.class,
@@ -3381,28 +3275,20 @@ public class ProtocolLayerDataCreationTests {
     final String fileMemo = "Test file memo";
 
     // Then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileUpdateRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                fileId,
-                contents,
-                expirationTime,
-                fileMemo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileUpdateRequest(
-                maxTransactionFee,
-                transactionValidDuration,
-                fileId,
-                null,
-                expirationTime,
-                fileMemo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileUpdateRequest(
-                maxTransactionFee, transactionValidDuration, fileId, contents, null, fileMemo));
+    Assertions.assertDoesNotThrow(() ->
+        new FileUpdateRequest(
+            maxTransactionFee,
+            transactionValidDuration,
+            fileId,
+            contents,
+            expirationTime,
+            fileMemo));
+    Assertions.assertDoesNotThrow(() ->
+        new FileUpdateRequest(
+            maxTransactionFee, transactionValidDuration, fileId, null, expirationTime, fileMemo));
+    Assertions.assertDoesNotThrow(() ->
+        new FileUpdateRequest(
+            maxTransactionFee, transactionValidDuration, fileId, contents, null, fileMemo));
     Assertions.assertDoesNotThrow(() -> FileUpdateRequest.of(fileId, contents));
     Assertions.assertDoesNotThrow(() -> FileUpdateRequest.of(fileId, expirationTime));
     Assertions.assertThrows(
@@ -3477,22 +3363,17 @@ public class ProtocolLayerDataCreationTests {
     // then
     Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents));
     Assertions.assertDoesNotThrow(() -> FileCreateRequest.of(contents, null));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileCreateRequest(
-                maxTransactionFee, transactionValidDuration, contents, expirationTime, fileMemo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileCreateRequest(
-                maxTransactionFee, transactionValidDuration, contents, null, fileMemo));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileCreateRequest(
-                maxTransactionFee, transactionValidDuration, contents, expirationTime, null));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new FileCreateRequest(
-                maxTransactionFee, transactionValidDuration, contents, null, null));
+    Assertions.assertDoesNotThrow(() ->
+        new FileCreateRequest(
+            maxTransactionFee, transactionValidDuration, contents, expirationTime, fileMemo));
+    Assertions.assertDoesNotThrow(() ->
+        new FileCreateRequest(
+            maxTransactionFee, transactionValidDuration, contents, null, fileMemo));
+    Assertions.assertDoesNotThrow(() ->
+        new FileCreateRequest(
+            maxTransactionFee, transactionValidDuration, contents, expirationTime, null));
+    Assertions.assertDoesNotThrow(() ->
+        new FileCreateRequest(maxTransactionFee, transactionValidDuration, contents, null, null));
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> FileCreateRequest.of(largeContents));
     Assertions.assertThrows(NullPointerException.class, () -> FileCreateRequest.of(null));
@@ -3575,14 +3456,13 @@ public class ProtocolLayerDataCreationTests {
     Assertions.assertDoesNotThrow(() -> TopicSubmitMessageRequest.of(validTopicId, validMessage));
     Assertions.assertDoesNotThrow(
         () -> TopicSubmitMessageRequest.of(validTopicId, validMessageBytes));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TopicSubmitMessageRequest(
-                validMaxTransactionFee,
-                validTransactionValidDuration,
-                validTopicId,
-                null,
-                validMessage.getBytes(StandardCharsets.UTF_8)));
+    Assertions.assertDoesNotThrow(() ->
+        new TopicSubmitMessageRequest(
+            validMaxTransactionFee,
+            validTransactionValidDuration,
+            validTopicId,
+            null,
+            validMessage.getBytes(StandardCharsets.UTF_8)));
     Assertions.assertThrows(
         NullPointerException.class, () -> TopicSubmitMessageRequest.of(null, validMessage));
     Assertions.assertThrows(
@@ -3621,9 +3501,8 @@ public class ProtocolLayerDataCreationTests {
 
     // then
     Assertions.assertDoesNotThrow(() -> TopicDeleteRequest.of(adminKey, topicId));
-    Assertions.assertDoesNotThrow(
-        () ->
-            new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, adminKey, topicId));
+    Assertions.assertDoesNotThrow(() ->
+        new TopicDeleteRequest(maxTransactionFee, transactionValidDuration, adminKey, topicId));
 
     Assertions.assertThrows(NullPointerException.class, () -> TopicDeleteRequest.of(null, null));
     Assertions.assertThrows(
@@ -3686,10 +3565,9 @@ public class ProtocolLayerDataCreationTests {
     final List<PrivateKey> signerKeys = List.of(signerKey);
 
     // then
-    Assertions.assertDoesNotThrow(
-        () ->
-            new HookStoreRequest(
-                maxTransactionFee, transactionValidDuration, hookId, storageUpdates, signerKeys));
+    Assertions.assertDoesNotThrow(() ->
+        new HookStoreRequest(
+            maxTransactionFee, transactionValidDuration, hookId, storageUpdates, signerKeys));
     Assertions.assertDoesNotThrow(() -> HookStoreRequest.of(hookId, storageUpdates, signerKey));
     Assertions.assertDoesNotThrow(() -> HookStoreRequest.of(hookId, storageUpdates, signerKeys));
     Assertions.assertThrows(

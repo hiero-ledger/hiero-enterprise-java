@@ -212,7 +212,6 @@ public interface TopicClient {
     Objects.requireNonNull(topicId, "topicId cannot be null");
     deleteTopic(TopicId.fromString(topicId));
   }
-  ;
 
   /**
    * Delete a Topic.
@@ -234,7 +233,6 @@ public interface TopicClient {
     Objects.requireNonNull(adminKey, "adminKey cannot be null");
     deleteTopic(TopicId.fromString(topicId), PrivateKey.fromStringDER(adminKey));
   }
-  ;
 
   /**
    * Submit a message to a Topic.
@@ -258,7 +256,6 @@ public interface TopicClient {
     Objects.requireNonNull(message, "message cannot be null");
     submitMessage(TopicId.fromString(topicId), message);
   }
-  ;
 
   /**
    * Submit a message to a Topic.
@@ -282,7 +279,6 @@ public interface TopicClient {
     Objects.requireNonNull(message, "message cannot be null");
     submitMessage(TopicId.fromString(topicId), message);
   }
-  ;
 
   /**
    * Submit a message to a Topic.
@@ -311,7 +307,6 @@ public interface TopicClient {
     Objects.requireNonNull(message, "message cannot be null");
     submitMessage(TopicId.fromString(topicId), PrivateKey.fromStringDER(submitKey), message);
   }
-  ;
 
   /**
    * Submit a message to a Topic.
@@ -340,5 +335,4 @@ public interface TopicClient {
     Objects.requireNonNull(message, "message cannot be null");
     submitMessage(TopicId.fromString(topicId), PrivateKey.fromStringDER(submitKey), message);
   }
-  ;
 }

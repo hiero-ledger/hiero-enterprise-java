@@ -137,10 +137,10 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": "exact_match"
-        }
-      """);
+          {
+            "match": "exact_match"
+          }
+        """);
 
     Assertions.assertThrows(
         IllegalStateException.class, () -> client.verify(contractId, "Hello", files));
@@ -164,37 +164,37 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": null
-        }
-      """);
+          {
+            "match": null
+          }
+        """);
 
     expectPost(
         verifyMetadataUrl(contractId),
         """
-        {
-          "verificationId": "verification-123"
-        }
-      """);
-
-    expectGet(
-        verificationJobUrl("verification-123"),
-        """
-        {
-          "isJobCompleted": false
-        }
-      """);
-
-    expectGet(
-        verificationJobUrl("verification-123"),
-        """
-        {
-          "isJobCompleted": true,
-          "contract": {
-            "match": "exact_match"
+          {
+            "verificationId": "verification-123"
           }
-        }
-      """);
+        """);
+
+    expectGet(
+        verificationJobUrl("verification-123"),
+        """
+          {
+            "isJobCompleted": false
+          }
+        """);
+
+    expectGet(
+        verificationJobUrl("verification-123"),
+        """
+          {
+            "isJobCompleted": true,
+            "contract": {
+              "match": "exact_match"
+            }
+          }
+        """);
 
     final ContractVerificationState result = client.verify(contractId, "Hello", files);
 
@@ -219,31 +219,31 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": null
-        }
-      """);
+          {
+            "match": null
+          }
+        """);
 
     expectPost(
         verifyMetadataUrl(contractId),
         """
-        {
-          "verificationId": "verification-123"
-        }
-      """);
+          {
+            "verificationId": "verification-123"
+          }
+        """);
 
     // Poll response
     expectGet(
         verificationJobUrl("verification-123"),
         """
-        {
-          "isJobCompleted": true,
-          "error": {
-            "customCode": "INVALID_METADATA",
-            "message": "Metadata is invalid"
+          {
+            "isJobCompleted": true,
+            "error": {
+              "customCode": "INVALID_METADATA",
+              "message": "Metadata is invalid"
+            }
           }
-        }
-      """);
+        """);
 
     Assertions.assertThrows(HieroException.class, () -> client.verify(contractId, "Hello", files));
     server.verify();
@@ -262,10 +262,10 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": "exact_match"
-        }
-      """);
+          {
+            "match": "exact_match"
+          }
+        """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -279,10 +279,10 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": "match"
-        }
-      """);
+          {
+            "match": "match"
+          }
+        """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -296,10 +296,10 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": null
-        }
-      """);
+          {
+            "match": null
+          }
+        """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -313,10 +313,10 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrl(contractId),
         """
-        {
-          "match": "unknown"
-        }
-      """);
+          {
+            "match": "unknown"
+          }
+        """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -331,12 +331,12 @@ public class ContractVerificationClientImplementationTest {
         contractUrl(contractId),
         HttpStatus.NOT_FOUND,
         """
-       {
-          "match": null,
-          "creationMatch": null,
-          "runtimeMatch": null
-       }
-    """);
+           {
+              "match": null,
+              "creationMatch": null,
+              "runtimeMatch": null
+           }
+        """);
 
     final ContractVerificationState result = client.checkVerification(contractId);
 
@@ -351,12 +351,12 @@ public class ContractVerificationClientImplementationTest {
         contractUrl(contractId),
         HttpStatus.BAD_REQUEST,
         """
-        {
-           "customCode": "unsupported_chain",
-           "message": "The chain with chainId 9429413 is not supported",
-           "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+          {
+             "customCode": "unsupported_chain",
+             "message": "The chain with chainId 9429413 is not supported",
+             "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+          }
+        """);
 
     Assertions.assertThrows(HieroException.class, () -> client.checkVerification(contractId));
     server.verify();
@@ -369,12 +369,12 @@ public class ContractVerificationClientImplementationTest {
         contractUrl(contractId),
         HttpStatus.INTERNAL_SERVER_ERROR,
         """
-        {
-          "customCode": "internal_error",
-          "message": "Something went wrong",
-          "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+          {
+            "customCode": "internal_error",
+            "message": "Something went wrong",
+            "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+          }
+        """);
 
     Assertions.assertThrows(HieroException.class, () -> client.checkVerification(contractId));
     server.verify();
@@ -435,13 +435,13 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrlWithFiles(contractId),
         """
-       {
-        "match": "exact_match",
-        "sources": {
-          "contracts/Hello.sol": {"content": "contract Hello {}"}
-        }
-       }
-    """);
+           {
+            "match": "exact_match",
+            "sources": {
+              "contracts/Hello.sol": {"content": "contract Hello {}"}
+            }
+           }
+        """);
     final boolean result = client.checkVerification(contractId, "Hello.sol", "contract Hello {}");
     Assertions.assertTrue(result);
     server.verify();
@@ -453,13 +453,13 @@ public class ContractVerificationClientImplementationTest {
     expectGet(
         contractUrlWithFiles(contractId),
         """
-       {
-        "match": "exact_match",
-        "sources": {
-          "contracts/Hello.sol": {"content": "contract Hello {}"}
-        }
-       }
-    """);
+           {
+            "match": "exact_match",
+            "sources": {
+              "contracts/Hello.sol": {"content": "contract Hello {}"}
+            }
+           }
+        """);
     final boolean result =
         client.checkVerification(contractId, "Hello.sol", "contract MyContract {}");
     Assertions.assertFalse(result);
@@ -473,12 +473,12 @@ public class ContractVerificationClientImplementationTest {
         contractUrlWithFiles(contractId),
         HttpStatus.NOT_FOUND,
         """
-           {
-          "match": null,
-          "creationMatch": null,
-          "runtimeMatch": null
-          }
-          """);
+         {
+        "match": null,
+        "creationMatch": null,
+        "runtimeMatch": null
+        }
+        """);
 
     Assertions.assertThrows(
         IllegalStateException.class,
@@ -493,12 +493,12 @@ public class ContractVerificationClientImplementationTest {
         contractUrlWithFiles(contractId),
         HttpStatus.BAD_REQUEST,
         """
-        {
-           "customCode": "unsupported_chain",
-           "message": "The chain with chainId 9429413 is not supported",
-           "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+          {
+             "customCode": "unsupported_chain",
+             "message": "The chain with chainId 9429413 is not supported",
+             "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+          }
+        """);
 
     Assertions.assertThrows(
         HieroException.class,
@@ -513,12 +513,12 @@ public class ContractVerificationClientImplementationTest {
         contractUrlWithFiles(contractId),
         HttpStatus.INTERNAL_SERVER_ERROR,
         """
-        {
-          "customCode": "internal_error",
-          "message": "Something went wrong",
-          "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
-        }
-      """);
+          {
+            "customCode": "internal_error",
+            "message": "Something went wrong",
+            "errorId": "1ac6b91a-0605-4459-93dc-18f210a70192"
+          }
+        """);
 
     Assertions.assertThrows(
         HieroException.class,

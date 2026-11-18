@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -34,10 +35,14 @@ import org.hiero.base.data.NetworkFee;
 import org.hiero.base.data.NetworkStake;
 import org.hiero.base.data.NetworkSupplies;
 import org.hiero.base.data.Nft;
+import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.NftTransfer;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.RoyaltyFee;
+import org.hiero.base.data.Schedule;
+import org.hiero.base.data.ScheduleSignature;
+import org.hiero.base.data.ScheduleSignatureType;
 import org.hiero.base.data.SinglePage;
 import org.hiero.base.data.StakingRewardTransfer;
 import org.hiero.base.data.TimestampRange;
@@ -192,16 +197,15 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
       throw new IllegalArgumentException("Fees node is not an array: " + feesNode);
     }
     return jsonArrayToStream(feesNode)
-        .map(
-            n -> {
-              try {
-                final long gas = n.get("gas").asLong();
-                final String transactionType = n.get("transaction_type").asText();
-                return new NetworkFee(gas, transactionType);
-              } catch (final Exception e) {
-                throw new JsonParseException(n, e);
-              }
-            })
+        .map(n -> {
+          try {
+            final long gas = n.get("gas").asLong();
+            final String transactionType = n.get("transaction_type").asText();
+            return new NetworkFee(gas, transactionType);
+          } catch (final Exception e) {
+            throw new JsonParseException(n, e);
+          }
+        })
         .toList();
   }
 
@@ -361,6 +365,58 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
   }
 
   @Override
+  public @NonNull List<NftTransactionHistory> toNftTransactionHistories(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("transactions")) {
+      return List.of();
+    }
+    final JsonNode transactionsNode = node.get("transactions");
+    if (!transactionsNode.isArray()) {
+      throw new IllegalArgumentException(
+          "NFT transaction history node is not an array: " + transactionsNode);
+    }
+    return jsonArrayToStream(transactionsNode)
+        .map(n -> toNftTransactionHistory(n))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<NftTransactionHistory> toNftTransactionHistory(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty()) {
+      return Optional.empty();
+    }
+    try {
+      final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
+      final boolean isApproval = node.get("is_approval").asBoolean();
+      final int nonce = node.get("nonce").asInt();
+      final AccountId receiverAccountId =
+          node.hasNonNull("receiver_account_id")
+              ? AccountId.fromString(node.get("receiver_account_id").asText())
+              : null;
+      final AccountId senderAccountId =
+          node.hasNonNull("sender_account_id")
+              ? AccountId.fromString(node.get("sender_account_id").asText())
+              : null;
+      final String transactionId = node.get("transaction_id").asText();
+      final TransactionType transactionType = TransactionType.from(node.get("type").asText());
+
+      return Optional.of(
+          new NftTransactionHistory(
+              consensusTimestamp,
+              isApproval,
+              nonce,
+              receiverAccountId,
+              senderAccountId,
+              transactionId,
+              transactionType));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
   public Optional<TokenInfo> toTokenInfo(JsonNode node) {
     Objects.requireNonNull(node, "jsonNode must not be null");
     if (node.isNull() || node.isEmpty()) {
@@ -437,19 +493,18 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
           StreamSupport.stream(
                   Spliterators.spliteratorUnknownSize(fixedFeeNode.iterator(), Spliterator.ORDERED),
                   false)
-              .map(
-                  n -> {
-                    final long amount = n.get("amount").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(n.get("denominating_token_id").asText())
-                            : null;
-                    return new FixedFee(amount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long amount = n.get("amount").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(n.get("denominating_token_id").asText())
+                        : null;
+                return new FixedFee(amount, accountId, tokenId);
+              })
               .toList();
     }
 
@@ -464,21 +519,19 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
                   Spliterators.spliteratorUnknownSize(
                       fractionalFeeNode.iterator(), Spliterator.ORDERED),
                   false)
-              .map(
-                  n -> {
-                    final long numeratorAmount = n.get("amount").get("numerator").asLong();
-                    final long denominatorAmount = n.get("amount").get("denominator").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(n.get("denominating_token_id").asText())
-                            : null;
-                    return new FractionalFee(
-                        numeratorAmount, denominatorAmount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long numeratorAmount = n.get("amount").get("numerator").asLong();
+                final long denominatorAmount = n.get("amount").get("denominator").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(n.get("denominating_token_id").asText())
+                        : null;
+                return new FractionalFee(numeratorAmount, denominatorAmount, accountId, tokenId);
+              })
               .toList();
     }
 
@@ -492,23 +545,22 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
                   Spliterators.spliteratorUnknownSize(
                       royaltyFeeNode.iterator(), Spliterator.ORDERED),
                   false)
-              .map(
-                  n -> {
-                    final long numeratorAmount = n.get("amount").get("numerator").asLong();
-                    final long denominatorAmount = n.get("amount").get("denominator").asLong();
-                    final long fallbackFeeAmount = n.get("fallback_fee").get("amount").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.get("fallback_fee").hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(
-                                n.get("fallback_fee").get("denominating_token_id").asText())
-                            : null;
-                    return new RoyaltyFee(
-                        numeratorAmount, denominatorAmount, fallbackFeeAmount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long numeratorAmount = n.get("amount").get("numerator").asLong();
+                final long denominatorAmount = n.get("amount").get("denominator").asLong();
+                final long fallbackFeeAmount = n.get("fallback_fee").get("amount").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.get("fallback_fee").hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(
+                            n.get("fallback_fee").get("denominating_token_id").asText())
+                        : null;
+                return new RoyaltyFee(
+                    numeratorAmount, denominatorAmount, fallbackFeeAmount, accountId, tokenId);
+              })
               .toList();
     }
 
@@ -588,19 +640,18 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
 
       final List<FixedFee> fixedFees =
           jsonArrayToStream(node.get("custom_fees").get("fixed_fees"))
-              .map(
-                  n -> {
-                    final long amount = n.get("amount").asLong();
-                    final AccountId accountId =
-                        n.hasNonNull("collector_account_id")
-                            ? AccountId.fromString(n.get("collector_account_id").asText())
-                            : null;
-                    final TokenId tokenId =
-                        n.hasNonNull("denominating_token_id")
-                            ? TokenId.fromString(n.get("denominating_token_id").asText())
-                            : null;
-                    return new FixedFee(amount, accountId, tokenId);
-                  })
+              .map(n -> {
+                final long amount = n.get("amount").asLong();
+                final AccountId accountId =
+                    n.hasNonNull("collector_account_id")
+                        ? AccountId.fromString(n.get("collector_account_id").asText())
+                        : null;
+                final TokenId tokenId =
+                    n.hasNonNull("denominating_token_id")
+                        ? TokenId.fromString(n.get("denominating_token_id").asText())
+                        : null;
+                return new FixedFee(amount, accountId, tokenId);
+              })
               .toList();
 
       final List<Key> feeExemptKeyList =
@@ -1051,6 +1102,103 @@ public class MirrorNodeJsonConverterImpl implements MirrorNodeJsonConverter<Json
     } catch (final Exception e) {
       throw new JsonParseException(node, e);
     }
+  }
+
+  @Override
+  public @NonNull Optional<Schedule> toSchedule(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (node.isNull() || node.isEmpty() || node.has("_status")) {
+      return Optional.empty();
+    }
+
+    try {
+      final ScheduleId scheduleId =
+          node.hasNonNull("schedule_id")
+              ? ScheduleId.fromString(node.get("schedule_id").asText())
+              : null;
+      final Key adminKey = node.hasNonNull("admin_key") ? parseKey(node.get("admin_key")) : null;
+      final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
+      final AccountId creatorAccountId =
+          node.hasNonNull("creator_account_id")
+              ? AccountId.fromString(node.get("creator_account_id").asText())
+              : null;
+      final boolean deleted = node.hasNonNull("deleted") && node.get("deleted").asBoolean();
+      final Instant executedTimestamp =
+          node.hasNonNull("executed_timestamp")
+              ? parseInstant(node.get("executed_timestamp").asText())
+              : null;
+      final Instant expirationTime =
+          node.hasNonNull("expiration_time")
+              ? parseInstant(node.get("expiration_time").asText())
+              : null;
+      final String memo = node.hasNonNull("memo") ? node.get("memo").asText() : "";
+      final AccountId payerAccountId =
+          node.hasNonNull("payer_account_id")
+              ? AccountId.fromString(node.get("payer_account_id").asText())
+              : null;
+      final List<ScheduleSignature> signatures =
+          node.hasNonNull("signatures")
+              ? jsonArrayToStream(node.get("signatures")).map(n -> toScheduleSignature(n)).toList()
+              : List.of();
+      final byte[] transactionBody = decodeBase64(node.get("transaction_body").textValue());
+      final boolean waitForExpiry =
+          node.hasNonNull("wait_for_expiry") && node.get("wait_for_expiry").asBoolean();
+
+      return Optional.of(
+          new Schedule(
+              scheduleId,
+              adminKey,
+              consensusTimestamp,
+              creatorAccountId,
+              deleted,
+              executedTimestamp,
+              expirationTime,
+              memo,
+              payerAccountId,
+              signatures,
+              transactionBody,
+              waitForExpiry));
+    } catch (final Exception e) {
+      throw new JsonParseException(node, e);
+    }
+  }
+
+  @Override
+  public @NonNull List<Schedule> toSchedules(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "jsonNode must not be null");
+    if (!node.has("schedules")) {
+      return List.of();
+    }
+
+    final JsonNode schedules = node.get("schedules");
+    if (!schedules.isArray()) {
+      throw new IllegalArgumentException("Schedules node is not an array: " + schedules);
+    }
+
+    return jsonArrayToStream(schedules)
+        .map(n -> toSchedule(n))
+        .filter(o -> o.isPresent())
+        .map(o -> o.get())
+        .toList();
+  }
+
+  private @NonNull ScheduleSignature toScheduleSignature(@NonNull JsonNode node) {
+    Objects.requireNonNull(node, "node must not be null");
+    final Instant consensusTimestamp = parseInstant(node.get("consensus_timestamp").asText());
+    final byte[] publicKeyPrefix = decodeBase64(node.get("public_key_prefix").textValue());
+    final byte[] signature = decodeBase64(node.get("signature").textValue());
+    final ScheduleSignatureType type =
+        ScheduleSignatureType.from(node.hasNonNull("type") ? node.get("type").asText() : null);
+    return new ScheduleSignature(consensusTimestamp, publicKeyPrefix, signature, type);
+  }
+
+  /**
+   * Decodes a Base64 value of the mirror node. The MIME decoder is used because the mirror node
+   * breaks long values such as schedule signatures into lines.
+   */
+  private static byte[] decodeBase64(final @NonNull String base64) {
+    Objects.requireNonNull(base64, "base64 must not be null");
+    return Base64.getMimeDecoder().decode(base64);
   }
 
   @NonNull

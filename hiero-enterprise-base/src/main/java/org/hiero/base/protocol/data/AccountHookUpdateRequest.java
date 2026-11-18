@@ -28,13 +28,12 @@ public record AccountHookUpdateRequest(
     if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
       throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
-    hooksToDelete.forEach(
-        hookId -> {
-          Objects.requireNonNull(hookId, "hooksToDelete must not contain null values");
-          if (hookId < 0) {
-            throw new IllegalArgumentException("hook IDs in hooksToDelete must be non-negative");
-          }
-        });
+    hooksToDelete.forEach(hookId -> {
+      Objects.requireNonNull(hookId, "hooksToDelete must not contain null values");
+      if (hookId < 0) {
+        throw new IllegalArgumentException("hook IDs in hooksToDelete must be non-negative");
+      }
+    });
   }
 
   @NonNull

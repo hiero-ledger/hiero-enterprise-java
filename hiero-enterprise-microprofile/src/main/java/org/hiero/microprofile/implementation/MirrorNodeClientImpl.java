@@ -14,9 +14,11 @@ import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.NftTransactionHistory;
 import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
+import org.hiero.base.data.Schedule;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
@@ -74,6 +76,19 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
     final String path = "/api/v1/tokens/" + tokenId + "/nfts";
     final Function<JsonObject, List<Nft>> dataExtractionFunction =
         node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<NftTransactionHistory> queryNftTransactionHistory(
+      @NonNull TokenId tokenId, long serialNumber) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    if (serialNumber <= 0) {
+      throw new IllegalArgumentException("serialNumber must be positive");
+    }
+    final String path = "/api/v1/tokens/" + tokenId + "/nfts/" + serialNumber + "/transactions";
+    final Function<JsonObject, List<NftTransactionHistory>> dataExtractionFunction =
+        node -> jsonConverter.toNftTransactionHistories(node);
     return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 
@@ -195,5 +210,23 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonObject> {
 
     return new RestBasedPage<>(restClient.getNetworkTarget(), dataExtractionFunction, path)
         .getData().stream().findFirst();
+  }
+
+  @Override
+  public @NonNull Page<Schedule> querySchedules() throws HieroException {
+    final String path = "/api/v1/schedules";
+    final Function<JsonObject, List<Schedule>> dataExtractionFunction =
+        node -> jsonConverter.toSchedules(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
+  }
+
+  @Override
+  public @NonNull Page<Schedule> querySchedulesByAccount(@NonNull AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/schedules?account.id=eq:" + accountId;
+    final Function<JsonObject, List<Schedule>> dataExtractionFunction =
+        node -> jsonConverter.toSchedules(node);
+    return new RestBasedPage<>(restClient.getTarget(), dataExtractionFunction, path);
   }
 }
