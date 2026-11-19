@@ -44,7 +44,7 @@ public class MirrorNodeRestClientImpl implements MirrorNodeRestClient<JsonNode> 
     networkRestClient =
         mirrorNodeJavaRestBaseUrl
             .filter(s -> !s.isBlank())
-            .map(base -> RestClient.builder().baseUrl(base).build())
+            .map(base -> restClientBuilder.clone().baseUrl(base).build())
             .orElse(null);
   }
 
