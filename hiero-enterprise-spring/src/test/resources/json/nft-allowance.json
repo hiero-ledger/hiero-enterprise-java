@@ -1,0 +1,137 @@
+{
+  "allowances": [
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7108611",
+      "timestamp": {
+        "from": "1761147827.156294000",
+        "to": null
+      },
+      "token_id": "0.0.7108613"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7108617",
+      "timestamp": {
+        "from": "1761147845.772330000",
+        "to": null
+      },
+      "token_id": "0.0.7108622"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7128637",
+      "timestamp": {
+        "from": "1761392138.762874746",
+        "to": null
+      },
+      "token_id": "0.0.7128639"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7128641",
+      "timestamp": {
+        "from": "1761392159.223177974",
+        "to": null
+      },
+      "token_id": "0.0.7128644"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7129132",
+      "timestamp": {
+        "from": "1761397514.706991680",
+        "to": null
+      },
+      "token_id": "0.0.7129135"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7129137",
+      "timestamp": {
+        "from": "1761397533.842162479",
+        "to": null
+      },
+      "token_id": "0.0.7129140"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7136587",
+      "timestamp": {
+        "from": "1761489219.225170000",
+        "to": null
+      },
+      "token_id": "0.0.7136589"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7136591",
+      "timestamp": {
+        "from": "1761489240.375949000",
+        "to": null
+      },
+      "token_id": "0.0.7136594"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7137304",
+      "timestamp": {
+        "from": "1761492957.562261000",
+        "to": null
+      },
+      "token_id": "0.0.7137306"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7137310",
+      "timestamp": {
+        "from": "1761492978.255736000",
+        "to": null
+      },
+      "token_id": "0.0.7137313"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7241996",
+      "timestamp": {
+        "from": "1762961291.926203389",
+        "to": null
+      },
+      "token_id": "0.0.7242000"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7424133",
+      "timestamp": {
+        "from": "1765448016.964557000",
+        "to": null
+      },
+      "token_id": "0.0.7424136"
+    },
+    {
+      "approved_for_all": true,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7424140",
+      "timestamp": {
+        "from": "1765448047.651579021",
+        "to": null
+      },
+      "token_id": "0.0.7424145"
+    }
+  ],
+  "links": {
+    "next": null
+  }
+}
