@@ -918,6 +918,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#create-immutable-topic" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Create Immutable Topic
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-topic-with-auto-renew-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Create Topic with Auto Renew Settings
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-topic" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -933,6 +955,39 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Update Topic Keys
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-auto-renew-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Update Auto Renew Settings
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extend-expiration-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Extend Expiration Time
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clear-topic-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Clear Topic Properties
       </span>
     </span>
   </a>
@@ -1592,6 +1647,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#create-immutable-topic" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Create Immutable Topic
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-topic-with-auto-renew-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Create Topic with Auto Renew Settings
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-topic" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1607,6 +1684,39 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Update Topic Keys
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-auto-renew-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Update Auto Renew Settings
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extend-expiration-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Extend Expiration Time
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clear-topic-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Clear Topic Properties
       </span>
     </span>
   </a>
@@ -1832,6 +1942,18 @@ The configured operator account is used as the transaction payer and must have s
 <td style="text-align: left;">Creates a private topic with admin key, submit key, and memo.</td>
 </tr>
 <tr>
+<td style="text-align: left;"><code>createImmutableTopic()</code></td>
+<td style="text-align: left;">Creates a topic without an admin key. It can never be updated or deleted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createImmutableTopic(String memo)</code></td>
+<td style="text-align: left;">Creates an immutable topic with the provided memo.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>createTopic(PrivateKey adminKey, PrivateKey submitKey, String memo, Account autoRenewAccount, Duration autoRenewPeriod)</code></td>
+<td style="text-align: left;">Creates a topic with full control over keys and auto renew settings. Every argument is optional.</td>
+</tr>
+<tr>
 <td style="text-align: left;"><code>updateTopic(TopicId topicId, String memo)</code></td>
 <td style="text-align: left;">Updates a topic memo using the operator account as admin key.</td>
 </tr>
@@ -1862,6 +1984,58 @@ The configured operator account is used as the transaction payer and must have s
 <tr>
 <td style="text-align: left;"><code>updateSubmitKey(TopicId topicId, PrivateKey adminKey, PrivateKey submitKey)</code></td>
 <td style="text-align: left;">Updates the topic submit key using the provided admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateAutoRenewAccount(TopicId topicId, Account autoRenewAccount)</code></td>
+<td style="text-align: left;">Sets a new auto renew account using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateAutoRenewAccount(TopicId topicId, PrivateKey adminKey, Account autoRenewAccount)</code></td>
+<td style="text-align: left;">Sets a new auto renew account using the provided admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearAutoRenewAccount(TopicId topicId)</code></td>
+<td style="text-align: left;">Removes the auto renew account using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearAutoRenewAccount(TopicId topicId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Removes the auto renew account using the provided admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateAutoRenewPeriod(TopicId topicId, Duration autoRenewPeriod)</code></td>
+<td style="text-align: left;">Updates the auto renew period using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateAutoRenewPeriod(TopicId topicId, PrivateKey adminKey, Duration autoRenewPeriod)</code></td>
+<td style="text-align: left;">Updates the auto renew period using the provided admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>updateExpirationTime(TopicId topicId, Instant expirationTime)</code></td>
+<td style="text-align: left;">Extends the topic expiration time. No admin key is required.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearAdminKey(TopicId topicId)</code></td>
+<td style="text-align: left;">Removes the admin key, making the topic immutable, using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearAdminKey(TopicId topicId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Removes the admin key, making the topic immutable, using the provided admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearSubmitKey(TopicId topicId)</code></td>
+<td style="text-align: left;">Removes the submit key, making the topic public, using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearSubmitKey(TopicId topicId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Removes the submit key, making the topic public, using the provided admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearTopicMemo(TopicId topicId)</code></td>
+<td style="text-align: left;">Removes the topic memo using the operator account as admin key.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>clearTopicMemo(TopicId topicId, PrivateKey adminKey)</code></td>
+<td style="text-align: left;">Removes the topic memo using the provided admin key.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>deleteTopic(TopicId topicId)</code></td>
@@ -1969,95 +2143,147 @@ The configured operator account is used as the transaction payer and must have s
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="p">);</span>
 </span></code></pre></div>
 <hr />
+<h2 id="create-immutable-topic">Create Immutable Topic<a class="headerlink" href="#create-immutable-topic" title="Permanent link">&para;</a></h2>
+<p>A topic created without an admin key is immutable: it can never be updated or deleted. Only its expiration time can be extended.</p>
+<div class="language-java highlight"><span class="filename">createImmutableTopic(String memo)</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">topicClient</span><span class="p">.</span><span class="na">createImmutableTopic</span><span class="p">(</span><span class="s">&quot;Immutable topic&quot;</span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="create-topic-with-auto-renew-settings">Create Topic with Auto Renew Settings<a class="headerlink" href="#create-topic-with-auto-renew-settings" title="Permanent link">&para;</a></h2>
+<p>The auto renew account pays to extend the topic when it expires and must sign the create transaction, which is why an <code>Account</code> (ID and private key) is passed. If no auto renew account is given, the operator account is used. The auto renew period must be between roughly 30 and 92 days.</p>
+<div class="language-java highlight"><span class="filename">createTopic(PrivateKey adminKey, PrivateKey submitKey, String memo, Account autoRenewAccount, Duration autoRenewPeriod)</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Account</span><span class="w"> </span><span class="n">autoRenewAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accountClient</span><span class="p">.</span><span class="na">createAccount</span><span class="p">(</span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">topicClient</span><span class="p">.</span><span class="na">createTopic</span><span class="p">(</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">        </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">        </span><span class="kc">null</span><span class="p">,</span><span class="w">              </span><span class="c1">// no submit key: public topic</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">        </span><span class="s">&quot;My topic&quot;</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">        </span><span class="n">autoRenewAccount</span><span class="p">,</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">        </span><span class="n">Duration</span><span class="p">.</span><span class="na">ofDays</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
 <h2 id="update-topic">Update Topic<a class="headerlink" href="#update-topic" title="Permanent link">&para;</a></h2>
 <p>Update topic properties such as memo, admin key, and submit key.</p>
-<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, String memo)</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, String memo)</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, PrivateKey adminKey, String memo)</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, PrivateKey adminKey, String memo)</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, PrivateKey updatedAdminKey, PrivateKey submitKey, String memo)</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">updatedAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">updatedAdminKey</span><span class="p">,</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="n">submitKey</span><span class="p">,</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, PrivateKey updatedAdminKey, PrivateKey submitKey, String memo)</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">updatedAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="n">updatedAdminKey</span><span class="p">,</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="n">submitKey</span><span class="p">,</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, PrivateKey adminKey, PrivateKey updatedAdminKey, PrivateKey submitKey, String memo)</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">updatedAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="n">updatedAdminKey</span><span class="p">,</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">submitKey</span><span class="p">,</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">updateTopic(TopicId topicId, PrivateKey adminKey, PrivateKey updatedAdminKey, PrivateKey submitKey, String memo)</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">updatedAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateTopic</span><span class="p">(</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="n">updatedAdminKey</span><span class="p">,</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="n">submitKey</span><span class="p">,</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="s">&quot;Updated topic&quot;</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="p">);</span>
 </span></code></pre></div>
 <hr />
 <h2 id="update-topic-keys">Update Topic Keys<a class="headerlink" href="#update-topic-keys" title="Permanent link">&para;</a></h2>
-<div class="language-java highlight"><span class="filename">updateAdminKey(TopicId topicId, PrivateKey updatedAdminKey)</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateAdminKey</span><span class="p">(</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="n">newAdminKey</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">);</span>
-</span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateSubmitKey(TopicId topicId, PrivateKey submitKey)</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newSubmitKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateSubmitKey</span><span class="p">(</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="n">newSubmitKey</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">);</span>
-</span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateAdminKey(TopicId topicId, PrivateKey adminKey, PrivateKey updatedAdminKey)</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+<div class="language-java highlight"><span class="filename">updateAdminKey(TopicId topicId, PrivateKey updatedAdminKey)</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateAdminKey</span><span class="p">(</span>
 </span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="n">newAdminKey</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">);</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="n">newAdminKey</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">updateSubmitKey(TopicId topicId, PrivateKey adminKey, PrivateKey submitKey)</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newSubmitKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+<div class="language-java highlight"><span class="filename">updateSubmitKey(TopicId topicId, PrivateKey submitKey)</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newSubmitKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateSubmitKey</span><span class="p">(</span>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="n">newSubmitKey</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">);</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="n">newSubmitKey</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">updateAdminKey(TopicId topicId, PrivateKey adminKey, PrivateKey updatedAdminKey)</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newAdminKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateAdminKey</span><span class="p">(</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="n">newAdminKey</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">updateSubmitKey(TopicId topicId, PrivateKey adminKey, PrivateKey submitKey)</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">PrivateKey</span><span class="w"> </span><span class="n">newSubmitKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrivateKey</span><span class="p">.</span><span class="na">generateED25519</span><span class="p">();</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateSubmitKey</span><span class="p">(</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="n">adminKey</span><span class="p">,</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">newSubmitKey</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Provide an <code>adminKey</code> when the topic was created with a custom admin key that differs from the configured operator account key.</p>
 </div>
 <hr />
+<h2 id="update-auto-renew-settings">Update Auto Renew Settings<a class="headerlink" href="#update-auto-renew-settings" title="Permanent link">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">updateAutoRenewAccount(TopicId topicId, Account autoRenewAccount)</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">Account</span><span class="w"> </span><span class="n">autoRenewAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accountClient</span><span class="p">.</span><span class="na">createAccount</span><span class="p">(</span><span class="n">Hbar</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateAutoRenewAccount</span><span class="p">(</span><span class="n">topicId</span><span class="p">,</span><span class="w"> </span><span class="n">autoRenewAccount</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">clearAutoRenewAccount(TopicId topicId)</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">clearAutoRenewAccount</span><span class="p">(</span><span class="n">topicId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">updateAutoRenewPeriod(TopicId topicId, Duration autoRenewPeriod)</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateAutoRenewPeriod</span><span class="p">(</span><span class="n">topicId</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">.</span><span class="na">ofDays</span><span class="p">(</span><span class="mi">60</span><span class="p">));</span>
+</span></code></pre></div>
+<hr />
+<h2 id="extend-expiration-time">Extend Expiration Time<a class="headerlink" href="#extend-expiration-time" title="Permanent link">&para;</a></h2>
+<p>Extending the expiration time does not require the admin key, so it also works for immutable topics. The new expiration time must be later than the current one and at most roughly 92 days in the future.</p>
+<div class="language-java highlight"><span class="filename">updateExpirationTime(TopicId topicId, Instant expirationTime)</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">updateExpirationTime</span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">plus</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofDays</span><span class="p">(</span><span class="mi">91</span><span class="p">))</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="clear-topic-properties">Clear Topic Properties<a class="headerlink" href="#clear-topic-properties" title="Permanent link">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">clearAdminKey(TopicId topicId)</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1">// The topic becomes immutable and can no longer be updated or deleted</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">clearAdminKey</span><span class="p">(</span><span class="n">topicId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">clearSubmitKey(TopicId topicId)</span><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1">// The topic becomes public: anyone can submit messages</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">clearSubmitKey</span><span class="p">(</span><span class="n">topicId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-java highlight"><span class="filename">clearTopicMemo(TopicId topicId)</span><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">clearTopicMemo</span><span class="p">(</span><span class="n">topicId</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Clearing the admin key cannot be undone. It also removes the auto renew account, because the network does not allow a topic without an admin key to have one.</p>
+</div>
+<hr />
 <h2 id="delete-topic">Delete Topic<a class="headerlink" href="#delete-topic" title="Permanent link">&para;</a></h2>
 <p>Delete the topic using topicId.</p>
-<div class="language-java highlight"><span class="filename">deleteTopic(TopicId topicId)</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">deleteTopic</span><span class="p">(</span><span class="n">topicId</span><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">deleteTopic(TopicId topicId)</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">deleteTopic</span><span class="p">(</span><span class="n">topicId</span><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">deleteTopic(TopicId topicId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">deleteTopic</span><span class="p">(</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">adminKey</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">deleteTopic(TopicId topicId, PrivateKey adminKey)</span><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">deleteTopic</span><span class="p">(</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="n">adminKey</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -2066,30 +2292,30 @@ The configured operator account is used as the transaction payer and must have s
 <hr />
 <h2 id="submit-message">Submit Message<a class="headerlink" href="#submit-message" title="Permanent link">&para;</a></h2>
 <p>Submit message to the topic.</p>
-<div class="language-java highlight"><span class="filename">submitMessage(TopicId topicId, byte[] message)</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">submitMessage</span><span class="p">(</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">submitMessage(TopicId topicId, byte[] message)</span><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">submitMessage</span><span class="p">(</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span><span class="s">&quot;Hello Hiero&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">submitMessage(TopicId topicId, String message)</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">submitMessage</span><span class="p">(</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="s">&quot;Hello Hiero&quot;</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">submitMessage(TopicId topicId, String message)</span><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">submitMessage</span><span class="p">(</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">    </span><span class="s">&quot;Hello Hiero&quot;</span>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-java highlight"><span class="filename">submitMessage(TopicId topicId, PrivateKey submitKey, String message)</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">submitMessage</span><span class="p">(</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">    </span><span class="n">submitKey</span><span class="p">,</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="s">&quot;Private message&quot;</span>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="p">);</span>
+<div class="language-java highlight"><span class="filename">submitMessage(TopicId topicId, PrivateKey submitKey, String message)</span><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">TopicId</span><span class="w"> </span><span class="n">topicId</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">    </span><span class="n">TopicId</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">&quot;0.0.1234&quot;</span><span class="p">);</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="n">topicClient</span><span class="p">.</span><span class="na">submitMessage</span><span class="p">(</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">    </span><span class="n">topicId</span><span class="p">,</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">    </span><span class="n">submitKey</span><span class="p">,</span>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="w">    </span><span class="s">&quot;Private message&quot;</span>
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="p">);</span>
 </span></code></pre></div>
 
 
