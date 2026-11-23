@@ -37,54 +37,59 @@ class HieroAutoConfigurationTest {
   @Test
   void mirrorNodeClientAppliesRestClientCustomizers() {
     customizedContextRunner()
-        .run(
-            context -> {
-              context
-                  .getBean(MirrorNodeClient.class)
-                  .queryAccount(AccountId.fromString("0.0.1001"));
+        .run(context -> {
+          context.getBean(MirrorNodeClient.class).queryAccount(AccountId.fromString("0.0.1001"));
 
-              Assertions.assertEquals(
-                  List.of(
-                      URI.create(
-                          "https://testnet.mirrornode.hedera.com:443/api/v1/accounts/0.0.1001")),
-                  interceptedRequests);
-            });
+          Assertions.assertEquals(
+              List.of(
+                  URI.create("https://testnet.mirrornode.hedera.com:443/api/v1/accounts/0.0.1001")),
+              interceptedRequests);
+        });
   }
 
   @Test
   void mirrorNodeJavaRestClientAppliesRestClientCustomizers() {
     customizedContextRunner()
-        .run(
-            context -> {
-              context.getBean(MirrorNodeClient.class).queryExchangeRates();
+        .run(context -> {
+          context.getBean(MirrorNodeClient.class).queryExchangeRates();
 
-              Assertions.assertEquals(
-                  List.of(URI.create("http://localhost:8084/api/v1/network/exchangerate")),
-                  interceptedRequests);
-            });
+          Assertions.assertEquals(
+              List.of(URI.create("http://localhost:8084/api/v1/network/exchangerate")),
+              interceptedRequests);
+        });
   }
 
   @Test
   void contractVerificationClientAppliesRestClientCustomizers() {
     final ContractId contractId = ContractId.fromString("0.0.1001");
     customizedContextRunner()
-        .run(
-            context -> {
-              context.getBean(ContractVerificationClient.class).checkVerification(contractId);
+        .run(context -> {
+          context.getBean(ContractVerificationClient.class).checkVerification(contractId);
 
-              Assertions.assertEquals(
-                  List.of(
-                      URI.create(
-                          "https://sourcify.dev/server/v2/contract/296/0x"
-                              + contractId.toEvmAddress())),
-                  interceptedRequests);
-            });
+          Assertions.assertEquals(
+              List.of(
+                  URI.create(
+                      "https://sourcify.dev/server/v2/contract/296/0x"
+                          + contractId.toEvmAddress())),
+              interceptedRequests);
+        });
   }
 
   @Test
   void createsClientsWithoutRestClientAutoConfiguration() {
-    contextRunner.run(
-        context -> {
+    contextRunner.run(context -> {
+      Assertions.assertNull(context.getStartupFailure());
+      Assertions.assertNotNull(context.getBean(MirrorNodeClient.class));
+      Assertions.assertNotNull(context.getBean(ContractVerificationClient.class));
+    });
+  }
+
+  @Test
+  void createsClientsWhenMultipleRestClientBuildersExistWithoutPrimary() {
+    contextRunner
+        .withBean("builderOne", RestClient.Builder.class, RestClient::builder)
+        .withBean("builderTwo", RestClient.Builder.class, RestClient::builder)
+        .run(context -> {
           Assertions.assertNull(context.getStartupFailure());
           Assertions.assertNotNull(context.getBean(MirrorNodeClient.class));
           Assertions.assertNotNull(context.getBean(ContractVerificationClient.class));
@@ -98,13 +103,12 @@ class HieroAutoConfigurationTest {
   }
 
   private void addRecordingInterceptor(final RestClient.Builder builder) {
-    builder.requestInterceptor(
-        (request, body, execution) -> {
-          interceptedRequests.add(request.getURI());
-          final MockClientHttpResponse response =
-              new MockClientHttpResponse("{}".getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
-          response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-          return response;
-        });
+    builder.requestInterceptor((request, body, execution) -> {
+      interceptedRequests.add(request.getURI());
+      final MockClientHttpResponse response =
+          new MockClientHttpResponse("{}".getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
+      response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+      return response;
+    });
   }
 }

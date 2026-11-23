@@ -172,7 +172,7 @@ public class HieroAutoConfiguration {
     }
     // Clone so the base URL is never set on a RestClient.Builder bean shared with the app.
     final RestClient.Builder builder =
-        restClientBuilderProvider.getIfAvailable(RestClient::builder).clone().baseUrl(baseUri);
+        restClientBuilderProvider.getIfUnique(RestClient::builder).clone().baseUrl(baseUri);
     Optional<String> mirrorNodeJavaRest =
         Optional.ofNullable(properties.getNetwork().getMirrorNodeJavaRest())
             .filter(s -> !s.isBlank());
@@ -253,8 +253,9 @@ public class HieroAutoConfiguration {
   ContractVerificationClient contractVerificationClient(
       final HieroConfig hieroConfig,
       final ObjectProvider<RestClient.Builder> restClientBuilderProvider) {
+    // Clone so the builder is isolated and not mutated when building the client.
     final RestClient.Builder builder =
-        restClientBuilderProvider.getIfAvailable(RestClient::builder);
+        restClientBuilderProvider.getIfUnique(RestClient::builder).clone();
     return new ContractVerificationClientImplementation(hieroConfig, builder);
   }
 
