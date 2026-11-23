@@ -73,10 +73,14 @@ public class NftClientImpl implements NftClient {
     return createNftType(name, symbol, operationalAccount, supplierKey);
   }
 
+  @Override
   public TokenId createNftType(
-      @NonNull final String name, @NonNull final String symbol, @NonNull final PrivateKey pauseKey)
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @NonNull final PrivateKey pauseKey)
       throws HieroException {
-    return createNftType(name, symbol, operationalAccount, pauseKey);
+    return createNftType(name, symbol, operationalAccount, supplierKey, pauseKey);
   }
 
   @Override
