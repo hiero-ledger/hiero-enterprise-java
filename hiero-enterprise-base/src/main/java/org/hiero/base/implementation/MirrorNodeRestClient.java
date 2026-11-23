@@ -2,6 +2,7 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.Objects;
@@ -92,5 +93,11 @@ public interface MirrorNodeRestClient<JSON> {
   default JSON queryBlock(@NonNull final String blockIdentifier) throws HieroException {
     Objects.requireNonNull(blockIdentifier, "blockIdentifier must not be null");
     return doGetCall("/api/v1/blocks/" + blockIdentifier);
+  }
+
+  @NonNull
+  default JSON queryScheduleById(@NonNull final ScheduleId scheduleId) throws HieroException {
+    Objects.requireNonNull(scheduleId, "scheduleId must not be null");
+    return doGetCall("/api/v1/schedules/" + scheduleId);
   }
 }

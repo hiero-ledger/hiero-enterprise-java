@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import org.jspecify.annotations.Nullable;
 
+/* Represent FractionFee used in CustomFee for TokenInfo */
 public record FractionalFee(
     long numeratorAmount,
     long denominatorAmount,

@@ -1,7 +1,10 @@
 package org.hiero.base.protocol.data;
 
+import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
+
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -13,53 +16,86 @@ public record ContractCreateRequest(
     @NonNull Hbar maxTransactionFee,
     @NonNull Duration transactionValidDuration,
     @NonNull FileId fileId,
+    int gas,
+    @Nullable PrivateKey adminKey,
     @NonNull List<ContractParam<?>> constructorParams)
     implements TransactionRequest {
+
+  public static final Hbar DEFAULT_CONTRACT_CREATE_TRANSACTION_FEE = Hbar.from(100);
 
   public ContractCreateRequest {
     Objects.requireNonNull(maxTransactionFee, "maxTransactionFee is required");
     Objects.requireNonNull(transactionValidDuration, "transactionValidDuration is required");
     Objects.requireNonNull(fileId, "fileId is required");
     Objects.requireNonNull(constructorParams, "constructorParams is required");
+
     if (maxTransactionFee.toTinybars() < 0) {
       throw new IllegalArgumentException("maxTransactionFee must be non-negative");
     }
     if (transactionValidDuration.isNegative() || transactionValidDuration.isZero()) {
       throw new IllegalArgumentException("transactionValidDuration must be positive");
     }
-  }
-
-  @NonNull
-  public static ContractCreateRequest of(
-      @NonNull String fileId, @Nullable ContractParam<?>... constructorParams) {
-    Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), constructorParams);
-  }
-
-  @NonNull
-  public static ContractCreateRequest of(
-      @NonNull FileId fileId, @Nullable ContractParam<?>... constructorParams) {
-    if (constructorParams == null) {
-      return of(fileId, List.of());
-    } else {
-      return of(fileId, List.of(constructorParams));
+    if (gas < 0 || gas > MAX_GAS_LIMIT) {
+      throw new IllegalArgumentException(
+          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
     }
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull String fileId, @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull String fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable PrivateKey adminKey,
+      @Nullable ContractParam<?>... constructorParams) {
     Objects.requireNonNull(fileId, "fileId must not be null");
-    return of(FileId.fromString(fileId), constructorParams);
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
+    return of(FileId.fromString(fileId), maxTransactionFee, gas, adminKey, constructorParams);
   }
 
   @NonNull
   public static ContractCreateRequest of(
-      @NonNull FileId fileId, @NonNull List<ContractParam<?>> constructorParams) {
+      @NonNull FileId fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable PrivateKey adminKey,
+      @Nullable ContractParam<?>... constructorParams) {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+
+    if (constructorParams == null) {
+      return of(fileId, maxTransactionFee, gas, adminKey, List.of());
+    } else {
+      return of(fileId, maxTransactionFee, gas, adminKey, List.of(constructorParams));
+    }
+  }
+
+  @NonNull
+  public static ContractCreateRequest of(
+      @NonNull String fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable PrivateKey adminKey,
+      @NonNull List<ContractParam<?>> constructorParams) {
+    Objects.requireNonNull(fileId, "fileId must not be null");
+    Objects.requireNonNull(maxTransactionFee, "maxTransactionFee must not be null");
+    return of(FileId.fromString(fileId), maxTransactionFee, gas, null, constructorParams);
+  }
+
+  @NonNull
+  public static ContractCreateRequest of(
+      @NonNull FileId fileId,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable PrivateKey adminKey,
+      @NonNull List<ContractParam<?>> constructorParams) {
     return new ContractCreateRequest(
-        DEFAULT_MAX_TRANSACTION_FEE,
+        maxTransactionFee,
         DEFAULT_TRANSACTION_VALID_DURATION,
         fileId,
+        gas,
+        adminKey,
         List.copyOf(constructorParams));
   }
 }

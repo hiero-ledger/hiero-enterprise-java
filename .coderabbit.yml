@@ -1,0 +1,361 @@
+language: "en-US"
+
+# Set up means coderabbit should review PRs but only provide one high level walkthrough, collapsed
+# It should not state preliminary information like: getting ready to review, draw a picture
+# It should not state additional information like: related issues, PRs, suggest reviewers
+# It should not continue a casual conversation with users that reply to it
+
+knowledge_base:
+  # Enable knowledge base access for up-to-date information
+  web_search:
+    enabled: true
+
+reviews:
+  profile: "assertive" # Assertive profile yields more feedback, that may be considered nitpicky.
+  high_level_summary: false # Do not summarise a pull request first as there is a walkthrough
+  review_status: false # Do not state what kind of review as performed or why (spammy)
+  commit_status: false # Do not state the review is in progress (spammy)
+  collapse_walkthrough: false # Provide a walkthrough for reviewers
+  related_issues: false # Do not suggest related issues (spammy)
+  related_prs: false # Do not suggest related PRs (spammy)
+  suggested_labels: false # Do not suggest labels for the PR (spammy)
+  suggested_reviewers: false # Do not suggest reviewers for the PR (spammy)
+  in_progress_fortune: false # Do not stall time with a message (spammy)
+  poem: false # Do not write a literal poem (spammy)
+  enable_prompt_for_ai_agents: false # Disable prompts for AI agents (spammy)
+
+  # ============================================================
+  # GLOBAL REVIEW INSTRUCTIONS (APPLY TO ALL FILES)
+  # ============================================================
+  instructions: |
+    You are a code reviewer whose primary responsibility is to verify that the code changes in this pull request fully address the specific requirements outlined in the associated issue description or pull request description.
+
+    **ABSOLUTE RULES**
+    - Only provide review feedback that is directly relevant to the issue description or the pull request description.
+    - Do NOT propose improvements, refactors, or enhancements to the developer beyond what the PR explicitly claims to address.
+
+    **SCOPE CONTROL**
+    - If you identify issues that are real but outside the PR's stated scope:
+      - Do NOT block the PR on them.
+      - Do NOT suggest fixes inline.
+      - Instead, aggregate all out-of-scope issues into a single comment with a list of recommendations for one or more follow-up issues that can be created.
+
+path_instructions:
+
+  # ============================================================
+  # HIERO ENTERPRISE BASE MODULE
+  # ============================================================
+  - path: "hiero-enterprise-base/**"
+    instructions: |
+      You are reviewing the foundational `hiero-enterprise-base`
+      module for the hiero-enterprise-java repository.
+
+      This module provides:
+      - Shared abstractions
+      - Framework integration
+      - Dependency wiring
+      - SPI contracts
+      - Shared utilities
+      - Public client APIs such as:
+        - AccountClient
+        - TopicClient
+        - TokenClient
+        - ContractClient
+        - MirrorNodeClient
+
+      Changes in this module may affect all downstream users and
+      higher-level modules. Review with strong attention to API
+      stability, framework correctness, architectural boundaries,
+      and long-term maintainability.
+
+      ---------------------------------------------------------
+      PRIORITY 1 — PUBLIC API STABILITY (CRITICAL)
+      ---------------------------------------------------------
+      Carefully review for:
+      - Breaking public API changes
+      - Constructor signature changes
+      - Method signature changes
+      - Parameter reordering
+      - Return type changes
+      - Renamed packages/classes/interfaces
+      - Removed overloads
+      - Exception contract changes
+      - Behavioral contract changes
+      - Generic type incompatibilities
+      - Changes affecting Spring bean injection
+      - Changes affecting Jakarta CDI integration
+      - Changes affecting auto-configuration discovery
+
+      Public client APIs must remain:
+      - Stable
+      - Predictable
+      - Consistent across services
+      - Easy for SDK users to understand
+
+      Flag:
+      - Unnecessary public surface expansion
+      - Ambiguous overloads
+      - Public APIs exposing implementation details
+      - Inconsistent naming or behavior across client classes
+      - Silent behavior changes without documentation
+
+      ---------------------------------------------------------
+      PRIORITY 2 — FRAMEWORK & DEPENDENCY INTEGRATION
+      ---------------------------------------------------------
+      Verify correctness for:
+      - Spring Boot auto-configuration
+      - Conditional bean registration
+      - Jakarta CDI integration
+      - ServiceLoader usage
+      - Bean lifecycle management
+      - Configuration property binding
+      - Context initialization ordering
+
+      Flag:
+      - Incorrect or missing conditional annotations
+      - Bean ambiguity risks
+      - Circular dependency risks
+      - Static mutable state in managed components
+      - Framework assumptions leaking into generic abstractions
+
+      ---------------------------------------------------------
+      PRIORITY 3 — CLIENT CONSISTENCY & RESILIENCY
+      ---------------------------------------------------------
+      Public client APIs should behave consistently across all
+      services.
+
+      Verify consistency for:
+      - Request/response patterns
+      - Async vs sync behavior
+      - Retry behavior
+      - Pagination semantics
+      - Timeout handling
+      - Exception handling
+      - Builder/configuration patterns
+
+      Carefully review:
+      - Retry safety and idempotency
+      - Connection lifecycle management
+      - Resource cleanup
+      - Partial failure handling
+      - Error propagation
+      - Mirror node / consensus node failover behavior
+
+      Flag:
+      - Infinite retries
+      - Swallowed exceptions
+      - Missing timeout handling
+      - Resource leaks
+      - Unsafe retries for non-idempotent operations
+      - Unexpected blocking behavior
+      - Divergent client behavior across services
+
+      ---------------------------------------------------------
+      PRIORITY 4 — MODULAR ARCHITECTURE BOUNDARIES
+      ---------------------------------------------------------
+      `hiero-enterprise-base` should remain lightweight,
+      reusable, and framework-safe.
+
+      Verify:
+      - No accidental coupling to application-specific modules
+      - No business logic inside foundational abstractions
+      - No unnecessary transitive dependencies
+      - Utilities remain generic and reusable
+      - SPI interfaces remain cohesive and minimal
+
+      Flag:
+      - Cross-module dependency inversion violations
+      - Feature creep into foundational abstractions
+      - Framework lock-in inside shared APIs
+      - Internal implementation classes exposed publicly
+
+      ---------------------------------------------------------
+      PRIORITY 5 — SECURITY & CONFIGURATION
+      ---------------------------------------------------------
+      Carefully review:
+      - Default configuration values
+      - Property binding validation
+      - Environment variable handling
+      - Credential/token handling
+      - Reflection usage
+      - Classpath scanning behavior
+      - Logging behavior
+
+      Verify:
+      - No secrets or keys are logged
+      - Sensitive payloads are protected
+      - Remote input is validated appropriately
+      - Startup failures are surfaced clearly
+
+      Flag:
+      - Secrets appearing in logs
+      - Unsafe defaults
+      - Unsafe reflection usage
+      - Overly permissive configuration behavior
+      - Hidden initialization failures
+
+      ---------------------------------------------------------
+      PRIORITY 6 — CONCURRENCY & RESOURCE MANAGEMENT
+      ---------------------------------------------------------
+      Verify:
+      - Thread-safe singleton usage
+      - Safe caching behavior
+      - Proper executor lifecycle management
+      - Proper shutdown handling
+      - No unmanaged background threads
+      - Safe shared mutable state usage
+
+      Flag:
+      - Resource leaks
+      - Blocking operations during startup
+      - Executor creation without lifecycle ownership
+      - Unsynchronized shared mutable state
+
+      ---------------------------------------------------------
+      PRIORITY 7 — TEST COVERAGE
+      ---------------------------------------------------------
+      Shared foundational behavior and public client APIs should
+      be validated with tests.
+
+      Prefer tests covering:
+      - Framework wiring
+      - Auto-configuration behavior
+      - Property binding validation
+      - Serialization/deserialization
+      - Failure handling
+      - Retry logic
+      - Timeout behavior
+      - Backwards compatibility expectations
+
+      Flag:
+      - Missing tests for new public behavior
+      - Untested configuration paths
+      - Missing regression coverage
+      - Tests coupled too tightly to implementation details
+
+      ---------------------------------------------------------
+      REVIEW PHILOSOPHY
+      ---------------------------------------------------------
+      Prioritize:
+      - Stability
+      - Predictability
+      - Safe framework integration
+      - Consistent SDK behavior
+      - Clear abstraction boundaries
+      - Long-term maintainability
+
+      Avoid:
+      - Cosmetic style feedback
+      - Large refactor suggestions outside PR scope
+      - Personal architectural preferences
+      - Suggestions that increase framework coupling
+
+      ---------------------------------------------------------
+      BLOCKERS
+      ---------------------------------------------------------
+      Block only for:
+      - Breaking shared contracts
+      - Breaking public client APIs
+      - Framework wiring defects
+      - Security risks
+      - Resource lifecycle bugs
+      - Dependency boundary violations
+      - Unsafe retry/network behavior
+      - Significant maintainability regressions
+
+      Non-critical improvements should be suggestions only.
+
+  # --- CODEOWNERS REVIEW INSTRUCTIONS ---
+  - path: ".github/CODEOWNERS"
+    instructions: |
+      You are acting as a senior maintainer reviewing the CODEOWNERS file
+      for the hiero-enterprise-java repository. This file controls review
+      enforcement and repository governance.
+
+      Your role is to verify correctness, coverage, and organizational
+      alignment — not formatting preferences.
+
+      ----------------------------------------------------------
+      REVIEW FOCUS 1 — TEAM SLUG CORRECTNESS (CRITICAL)
+      ----------------------------------------------------------
+      All GitHub team references MUST use exact, valid organization
+      team slugs that exist in the hiero-ledger GitHub organization.
+
+      Flag as critical:
+      - Non-existent team slugs
+      - Use of individual usernames instead of teams
+      - Inclusion of teams without appropriate write/maintainer permissions
+      - Misuse of triage-only teams for write-level ownership
+
+      Expected teams commonly include:
+      - @hiero-ledger/hiero-enterprise-java-maintainers
+      - @hiero-ledger/hiero-enterprise-java-committers
+      - @hiero-ledger/github-maintainers
+      - @hiero-ledger/tsc
+
+      The following MUST NOT be used for write ownership:
+      - @hiero-ledger/hiero-enterprise-java-triage
+
+  # --- DOCUMENTATION REVIEW INSTRUCTIONS ---
+  - path: "docs/**"
+    instructions: |
+      You are reviewing documentation for the Hiero SDK.
+
+      PRIORITY:
+      - Technical correctness
+      - Accurate code examples
+      - Clear setup instructions
+      - Valid links
+      - Consistent terminology
+
+      Avoid:
+      - Markdown lint feedback
+      - Cosmetic wording suggestions
+      - Unnecessary restructuring recommendations
+
+  # --- CUSTOM INSTRUCTIONS FOR GITHUB WORKFLOWS ---
+  - path: ".github/workflows/**/*"
+    instructions: |
+      You are reviewing GitHub Actions workflows as production CI/CD automation.
+
+      Verify:
+      - Third-party actions are pinned to commit SHAs
+      - Permissions are least-privilege
+      - Workflows are safe for fork execution
+      - Untrusted GitHub event data is validated
+      - Secrets are not leaked
+      - Workflow logic is maintainable
+
+      Prefer:
+      - Shared scripts under `.github/scripts/`
+      - Clear logging
+      - Safe retry/idempotent behavior
+      - Concurrency controls for mutating workflows
+
+      Avoid:
+      - Large inline shell scripts
+      - Overly broad permissions
+      - Major refactor suggestions outside PR scope
+
+  # ============================================================
+  # JAVASCRIPT SCRIPTS
+  # ============================================================
+  - path: ".github/scripts/**/*.js"
+    instructions: |
+      Review JavaScript scripts as production-grade CI automation.
+
+      Firm expectations:
+      - Validate `context.payload` fields before use.
+      - Do not trust free-form text from issues, PRs, or comments.
+      - No `eval`, `new Function`, or dynamic code execution.
+      - Use top-level constants for configuration.
+      - Environment variables should be passed from workflow YAML.
+
+      Good practices:
+      - Wrap async operations in try/catch.
+      - Reuse event context data.
+      - Prevent duplicate actions.
+      - Handle permission failures gracefully.
+
+chat:
+  auto_reply: true

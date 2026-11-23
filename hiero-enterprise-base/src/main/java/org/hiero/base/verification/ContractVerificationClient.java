@@ -1,6 +1,7 @@
 package org.hiero.base.verification;
 
 import com.hedera.hashgraph.sdk.ContractId;
+import java.util.HashMap;
 import java.util.Map;
 import org.hiero.base.HieroException;
 import org.jspecify.annotations.NonNull;
@@ -55,10 +56,12 @@ public interface ContractVerificationClient {
       @NonNull final String contractSource,
       final String contractMetadata)
       throws HieroException {
-    return verify(
-        contractId,
-        contractName,
-        Map.of(contractName + ".sol", contractSource, "metadata.json", contractMetadata));
+    final Map<String, String> files = new HashMap<>();
+    files.put(contractName + ".sol", contractSource);
+    if (contractMetadata != null) {
+      files.put("metadata.json", contractMetadata);
+    }
+    return verify(contractId, contractName, files);
   }
 
   /**

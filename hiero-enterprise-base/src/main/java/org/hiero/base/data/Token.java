@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/* Represent the Token for ListTokens on Hiero mirror-node */
 public record Token(
     long decimals,
     byte[] metadata,

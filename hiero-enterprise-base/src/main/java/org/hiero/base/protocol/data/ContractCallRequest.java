@@ -1,5 +1,7 @@
 package org.hiero.base.protocol.data;
 
+import static org.hiero.base.implementation.ProtocolLayerClientImpl.MAX_GAS_LIMIT;
+
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.Hbar;
 import java.time.Duration;
@@ -14,6 +16,7 @@ public record ContractCallRequest(
     @NonNull Duration transactionValidDuration,
     @NonNull ContractId contractId,
     @NonNull String functionName,
+    int gas,
     @NonNull List<ContractParam<?>> functionParams)
     implements TransactionRequest {
 
@@ -23,6 +26,7 @@ public record ContractCallRequest(
     Objects.requireNonNull(contractId, "contractId is required");
     Objects.requireNonNull(functionName, "functionName is required");
     Objects.requireNonNull(functionParams, "functionParams is required");
+
     if (maxTransactionFee.toTinybars() < 0) {
       throw new IllegalArgumentException("maxTransactionFee must be non-negative");
     }
@@ -32,26 +36,10 @@ public record ContractCallRequest(
     if (functionName.isBlank() || functionName.contains(" ")) {
       throw new IllegalArgumentException("functionName must not be blank or contain spaces");
     }
-  }
 
-  @NonNull
-  public static ContractCallRequest of(
-      @NonNull String contractId,
-      @NonNull String functionName,
-      @Nullable ContractParam<?>... functionParams) {
-    Objects.requireNonNull(contractId, "contractId must not be null");
-    return of(ContractId.fromString(contractId), functionName, functionParams);
-  }
-
-  @NonNull
-  public static ContractCallRequest of(
-      @NonNull ContractId contractId,
-      @NonNull String functionName,
-      @Nullable ContractParam<?>... functionParams) {
-    if (functionParams == null) {
-      return of(contractId, functionName, List.of());
-    } else {
-      return of(contractId, functionName, List.of(functionParams));
+    if (gas < 0 || gas > MAX_GAS_LIMIT) {
+      throw new IllegalArgumentException(
+          "gas must be between 0 and " + MAX_GAS_LIMIT + " inclusive");
     }
   }
 
@@ -59,21 +47,53 @@ public record ContractCallRequest(
   public static ContractCallRequest of(
       @NonNull String contractId,
       @NonNull String functionName,
-      @NonNull List<ContractParam<?>> functionParams) {
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable ContractParam<?>... functionParams) {
     Objects.requireNonNull(contractId, "contractId must not be null");
-    return of(ContractId.fromString(contractId), functionName, functionParams);
+    return of(
+        ContractId.fromString(contractId), functionName, maxTransactionFee, gas, functionParams);
   }
 
   @NonNull
   public static ContractCallRequest of(
       @NonNull ContractId contractId,
       @NonNull String functionName,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @Nullable ContractParam<?>... functionParams) {
+    if (functionParams == null) {
+      return of(contractId, functionName, maxTransactionFee, gas, List.of());
+    } else {
+      return of(contractId, functionName, maxTransactionFee, gas, List.of(functionParams));
+    }
+  }
+
+  @NonNull
+  public static ContractCallRequest of(
+      @NonNull String contractId,
+      @NonNull String functionName,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
+      @NonNull List<ContractParam<?>> functionParams) {
+    Objects.requireNonNull(contractId, "contractId must not be null");
+    return of(
+        ContractId.fromString(contractId), functionName, maxTransactionFee, gas, functionParams);
+  }
+
+  @NonNull
+  public static ContractCallRequest of(
+      @NonNull ContractId contractId,
+      @NonNull String functionName,
+      @NonNull Hbar maxTransactionFee,
+      int gas,
       @NonNull List<ContractParam<?>> functionParams) {
     return new ContractCallRequest(
-        DEFAULT_MAX_TRANSACTION_FEE,
+        maxTransactionFee,
         DEFAULT_TRANSACTION_VALID_DURATION,
         contractId,
         functionName,
+        gas,
         List.copyOf(functionParams));
   }
 }

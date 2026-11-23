@@ -11,15 +11,15 @@ This folder contains the source for the [Hiero Enterprise Java technical documen
 - **`microprofile.md`** — MicroProfile integration.
 - **`managed-services.md`** — Base module and managed services.
 
-The site is built with [MkDocs](https://www.mkdocs.org/) and the [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) theme. Configuration is in the repository root: `mkdocs.yml`.
+The site is built with [Zensical](https://pypi.org/project/zensical/). The configuration file is located in the repository root: `zensical.toml`.
 
 ## Building locally
 
 From the repository root:
 
 ```bash
-pip install mkdocs-material "pymdown-extensions"
-mkdocs serve
+pip install zensical
+zensical serve
 ```
 
 Then open http://127.0.0.1:8000 .

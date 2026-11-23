@@ -2,13 +2,7 @@ package org.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
-import java.util.Objects;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public record TokenTransfer(
-    @NonNull TokenId tokenId, @NonNull AccountId account, long amount, boolean isApproval) {
-  public TokenTransfer {
-    Objects.requireNonNull(tokenId, "tokenId cannot be null");
-    Objects.requireNonNull(account, "account cannot be null");
-  }
-}
+    @Nullable TokenId tokenId, @Nullable AccountId account, long amount, boolean isApproval) {}

@@ -1,0 +1,19 @@
+{
+  "chunk_info": {
+    "initial_transaction_id": {
+      "account_id": "0.0.6105114",
+      "nonce": 0,
+      "scheduled": false,
+      "transaction_valid_start": "1783075662.488473892"
+    },
+    "number": 3,
+    "total": 14
+  },
+  "consensus_timestamp": "1783075674.960707349",
+  "message": "aWd1bGEuIFN1c3BlbmRpc3NlIGxpZ3VsYSBlbGl0LCBjb25ndWUgZXQgbmlzaSBzaXQgYW1ldCwgY3Vyc3VzIGV1aXNtb2QgZG9sb3IuIE1vcmJpIGFsaXF1YW0sIG51bGxhIGEgcG9zdWVyZSBwZWxsZW50ZXNxdWUsIGRpYW0gbWFzc2Egb3JuYXJlIHJpc3VzLCBuZWMgZWxlaWZlbmQgbmVxdWUgZXJvcyBldCBlbGl0LgpQZWxsZW50ZXNxdWUgYSBzb2RhbGVzIGR1aS4gU2VkIGluIGVmZmljaXR1ciBhbnRlLiBEdWlzIGVnZXQgdm9sdXRwYXQgZWxpdCwgZXQgb3JuYXJlIGVzdC4gTmFtIGZlbGlzIGRvbG9yLCBwbGFjZXJhdCBtYXR0aXMgZGlhbSBpZCwgbWF4aW11cyBsb2JvcnRpcyBxdWFtLiBTZWQgcGVsbGVudGVzcXVlIGxvYm9ydGlzIHNlbSBzZWQgcGxhY2VyYXQuIFBlbGxlbnRlc3F1ZSBhdWd1ZSBvZGlvLCBtb2xlc3RpZSBzZWQgbGVjdHVzIHNpdCBhbWV0LCBjb25ndWUgdm9sdXRwYXQgbWFzc2EuIFF1aXNxdWUgY29uZ3VlIGNvbnNlcXVhdCBudW5jIGlkIGZyaW5naWxsYS4gRHVpcyBzZW1wZXIgbnVsbGEgZWdldCBlbmltIHZlbmVuYXRpcyBkYXBpYnVzLiBDbGFzcyBhcHRlbnQgdGFjaXRpIHNvY2lvc3F1IGFkIGxpdG9yYSB0b3JxdWVudCBwZXIgY29udWJpYSBub3N0cmEsIHBlciBpbmNlcHRvcyBoaW1lbmFlb3MuIFBlbGxlbnRlc3F1ZSB2YXJpdXMgdHVycGlzIG5pYmgsIHNpdCBhbWV0IG1hbGVzdWFkYSBtYXVyaXMgbWFsZXN1YWRhIHF1aXMuIFZpdmFtdXMgZGljdHVtIGVnZXN0YXMgcGxhY2VyYXQuIFZpdmFtdXMgaWQgYXVndWUgZWxpdC4KQ3JhcyBmZXJtZW50dW0gdm9sdXRwYXQgZXJvcywgdml0YWUgZXVpc21vZCBsb3JlbSB2aXZlcnJhIG5lYy4gRG9uZWMgbGVjdHVzIGF1Z3VlLCBwb3J0YSBlbGVpZmVuZCBvZGlvIHNpdCBhbWV0LCBjb25kaW1lbnR1bSByaG9uY3VzIHVybmEuIE51bmMgc2VkIG9kaW8gdmVsaXQuIE1vcmJpIG5vbiBjdXJzdXMgb2RpbywgZWdldCBpbXBlcmRpZXQgZXJhdC4gTnVuYyByaG9uY3VzIG1hc3NhIG5vbiBuZXF1ZSB2b2x1dHBhdCwgc2l0IGFtZQ==",
+  "payer_account_id": "0.0.6105114",
+  "running_hash": "qAIp0612V63kRt90Jwnmg3TmOn9WYZ50hzqGeiAACy569p0XYSEzqp5u6b1e4Nmd",
+  "running_hash_version": 3,
+  "sequence_number": 3,
+  "topic_id": "0.0.9411905"
+}

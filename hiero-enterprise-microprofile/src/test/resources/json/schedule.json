@@ -1,0 +1,36 @@
+{
+  "admin_key": {
+    "_type": "ED25519",
+    "key": "4fafbd7db4965bd2c109b2864fec4840c0b180a2b54446660ce4511f09287692"
+  },
+  "deleted": false,
+  "consensus_timestamp": "1793726878.208132774",
+  "creator_account_id": "0.0.4866188",
+  "executed_timestamp": "1793726884.028797492",
+  "expiration_time": "1793986077.786000000",
+  "memo": "nodeStream automatic payments v1 29fc29ca586a5841",
+  "payer_account_id": "0.0.4866188",
+  "schedule_id": "0.0.11296896",
+  "signatures": [
+    {
+      "consensus_timestamp": "1793726878.208132774",
+      "public_key_prefix": "T6+9fbSWW9LBCbKGT+xIQMCxgKK1REZmDORRHwkodpI=",
+      "signature": "I6hTintI2Rz7l8R6q8pSBDOs00FP2Beq7NaXFEwZup5oB+FdgDNGHQe88fDVEvMutR3sPTT9xL9q\n8IMv0nPPDg==",
+      "type": "ED25519"
+    },
+    {
+      "consensus_timestamp": "1793726884.028797491",
+      "public_key_prefix": "T6+9fbSWW9LBCbKGT+xIQMCxgKK1REZmDORRHwkodpI=",
+      "signature": "a6XVktwaknXXO5OGtjtU13Bz9MD7C7ft5fxuOw89MnqoOOu+8d9fFY+MerCoGJ7zxsHEGKMjdlWr\nRz+DYUg7Cg==",
+      "type": "ED25519"
+    },
+    {
+      "consensus_timestamp": "1793726884.028797491",
+      "public_key_prefix": "1ygsFgf48bLFevPbT9uVhn65mz7TO+kqFMkllof35X4=",
+      "signature": "piA6m2pgcmY7MoicMkI8FffStmycQXvV9rsoB4OYWEdrGVESO6pvaPgfWDL6kvYc1i06b2hiCD0C\nqKUBhzytDw==",
+      "type": "ED25519"
+    }
+  ],
+  "transaction_body": "CICEr18SMW5vZGVTdHJlYW0gYXV0b21hdGljIHBheW1lbnRzIHYxIDI5ZmMyOWNhNTg2YTU4NDGqAhoKGAoFGPbAsQUSBRj3wLEFGP//////////fw==",
+  "wait_for_expiry": false
+}

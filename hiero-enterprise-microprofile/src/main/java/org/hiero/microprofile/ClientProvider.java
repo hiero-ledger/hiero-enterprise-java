@@ -11,6 +11,7 @@ import org.hiero.base.HieroContext;
 import org.hiero.base.HookClient;
 import org.hiero.base.NftClient;
 import org.hiero.base.SmartContractClient;
+import org.hiero.base.TopicClient;
 import org.hiero.base.config.HieroConfig;
 import org.hiero.base.implementation.AccountClientImpl;
 import org.hiero.base.implementation.AccountRepositoryImpl;
@@ -23,8 +24,11 @@ import org.hiero.base.implementation.NetworkRepositoryImpl;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.implementation.NftRepositoryImpl;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
+import org.hiero.base.implementation.ScheduleRepositoryImpl;
 import org.hiero.base.implementation.SmartContractClientImpl;
 import org.hiero.base.implementation.TokenRepositoryImpl;
+import org.hiero.base.implementation.TopicClientImpl;
+import org.hiero.base.implementation.TopicRepositoryImpl;
 import org.hiero.base.implementation.TransactionRepositoryImpl;
 import org.hiero.base.mirrornode.AccountRepository;
 import org.hiero.base.mirrornode.BlockRepository;
@@ -32,7 +36,9 @@ import org.hiero.base.mirrornode.ContractRepository;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.hiero.base.mirrornode.NftRepository;
+import org.hiero.base.mirrornode.ScheduleRepository;
 import org.hiero.base.mirrornode.TokenRepository;
+import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.base.mirrornode.TransactionRepository;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.verification.ContractVerificationClient;
@@ -82,8 +88,10 @@ public class ClientProvider {
   @ApplicationScoped
   SmartContractClient createSmartContractClient(
       @NonNull final ProtocolLayerClient protocolLayerClient,
-      @NonNull final FileClient fileClient) {
-    return new SmartContractClientImpl(protocolLayerClient, fileClient);
+      @NonNull final FileClient fileClient,
+      @NonNull final HieroContext hieroContext) {
+    return new SmartContractClientImpl(
+        protocolLayerClient, fileClient, hieroContext.getOperatorAccount());
   }
 
   @NonNull
@@ -107,8 +115,19 @@ public class ClientProvider {
   @NonNull
   @Produces
   @ApplicationScoped
-  AccountClient createAccountClient(@NonNull final ProtocolLayerClient protocolLayerClient) {
-    return new AccountClientImpl(protocolLayerClient);
+  AccountClient createAccountClient(
+      @NonNull final ProtocolLayerClient protocolLayerClient,
+      @NonNull final HieroContext hieroContext) {
+    return new AccountClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  TopicClient createTopicClient(
+      @NonNull final ProtocolLayerClient protocolLayerClient,
+      @NonNull final HieroContext hieroContext) {
+    return new TopicClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
   }
 
   @NonNull
@@ -134,7 +153,8 @@ public class ClientProvider {
         hieroConfig.getMirrorNodeAddresses().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No mirror node addresses configured"));
-    final MirrorNodeRestClientImpl restClient = new MirrorNodeRestClientImpl(target);
+    final MirrorNodeRestClientImpl restClient =
+        new MirrorNodeRestClientImpl(target, networkConfiguration.getMirrorNodeJavaRest());
     final MirrorNodeJsonConverterImpl jsonConverter = new MirrorNodeJsonConverterImpl();
     return new MirrorNodeClientImpl(restClient, jsonConverter);
   }
@@ -187,5 +207,19 @@ public class ClientProvider {
   @ApplicationScoped
   ContractRepository createContractRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
     return new ContractRepositoryImpl(mirrorNodeClient);
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  TopicRepository createTopicRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
+    return new TopicRepositoryImpl(mirrorNodeClient);
+  }
+
+  @NonNull
+  @Produces
+  @ApplicationScoped
+  ScheduleRepository createScheduleRepository(@NonNull final MirrorNodeClient mirrorNodeClient) {
+    return new ScheduleRepositoryImpl(mirrorNodeClient);
   }
 }

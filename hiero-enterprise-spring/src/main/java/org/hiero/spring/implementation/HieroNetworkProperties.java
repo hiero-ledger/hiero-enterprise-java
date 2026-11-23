@@ -21,6 +21,13 @@ public class HieroNetworkProperties {
   /** Mirror node endpoint to connect to. */
   private String mirrorNode;
 
+  /**
+   * Optional base URL for the Java REST API (e.g. {@code http://localhost:8084} in Solo). Required
+   * for {@code /api/v1/network/*} on mirror-node 0.15x+, where those routes are served by REST-Java
+   * only while the Node REST API remains the primary host for most other {@code /api/v1} paths.
+   */
+  private String mirrorNodeJavaRest;
+
   private Long requestTimeoutInMs;
 
   public String getName() {
@@ -37,6 +44,14 @@ public class HieroNetworkProperties {
 
   public void setMirrorNode(String mirrorNode) {
     this.mirrorNode = mirrorNode;
+  }
+
+  public String getMirrorNodeJavaRest() {
+    return mirrorNodeJavaRest;
+  }
+
+  public void setMirrorNodeJavaRest(String mirrorNodeJavaRest) {
+    this.mirrorNodeJavaRest = mirrorNodeJavaRest;
   }
 
   public List<HieroNode> getNodes() {

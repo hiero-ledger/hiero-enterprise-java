@@ -1,26 +1,47 @@
 package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFractionalFee;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenType;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.hiero.base.HieroException;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
 import org.hiero.base.protocol.ProtocolLayerClient;
+import org.hiero.base.protocol.data.NftAllowanceApproveRequest;
+import org.hiero.base.protocol.data.NftApprovedTransferRequest;
+import org.hiero.base.protocol.data.TokenAirdropRequest;
 import org.hiero.base.protocol.data.TokenAssociateRequest;
 import org.hiero.base.protocol.data.TokenBurnRequest;
+import org.hiero.base.protocol.data.TokenBurnResult;
+import org.hiero.base.protocol.data.TokenCancelAirdropRequest;
 import org.hiero.base.protocol.data.TokenCreateRequest;
 import org.hiero.base.protocol.data.TokenCreateResult;
+import org.hiero.base.protocol.data.TokenDeleteRequest;
 import org.hiero.base.protocol.data.TokenDissociateRequest;
+import org.hiero.base.protocol.data.TokenFeeScheduleUpdateRequest;
+import org.hiero.base.protocol.data.TokenFreezeRequest;
+import org.hiero.base.protocol.data.TokenGrantKycRequest;
 import org.hiero.base.protocol.data.TokenMintRequest;
 import org.hiero.base.protocol.data.TokenMintResult;
+import org.hiero.base.protocol.data.TokenRejectRequest;
+import org.hiero.base.protocol.data.TokenRevokeKycRequest;
 import org.hiero.base.protocol.data.TokenTransferRequest;
+import org.hiero.base.protocol.data.TokenUnfreezeRequest;
+import org.hiero.base.protocol.data.TokenUpdateNftsRequest;
+import org.hiero.base.protocol.data.TokenUpdateRequest;
+import org.hiero.base.protocol.data.TokenWipeRequest;
+import org.hiero.base.protocol.data.TokenWipeResult;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NftClientImpl implements NftClient {
 
@@ -82,6 +103,109 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @NonNull final PrivateKey metadataKey)
+      throws HieroException {
+    return createNftType(name, symbol, supplierKey, metadataKey, null);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final PrivateKey supplierKey,
+      @NonNull final PrivateKey metadataKey)
+      throws HieroException {
+    return createNftType(
+        name, symbol, treasuryAccountId, treasuryKey, supplierKey, metadataKey, null);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey)
+      throws HieroException {
+    return createNftType(
+        name,
+        symbol,
+        operationalAccount.accountId(),
+        operationalAccount.privateKey(),
+        supplierKey,
+        metadataKey,
+        kycKey);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey)
+      throws HieroException {
+    return createNftType(
+        name, symbol, treasuryAccountId, treasuryKey, supplierKey, metadataKey, kycKey, null);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey,
+      @Nullable final PrivateKey feeScheduleKey)
+      throws HieroException {
+    return createNftType(
+        name,
+        symbol,
+        operationalAccount.accountId(),
+        operationalAccount.privateKey(),
+        supplierKey,
+        metadataKey,
+        kycKey,
+        feeScheduleKey);
+  }
+
+  @Override
+  public TokenId createNftType(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final PrivateKey supplierKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey kycKey,
+      @Nullable final PrivateKey feeScheduleKey)
+      throws HieroException {
+    final TokenCreateRequest request =
+        TokenCreateRequest.of(
+            name,
+            symbol,
+            treasuryAccountId,
+            treasuryKey,
+            TokenType.NON_FUNGIBLE_UNIQUE,
+            supplierKey,
+            metadataKey,
+            null,
+            null,
+            kycKey,
+            feeScheduleKey);
+    final TokenCreateResult tokenCreateResult = client.executeTokenCreateTransaction(request);
+    return tokenCreateResult.tokenId();
+  }
+
+  @Override
   public void associateNft(
       @NonNull final TokenId tokenId,
       @NonNull final AccountId accountId,
@@ -133,6 +257,74 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
+  public void freezeNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    freezeNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void freezeNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey freezeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(freezeKey, "freezeKey must not be null");
+    final TokenFreezeRequest request = TokenFreezeRequest.of(tokenId, accountId, freezeKey);
+    client.executeTokenFreezeTransaction(request);
+  }
+
+  @Override
+  public void unfreezeNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    unfreezeNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void unfreezeNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey freezeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(freezeKey, "freezeKey must not be null");
+    final TokenUnfreezeRequest request = TokenUnfreezeRequest.of(tokenId, accountId, freezeKey);
+    client.executeTokenUnfreezeTransaction(request);
+  }
+
+  @Override
+  public void grantKycNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    grantKycNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void grantKycNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey kycKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(kycKey, "kycKey must not be null");
+    final TokenGrantKycRequest request = TokenGrantKycRequest.of(tokenId, accountId, kycKey);
+    client.executeTokenGrantKycTransaction(request);
+  }
+
+  @Override
+  public void revokeKycNft(@NonNull TokenId tokenId, @NonNull AccountId accountId)
+      throws HieroException {
+    revokeKycNft(tokenId, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void revokeKycNft(
+      @NonNull TokenId tokenId, @NonNull AccountId accountId, @NonNull PrivateKey kycKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(kycKey, "kycKey must not be null");
+    final TokenRevokeKycRequest request = TokenRevokeKycRequest.of(tokenId, accountId, kycKey);
+    client.executeTokenRevokeKycTransaction(request);
+  }
+
+  @Override
   public long mintNft(@NonNull TokenId tokenId, @NonNull byte[] metadata) throws HieroException {
     return mintNft(tokenId, operationalAccount.privateKey(), metadata);
   }
@@ -160,17 +352,42 @@ public class NftClientImpl implements NftClient {
   }
 
   @Override
-  public void burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers)
+  public long burnNfts(@NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers)
       throws HieroException {
-    burnNfts(tokenId, serialNumbers, operationalAccount.privateKey());
+    return burnNfts(tokenId, serialNumbers, operationalAccount.privateKey());
   }
 
   @Override
-  public void burnNfts(
+  public long burnNfts(
       @NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers, @NonNull PrivateKey supplyKey)
       throws HieroException {
     final TokenBurnRequest request = TokenBurnRequest.of(tokenId, serialNumbers, supplyKey);
-    client.executeBurnTokenTransaction(request);
+    final TokenBurnResult result = client.executeBurnTokenTransaction(request);
+    return result.totalSupply();
+  }
+
+  @Override
+  public long wipeNfts(
+      @NonNull TokenId tokenId, @NonNull Set<Long> serialNumbers, @NonNull AccountId accountId)
+      throws HieroException {
+    return wipeNfts(tokenId, serialNumbers, accountId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public long wipeNfts(
+      @NonNull TokenId tokenId,
+      @NonNull Set<Long> serialNumbers,
+      @NonNull AccountId accountId,
+      @NonNull PrivateKey wipeKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    Objects.requireNonNull(wipeKey, "wipeKey must not be null");
+    final TokenWipeRequest request =
+        TokenWipeRequest.of(tokenId, accountId, serialNumbers, wipeKey);
+    final TokenWipeResult result = client.executeWipeTokenTransaction(request);
+    return result.totalSupply();
   }
 
   @Override
@@ -195,5 +412,341 @@ public class NftClientImpl implements NftClient {
     final TokenTransferRequest request =
         TokenTransferRequest.of(tokenId, serialNumber, fromAccountId, toAccountId, fromAccountKey);
     client.executeTransferTransaction(request);
+  }
+
+  @Override
+  public void transferApprovedNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final AccountId spenderAccountId,
+      @NonNull final PrivateKey spenderAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    transferApprovedNfts(
+        tokenId,
+        List.of(serialNumber),
+        ownerAccountId,
+        spenderAccountId,
+        spenderAccountKey,
+        toAccountId);
+  }
+
+  @Override
+  public void transferApprovedNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final AccountId spenderAccountId,
+      @NonNull final PrivateKey spenderAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    Objects.requireNonNull(spenderAccountKey, "spenderAccountKey must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    final NftApprovedTransferRequest request =
+        NftApprovedTransferRequest.of(
+            tokenId,
+            serialNumbers,
+            ownerAccountId,
+            spenderAccountId,
+            spenderAccountKey,
+            toAccountId);
+    client.executeNftApprovedTransferTransaction(request);
+  }
+
+  @Override
+  public void transferApprovedNfts(
+      @NonNull final Map<TokenId, Map<Long, AccountId>> nftTransfers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final AccountId spenderAccountId,
+      @NonNull final PrivateKey spenderAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(nftTransfers, "nftTransfers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    Objects.requireNonNull(spenderAccountKey, "spenderAccountKey must not be null");
+    final NftApprovedTransferRequest request =
+        NftApprovedTransferRequest.of(
+            nftTransfers, ownerAccountId, spenderAccountId, spenderAccountKey);
+    client.executeNftApprovedTransferTransaction(request);
+  }
+
+  @Override
+  public void airdropNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    airdropNfts(tokenId, List.of(serialNumber), fromAccountId, fromAccountKey, toAccountId);
+  }
+
+  @Override
+  public void airdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    if (serialNumbers.isEmpty()) {
+      throw new IllegalArgumentException("serials must not be empty");
+    }
+    final Map<Long, AccountId> serialNumberToAccountId = new LinkedHashMap<>();
+    for (final Long serialNumber : serialNumbers) {
+      serialNumberToAccountId.put(serialNumber, toAccountId);
+    }
+    airdropNfts(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+  }
+
+  @Override
+  public void airdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumberToAccountId, "serialNumberToAccountId must not be null");
+    Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+    Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+    final TokenAirdropRequest request =
+        TokenAirdropRequest.of(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+    client.executeTokenAirdropTransaction(request);
+  }
+
+  @Override
+  public void cancelAirdropNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    cancelAirdropNfts(tokenId, List.of(serialNumber), fromAccountId, fromAccountKey, toAccountId);
+  }
+
+  @Override
+  public void cancelAirdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey,
+      @NonNull final AccountId toAccountId)
+      throws HieroException {
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(toAccountId, "toAccountId must not be null");
+    if (serialNumbers.isEmpty()) {
+      throw new IllegalArgumentException("serials must not be empty");
+    }
+    final Map<Long, AccountId> serialNumberToAccountId = new LinkedHashMap<>();
+    for (final Long serialNumber : serialNumbers) {
+      serialNumberToAccountId.put(serialNumber, toAccountId);
+    }
+    cancelAirdropNfts(tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+  }
+
+  @Override
+  public void cancelAirdropNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final Map<Long, AccountId> serialNumberToAccountId,
+      @NonNull final AccountId fromAccountId,
+      @NonNull final PrivateKey fromAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumberToAccountId, "serialNumberToAccountId must not be null");
+    Objects.requireNonNull(fromAccountId, "fromAccountId must not be null");
+    Objects.requireNonNull(fromAccountKey, "fromAccountKey must not be null");
+    final TokenCancelAirdropRequest request =
+        TokenCancelAirdropRequest.of(
+            tokenId, serialNumberToAccountId, fromAccountId, fromAccountKey);
+    client.executeTokenCancelAirdropTransaction(request);
+  }
+
+  @Override
+  public void rejectNft(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey)
+      throws HieroException {
+    rejectNfts(tokenId, List.of(serialNumber), ownerAccountId, ownerAccountKey);
+  }
+
+  @Override
+  public void rejectNfts(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
+    final TokenRejectRequest request =
+        TokenRejectRequest.of(tokenId, serialNumbers, ownerAccountId, ownerAccountKey);
+    client.executeTokenRejectTransaction(request);
+  }
+
+  @Override
+  public void approveNftAllowance(
+      @NonNull final TokenId tokenId,
+      final long serialNumber,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    approveNftAllowances(
+        tokenId, List.of(serialNumber), ownerAccountId, ownerAccountKey, spenderAccountId);
+  }
+
+  @Override
+  public void approveNftAllowances(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<Long> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    approveNftAllowances(
+        Map.of(tokenId, serialNumbers), ownerAccountId, ownerAccountKey, spenderAccountId);
+  }
+
+  @Override
+  public void approveNftAllowances(
+      @NonNull final Map<TokenId, List<Long>> serialNumbers,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    final NftAllowanceApproveRequest request =
+        NftAllowanceApproveRequest.of(
+            ownerAccountId, spenderAccountId, serialNumbers, ownerAccountKey);
+    client.executeNftAllowanceApproveTransaction(request);
+  }
+
+  @Override
+  public void approveNftAllowanceAllSerials(
+      @NonNull final TokenId tokenId,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    approveNftAllowanceAllSerials(
+        List.of(tokenId), ownerAccountId, ownerAccountKey, spenderAccountId);
+  }
+
+  @Override
+  public void approveNftAllowanceAllSerials(
+      @NonNull final List<TokenId> tokenIds,
+      @NonNull final AccountId ownerAccountId,
+      @NonNull final PrivateKey ownerAccountKey,
+      @NonNull final AccountId spenderAccountId)
+      throws HieroException {
+    Objects.requireNonNull(tokenIds, "tokenIds must not be null");
+    Objects.requireNonNull(ownerAccountId, "ownerAccountId must not be null");
+    Objects.requireNonNull(ownerAccountKey, "ownerAccountKey must not be null");
+    Objects.requireNonNull(spenderAccountId, "spenderAccountId must not be null");
+    final NftAllowanceApproveRequest request =
+        NftAllowanceApproveRequest.forAllSerials(
+            ownerAccountId, spenderAccountId, tokenIds, ownerAccountKey);
+    client.executeNftAllowanceApproveTransaction(request);
+  }
+
+  @Override
+  public void updateNftType(@NonNull TokenId tokenId, @NonNull String name, @NonNull String symbol)
+      throws HieroException {
+    updateNftType(tokenId, name, symbol, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void updateNftType(
+      @NonNull TokenId tokenId,
+      @NonNull String name,
+      @NonNull String symbol,
+      @NonNull PrivateKey adminKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(name, "name must not be null");
+    Objects.requireNonNull(symbol, "symbol must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    final TokenUpdateRequest request = TokenUpdateRequest.of(tokenId, adminKey, name, symbol);
+    client.executeTokenUpdateTransaction(request);
+  }
+
+  @Override
+  public void updateNftFeeSchedule(
+      @NonNull final TokenId tokenId, @NonNull final List<CustomFee> customFees)
+      throws HieroException {
+    updateNftFeeSchedule(tokenId, customFees, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void updateNftFeeSchedule(
+      @NonNull final TokenId tokenId,
+      @NonNull final List<CustomFee> customFees,
+      @NonNull final PrivateKey feeScheduleKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(customFees, "customFees must not be null");
+    Objects.requireNonNull(feeScheduleKey, "feeScheduleKey must not be null");
+    if (customFees.stream().anyMatch(CustomFractionalFee.class::isInstance)) {
+      throw new IllegalArgumentException("Fractional fees are not supported for NFT types");
+    }
+    final TokenFeeScheduleUpdateRequest request =
+        TokenFeeScheduleUpdateRequest.of(tokenId, customFees, feeScheduleKey);
+    client.executeTokenFeeScheduleUpdateTransaction(request);
+  }
+
+  @Override
+  public void updateNftsMetadata(
+      @NonNull TokenId tokenId, @NonNull List<Long> serialNumbers, @NonNull byte[] metadata)
+      throws HieroException {
+    updateNftsMetadata(tokenId, serialNumbers, operationalAccount.privateKey(), metadata);
+  }
+
+  @Override
+  public void updateNftsMetadata(
+      @NonNull TokenId tokenId,
+      @NonNull List<Long> serialNumbers,
+      @NonNull PrivateKey metadataKey,
+      @NonNull byte[] metadata)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(serialNumbers, "serialNumbers must not be null");
+    Objects.requireNonNull(metadataKey, "metadataKey must not be null");
+    Objects.requireNonNull(metadata, "metadata must not be null");
+    final TokenUpdateNftsRequest request =
+        TokenUpdateNftsRequest.of(tokenId, serialNumbers, metadata, metadataKey);
+    client.executeTokenUpdateNftsTransaction(request);
+  }
+
+  @Override
+  public void deleteNftType(@NonNull final TokenId tokenId) throws HieroException {
+    deleteNftType(tokenId, operationalAccount.privateKey());
+  }
+
+  @Override
+  public void deleteNftType(@NonNull final TokenId tokenId, @NonNull final PrivateKey adminKey)
+      throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    Objects.requireNonNull(adminKey, "adminKey must not be null");
+    final TokenDeleteRequest request = TokenDeleteRequest.of(tokenId, adminKey);
+    client.executeTokenDeleteTransaction(request);
   }
 }

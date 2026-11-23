@@ -1,0 +1,99 @@
+# SPDX-License-Identifier: Apache-2.0
+
+name: Release Artifacts
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Java
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Import GPG key
+        id: gpg_key
+        uses: step-security/ghaction-import-gpg@c0b4a334b9b72bfaaebec86ef022a78a5b17f828 # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY_CONTENTS }}
+          passphrase: ${{ secrets.GPG_KEY_PASSPHRASE }}
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+
+      - name: Verify POM Version
+        run: |
+          POM_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          
+          if [ "$POM_VERSION" != "$TAG_VERSION" ]; then
+            echo "Error: Version mismatch, POM version ($POM_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
+          echo "Success: POM version matches the tag"
+
+      - name: Prepare Hiero Solo
+        id: solo
+        uses: hiero-ledger/hiero-solo-action@dd84e95ece32d42071c945214571099ffbed9cf2 # v0.27.0
+        with:
+          installMirrorNode: true
+
+      - name: Wait for Mirror Node
+        run: |
+          echo "Waiting for Mirror Node REST (Node.js) on http://localhost:38081..."
+          until curl --output /dev/null --silent --fail http://localhost:38081/health/readiness; do
+            echo "Mirror Node (rest) not ready, waiting..."
+            kubectl get svc -n solo || true
+            curl --silent http://localhost:38081/health/readiness || echo "No response from mirrorNode REST readiness"
+            sleep 5
+          done
+          echo "Waiting for Mirror Node REST-Java on http://localhost:8084..."
+          until curl --output /dev/null --silent --fail http://localhost:8084/actuator/health/readiness; do
+            echo "Mirror Node (rest-java) not ready, waiting..."
+            curl --silent http://localhost:8084/actuator/health/readiness || echo "No response from REST-Java readiness"
+            sleep 5
+          done
+          echo "Mirror Node APIs are ready!"
+
+      - name: Build & Stage
+        env:
+          SPRING_PROFILES_ACTIVE: solo
+          HEDERA_ACCOUNT_ID: ${{ steps.solo.outputs.accountId }}
+          HEDERA_PRIVATE_KEY: ${{ steps.solo.outputs.privateKey }}
+          HEDERA_NETWORK: hiero-solo-action
+        run: ./mvnw -B -Ppublication deploy
+
+      - name: Publish with JReleaser
+        run: ./mvnw -B -Ppublication jreleaser:full-release -N
+        env:
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

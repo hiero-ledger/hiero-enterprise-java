@@ -3,6 +3,7 @@ package org.hiero.spring.implementation;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import org.hiero.base.AccountClient;
 import org.hiero.base.FileClient;
 import org.hiero.base.FungibleTokenClient;
@@ -23,6 +24,7 @@ import org.hiero.base.implementation.NetworkRepositoryImpl;
 import org.hiero.base.implementation.NftClientImpl;
 import org.hiero.base.implementation.NftRepositoryImpl;
 import org.hiero.base.implementation.ProtocolLayerClientImpl;
+import org.hiero.base.implementation.ScheduleRepositoryImpl;
 import org.hiero.base.implementation.SmartContractClientImpl;
 import org.hiero.base.implementation.TokenRepositoryImpl;
 import org.hiero.base.implementation.TopicClientImpl;
@@ -35,6 +37,7 @@ import org.hiero.base.mirrornode.ContractRepository;
 import org.hiero.base.mirrornode.MirrorNodeClient;
 import org.hiero.base.mirrornode.NetworkRepository;
 import org.hiero.base.mirrornode.NftRepository;
+import org.hiero.base.mirrornode.ScheduleRepository;
 import org.hiero.base.mirrornode.TokenRepository;
 import org.hiero.base.mirrornode.TopicRepository;
 import org.hiero.base.mirrornode.TransactionRepository;
@@ -88,13 +91,17 @@ public class HieroAutoConfiguration {
 
   @Bean
   SmartContractClient smartContractClient(
-      final ProtocolLayerClient protocolLayerClient, FileClient fileClient) {
-    return new SmartContractClientImpl(protocolLayerClient, fileClient);
+      final ProtocolLayerClient protocolLayerClient,
+      FileClient fileClient,
+      final HieroContext hieroContext) {
+    return new SmartContractClientImpl(
+        protocolLayerClient, fileClient, hieroContext.getOperatorAccount());
   }
 
   @Bean
-  AccountClient accountClient(final ProtocolLayerClient protocolLayerClient) {
-    return new AccountClientImpl(protocolLayerClient);
+  AccountClient accountClient(
+      final ProtocolLayerClient protocolLayerClient, final HieroContext hieroContext) {
+    return new AccountClientImpl(protocolLayerClient, hieroContext.getOperatorAccount());
   }
 
   @Bean
@@ -125,7 +132,8 @@ public class HieroAutoConfiguration {
       name = "mirrorNodeSupported",
       havingValue = "true",
       matchIfMissing = true)
-  MirrorNodeClient mirrorNodeClient(final HieroContext hieroContext) {
+  MirrorNodeClient mirrorNodeClient(
+      final HieroContext hieroContext, final HieroProperties properties) {
     final String mirrorNodeEndpoint;
     final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
     if (mirrorNetwork.isEmpty()) {
@@ -159,8 +167,11 @@ public class HieroAutoConfiguration {
       throw new IllegalArgumentException(
           "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
     }
-    RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
-    return new MirrorNodeClientImpl(builder);
+    final RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
+    Optional<String> mirrorNodeJavaRest =
+        Optional.ofNullable(properties.getNetwork().getMirrorNodeJavaRest())
+            .filter(s -> !s.isBlank());
+    return new MirrorNodeClientImpl(builder, mirrorNodeJavaRest);
   }
 
   @Bean
@@ -235,7 +246,8 @@ public class HieroAutoConfiguration {
 
   @Bean
   ContractVerificationClient contractVerificationClient(final HieroConfig hieroConfig) {
-    return new ContractVerificationClientImplementation(hieroConfig);
+    final RestClient.Builder builder = RestClient.builder();
+    return new ContractVerificationClientImplementation(hieroConfig, builder);
   }
 
   @Bean
@@ -246,5 +258,15 @@ public class HieroAutoConfiguration {
       matchIfMissing = true)
   BlockRepository blockRepository(final MirrorNodeClient mirrorNodeClient) {
     return new BlockRepositoryImpl(mirrorNodeClient);
+  }
+
+  @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.hiero",
+      name = "mirrorNodeSupported",
+      havingValue = "true",
+      matchIfMissing = true)
+  ScheduleRepository scheduleRepository(final MirrorNodeClient mirrorNodeClient) {
+    return new ScheduleRepositoryImpl(mirrorNodeClient);
   }
 }

@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TopicId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Balance;
@@ -14,8 +15,11 @@ import org.hiero.base.data.BalanceModification;
 import org.hiero.base.data.Block;
 import org.hiero.base.data.Nft;
 import org.hiero.base.data.NftMetadata;
+import org.hiero.base.data.NftTransactionHistory;
+import org.hiero.base.data.Node;
 import org.hiero.base.data.Page;
 import org.hiero.base.data.Result;
+import org.hiero.base.data.Schedule;
 import org.hiero.base.data.Token;
 import org.hiero.base.data.TopicMessage;
 import org.hiero.base.data.TransactionInfo;
@@ -32,6 +36,8 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
 
   private final RestClient restClient;
 
+  private final RestClient networkRestClient;
+
   private final MirrorNodeRestClientImpl mirrorNodeRestClient;
 
   private final MirrorNodeJsonConverter<JsonNode> jsonConverter;
@@ -42,11 +48,32 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
    * @param restClientBuilder the builder for the REST client that must have the base URL set
    */
   public MirrorNodeClientImpl(final RestClient.Builder restClientBuilder) {
+    this(restClientBuilder, Optional.empty());
+  }
+
+  /**
+   * Constructor with optional REST-Java base URL for {@code /api/v1/network/*} (mirror-node
+   * 0.15x+).
+   *
+   * @param restClientBuilder builder with Node REST base URL (e.g. port 38081)
+   * @param mirrorNodeJavaRestBaseUrl optional base URL for REST-Java (e.g. {@code
+   *     http://localhost:8084})
+   */
+  public MirrorNodeClientImpl(
+      final RestClient.Builder restClientBuilder,
+      final Optional<String> mirrorNodeJavaRestBaseUrl) {
     Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null");
-    mirrorNodeRestClient = new MirrorNodeRestClientImpl(restClientBuilder);
+    Objects.requireNonNull(mirrorNodeJavaRestBaseUrl, "mirrorNodeJavaRestBaseUrl must not be null");
+    mirrorNodeRestClient =
+        new MirrorNodeRestClientImpl(restClientBuilder, mirrorNodeJavaRestBaseUrl);
     jsonConverter = new MirrorNodeJsonConverterImpl();
     objectMapper = new ObjectMapper();
     restClient = restClientBuilder.build();
+    networkRestClient =
+        mirrorNodeJavaRestBaseUrl
+            .filter(s -> !s.isBlank())
+            .map(base -> restClientBuilder.clone().baseUrl(base).build())
+            .orElse(restClient);
   }
 
   @Override
@@ -83,6 +110,20 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
   public Page<Nft> queryNftsByTokenId(@NonNull TokenId tokenId) {
     final String path = "/api/v1/tokens/" + tokenId + "/nfts";
     final Function<JsonNode, List<Nft>> dataExtractionFunction = node -> jsonConverter.toNfts(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<NftTransactionHistory> queryNftTransactionHistory(
+      @NonNull TokenId tokenId, long serialNumber) throws HieroException {
+    Objects.requireNonNull(tokenId, "tokenId must not be null");
+    if (serialNumber <= 0) {
+      throw new IllegalArgumentException("serialNumber must be positive");
+    }
+    final String path = "/api/v1/tokens/" + tokenId + "/nfts/" + serialNumber + "/transactions";
+    final Function<JsonNode, List<NftTransactionHistory>> dataExtractionFunction =
+        node -> jsonConverter.toNftTransactionHistories(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
   }
@@ -189,6 +230,48 @@ public class MirrorNodeClientImpl extends AbstractMirrorNodeClient<JsonNode> {
     final String path = "/api/v1/blocks";
     final Function<JsonNode, List<Block>> dataExtractionFunction =
         node -> jsonConverter.toBlocks(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<Node> queryNetworkNodes() throws HieroException {
+    final String path = "/api/v1/network/nodes";
+    final Function<JsonNode, List<Node>> dataExtractionFunction =
+        node -> jsonConverter.toNodes(node);
+    return new RestBasedPage<>(
+        objectMapper, networkRestClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Optional<Node> queryNetworkNodeById(long nodeId) throws HieroException {
+
+    final String path = "/api/v1/network/nodes?node.id=" + nodeId;
+
+    final Function<JsonNode, List<Node>> dataExtractionFunction =
+        node -> jsonConverter.toNodes(node);
+
+    return new RestBasedPage<>(
+            objectMapper, networkRestClient.mutate().clone(), path, dataExtractionFunction)
+        .getData().stream().findFirst();
+  }
+
+  @Override
+  public @NonNull Page<Schedule> querySchedules() throws HieroException {
+    final String path = "/api/v1/schedules";
+    final Function<JsonNode, List<Schedule>> dataExtractionFunction =
+        node -> jsonConverter.toSchedules(node);
+    return new RestBasedPage<>(
+        objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
+  }
+
+  @Override
+  public @NonNull Page<Schedule> querySchedulesByAccount(@NonNull final AccountId accountId)
+      throws HieroException {
+    Objects.requireNonNull(accountId, "accountId must not be null");
+    final String path = "/api/v1/schedules?account.id=eq:" + accountId;
+    final Function<JsonNode, List<Schedule>> dataExtractionFunction =
+        node -> jsonConverter.toSchedules(node);
     return new RestBasedPage<>(
         objectMapper, restClient.mutate().clone(), path, dataExtractionFunction);
   }

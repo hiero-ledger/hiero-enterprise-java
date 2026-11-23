@@ -6,8 +6,10 @@ import static org.mockito.Mockito.*;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.NftId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
@@ -17,8 +19,16 @@ import org.hiero.base.protocol.data.AccountBalanceRequest;
 import org.hiero.base.protocol.data.AccountBalanceResponse;
 import org.hiero.base.protocol.data.AccountCreateRequest;
 import org.hiero.base.protocol.data.AccountCreateResult;
+import org.hiero.base.protocol.data.AccountInfoRequest;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.hiero.base.protocol.data.AccountUpdateRequest;
 import org.hiero.base.protocol.data.AccountUpdateResult;
+import org.hiero.base.protocol.data.HbarAllowanceApproveRequest;
+import org.hiero.base.protocol.data.HbarAllowanceApproveResult;
+import org.hiero.base.protocol.data.HbarTransferRequest;
+import org.hiero.base.protocol.data.HbarTransferResult;
+import org.hiero.base.protocol.data.NftAllowanceDeleteRequest;
+import org.hiero.base.protocol.data.NftAllowanceDeleteResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,12 +37,14 @@ import org.mockito.ArgumentMatchers;
 public class AccountClientImplTest {
 
   private ProtocolLayerClient mockProtocolLayerClient;
+  private Account operatorAccount;
   private AccountClientImpl accountClientImpl;
 
   @BeforeEach
   public void setUp() {
     mockProtocolLayerClient = mock(ProtocolLayerClient.class);
-    accountClientImpl = new AccountClientImpl(mockProtocolLayerClient);
+    operatorAccount = Account.of(AccountId.fromString("0.0.1"), PrivateKey.generateECDSA());
+    accountClientImpl = new AccountClientImpl(mockProtocolLayerClient, operatorAccount);
   }
 
   @Test
@@ -51,6 +63,76 @@ public class AccountClientImplTest {
     Hbar balance = accountClientImpl.getAccountBalance(accountId);
 
     assertEquals(expectedBalance, balance);
+  }
+
+  @Test
+  public void testGetAccountInfoSuccessful() throws HieroException {
+    AccountId accountId = AccountId.fromString("0.0.12345");
+    AccountInfoResponse mockResponse = mock(AccountInfoResponse.class);
+    when(mockResponse.accountId()).thenReturn(accountId);
+    when(mockResponse.balance()).thenReturn(Hbar.from(10));
+    when(mockResponse.accountMemo()).thenReturn("memo");
+    when(mockResponse.deleted()).thenReturn(false);
+
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenReturn(mockResponse);
+
+    AccountInfoResponse info = accountClientImpl.getAccountInfo(accountId);
+
+    assertEquals(accountId, info.accountId());
+    assertEquals(Hbar.from(10), info.balance());
+    assertEquals("memo", info.accountMemo());
+    assertFalse(info.deleted());
+    verify(mockProtocolLayerClient, times(1))
+        .executeAccountInfoQuery(any(AccountInfoRequest.class));
+  }
+
+  @Test
+  public void testGetAccountInfoByStringSuccessful() throws HieroException {
+    AccountInfoResponse mockResponse = mock(AccountInfoResponse.class);
+    when(mockResponse.accountId()).thenReturn(AccountId.fromString("0.0.12345"));
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenReturn(mockResponse);
+
+    AccountInfoResponse info = accountClientImpl.getAccountInfo("0.0.12345");
+
+    assertEquals(AccountId.fromString("0.0.12345"), info.accountId());
+    ArgumentCaptor<AccountInfoRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountInfoRequest.class);
+    verify(mockProtocolLayerClient).executeAccountInfoQuery(requestCaptor.capture());
+    assertEquals(AccountId.fromString("0.0.12345"), requestCaptor.getValue().accountId());
+  }
+
+  @Test
+  public void testGetOperatorAccountInfoSuccessful() throws HieroException {
+    AccountInfoResponse mockResponse = mock(AccountInfoResponse.class);
+    when(mockResponse.accountId()).thenReturn(operatorAccount.accountId());
+    when(mockProtocolLayerClient.getOperatorAccountId()).thenReturn(operatorAccount.accountId());
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenReturn(mockResponse);
+
+    AccountInfoResponse info = accountClientImpl.getOperatorAccountInfo();
+
+    assertEquals(operatorAccount.accountId(), info.accountId());
+    ArgumentCaptor<AccountInfoRequest> requestCaptor =
+        ArgumentCaptor.forClass(AccountInfoRequest.class);
+    verify(mockProtocolLayerClient).executeAccountInfoQuery(requestCaptor.capture());
+    assertEquals(operatorAccount.accountId(), requestCaptor.getValue().accountId());
+  }
+
+  @Test
+  public void testGetAccountInfoNullThrowsException() {
+    assertThrows(
+        NullPointerException.class, () -> accountClientImpl.getAccountInfo((AccountId) null));
+  }
+
+  @Test
+  public void testGetAccountInfoInvalidAccountThrowsException() throws HieroException {
+    AccountId invalidAccountId = AccountId.fromString("0.0.9999999");
+    when(mockProtocolLayerClient.executeAccountInfoQuery(any(AccountInfoRequest.class)))
+        .thenThrow(new HieroException("Invalid account"));
+
+    assertThrows(HieroException.class, () -> accountClientImpl.getAccountInfo(invalidAccountId));
   }
 
   @Test
@@ -236,5 +318,144 @@ public class AccountClientImplTest {
     assertEquals(memo, request.memo());
     assertEquals(account.accountId(), updatedAccount.accountId());
     assertEquals(updatedPrivateKey, updatedAccount.privateKey());
+  }
+
+  @Test
+  void testTransferHbarFromOperatorSuccessful() throws HieroException {
+    AccountId toAccountId = AccountId.fromString("0.0.12345");
+    Hbar amount = Hbar.from(1);
+    ArgumentCaptor<HbarTransferRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarTransferRequest.class);
+    when(mockProtocolLayerClient.executeHbarTransferTransaction(any(HbarTransferRequest.class)))
+        .thenReturn(
+            new HbarTransferResult(
+                TransactionId.generate(operatorAccount.accountId()), Status.SUCCESS));
+
+    accountClientImpl.transferHbar(toAccountId, amount);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarTransferTransaction(requestCaptor.capture());
+    HbarTransferRequest request = requestCaptor.getValue();
+    assertEquals(operatorAccount.accountId(), request.sender());
+    assertEquals(toAccountId, request.receiver());
+    assertEquals(amount, request.amount());
+    assertEquals(operatorAccount.privateKey(), request.senderKey());
+  }
+
+  @Test
+  void testTransferHbarBetweenAccountsSuccessful() throws HieroException {
+    Account fromAccount = Account.of(AccountId.fromString("0.0.22222"), PrivateKey.generateECDSA());
+    AccountId toAccountId = AccountId.fromString("0.0.12345");
+    Hbar amount = Hbar.from(2);
+    ArgumentCaptor<HbarTransferRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarTransferRequest.class);
+    when(mockProtocolLayerClient.executeHbarTransferTransaction(any(HbarTransferRequest.class)))
+        .thenReturn(
+            new HbarTransferResult(
+                TransactionId.generate(fromAccount.accountId()), Status.SUCCESS));
+
+    accountClientImpl.transferHbar(fromAccount, toAccountId, amount);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarTransferTransaction(requestCaptor.capture());
+    HbarTransferRequest request = requestCaptor.getValue();
+    assertEquals(fromAccount.accountId(), request.sender());
+    assertEquals(toAccountId, request.receiver());
+    assertEquals(amount, request.amount());
+    assertEquals(fromAccount.privateKey(), request.senderKey());
+  }
+
+  @Test
+  void testTransferHbarInvalidAmountThrowsException() {
+    AccountId toAccountId = AccountId.fromString("0.0.12345");
+
+    HieroException exception =
+        assertThrows(
+            HieroException.class, () -> accountClientImpl.transferHbar(toAccountId, Hbar.ZERO));
+    assertTrue(exception.getMessage().contains("Invalid transfer amount"));
+  }
+
+  @Test
+  void testApproveHbarAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    AccountId spenderId = AccountId.fromString("0.0.22222");
+    Hbar amount = Hbar.from(1);
+    ArgumentCaptor<HbarAllowanceApproveRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarAllowanceApproveRequest.class);
+    when(mockProtocolLayerClient.executeHbarAllowanceApproveTransaction(
+            any(HbarAllowanceApproveRequest.class)))
+        .thenReturn(
+            new HbarAllowanceApproveResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.approveHbarAllowance(owner, spenderId, amount);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
+    HbarAllowanceApproveRequest request = requestCaptor.getValue();
+    assertEquals(owner.accountId(), request.owner());
+    assertEquals(spenderId, request.spender());
+    assertEquals(amount, request.amount());
+    assertEquals(owner.privateKey(), request.ownerKey());
+  }
+
+  @Test
+  void testRevokeHbarAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    AccountId spenderId = AccountId.fromString("0.0.22222");
+    ArgumentCaptor<HbarAllowanceApproveRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarAllowanceApproveRequest.class);
+    when(mockProtocolLayerClient.executeHbarAllowanceApproveTransaction(
+            any(HbarAllowanceApproveRequest.class)))
+        .thenReturn(
+            new HbarAllowanceApproveResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.revokeHbarAllowance(owner, spenderId);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
+    assertEquals(Hbar.ZERO, requestCaptor.getValue().amount());
+  }
+
+  @Test
+  void testDeleteHbarAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    AccountId spenderId = AccountId.fromString("0.0.22222");
+    ArgumentCaptor<HbarAllowanceApproveRequest> requestCaptor =
+        ArgumentCaptor.forClass(HbarAllowanceApproveRequest.class);
+    when(mockProtocolLayerClient.executeHbarAllowanceApproveTransaction(
+            any(HbarAllowanceApproveRequest.class)))
+        .thenReturn(
+            new HbarAllowanceApproveResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.deleteHbarAllowance(owner, spenderId);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeHbarAllowanceApproveTransaction(requestCaptor.capture());
+    assertEquals(Hbar.ZERO, requestCaptor.getValue().amount());
+  }
+
+  @Test
+  void testDeleteNftAllowanceSuccessful() throws HieroException {
+    Account owner = Account.of(AccountId.fromString("0.0.11111"), PrivateKey.generateECDSA());
+    NftId nftId = new NftId(TokenId.fromString("0.0.33333"), 1L);
+    ArgumentCaptor<NftAllowanceDeleteRequest> requestCaptor =
+        ArgumentCaptor.forClass(NftAllowanceDeleteRequest.class);
+    when(mockProtocolLayerClient.executeNftAllowanceDeleteTransaction(
+            any(NftAllowanceDeleteRequest.class)))
+        .thenReturn(
+            new NftAllowanceDeleteResult(
+                TransactionId.generate(owner.accountId()), Status.SUCCESS));
+
+    accountClientImpl.deleteNftAllowance(owner, nftId);
+
+    verify(mockProtocolLayerClient, times(1))
+        .executeNftAllowanceDeleteTransaction(requestCaptor.capture());
+    NftAllowanceDeleteRequest request = requestCaptor.getValue();
+    assertEquals(owner.accountId(), request.owner());
+    assertEquals(nftId, request.nftId());
+    assertEquals(owner.privateKey(), request.ownerKey());
   }
 }

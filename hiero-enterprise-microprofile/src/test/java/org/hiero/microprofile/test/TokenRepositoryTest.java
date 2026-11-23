@@ -21,6 +21,7 @@ import org.hiero.base.data.Token;
 import org.hiero.base.data.TokenInfo;
 import org.hiero.base.mirrornode.TokenRepository;
 import org.hiero.microprofile.ClientProvider;
+import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,8 @@ public class TokenRepositoryTest {
   @Inject private TokenRepository tokenRepository;
 
   @Inject private AccountClient accountClient;
+
+  @Inject private HieroTestUtils hieroTestUtils;
 
   @Test
   void testNullParam() {
@@ -73,8 +76,7 @@ public class TokenRepositoryTest {
 
     final TokenId tokenId = tokenClient.createToken(name, symbol);
     tokenClient.associateToken(tokenId, newOwner, privateKey);
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     // when
     final Page<Token> tokens = tokenRepository.findByAccount(newOwner);
@@ -93,8 +95,7 @@ public class TokenRepositoryTest {
     final AccountId newOwner = account.accountId();
 
     final TokenId tokenId = tokenClient.createToken(name, symbol);
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     // when
     final Page<Token> tokens = tokenRepository.findByAccount(newOwner);
@@ -111,8 +112,7 @@ public class TokenRepositoryTest {
     final String symbol = "TSY";
     final TokenId fungiTokenId = tokenClient.createToken(name, symbol);
     final TokenId nftTokenId = nftClient.createNftType(name, symbol);
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     // when
     final Optional<TokenInfo> fungiToken = tokenRepository.findById(fungiTokenId);
@@ -146,8 +146,7 @@ public class TokenRepositoryTest {
     final String name = "TOKEN";
     final String symbol = "TSY";
     final TokenId tokenId = tokenClient.createToken(name, symbol);
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     // when
     final Page<Balance> balances = tokenRepository.getBalances(tokenId);
@@ -178,8 +177,7 @@ public class TokenRepositoryTest {
 
     final TokenId tokenId = tokenClient.createToken(name, symbol);
     tokenClient.associateToken(tokenId, newOwner, newPrivateKey);
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     // when
     final Page<Balance> balances = tokenRepository.getBalancesForAccount(tokenId, newOwner);
@@ -198,8 +196,7 @@ public class TokenRepositoryTest {
     final AccountId newOwner = account.accountId();
 
     final TokenId tokenId = tokenClient.createToken(name, symbol);
-    // TODO: fix sleep
-    Thread.sleep(10_000);
+    hieroTestUtils.waitForMirrorNodeRecords();
 
     // when
     final Page<Balance> balances = tokenRepository.getBalancesForAccount(tokenId, newOwner);

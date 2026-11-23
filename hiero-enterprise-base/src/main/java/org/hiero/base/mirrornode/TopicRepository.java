@@ -57,7 +57,6 @@ public interface TopicRepository {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return getMessages(TopicId.fromString(topicId));
   }
-  ;
 
   /**
    * Return TopicMessage for given topicId.
@@ -84,5 +83,4 @@ public interface TopicRepository {
     Objects.requireNonNull(topicId, "topicId must not be null");
     return getMessageBySequenceNumber(TopicId.fromString(topicId), sequenceNumber);
   }
-  ;
 }

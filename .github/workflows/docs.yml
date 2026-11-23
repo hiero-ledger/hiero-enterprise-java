@@ -1,23 +1,21 @@
 name: Docs
-
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
-      - "mkdocs.yml"
+      - "zensical.toml"
       - ".github/workflows/docs.yml"
   pull_request:
     branches: [main]
     paths:
       - "docs/**"
-      - "mkdocs.yml"
+      - "zensical.toml"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: "pages-${{ github.ref }}"
@@ -27,79 +25,132 @@ jobs:
   deploy-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v6
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
 
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.x"
 
-      - name: Set cache date
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Install Zensical
+        run: pip install --require-hashes -r docs/requirements.txt
 
-      - uses: actions/cache@v5
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-
-      - name: Install MkDocs and Material
-        run: pip install mkdocs-material "pymdown-extensions"
-
-      - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
-
-  # PR preview: build and deploy to .../pr/<number>/
-  deploy-preview:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Configure Git Credentials
+      - name: Set site_url for GitHub Pages
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
         run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.x"
-
-      - name: Set cache date
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-
-      - uses: actions/cache@v5
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-
-      - name: Install MkDocs and Material
-        run: pip install mkdocs-material "pymdown-extensions"
-
+          python3 <<'PY'
+          import os, re
+          url = os.environ["SITE_URL"].rstrip("/") + "/"
+          path = "zensical.toml"
+          text = open(path, encoding="utf-8").read()
+          # Normalize line endings to avoid insertion bugs
+          text = text.replace("\r\n", "\n")
+          if re.search(r"^site_url\s*=", text, re.M):
+            text = re.sub(r"^site_url\s*=.*$", "site_url = " + repr(url), text, count=1, flags=re.M)
+          else:
+            text = text.replace("[project]\n", "[project]\nsite_url = " + repr(url) + "\n", 1)
+          open(path, "w", encoding="utf-8").write(text)
+          PY
       - name: Build site
-        run: mkdocs build --strict
+        run: zensical build --clean -f zensical.toml
 
-      - name: Deploy PR preview to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Deploy to gh-pages (production)
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
-          destination_dir: "pr/${{ github.event.pull_request.number }}"
+          enable_jekyll: false
+          keep_files: true
+
+  # Fork Repository PRs: read-only token, so just verify the docs build (no deploy, no comment)
+  build-check:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.x"
+
+      - name: Install Zensical
+        run: pip install --require-hashes -r docs/requirements.txt
+
+      - name: Build site
+        run: zensical build --clean -f zensical.toml
+
+
+  # Repository PRs preview: build and deploy to .../pr/<number>/
+  deploy-preview:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.x"
+
+      - name: Install Zensical
+        run: pip install --require-hashes -r docs/requirements.txt
+
+      - name: Set site_url for PR preview
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr/${{ github.event.pull_request.number }}/
+        run: |
+          python3 <<'PY'
+          import os, re
+          url = os.environ["SITE_URL"].rstrip("/") + "/"
+          path = "zensical.toml"
+          text = open(path, encoding="utf-8").read()
+          text = text.replace("\r\n", "\n")
+          if re.search(r"^site_url\s*=", text, re.M):
+            text = re.sub(r"^site_url\s*=.*$", "site_url = " + repr(url), text, count=1, flags=re.M)
+          else:
+            text = text.replace("[project]\n", "[project]\nsite_url = " + repr(url) + "\n", 1)
+          open(path, "w", encoding="utf-8").write(text)
+          PY
+
+      - name: Build site
+        run: zensical build --clean -f zensical.toml
+
+      - name: Deploy PR preview to gh-pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: pr/${{ github.event.pull_request.number }}
+          enable_jekyll: false
           keep_files: true
 
       - name: Comment PR with preview URL
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
-            const url = `https://hiero-ledger.github.io/hiero-enterprise-java/pr/${{ github.event.pull_request.number }}/`;
+            const url = `https://${context.repo.owner}.github.io/${context.repo.repo}/pr/${context.issue.number}/`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

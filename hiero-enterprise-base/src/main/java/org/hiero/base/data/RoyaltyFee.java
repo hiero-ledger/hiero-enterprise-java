@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.TokenId;
 import org.jspecify.annotations.Nullable;
 
+/* Represent RoyaltyFee used in CustomFee for TokenInfo */
 public record RoyaltyFee(
     long numeratorAmount,
     long denominatorAmount,

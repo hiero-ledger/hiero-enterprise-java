@@ -36,6 +36,7 @@ public class ProtocolLayerClientTests {
     // then
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeAccountBalanceQuery(null));
+    Assertions.assertThrows(NullPointerException.class, () -> client.executeAccountInfoQuery(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeFileContentsQuery(null));
     Assertions.assertThrows(
@@ -64,6 +65,12 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTokenAssociateTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenDeleteTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenUpdateTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenUpdateNftsTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTokenDissociateTransaction(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTopicCreateTransaction(null));
@@ -74,9 +81,37 @@ public class ProtocolLayerClientTests {
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeBurnTokenTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeWipeTokenTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeMintTokenTransaction(null));
     Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenFreezeTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenUnfreezeTransaction(null));
+    Assertions.assertThrows(
         NullPointerException.class, () -> client.executeTransferTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeNftApprovedTransferTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenAirdropTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenCancelAirdropTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenRejectTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenGrantKycTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenRevokeKycTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeTokenFeeScheduleUpdateTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeHbarTransferTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeHbarAllowanceApproveTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeNftAllowanceApproveTransaction(null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> client.executeNftAllowanceDeleteTransaction(null));
     Assertions.assertThrows(
         NullPointerException.class, () -> client.executeHookStoreTransaction(null));
   }

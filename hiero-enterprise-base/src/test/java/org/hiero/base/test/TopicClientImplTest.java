@@ -3,8 +3,11 @@ package org.hiero.base.test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
+import java.time.Duration;
+import java.time.Instant;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
 import org.hiero.base.implementation.TopicClientImpl;
@@ -606,5 +609,174 @@ public class TopicClientImplTest {
     Assertions.assertThrows(
         NullPointerException.class,
         () -> topicClient.submitMessage((TopicId) null, null, (String) null));
+  }
+
+  @Test
+  void shouldCreateImmutableTopicWithoutAdminKey() throws HieroException {
+    final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    when(protocolLayerClient.executeTopicCreateTransaction(any(TopicCreateRequest.class)))
+        .thenReturn(topicCreateResult);
+    when(topicCreateResult.topicId()).thenReturn(topicId);
+
+    final TopicId result = topicClient.createImmutableTopic("Immutable topic");
+
+    verify(protocolLayerClient).executeTopicCreateTransaction(topicCreateCaptor.capture());
+    verify(operationalAccount, never()).privateKey();
+    final TopicCreateRequest request = topicCreateCaptor.getValue();
+    Assertions.assertNull(request.adminKey());
+    Assertions.assertNull(request.submitKey());
+    Assertions.assertEquals("Immutable topic", request.memo());
+    Assertions.assertEquals(topicId, result);
+  }
+
+  @Test
+  void shouldCreateTopicWithAutoRenewSettings() throws HieroException {
+    final TopicCreateResult topicCreateResult = Mockito.mock(TopicCreateResult.class);
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final PrivateKey submitKey = PrivateKey.generateECDSA();
+    final Account autoRenewAccount =
+        Account.of(AccountId.fromString("0.0.1234"), PrivateKey.generateECDSA());
+    final Duration autoRenewPeriod = Duration.ofDays(60);
+    when(protocolLayerClient.executeTopicCreateTransaction(any(TopicCreateRequest.class)))
+        .thenReturn(topicCreateResult);
+    when(topicCreateResult.topicId()).thenReturn(topicId);
+
+    final TopicId result =
+        topicClient.createTopic(adminKey, submitKey, "memo", autoRenewAccount, autoRenewPeriod);
+
+    verify(protocolLayerClient).executeTopicCreateTransaction(topicCreateCaptor.capture());
+    final TopicCreateRequest request = topicCreateCaptor.getValue();
+    Assertions.assertEquals(adminKey, request.adminKey());
+    Assertions.assertEquals(submitKey, request.submitKey());
+    Assertions.assertEquals("memo", request.memo());
+    Assertions.assertEquals(autoRenewAccount.accountId(), request.autoRenewAccountId());
+    Assertions.assertEquals(autoRenewAccount.privateKey(), request.autoRenewAccountKey());
+    Assertions.assertEquals(autoRenewPeriod, request.autoRenewPeriod());
+    Assertions.assertEquals(topicId, result);
+  }
+
+  @Test
+  void shouldUpdateAutoRenewAccountWithOperatorAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Account autoRenewAccount =
+        Account.of(AccountId.fromString("0.0.1234"), PrivateKey.generateECDSA());
+    when(operationalAccount.privateKey()).thenReturn(adminKey);
+
+    topicClient.updateAutoRenewAccount(topicId, autoRenewAccount);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertEquals(topicId, request.topicId());
+    Assertions.assertEquals(adminKey, request.adminKey());
+    Assertions.assertEquals(autoRenewAccount.accountId(), request.autoRenewAccountId());
+    Assertions.assertEquals(autoRenewAccount.privateKey(), request.autoRenewAccountKey());
+    Assertions.assertFalse(request.clearAutoRenewAccountId());
+  }
+
+  @Test
+  void shouldClearAutoRenewAccount() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = TopicId.fromString("1.2.3");
+
+    topicClient.clearAutoRenewAccount(topicId, adminKey);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertEquals(adminKey, request.adminKey());
+    Assertions.assertTrue(request.clearAutoRenewAccountId());
+    Assertions.assertNull(request.autoRenewAccountId());
+  }
+
+  @Test
+  void shouldUpdateAutoRenewPeriod() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Duration autoRenewPeriod = Duration.ofDays(45);
+
+    topicClient.updateAutoRenewPeriod(topicId, adminKey, autoRenewPeriod);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertEquals(adminKey, request.adminKey());
+    Assertions.assertEquals(autoRenewPeriod, request.autoRenewPeriod());
+  }
+
+  @Test
+  void shouldUpdateExpirationTimeWithoutAdminKey() throws HieroException {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final Instant expirationTime = Instant.now().plus(Duration.ofDays(91));
+
+    topicClient.updateExpirationTime(topicId, expirationTime);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    verify(operationalAccount, never()).privateKey();
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertNull(request.adminKey());
+    Assertions.assertEquals(expirationTime, request.expirationTime());
+  }
+
+  @Test
+  void shouldClearAdminKeyWithOperatorAdminKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    when(operationalAccount.privateKey()).thenReturn(adminKey);
+
+    topicClient.clearAdminKey(topicId);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertEquals(adminKey, request.adminKey());
+    Assertions.assertTrue(request.clearAdminKey());
+    Assertions.assertTrue(request.clearAutoRenewAccountId());
+    Assertions.assertNull(request.updatedAdminKey());
+  }
+
+  @Test
+  void shouldClearSubmitKey() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = TopicId.fromString("1.2.3");
+
+    topicClient.clearSubmitKey(topicId, adminKey);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertTrue(request.clearSubmitKey());
+    Assertions.assertNull(request.submitKey());
+  }
+
+  @Test
+  void shouldClearTopicMemo() throws HieroException {
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    final TopicId topicId = TopicId.fromString("1.2.3");
+
+    topicClient.clearTopicMemo(topicId, adminKey);
+
+    verify(protocolLayerClient).executeTopicUpdateTransaction(topicUpdateCaptor.capture());
+    final TopicUpdateRequest request = topicUpdateCaptor.getValue();
+    Assertions.assertTrue(request.clearMemo());
+    Assertions.assertNull(request.memo());
+  }
+
+  @Test
+  void shouldThrowExceptionForNullParamOnNewUpdateMethods() {
+    final TopicId topicId = TopicId.fromString("1.2.3");
+    final PrivateKey adminKey = PrivateKey.generateECDSA();
+    Assertions.assertThrows(
+        NullPointerException.class, () -> topicClient.updateExpirationTime(topicId, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> topicClient.updateAutoRenewPeriod(topicId, adminKey, null));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> topicClient.updateAutoRenewAccount(topicId, adminKey, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> topicClient.clearAdminKey(null, adminKey));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> topicClient.clearSubmitKey(topicId, null));
+    Assertions.assertThrows(
+        NullPointerException.class, () -> topicClient.createImmutableTopic(null));
   }
 }

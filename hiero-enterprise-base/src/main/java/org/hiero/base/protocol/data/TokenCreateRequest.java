@@ -18,7 +18,13 @@ public record TokenCreateRequest(
     @NonNull AccountId treasuryAccountId,
     @NonNull PrivateKey treasuryKey,
     @NonNull TokenType tokenType,
-    @Nullable PrivateKey supplyKey)
+    @Nullable PrivateKey supplyKey,
+    @Nullable PrivateKey adminKey,
+    @Nullable PrivateKey metadataKey,
+    @Nullable PrivateKey wipeKey,
+    @Nullable PrivateKey freezeKey,
+    @Nullable PrivateKey kycKey,
+    @Nullable PrivateKey feeScheduleKey)
     implements TransactionRequest {
 
   static final int MAX_SYMBOL_LENGTH = 100;
@@ -78,6 +84,12 @@ public record TokenCreateRequest(
         treasuryAccountId,
         treasuryKey,
         tokenType,
+        null,
+        treasuryKey,
+        null,
+        null,
+        null,
+        null,
         null);
   }
 
@@ -96,6 +108,175 @@ public record TokenCreateRequest(
         treasuryAccountId,
         treasuryKey,
         tokenType,
-        supplyKey);
+        supplyKey,
+        treasuryKey,
+        null,
+        null,
+        null,
+        null,
+        null);
+  }
+
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @NonNull final PrivateKey metadataKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        null,
+        null,
+        null,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, and wipe keys.
+   *
+   * @param wipeKey the wipe key; required to wipe tokens from non-treasury accounts
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @NonNull final PrivateKey wipeKey) {
+    Objects.requireNonNull(wipeKey, "Wipe key cannot be null");
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        null,
+        null,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, wipe, and freeze keys.
+   *
+   * @param wipeKey the wipe key; optional unless wiping from non-treasury accounts
+   * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey wipeKey,
+      @Nullable final PrivateKey freezeKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        freezeKey,
+        null,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, wipe, freeze, and KYC keys.
+   *
+   * @param wipeKey the wipe key; optional unless wiping from non-treasury accounts
+   * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
+   * @param kycKey the KYC key; required to grant or revoke KYC for the token
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey wipeKey,
+      @Nullable final PrivateKey freezeKey,
+      @Nullable final PrivateKey kycKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        freezeKey,
+        kycKey,
+        null);
+  }
+
+  /**
+   * Creates a token create request with supply, optional metadata, wipe, freeze, KYC, and fee
+   * schedule keys.
+   *
+   * @param wipeKey the wipe key; optional unless wiping from non-treasury accounts
+   * @param freezeKey the freeze key; required to freeze or unfreeze accounts for the token
+   * @param kycKey the KYC key; required to grant or revoke KYC for the token
+   * @param feeScheduleKey the fee schedule key; required to update the token's custom fees
+   */
+  public static TokenCreateRequest of(
+      @NonNull final String name,
+      @NonNull final String symbol,
+      @NonNull final AccountId treasuryAccountId,
+      @NonNull final PrivateKey treasuryKey,
+      @NonNull final TokenType tokenType,
+      @NonNull final PrivateKey supplyKey,
+      @Nullable final PrivateKey metadataKey,
+      @Nullable final PrivateKey wipeKey,
+      @Nullable final PrivateKey freezeKey,
+      @Nullable final PrivateKey kycKey,
+      @Nullable final PrivateKey feeScheduleKey) {
+    return new TokenCreateRequest(
+        Hbar.from(100),
+        TransactionRequest.DEFAULT_TRANSACTION_VALID_DURATION,
+        name,
+        symbol,
+        treasuryAccountId,
+        treasuryKey,
+        tokenType,
+        supplyKey,
+        treasuryKey,
+        metadataKey,
+        wipeKey,
+        freezeKey,
+        kycKey,
+        feeScheduleKey);
   }
 }

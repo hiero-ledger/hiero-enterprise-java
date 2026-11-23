@@ -15,16 +15,24 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
       - name: Checkout Repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           java-version: '25'
           distribution: 'temurin'
@@ -35,26 +43,26 @@ jobs:
 
       - name: Prepare Hiero Solo
         id: solo
-        uses: hiero-ledger/hiero-solo-action@692b186bd2e4c8d46b9deb1c067dc6ddcf0abcd7 # v0.18.0
+        uses: hiero-ledger/hiero-solo-action@dd84e95ece32d42071c945214571099ffbed9cf2 # v0.27.0
         with:
           installMirrorNode: true
-          hieroVersion: v0.66.0
-          mirrorNodeVersion: v0.138.0
-          mirrorNodePortRest: 5551
-          mirrorNodePortGrpc: 5600
-          mirrorNodePortWeb3Rest: 8545
-          soloVersion: 0.46.1
 
       - name: Wait for Mirror Node
         run: |
-          echo "Waiting for Mirror Node REST API to be ready on http://localhost:5551..."
-          until curl --output /dev/null --silent --head --fail http://localhost:5551/api/v1/network/supply; do
-            echo "Mirror Node not ready, waiting..."
-            kubectl get svc -n solo
-            curl --silent http://localhost:5551/api/v1/network/supply || echo "No response from /api/v1/network/supply"
+          echo "Waiting for Mirror Node REST (Node.js) on http://localhost:38081..."
+          until curl --output /dev/null --silent --fail http://localhost:38081/health/readiness; do
+            echo "Mirror Node (rest) not ready, waiting..."
+            kubectl get svc -n solo || true
+            curl --silent http://localhost:38081/health/readiness || echo "No response from mirrorNode REST readiness"
             sleep 5
           done
-          echo "Mirror Node REST API is ready!"
+          echo "Waiting for Mirror Node REST-Java on http://localhost:8084..."
+          until curl --output /dev/null --silent --fail http://localhost:8084/actuator/health/readiness; do
+            echo "Mirror Node (rest-java) not ready, waiting..."
+            curl --silent http://localhost:8084/actuator/health/readiness || echo "No response from REST-Java readiness"
+            sleep 5
+          done
+          echo "Mirror Node APIs are ready!"
 
       - name: Build with Maven
         env:

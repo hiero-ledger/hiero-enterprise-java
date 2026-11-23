@@ -48,9 +48,12 @@ public class TestConfigSource implements ConfigSource {
         .filter(e -> !e.getKey().equals("hiero.network.name"))
         .forEach(e -> properties.put(e.getKey(), e.getValue()));
 
-    properties.forEach(
-        (k, v) ->
-            log.info("CONFIG: '" + k + "'->'" + ("hiero.privateKey".equals(k) ? "***" : v) + "'"));
+    if ("hiero-solo-action".equals(properties.get("hiero.network.name"))) {
+      properties.putIfAbsent("hiero.network.mirror-node-java-rest", "http://localhost:8084");
+    }
+
+    properties.forEach((k, v) ->
+        log.info("CONFIG: '" + k + "'->'" + ("hiero.privateKey".equals(k) ? "***" : v) + "'"));
   }
 
   @Override

@@ -1,11 +1,6 @@
 package org.hiero.base.data;
 
 import com.hedera.hashgraph.sdk.AccountId;
-import java.util.Objects;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-public record StakingRewardTransfer(@NonNull AccountId account, long amount) {
-  public StakingRewardTransfer {
-    Objects.requireNonNull(account, "account cannot be null");
-  }
-}
+public record StakingRewardTransfer(@Nullable AccountId account, long amount) {}
