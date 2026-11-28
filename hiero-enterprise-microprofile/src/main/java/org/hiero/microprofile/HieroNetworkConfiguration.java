@@ -32,8 +32,11 @@ public class HieroNetworkConfiguration {
   @ConfigProperty(name = "mirror-node-java-rest")
   private Optional<String> mirrorNodeJavaRest;
 
-  @ConfigProperty(name = "mirrornode-grpc-address")
-  private Optional<String> mirrorNodeGrpcAddress;
+  /**
+   * Optional base URL for the Mirror Node REST API (e.g. {@code http://localhost:38081} for Solo).
+   */
+  @ConfigProperty(name = "mirror-node-rest-url")
+  private Optional<String> mirrorNodeRestUrl;
 
   private Optional<Long> requestTimeoutInMs;
 
@@ -50,11 +53,11 @@ public class HieroNetworkConfiguration {
   }
 
   public Optional<String> getMirrorNodeJavaRest() {
-    return mirrorNodeJavaRest != null ? mirrorNodeJavaRest : Optional.empty();
+    return mirrorNodeJavaRest;
   }
 
-  public Optional<String> getMirrorNodeGrpcAddress() {
-    return mirrorNodeGrpcAddress != null ? mirrorNodeGrpcAddress : Optional.empty();
+  public Optional<String> getMirrorNodeRestUrl() {
+    return mirrorNodeRestUrl;
   }
 
   public Set<ConsensusNode> getNodes() {

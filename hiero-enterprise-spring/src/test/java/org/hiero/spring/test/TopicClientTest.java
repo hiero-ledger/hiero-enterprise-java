@@ -7,14 +7,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.Duration;
-import java.time.Instant;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
+import org.hiero.base.data.Account;
 import org.hiero.base.data.Subscription;
 import org.hiero.test.HieroTestUtils;
-import org.hiero.base.data.Account;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -292,7 +290,7 @@ public class TopicClientTest {
     final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
-            (message) -> {
+            message -> {
               messages.add(new String(message.contents));
             });
 
@@ -325,7 +323,7 @@ public class TopicClientTest {
     final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
-            (message) -> {
+            message -> {
               messages.add(new String(message.contents));
             },
             limit);
@@ -357,7 +355,7 @@ public class TopicClientTest {
     final IllegalArgumentException e =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, (message) -> {}, limit));
+            () -> topicClient.subscribeTopic(topicId, message -> {}, limit));
 
     Assertions.assertEquals(msg, e.getMessage());
   }
@@ -371,7 +369,7 @@ public class TopicClientTest {
     final Instant end = Instant.now().plus(Duration.ofDays(2));
     final Subscription handler =
         Assertions.assertDoesNotThrow(
-            () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end, -1));
+            () -> topicClient.subscribeTopic(topicId, message -> {}, start, end, -1));
 
     Assertions.assertNotNull(handler);
     handler.unsubscribe();

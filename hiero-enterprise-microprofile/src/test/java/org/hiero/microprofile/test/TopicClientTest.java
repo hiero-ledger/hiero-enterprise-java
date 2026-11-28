@@ -2,7 +2,6 @@ package org.hiero.microprofile.test;
 
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.Configuration;
@@ -17,8 +16,8 @@ import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.hiero.base.AccountClient;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
-import org.hiero.base.data.Subscription;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.Subscription;
 import org.hiero.microprofile.ClientProvider;
 import org.hiero.test.HieroTestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -154,7 +153,6 @@ public class TopicClientTest {
     Assertions.assertDoesNotThrow(
         () -> topicClient.submitMessage(topicId, updatedSubmitKey, message));
   }
-
 
   @Test
   void testUpdateSubmitKeyForPublicTopic() throws HieroException {
@@ -298,7 +296,6 @@ public class TopicClientTest {
     Assertions.assertDoesNotThrow(() -> topicClient.clearTopicMemo(topicId));
   }
 
-
   void testSubscribeTopic() throws Exception {
     final String msg1 = "Hello Hiero First";
     final String msg2 = "Hello Hiero Second";
@@ -310,7 +307,7 @@ public class TopicClientTest {
     final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
-            (message) -> {
+            message -> {
               messages.add(new String(message.contents));
             });
 
@@ -329,9 +326,9 @@ public class TopicClientTest {
     Assertions.assertEquals(msg1, messages.get(0));
     Assertions.assertEquals(msg2, messages.get(1));
     handler.unsubscribe();
-    }
+  }
 
-    @Test
+  @Test
   void testSubscribeTopicWithLimit() throws Exception {
     final String msg = "Hello Hiero";
     final long limit = 1;
@@ -343,7 +340,7 @@ public class TopicClientTest {
     final Subscription handler =
         topicClient.subscribeTopic(
             topicId,
-            (message) -> {
+            message -> {
               messages.add(new String(message.contents));
             },
             limit);
@@ -362,36 +359,36 @@ public class TopicClientTest {
     Assertions.assertEquals(limit, messages.size());
     Assertions.assertEquals(msg, messages.getFirst());
     handler.unsubscribe();
-    }
+  }
 
-    @Test
+  @Test
   void testSubscribeTopicWithInvalidLimit() throws HieroException {
     final String msg = "limit must be -1 (infinite) or greater than 0";
     final long limit = -2;
 
-      final TopicId topicId = topicClient.createTopic();
+    final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
     final IllegalArgumentException e =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> topicClient.subscribeTopic(topicId, (message) -> {}, limit));
+            () -> topicClient.subscribeTopic(topicId, message -> {}, limit));
 
     Assertions.assertEquals(msg, e.getMessage());
-    }
+  }
 
-    @Test
+  @Test
   void testSubscribeTopicWithStartAndEndTime() throws HieroException {
-      final TopicId topicId = topicClient.createTopic();
+    final TopicId topicId = topicClient.createTopic();
     hieroTestUtils.waitForMirrorNodeRecords();
 
     final Instant start = Instant.now().plus(Duration.ofMinutes(10));
     final Instant end = Instant.now().plus(Duration.ofDays(2));
     final Subscription handler =
         Assertions.assertDoesNotThrow(
-            () -> topicClient.subscribeTopic(topicId, (message) -> {}, start, end, -1));
+            () -> topicClient.subscribeTopic(topicId, message -> {}, start, end, -1));
 
     Assertions.assertNotNull(handler);
     handler.unsubscribe();
-    }
+  }
 }

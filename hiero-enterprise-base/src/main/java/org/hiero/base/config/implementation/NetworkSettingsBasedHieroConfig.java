@@ -42,8 +42,8 @@ public class NetworkSettingsBasedHieroConfig implements HieroConfig {
   }
 
   @Override
-  public @NonNull Optional<String> getMirrorNodeGrpcAddress() {
-    return networkSetting.getMirrorNodeGrpcAddress();
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return networkSetting.getMirrorNodeRestUrl();
   }
 
   @Override

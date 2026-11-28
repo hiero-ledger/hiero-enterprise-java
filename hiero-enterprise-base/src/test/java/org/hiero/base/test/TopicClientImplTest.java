@@ -7,9 +7,9 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessage;
 import java.time.Duration;
 import java.time.Instant;
-import com.hedera.hashgraph.sdk.TopicMessage;
 import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.data.Account;
@@ -795,7 +795,7 @@ public class TopicClientImplTest {
 
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
-    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Consumer<TopicMessage> subscription = message -> {};
 
     when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
         .thenReturn(topicMessageResult);
@@ -825,7 +825,7 @@ public class TopicClientImplTest {
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
     final int limit = 2;
-    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Consumer<TopicMessage> subscription = message -> {};
 
     when(protocolLayerClient.executeTopicMessageQuery(any(TopicMessageRequest.class)))
         .thenReturn(topicMessageResult);
@@ -854,7 +854,7 @@ public class TopicClientImplTest {
 
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
-    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Consumer<TopicMessage> subscription = message -> {};
     final Instant startTime = Instant.now().plusSeconds(120);
     final Instant endTime = Instant.now().plusSeconds(1800);
     final int limit = 1;
@@ -884,7 +884,7 @@ public class TopicClientImplTest {
   void shouldThrowExceptionOnSubscribeTopicWithInvalidStartAndEndTime() {
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
-    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Consumer<TopicMessage> subscription = message -> {};
 
     final Instant startTime = Instant.now().plusSeconds(120);
     final Instant endTime = startTime.minusSeconds(60);
@@ -905,7 +905,7 @@ public class TopicClientImplTest {
 
     // given
     final TopicId topicId = TopicId.fromString("1.2.3");
-    final Consumer<TopicMessage> subscription = (message) -> {};
+    final Consumer<TopicMessage> subscription = message -> {};
     final Instant startTime = Instant.now().plusSeconds(120);
     final Instant endTime = startTime.plusSeconds(120);
     final int limit = -2;

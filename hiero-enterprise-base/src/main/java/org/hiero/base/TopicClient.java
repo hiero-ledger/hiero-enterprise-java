@@ -2,13 +2,13 @@ package org.hiero.base;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessage;
 import java.time.Duration;
 import java.time.Instant;
-import com.hedera.hashgraph.sdk.TopicMessage;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.hiero.base.data.Subscription;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.Subscription;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
