@@ -2,12 +2,15 @@ package org.hiero.base.implementation;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessage;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
 import org.hiero.base.data.Account;
+import org.hiero.base.data.Subscription;
 import org.hiero.base.protocol.ProtocolLayerClient;
 import org.hiero.base.protocol.data.*;
 import org.jspecify.annotations.NonNull;
@@ -367,5 +370,31 @@ public class TopicClientImpl implements TopicClient {
     Objects.requireNonNull(message, "message must not be null");
     TopicSubmitMessageRequest request = TopicSubmitMessageRequest.of(topicId, submitKey, message);
     client.executeTopicMessageSubmitTransaction(request);
+  }
+
+  @Override
+  public Subscription subscribeTopic(
+      @NonNull TopicId topicId,
+      @NonNull Consumer<TopicMessage> handler,
+      @Nullable Instant startTime,
+      @Nullable Instant endTime,
+      long limit)
+      throws HieroException {
+    Objects.requireNonNull(topicId, "topicId must not be null");
+    Objects.requireNonNull(handler, "handler must not be null");
+
+    if (limit != -1 && limit <= 0) {
+      throw new IllegalArgumentException("limit must be -1 (infinite) or greater than 0");
+    }
+
+    if (startTime != null && endTime != null && endTime.isBefore(startTime)) {
+      throw new IllegalArgumentException("endTime cannot be before startTime");
+    }
+
+    final TopicMessageRequest request =
+        TopicMessageRequest.of(topicId, handler, startTime, endTime, limit);
+    final TopicMessageResult result = client.executeTopicMessageQuery(request);
+
+    return new TopicSubscription(result.subscriptionHandle());
   }
 }

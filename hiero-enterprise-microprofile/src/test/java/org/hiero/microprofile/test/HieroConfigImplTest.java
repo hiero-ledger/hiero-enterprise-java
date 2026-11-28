@@ -90,6 +90,11 @@ class HieroConfigImplTest {
           }
 
           @Override
+          public Optional<String> getMirrorNodeRestUrl() {
+            return Optional.empty();
+          }
+
+          @Override
           public Optional<String> getMirrorNodeJavaRest() {
             return Optional.empty();
           }

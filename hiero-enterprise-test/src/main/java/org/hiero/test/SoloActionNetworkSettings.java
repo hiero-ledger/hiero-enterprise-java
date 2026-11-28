@@ -20,7 +20,12 @@ public class SoloActionNetworkSettings implements NetworkSettings {
 
   @Override
   public @NonNull Set<String> getMirrorNodeAddresses() {
-    return Set.of("http://localhost:38081");
+    return Set.of("localhost:5600");
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.of("http://localhost:38081");
   }
 
   @Override
