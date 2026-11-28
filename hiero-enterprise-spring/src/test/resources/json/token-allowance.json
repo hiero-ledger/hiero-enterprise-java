@@ -1,0 +1,51 @@
+{
+  "allowances": [
+    {
+      "amount": 1,
+      "amount_granted": 500,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7129629",
+      "timestamp": {
+        "from": "1761399104.166279271",
+        "to": null
+      },
+      "token_id": "0.0.7129630"
+    },
+    {
+      "amount": 1,
+      "amount_granted": 500,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7137056",
+      "timestamp": {
+        "from": "1761490804.263434887",
+        "to": null
+      },
+      "token_id": "0.0.7137057"
+    },
+    {
+      "amount": 1,
+      "amount_granted": 500,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7137823",
+      "timestamp": {
+        "from": "1761494786.926996350",
+        "to": null
+      },
+      "token_id": "0.0.7137824"
+    },
+    {
+      "amount": 1,
+      "amount_granted": 500,
+      "owner": "0.0.6105114",
+      "spender": "0.0.7425154",
+      "timestamp": {
+        "from": "1765451259.405324000",
+        "to": null
+      },
+      "token_id": "0.0.7425155"
+    }
+  ],
+  "links": {
+    "next": null
+  }
+}
