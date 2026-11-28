@@ -1,8 +1,5 @@
 package org.hiero.spring.implementation;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import org.hiero.base.AccountClient;
 import org.hiero.base.FileClient;
@@ -133,41 +130,13 @@ public class HieroAutoConfiguration {
       havingValue = "true",
       matchIfMissing = true)
   MirrorNodeClient mirrorNodeClient(
-      final HieroContext hieroContext, final HieroProperties properties) {
-    final String mirrorNodeEndpoint;
-    final List<String> mirrorNetwork = hieroContext.getClient().getMirrorNetwork();
-    if (mirrorNetwork.isEmpty()) {
-      throw new IllegalArgumentException("Mirror node endpoint must be set");
-    }
-    mirrorNodeEndpoint = mirrorNetwork.get(0);
-    final String baseUri;
-    try {
-      URL url = new URI(mirrorNodeEndpoint).toURL();
-      final String mirrorNodeEndpointProtocol = url.getProtocol();
-      final String mirrorNodeEndpointHost = url.getHost();
-      final int mirrorNodeEndpointPort;
-      if (url.getPort() == -1) {
-        if ("http".equalsIgnoreCase(mirrorNodeEndpointProtocol)) {
-          mirrorNodeEndpointPort = 80;
-        } else if ("https".equalsIgnoreCase(mirrorNodeEndpointProtocol)) {
-          mirrorNodeEndpointPort = 443;
-        } else {
-          throw new IllegalArgumentException("Unsupported protocol: " + mirrorNodeEndpointProtocol);
-        }
-      } else {
-        mirrorNodeEndpointPort = url.getPort();
-      }
-      baseUri =
-          mirrorNodeEndpointProtocol
-              + "://"
-              + mirrorNodeEndpointHost
-              + ":"
-              + mirrorNodeEndpointPort;
-    } catch (Exception e) {
-      throw new IllegalArgumentException(
-          "Error parsing mirrorNodeEndpoint '" + mirrorNodeEndpoint + "'", e);
-    }
-    final RestClient.Builder builder = RestClient.builder().baseUrl(baseUri);
+      final HieroConfig hieroConfig, final HieroProperties properties) {
+    final String mirrorNodeEndpoint =
+        hieroConfig
+            .getMirrorNodeRestUrl()
+            .orElseThrow(() -> new IllegalArgumentException("Mirror node endpoint must be set"));
+
+    RestClient.Builder builder = RestClient.builder().baseUrl(mirrorNodeEndpoint);
     Optional<String> mirrorNodeJavaRest =
         Optional.ofNullable(properties.getNetwork().getMirrorNodeJavaRest())
             .filter(s -> !s.isBlank());

@@ -23,6 +23,8 @@ public class HieroConfigImpl implements HieroConfig {
 
   private final Set<String> mirrorNodeAddresses;
 
+  private final String mirrorNodeRestUrl;
+
   private final Set<ConsensusNode> consensusNodes;
 
   private final Long chainId;
@@ -52,11 +54,13 @@ public class HieroConfigImpl implements HieroConfig {
       final NetworkSettings settings = networkSettings.get();
       networkName = settings.getNetworkName().orElse(properties.getNetwork().getName());
       mirrorNodeAddresses = Collections.unmodifiableSet(settings.getMirrorNodeAddresses());
+      mirrorNodeRestUrl = settings.getMirrorNodeRestUrl().orElse(null);
       consensusNodes = Collections.unmodifiableSet(settings.getConsensusNodes());
       chainId = settings.chainId().orElse(null);
       relayUrl = settings.relayUrl().orElse(null);
     } else {
       networkName = properties.getNetwork().getName();
+      mirrorNodeRestUrl = properties.getNetwork().getMirrorNodeRestUrl();
       final String mirrorNodeAddress = properties.getNetwork().getMirrorNode();
       if (mirrorNodeAddress != null && !mirrorNodeAddress.isBlank()) {
         mirrorNodeAddresses = Set.of(mirrorNodeAddress);
@@ -108,6 +112,11 @@ public class HieroConfigImpl implements HieroConfig {
   @Override
   public Set<String> getMirrorNodeAddresses() {
     return mirrorNodeAddresses;
+  }
+
+  @Override
+  public @NonNull Optional<String> getMirrorNodeRestUrl() {
+    return Optional.ofNullable(mirrorNodeRestUrl);
   }
 
   @Override
