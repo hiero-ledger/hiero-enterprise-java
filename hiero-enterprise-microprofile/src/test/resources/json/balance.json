@@ -1,0 +1,152 @@
+{
+  "timestamp": "1788979935.501811104",
+  "balances": [
+    {
+      "account": "0.0.10852697",
+      "balance": 0,
+      "tokens": [
+        {
+          "token_id": "0.0.4431990",
+          "balance": 0
+        },
+        {
+          "token_id": "0.0.1320271",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "account": "0.0.10852696",
+      "balance": 1000000,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852695",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852694",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852693",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852692",
+      "balance": 1000000,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852691",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852690",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852689",
+      "balance": 0,
+      "tokens": [
+        {
+          "token_id": "0.0.5108941",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "account": "0.0.10852688",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852687",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852686",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852685",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852684",
+      "balance": 0,
+      "tokens": [
+        {
+          "token_id": "0.0.6814827",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "account": "0.0.10852683",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852682",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852681",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852680",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852679",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852678",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852677",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852676",
+      "balance": 1000000,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852675",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852674",
+      "balance": 0,
+      "tokens": []
+    },
+    {
+      "account": "0.0.10852673",
+      "balance": 0,
+      "tokens": []
+    }
+  ],
+  "links": {
+    "next": "/api/v1/balances?account.id=lt:0.0.10852673"
+  }
+}
